@@ -357,9 +357,10 @@ export default function ProjectDetail() {
             <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
               <div className="rounded-[24px] overflow-hidden bg-black aspect-video relative">
                 <iframe
-                  src={`https://player.vimeo.com/video/${project.vimeoWireframe}?autoplay=1&loop=1&muted=1&background=1&autopause=0`}
+                  src={`https://player.vimeo.com/video/${project.vimeoWireframe}?autoplay=1&loop=1&muted=1&controls=0&autopause=0&title=0&byline=0&portrait=0`}
                   className="w-full h-full border-0 pointer-events-none scale-[1.01]"
                   allow="autoplay; fullscreen; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
                   title="Semantix Wireframe"
                 />
               </div>
@@ -371,9 +372,10 @@ export default function ProjectDetail() {
               <div className="rounded-[24px] overflow-hidden bg-black aspect-square relative">
                 {project.vimeoCores && (
                   <iframe
-                    src={`https://player.vimeo.com/video/${project.vimeoCores}?autoplay=1&loop=1&muted=1&background=1&autopause=0`}
+                    src={`https://player.vimeo.com/video/${project.vimeoCores}?autoplay=1&loop=1&muted=1&controls=0&autopause=0&title=0&byline=0&portrait=0`}
                     className="w-full h-full border-0 pointer-events-none scale-[1.01]"
                     allow="autoplay; fullscreen; picture-in-picture"
+                    referrerPolicy="strict-origin-when-cross-origin"
                     title="Semantix Cores"
                   />
                 )}
@@ -394,9 +396,10 @@ export default function ProjectDetail() {
             <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
               <div className="rounded-[24px] overflow-hidden bg-black aspect-video relative">
                 <iframe
-                  src={`https://player.vimeo.com/video/${project.vimeoTelas}?autoplay=1&loop=1&muted=1&background=1&autopause=0`}
+                  src={`https://player.vimeo.com/video/${project.vimeoTelas}?autoplay=1&loop=1&muted=1&controls=0&autopause=0&title=0&byline=0&portrait=0`}
                   className="w-full h-full border-0 pointer-events-none scale-[1.01]"
                   allow="autoplay; fullscreen; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
                   title="Semantix Telas"
                 />
               </div>
@@ -614,9 +617,10 @@ export default function ProjectDetail() {
             <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
               <div className="rounded-[24px] overflow-hidden bg-black aspect-video relative">
                 <iframe
-                  src={`https://player.vimeo.com/video/${project.vimeoPalavras}?autoplay=1&loop=1&muted=1&background=1&autopause=0`}
+                  src={`https://player.vimeo.com/video/${project.vimeoPalavras}?autoplay=1&loop=1&muted=1&controls=0&autopause=0&title=0&byline=0&portrait=0`}
                   className="w-full h-full border-0 pointer-events-none scale-[1.01]"
                   allow="autoplay; fullscreen; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
                   title="Semantix Palavras"
                 />
               </div>
@@ -635,9 +639,10 @@ export default function ProjectDetail() {
             <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-20">
               <div className="rounded-[24px] overflow-hidden bg-black aspect-video relative">
                 <iframe
-                  src={`https://player.vimeo.com/video/${project.vimeoCards}?autoplay=1&loop=1&muted=1&background=1&autopause=0`}
+                  src={`https://player.vimeo.com/video/${project.vimeoCards}?autoplay=1&loop=1&muted=1&controls=0&autopause=0&title=0&byline=0&portrait=0`}
                   className="w-full h-full border-0 pointer-events-none scale-[1.01]"
                   allow="autoplay; fullscreen; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
                   title="Semantix Cards"
                 />
               </div>
