@@ -8,15 +8,15 @@ export const projects = [
     typeTag: "LAST LAB",
     subtitle: "Identidade visual e posicionamento de marca desenvolvidos para o Studio VZO.",
     coverImage: "/images/studio-vzo.png",
-    hoverImage: "/images/vzo click.avif",
-    bannerImage: "/images/vzo/banner.png",
+    hoverImage: "/images/vzo-click.avif",
+    bannerImage: "/images/vzo/banner-vzo.avif",
     description: "O Studio VZO é um estúdio de arquitetura contemporânea focado em criar espaços autorais, funcionais e com forte senso de identidade. O desafio do projeto foi traduzir essa abordagem em uma marca sólida, sofisticada e minimalista.",
     quote1: "O desafio foi criar uma identidade capaz de transmitir a precisão técnica e a sensibilidade estética que definem a arquitetura do Studio VZO. O resultado é um sistema visual atemporal, estruturado em tipografia marcante, paleta sóbria e grid rigoroso.",
     quote2: "Uma marca minimalista não é sobre a ausência de elementos, mas sobre a presença exata daquilo que importa.",
     topGrid: [
-      "/images/vzo/top-1.png",
-      "/images/vzo/top-2.png",
-      "/images/vzo/top-3.png"
+      "/images/vzo/top-1.avif",
+      "/images/vzo/top-2.avif",
+      "/images/vzo/top-3.avif"
     ],
     expandDetails: {
       paragraphs: [
@@ -32,21 +32,21 @@ export const projects = [
       team: "Thomás Pires",
       partner: "",
       expandImages: [
-        "/images/vzo/brandboard.png",
-        "/images/vzo/cards.png"
+        "/images/vzo/expand-1.avif",
+        "/images/vzo/expand-2.avif"
       ]
     },
-    vzoOutdoor: "/images/vzo/outdoor.png",
+    vzoOutdoor: "/images/vzo/outdoor.avif",
     vzoPairIconsPhone: [
-      "/images/vzo/icons.png",
-      "/images/vzo/phone.png"
+      "/images/vzo/icons.avif",
+      "/images/vzo/phone.avif"
     ],
-    vzoDuo: "/images/vzo/duo-cards.png",
-    vzoTshirt: "/images/vzo/tshirt.png",
-    vzoBento: "/images/vzo/bento.png",
+    vzoDuo: "/images/vzo/duo.avif",
+    vzoTshirt: "/images/vzo/camiseta.avif",
+    vzoBento: "/images/vzo/bento-grid.avif",
     vzoPairBottom: [
-      "/images/vzo/swatches.png",
-      "/images/vzo/sand-art.png"
+      "/images/vzo/gradiente.avif",
+      "/images/vzo/color.avif"
     ]
   },
   {
@@ -58,7 +58,7 @@ export const projects = [
     typeTag: "LAST LAB",
     subtitle: "Plataforma de viagens e experiências autênticas focada em roteiros independentes.",
     coverImage: "/images/pronto-pra-partir.png",
-    hoverImage: "/images/ppp click.avif",
+    hoverImage: "/images/ppp-click.avif",
     bannerImage: "/images/ppp/banner.png",
     description: "O Pronto pra Partir é uma plataforma criada para transformar a forma como as pessoas planejam e vivem suas viagens. O projeto envolveu desde a criação do posicionamento até a identidade visual e experiência digital.",
     quote1: "Viajar não é só chegar ao destino, é sobre a liberdade da jornada. Construímos uma marca dinâmica, vibrante e digital-first que convida as pessoas a explorarem o mundo com autonomia.",
@@ -82,18 +82,18 @@ export const projects = [
       team: "Thomás Pires",
       partner: "",
       expandImages: [
-        "/images/ppp/expand-1.png",
-        "/images/ppp/expand-2.png"
+        "/images/ppp/expand-1.webp",
+        "/images/ppp/expand-2.webp"
       ]
     },
-    pppBeyondBasic: "/images/ppp/beyond-basic.png",
-    pppMockupsTrio: "/images/ppp/mockups-trio.png",
-    pppNyGuide: "/images/ppp/ny-guide.png",
-    pppPosterWall: "/images/ppp/poster-wall.png",
-    pppLaptopChair: "/images/ppp/laptop-chair.png",
+    pppBeyondBasic: "/images/ppp/cores.png",
+    pppMockupsTrio: "/images/ppp/mockup-triplo.png",
+    pppNyGuide: "/images/ppp/ny-guide.avif",
+    pppPosterWall: "/images/ppp/poster-wall.avif",
+    pppLaptopChair: "/images/ppp/laptop-chair.avif",
     pppPairBottom: [
-      "/images/ppp/bag.png",
-      "/images/ppp/sticker-pack.png"
+      "/images/ppp/laptop-sticker.avif",
+      "/images/ppp/hand-books.avif"
     ]
   },
   {
@@ -105,7 +105,7 @@ export const projects = [
     typeTag: "EXPERIÊNCIA PROFISSIONAL",
     subtitle: "Redesign de marca e sistema de design desenvolvido como parte da equipe da Semantix.",
     coverImage: "/images/semantix.png",
-    hoverImage: "/images/semantix click.avif",
+    hoverImage: "/images/semantix-click.avif",
     bannerImage: "/images/semantix-banner.png",
     description: "A Semantix é uma multinacional líder em Big Data e Inteligência Artificial na América Latina. O desafio do projeto foi evoluir a identidade visual para refletir sua maturidade e liderança global no setor de tecnologia.",
     quote1: "Simplificar a complexidade dos dados através de um design limpo, inteligente e escalável. O novo sistema visual da Semantix traduz tecnologia de ponta em uma linguagem humana e acessível.",
@@ -205,7 +205,7 @@ export const projects = [
     typeTag: "EXPERIÊNCIA PROFISSIONAL",
     subtitle: "Projeto de branding e identidade de marca desenvolvido como parte da equipe do Quarteirão Mágico.",
     coverImage: "/images/quarteirao.png",
-    hoverImage: "/images/Quarteirao click.avif",
+    hoverImage: "/images/quarteirao-click.avif",
     bannerImage: "/images/quarteirao/banner.png",
     description: "Criado em 2018, o Quarteirão Mágico nasceu da união de três bares da Vila Madalena em um único circuito de carnaval.",
     quote1: "Criado em 2018, o Quarteirão Mágico nasceu da união de três bares da Vila Madalena em um único circuito de carnaval. O desafio foi transformar essa conexão física em uma marca vibrante, capaz de traduzir a energia coletiva, festiva e espontânea do carnaval de rua.",
@@ -230,7 +230,7 @@ export const projects = [
       partner: "",
       expandImages: [
         "/images/quarteirao/bebidas.webp",
-        "/images/quarteirao/poster vermelho.png"
+        "/images/quarteirao/poster-vermelho.png"
       ]
     },
     quarteiraoPhones: "/images/quarteirao/celular.webp",
@@ -253,7 +253,7 @@ export const projects = [
     typeTag: "LAST LAB",
     subtitle: "Estruturação de identidade de marca e posicionamento visual e verbal",
     coverImage: "/images/una.png",
-    hoverImage: "/images/Una Click.avif",
+    hoverImage: "/images/una-click.avif",
     bannerImage: "/images/una/banner.png",
     description: "O projeto UNA nasceu do desafio de criar uma marca capaz de integrar vida pessoal e profissional de forma intencional. O foco foi construir um território de marca claro, sensível e estratégico, traduzindo equilíbrio, presença e propósito em um sistema coerente de branding.",
     quote1: "O projeto UNA nasceu do desafio de criar uma marca capaz de integrar vida pessoal e profissional de forma intencional. O foco foi construir um território de marca claro, sensível e estratégico, traduzindo equilíbrio, presença e propósito em um sistema coerente de branding.",
@@ -278,8 +278,8 @@ export const projects = [
       team: "Thomás Pires",
       partner: "",
       expandImages: [
-        "/images/una/expand 1.avif",
-        "/images/una/expand 2.avif"
+        "/images/una/expand-1.avif",
+        "/images/una/expand-2.avif"
       ]
     },
     unaMiddle1: "/images/una/circle-seal.png",
@@ -300,7 +300,7 @@ export const projects = [
     typeTag: "EXPERIÊNCIA PROFISSIONAL",
     subtitle: "Projeto de branding desenvolvido como parte da equipe da Conquer Business School.",
     coverImage: "/images/conquer.png",
-    hoverImage: "/images/Conquer Click.png",
+    hoverImage: "/images/conquer-click.png",
     bannerImage: "/images/conquer.png",
     youtubeId: "FWYxbc6Lp44",
     description: "A Conquer é uma escola de negócios que nasceu da insatisfação com o ensino tradicional, o desafio do projeto foi transformar essa insatisfação em ação, romper com status quo e fugir de uma comunicação quadrada.",
@@ -333,8 +333,8 @@ export const projects = [
     doritosImage: "/images/conquer/doritos.png",
     transformarImage: "/images/conquer/transformar.png",
     youXyouGrid: [
-      "/images/conquer/img-GH2MQ.png",
-      "/images/conquer/img-M40Gu.png"
+      "/images/conquer/img-pHPFE.png",
+      "/images/conquer/img-sySrb.png"
     ],
     inComumImage: "/images/conquer/in-comum.png",
     flagImage: "/images/conquer/flag.png",

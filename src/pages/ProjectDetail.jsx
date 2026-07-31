@@ -458,10 +458,10 @@ export default function ProjectDetail() {
           <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/una/expand 1.avif" alt="UNA Notebook Journaling" className="w-full h-full object-cover" />
+                <img src="/images/una/expand-1.avif" alt="UNA Notebook Journaling" className="w-full h-full object-cover" />
               </div>
               <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/una/expand 2.avif" alt="UNA Instagram Profile" className="w-full h-full object-cover" />
+                <img src="/images/una/expand-2.avif" alt="UNA Instagram Profile" className="w-full h-full object-cover" />
               </div>
             </div>
           </section>
