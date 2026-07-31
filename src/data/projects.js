@@ -86,6 +86,7 @@ export const projects = [
         "/images/ppp/expand-2.webp"
       ]
     },
+    vimeoPppVideo: "1214705988",
     pppBeyondBasic: "/images/ppp/cores.png",
     pppMockupsTrio: "/images/ppp/mockup-triplo.png",
     pppNyGuide: "/images/ppp/ny-guide.avif",

@@ -321,10 +321,16 @@ export default function ProjectDetail() {
       {/* PRONTO PRA PARTIR Specific Gallery Sections */}
       {project.slug === "pronto-pra-partir" && (
         <>
-          {project.pppBeyondBasic && (
+          {project.vimeoPppVideo && (
             <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
-                <img src={project.pppBeyondBasic} alt="PPP Sua viagem muito além do básico" className="w-full h-auto object-cover" />
+              <div className="rounded-[24px] overflow-hidden bg-black aspect-video relative shadow-sm border border-zinc-200/60">
+                <iframe
+                  src={`https://player.vimeo.com/video/${project.vimeoPppVideo}?autoplay=1&loop=1&muted=1&controls=0&autopause=0&title=0&byline=0&portrait=0&dnt=1`}
+                  className="w-full h-full border-0 pointer-events-none scale-[1.01]"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  title="Pronto pra Partir Video"
+                />
               </div>
             </section>
           )}
