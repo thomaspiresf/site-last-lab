@@ -32,7 +32,7 @@ export default function Home() {
       <PlantaBaixaAnimation />
 
       {/* Cases Section with Category Filters */}
-      <section className="w-full py-8 sm:py-12">
+      <section id="projetos" className="w-full py-8 sm:py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
           
           {/* Category Filter Tabs Bar */}

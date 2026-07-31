@@ -3,35 +3,53 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Hero() {
-  const slides = [
-    {
-      word: "sites & landing pages.",
-      image: "/images/banner-ppp-home.avif"
-    },
-    {
-      word: "branding.",
-      image: "/images/banner-una-home.avif"
-    },
-    {
-      word: "apresentações.",
-      image: "/images/hero-2.png"
-    },
-    {
-      word: "campanhas on & offline.",
-      image: "/images/banner-conquer-home.avif"
-    }
+  const images = [
+    "/images/banner-vzo-home.png",
+    "/images/banner-ppp-home.avif",
+    "/images/banner-una-home.avif",
+    "/images/banner-conquer-home.avif",
+    "/images/hero-2.png"
   ];
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const words = [
+    "sites & landing pages.",
+    "branding.",
+    "posicionamento.",
+    "apresentações.",
+    "campanhas on & offline."
+  ];
 
+  const [imageIndex, setImageIndex] = useState(0);
+  const [wordIndex, setWordIndex] = useState(0);
+
+  // Troca de imagens a cada 2 segundos (2000ms)
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % slides.length);
-    }, 1400);
-    return () => clearInterval(timer);
-  }, [slides.length]);
+    const imgTimer = setInterval(() => {
+      setImageIndex((prev) => (prev + 1) % images.length);
+    }, 2000);
+    return () => clearInterval(imgTimer);
+  }, [images.length]);
 
-  const currentSlide = slides[currentIndex];
+  // Troca de texto dinâmico a cada 1 segundo (1000ms)
+  useEffect(() => {
+    const textTimer = setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % words.length);
+    }, 1000);
+    return () => clearInterval(textTimer);
+  }, [words.length]);
+
+  const currentImage = images[imageIndex];
+  const currentWord = words[wordIndex];
+
+  const handleScrollToProjects = (e) => {
+    e.preventDefault();
+    const el = document.getElementById("projetos");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = "/#projetos";
+    }
+  };
 
   return (
     <section className="w-full bg-white pt-28 sm:pt-32 pb-2 sm:pb-6 overflow-hidden">
@@ -41,8 +59,8 @@ export default function Hero() {
           
           {/* Instantaneous Hard Image Swap (No Fade Transition) */}
           <img
-            key={currentSlide.image}
-            src={currentSlide.image}
+            key={currentImage}
+            src={currentImage}
             alt="Last Lab Showcase"
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
@@ -62,14 +80,14 @@ export default function Hero() {
                 <span className="inline-flex relative overflow-hidden align-baseline">
                   <AnimatePresence mode="wait">
                     <motion.span
-                      key={currentSlide.word}
+                      key={currentWord}
                       initial={{ y: 10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -10, opacity: 0 }}
                       transition={{ duration: 0.2, ease: "easeOut" }}
                       className="text-black font-bold whitespace-nowrap inline-block"
                     >
-                      {currentSlide.word}
+                      {currentWord}
                     </motion.span>
                   </AnimatePresence>
                 </span>
@@ -77,12 +95,13 @@ export default function Hero() {
             </div>
 
             <div className="pt-2 text-left">
-              <Link
-                to="/sobre"
-                className="inline-block px-5 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-black border-[1.5px] border-black rounded-[14px] bg-transparent hover:bg-black hover:text-white transition-all duration-300 shadow-sm"
+              <a
+                href="#projetos"
+                onClick={handleScrollToProjects}
+                className="inline-block px-5 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-black border-[1.5px] border-black rounded-[14px] bg-transparent hover:bg-black hover:text-white transition-all duration-300 shadow-sm cursor-pointer"
               >
-                Como fazemos?
-              </Link>
+                Ver projetos
+              </a>
             </div>
           </div>
         </div>
