@@ -20,6 +20,14 @@ export default function Hero() {
   const [imageIndex, setImageIndex] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
 
+  // Preload all hero banner images on mount to eliminate initial load flickering
+  useEffect(() => {
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   // Troca de imagens a cada 2 segundos (2000ms)
   useEffect(() => {
     const imgTimer = setInterval(() => {
@@ -36,7 +44,6 @@ export default function Hero() {
     return () => clearInterval(textTimer);
   }, [words.length]);
 
-  const currentImage = images[imageIndex];
   const currentWord = words[wordIndex];
 
   const handleScrollToProjects = (e) => {
@@ -55,13 +62,17 @@ export default function Hero() {
         {/* Main Hero Card Container matching mobile screenshot aspect & vertical spacing */}
         <div className="relative rounded-[28px] sm:rounded-[32px] overflow-hidden min-h-[540px] sm:min-h-[460px] md:min-h-[520px] aspect-auto sm:aspect-[2.1/1] shadow-sm flex items-center w-full max-w-full">
           
-          {/* Instantaneous Hard Image Swap (No Fade Transition) */}
-          <img
-            key={currentImage}
-            src={currentImage}
-            alt="Last Lab Showcase"
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
+          {/* Stacked pre-rendered images for 100% flash-free smooth opacity transitions */}
+          {images.map((src, idx) => (
+            <img
+              key={src}
+              src={src}
+              alt="Last Lab Showcase"
+              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-300 pointer-events-none ${
+                idx === imageIndex ? "opacity-100 z-0" : "opacity-0 z-0"
+              }`}
+            />
+          ))}
 
           {/* Overlaid Content Block (Left Side) */}
           <div className="relative z-10 p-6 sm:p-12 md:p-14 max-w-2xl w-full space-y-5 sm:space-y-6">
