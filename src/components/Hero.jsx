@@ -27,7 +27,7 @@ export default function Hero() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % slides.length);
-    }, 2800);
+    }, 1400);
     return () => clearInterval(timer);
   }, [slides.length]);
 
@@ -57,22 +57,22 @@ export default function Hero() {
 
             <div className="text-sm sm:text-lg font-medium text-zinc-900 leading-snug space-y-1 text-left max-w-full">
               <p>Para sua marca ganhar força,</p>
-              <div className="flex flex-wrap items-center gap-x-1.5 max-w-full">
+              <div className="flex flex-wrap items-baseline gap-x-1.5 max-w-full">
                 <span>consistência e presença em</span>
-                <div className="inline-block relative overflow-hidden h-[24px] sm:h-[30px] min-w-[220px] sm:min-w-[280px] max-w-full">
+                <span className="inline-flex relative overflow-hidden align-baseline">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={currentSlide.word}
-                      initial={{ y: 16, opacity: 0 }}
+                      initial={{ y: 10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -16, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="absolute left-0 top-0 text-black font-bold whitespace-nowrap"
+                      exit={{ y: -10, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="text-black font-bold whitespace-nowrap inline-block"
                     >
                       {currentSlide.word}
                     </motion.span>
                   </AnimatePresence>
-                </div>
+                </span>
               </div>
             </div>
 
