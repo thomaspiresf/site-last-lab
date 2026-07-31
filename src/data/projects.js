@@ -133,11 +133,11 @@ export const projects = [
         "/images/semantix-g5.png"
       ]
     },
-    vimeoWireframe: "1064843932",
-    vimeoCores: "1064843977",
-    vimeoTelas: "1064844005",
-    vimeoPalavras: "1064844026",
-    vimeoCards: "1064844053",
+    vimeoWireframe: "1214260584",
+    vimeoCores: "1214261121",
+    vimeoTelas: "1027680988",
+    vimeoPalavras: "1214261537",
+    vimeoCards: "1214259983",
     semantixRocks: "/images/semantix/rocks-laptop.png"
   },
   {
