@@ -7,15 +7,13 @@ export default function Hero() {
     "/images/banner-vzo-home.png",
     "/images/banner-ppp-home.avif",
     "/images/banner-una-home.avif",
-    "/images/banner-conquer-home.avif",
-    "/images/hero-2.png"
+    "/images/banner-conquer-home.avif"
   ];
 
   const words = [
     "sites & landing pages.",
     "branding.",
     "posicionamento.",
-    "apresentações.",
     "campanhas on & offline."
   ];
 
