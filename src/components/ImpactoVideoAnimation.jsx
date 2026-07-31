@@ -29,7 +29,7 @@ export default function ImpactoVideoAnimation() {
     for (let i = 0; i <= TOTAL_LAPTOP_FRAMES; i++) {
       const img = new Image();
       const numStr = String(i).padStart(5, "0");
-      img.src = `/images/Impacto Conquer/video laptop otmz/laptop impacto conquer_${numStr}.webp`;
+      img.src = `/images/impacto-conquer/video-laptop-otmz/laptop impacto conquer_${numStr}.webp`;
 
       img.onload = () => {
         loadedCount++;
@@ -50,7 +50,7 @@ export default function ImpactoVideoAnimation() {
     for (let i = 0; i <= TOTAL_MOBILE_FRAMES; i++) {
       const img = new Image();
       const numStr = String(i).padStart(5, "0");
-      img.src = `/images/Impacto Conquer/video mobile otmz/video mobile_${numStr}.webp`;
+      img.src = `/images/impacto-conquer/video-mobile-otmz/video mobile_${numStr}.webp`;
 
       img.onload = () => {
         loadedCount++;

@@ -148,17 +148,17 @@ export const projects = [
     categories: ["Branding", "Campanhas"],
     typeTag: "EXPERIÊNCIA PROFISSIONAL",
     subtitle: "Estratégia e campanha digital desenvolvida para a Pós-graduação da Conquer.",
-    coverImage: "/images/Impacto Conquer/Outdoor-Lampadas.webp",
+    coverImage: "/images/impacto-conquer/outdoor-lampadas.webp",
     coverClass: "scale-[1.4] origin-center",
-    hoverImage: "/images/Impacto Conquer/phone-pé-na-porta.webp",
-    bannerImage: "/images/Impacto Conquer/Banner-Impacto-Conquer.webp",
+    hoverImage: "/images/impacto-conquer/phone-pe-na-porta.webp",
+    bannerImage: "/images/impacto-conquer/banner-impacto-conquer.webp",
     description: "A Pós-graduação da Conquer nasceu para formar profissionais capazes de gerar impacto real no mercado. O desafio deste projeto foi transformar essa promessa em uma campanha digital capaz de comunicar resultados sem recorrer ao discurso tradicional das instituições de ensino.",
     quote1: "O desafio foi construir uma campanha capaz de provar que o valor da Pós Conquer não está apenas no conhecimento adquirido, mas no impacto que ele gera na vida e na carreira dos alunos. O resultado foi uma plataforma criativa baseada em estratégia, dados e transformação real.",
     quote2: "Em vez de vender uma pós-graduação como acúmulo de conhecimento, a campanha passou a defender que o verdadeiro valor está na transformação prática que o aprendizado gera na carreira das pessoas.",
     topGrid: [
-      "/images/Impacto Conquer/top-1.webp",
-      "/images/Impacto Conquer/top-2.webp",
-      "/images/Impacto Conquer/top-3.webp"
+      "/images/impacto-conquer/top-1.webp",
+      "/images/impacto-conquer/top-2.webp",
+      "/images/impacto-conquer/top-3.webp"
     ],
     expandDetails: {
       paragraphs: [
@@ -174,26 +174,26 @@ export const projects = [
       team: "Felipe dos Santos, Danilo Zanin, Isabella Ribeiro, José Augusto Silva, Sarah Azevedo, Leticia Graton e Thomás Pires",
       partner: "",
       expandImages: [
-        "/images/Impacto Conquer/expand-1.png",
-        "/images/Impacto Conquer/Expand-2.png"
+        "/images/impacto-conquer/expand-1.png",
+        "/images/impacto-conquer/expand-2.png"
       ]
     },
     impactoFlow: [
-      { type: "single", src: "/images/Impacto Conquer/Outdoor-Lampadas.webp", alt: "Outdoor Lâmpadas", aspect: "aspect-[16/9]" },
-      { type: "single", src: "/images/Impacto Conquer/phone-professores.webp", alt: "Phone Professores" },
-      { type: "single", src: "/images/Impacto Conquer/manifesto.webp", alt: "Manifesto Impacto Conquer" },
+      { type: "single", src: "/images/impacto-conquer/outdoor-lampadas.webp", alt: "Outdoor Lâmpadas", aspect: "aspect-[16/9]" },
+      { type: "single", src: "/images/impacto-conquer/phone-professores.webp", alt: "Phone Professores" },
+      { type: "single", src: "/images/impacto-conquer/manifesto.webp", alt: "Manifesto Impacto Conquer" },
       { type: "quote2" },
-      { type: "single", src: "/images/Impacto Conquer/posts-instagram.webp", alt: "Posts Instagram Impacto" },
-      { type: "single", src: "/images/Impacto Conquer/3-posters-impacto.webp", alt: "3 Posters Impacto" },
+      { type: "single", src: "/images/impacto-conquer/posts-instagram.webp", alt: "Posts Instagram Impacto" },
+      { type: "single", src: "/images/impacto-conquer/3-posters-impacto.webp", alt: "3 Posters Impacto" },
       {
         type: "grid2",
         items: [
-          { src: "/images/Impacto Conquer/phone-pé-na-porta.webp", alt: "Phone Pé na Porta" },
-          { src: "/images/Impacto Conquer/bus-point.webp", alt: "Bus Point Impacto" }
+          { src: "/images/impacto-conquer/phone-pe-na-porta.webp", alt: "Phone Pé na Porta" },
+          { src: "/images/impacto-conquer/bus-point.webp", alt: "Bus Point Impacto" }
         ]
       },
-      { type: "single", src: "/images/Impacto Conquer/radar.png", alt: "Radar Impacto" },
-      { type: "single", src: "/images/Impacto Conquer/impacto-outdoor.webp", alt: "Impacto Outdoor" }
+      { type: "single", src: "/images/impacto-conquer/radar.png", alt: "Radar Impacto" },
+      { type: "single", src: "/images/impacto-conquer/impacto-outdoor.webp", alt: "Impacto Outdoor" }
     ]
   },
   {
