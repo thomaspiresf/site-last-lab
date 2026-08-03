@@ -68,21 +68,21 @@ export default function Hero() {
               key={src}
               src={src}
               alt="Last Lab Showcase"
-              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-300 pointer-events-none ${
+              className={`absolute inset-0 w-full h-full object-cover object-left sm:object-center transform scale-[2] sm:scale-100 origin-left sm:origin-center transition-all duration-300 pointer-events-none ${
                 idx === imageIndex ? "opacity-100 z-0" : "opacity-0 z-0"
               }`}
             />
           ))}
 
           {/* Overlaid Content Block (Left Side) */}
-          <div className="relative z-10 p-6 sm:p-12 md:p-14 max-w-2xl w-full space-y-5 sm:space-y-6">
-            <h1 className="text-[26px] xs:text-[28px] sm:text-5xl lg:text-6xl font-black text-black tracking-tight leading-[1.08] text-left break-words">
+          <div className="relative z-10 p-5 xs:p-6 sm:p-12 md:p-14 max-w-2xl w-full space-y-6 sm:space-y-6 mt-4 sm:mt-0">
+            <h1 className="text-[34px] xs:text-[38px] sm:text-5xl lg:text-6xl font-black text-black tracking-tight leading-[1.05] text-left break-words">
               Design que<br />
               <span className="sm:whitespace-nowrap">organiza, conecta</span><br />
               & comunica.
             </h1>
 
-            <div className="text-sm sm:text-lg font-medium text-zinc-900 leading-snug space-y-1 text-left max-w-full">
+            <div className="text-[17px] sm:text-lg font-medium text-zinc-900 leading-snug space-y-1 text-left max-w-full">
               <p>Para sua marca ganhar força,</p>
               <div className="flex flex-wrap items-baseline gap-x-1.5 max-w-full">
                 <span>consistência e presença em</span>
@@ -103,11 +103,11 @@ export default function Hero() {
               </div>
             </div>
 
-            <div className="pt-2 text-left">
+            <div className="pt-3 sm:pt-2 text-left">
               <a
                 href="#projetos"
                 onClick={handleScrollToProjects}
-                className="inline-block px-5 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold text-black border-[1.5px] border-black rounded-[14px] bg-transparent hover:bg-black hover:text-white transition-all duration-300 shadow-sm cursor-pointer"
+                className="inline-block px-6 py-3 sm:px-6 sm:py-3 text-[15px] sm:text-base font-semibold text-black border-[1.5px] border-black rounded-[14px] bg-transparent hover:bg-black hover:text-white transition-all duration-300 shadow-sm cursor-pointer"
               >
                 Ver projetos
               </a>
