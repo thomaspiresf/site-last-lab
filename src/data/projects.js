@@ -276,12 +276,8 @@ export const projects = [
       client: "Una",
       sector: "Consultoria",
       year: "2025",
-      team: "Thomás Pires",
-      partner: "",
-      expandImages: [
-        "/images/una/expand-1.avif",
-        "/images/una/expand-2.avif"
-      ]
+      team: "Beatriz Lino, Ana Carolina e Thomás Pires",
+      partner: ""
     },
     unaFlow: [
       { type: "vimeo", id: "1215312497" },

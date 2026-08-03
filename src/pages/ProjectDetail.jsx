@@ -569,35 +569,7 @@ export default function ProjectDetail() {
         </>
       )}
 
-      {/* UNA Specific Gallery Sections */}
-      {project.slug === "una" && (
-        <>
-          {project.unaMiddle1 && (
-            <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
-                <img src={project.unaMiddle1} alt="UNA Circle Seal" className="w-full h-auto object-cover" />
-              </div>
-            </section>
-          )}
 
-          <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-            <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
-              <img src="/images/una/top-1.png" alt="UNA Laptop Presentation" className="w-full h-auto object-cover" />
-            </div>
-          </section>
-
-          <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/una/expand-1.avif" alt="UNA Notebook Journaling" className="w-full h-full object-cover" />
-              </div>
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/una/expand-2.avif" alt="UNA Instagram Profile" className="w-full h-full object-cover" />
-              </div>
-            </div>
-          </section>
-        </>
-      )}
 
       {/* CONQUER Specific Gallery Sections */}
       {project.slug === "conquer-business-school" && (
