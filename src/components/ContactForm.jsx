@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle2, Mail, Send, MessageSquare } from "lucide-react";
+import { ArrowRight, CheckCircle2, Mail, Send, MessageSquare, Loader2 } from "lucide-react";
 
 export default function ContactForm() {
   const [step, setStep] = useState(1);
@@ -11,6 +11,7 @@ export default function ContactForm() {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const totalSteps = 4;
 
@@ -27,9 +28,36 @@ export default function ContactForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+
+    try {
+      await fetch("https://formsubmit.co/ajax/thomas.pires.f@gmail.com", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          Nome: formData.name,
+          Email: formData.email,
+          Empresa: formData.company,
+          Mensagem: formData.message,
+          _subject: `Novo Contato do Site - ${formData.name}`,
+          _template: "table",
+          _captcha: "false"
+        })
+      });
+      
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Erro ao enviar formulário:", error);
+      // Fallback para exibir a tela de sucesso de qualquer forma (com os botões de e-mail/WhatsApp manual)
+      setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsAppRedirect = () => {
@@ -173,11 +201,12 @@ export default function ContactForm() {
 
               <button
                 type="submit"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white hover:bg-zinc-800 font-bold rounded-xl transition-all duration-300 shadow-md group"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white hover:bg-zinc-800 font-bold rounded-xl transition-all duration-300 shadow-md group disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                <span>{step === totalSteps ? "Enviar Projeto" : "Continuar"}</span>
+                <span>{step === totalSteps ? (isSubmitting ? "Enviando..." : "Enviar Projeto") : "Continuar"}</span>
                 {step === totalSteps ? (
-                  <Send size={18} />
+                  isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />
                 ) : (
                   <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
                 )}
