@@ -294,7 +294,7 @@ export default function ProjectDetail() {
 
       {/* SITE PRONTO PRA PARTIR Custom Flow */}
       {project.sitePppFlow && (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 space-y-12 mb-16">
+        <div className="w-full mb-16 space-y-12">
           {project.sitePppFlow.map((item, idx) => {
             if (item.type === "animation") {
               return <SitePppVideoAnimation key={idx} />;
@@ -302,7 +302,7 @@ export default function ProjectDetail() {
 
             if (item.type === "grid2") {
               return (
-                <section key={idx} className="w-full">
+                <section key={idx} className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 w-full">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {item.items.map((subItem, subIdx) => (
                       <div
@@ -322,7 +322,7 @@ export default function ProjectDetail() {
             }
 
             return (
-              <section key={idx} className="w-full">
+              <section key={idx} className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 w-full">
                 <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
                   <img
                     src={item.src}

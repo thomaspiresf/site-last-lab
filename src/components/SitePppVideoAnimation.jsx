@@ -35,10 +35,10 @@ export default function SitePppVideoAnimation() {
     imagesRef.current = loadedImages;
   }, []);
 
-  // Scroll tracking on card bounds as it passes through the viewport
+  // Scroll tracking pinned across 200vh height so user is locked on the fold until animation finishes
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 90%", "end 10%"]
+    offset: ["start start", "end end"]
   });
 
   const renderFrameOnCanvas = (canvas, img) => {
@@ -104,19 +104,23 @@ export default function SitePppVideoAnimation() {
   }, [scrollYProgress]);
 
   return (
-    <section ref={containerRef} className="w-full">
-      <div className="rounded-[24px] overflow-hidden bg-zinc-950 aspect-video relative shadow-sm border border-zinc-200/60 flex items-center justify-center">
-        <canvas
-          ref={canvasRef}
-          width={1280}
-          height={720}
-          className="w-full h-full object-cover"
-        />
-        {!imagesLoaded && (
-          <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center text-zinc-400 text-sm font-medium">
-            Carregando animação...
+    <section ref={containerRef} className="relative h-[200vh] w-full">
+      <div className="sticky top-0 h-screen w-full flex items-center justify-center pointer-events-none">
+        <div className="max-w-6xl w-full px-4 sm:px-6 md:px-8 pointer-events-auto">
+          <div className="rounded-[24px] overflow-hidden bg-zinc-950 aspect-video relative shadow-sm border border-zinc-200/60 flex items-center justify-center">
+            <canvas
+              ref={canvasRef}
+              width={1280}
+              height={720}
+              className="w-full h-full object-cover"
+            />
+            {!imagesLoaded && (
+              <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center text-zinc-400 text-sm font-medium">
+                Carregando animação...
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
