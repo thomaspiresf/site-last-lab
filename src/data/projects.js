@@ -353,8 +353,8 @@ export const projects = [
     categories: ["Website", "UI/UX"],
     typeTag: "LAST LAB",
     subtitle: "Plataforma digital completa de vendas, área de membros e sistema administrativo para roteiros de viagem.",
-    coverImage: "/images/site-ppp/banner-site-ppp.png",
-    hoverImage: "/images/ppp-click.avif",
+    coverImage: "/images/site-ppp/imagem-site-ppp-1.png",
+    hoverImage: "/images/site-ppp/meus-roteiros.png",
     bannerImage: "/images/site-ppp/banner-site-ppp.png",
     description: "O Pronto pra Partir nasceu com o objetivo de simplificar o planejamento de viagens por meio de roteiros digitais prontos para uso. O desafio do projeto foi transformar esse conceito em uma plataforma completa de vendas, capaz de oferecer uma experiência fluida desde a descoberta do destino até o acesso ao conteúdo adquirido.",
     quote1: "Desenvolvido de forma end-to-end, o projeto envolveu a criação da experiência digital completa da marca. Foram concebidas páginas de venda individuais para cada destino, uma jornada de compra otimizada, área de membros para acesso aos guias digitais e um sistema administrativo para gerenciamento de produtos, pedidos e conteúdo.",
@@ -395,7 +395,13 @@ export const projects = [
       { type: "single", src: "/images/site-ppp/checkout.png", alt: "Checkout e Área de Membros" },
       { type: "single", src: "/images/site-ppp/mobiles.png", alt: "Telas Mobile" },
       { type: "single", src: "/images/site-ppp/3-telas-desktop.png", alt: "3 Telas Desktop" },
-      { type: "single", src: "/images/site-ppp/4-telas-desktop.png", alt: "4 Telas Desktop" }
+      {
+        type: "grid2",
+        items: [
+          { src: "/images/site-ppp/4-telas-desktop.png", alt: "4 Telas Desktop" },
+          { src: "/images/site-ppp/mobile-icones.png", alt: "Celulares e Ícones" }
+        ]
+      }
     ]
   }
 ];
