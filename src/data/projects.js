@@ -284,6 +284,7 @@ export const projects = [
       ]
     },
     unaFlow: [
+      { type: "vimeo", id: "1215312497" },
       { type: "single", src: "/images/una/circle-seal.png", alt: "UNA Circle Seal" },
       { type: "single", src: "/images/una/img 5.png", alt: "UNA Laptop Mockup" },
       { type: "grid2", items: [

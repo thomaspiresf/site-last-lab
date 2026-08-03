@@ -296,6 +296,22 @@ export default function ProjectDetail() {
       {project.slug === "una" && project.unaFlow && (
         <div className="space-y-6 sm:space-y-12 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-16">
           {project.unaFlow.map((item, idx) => {
+            if (item.type === "vimeo") {
+              return (
+                <section key={idx} className="w-full">
+                  <div className="rounded-[24px] overflow-hidden bg-black aspect-video relative shadow-sm border border-zinc-200/60">
+                    <iframe
+                      src={`https://player.vimeo.com/video/${item.id}?autoplay=1&loop=1&muted=1&controls=0&autopause=0&title=0&byline=0&portrait=0&dnt=1`}
+                      className="w-full h-full border-0 pointer-events-none scale-[1.01]"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      title="UNA Video"
+                    />
+                  </div>
+                </section>
+              );
+            }
+
             if (item.type === "quote2") {
               return (
                 <section key={idx} className="w-full my-4">
