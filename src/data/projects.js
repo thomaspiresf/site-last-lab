@@ -285,17 +285,17 @@ export const projects = [
     },
     unaFlow: [
       { type: "vimeo", id: "1215312497" },
-      { type: "single", src: "/images/una/circle-seal.png", alt: "UNA Circle Seal" },
-      { type: "single", src: "/images/una/img 5.png", alt: "UNA Laptop Mockup" },
+      { type: "single", src: "/images/una/expand-1.avif", alt: "UNA Logo White Background" },
+      { type: "single", src: "/images/una/img-5.png", alt: "UNA Laptop Mockup" },
       { type: "grid2", items: [
           { src: "/images/una/jornaling.png", alt: "UNA Journaling" },
-          { src: "/images/una/logo-black-drawer.png", alt: "UNA Instagram Phone" }
+          { src: "/images/una/expand-2.avif", alt: "UNA Instagram Phone" }
         ]
       },
       { type: "quote2" },
       { type: "single", src: "/images/una/cor.png", alt: "UNA Colors" },
       { type: "single", src: "/images/una/phone.png", alt: "UNA Phone Screens" },
-      { type: "single", src: "/images/una/social.png", alt: "UNA Social Posts" },
+      { type: "single", src: "/images/una/posts-1.png", alt: "UNA Social Posts" },
       { type: "grid2", items: [
           { src: "/images/una/elements.png", alt: "UNA Elements" },
           { src: "/images/una/detalhes.png", alt: "UNA Brandboard Details" }
