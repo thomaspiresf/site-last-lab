@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import ProjectCard from "../components/ProjectCard";
 import ImpactoVideoAnimation from "../components/ImpactoVideoAnimation";
+import SitePppVideoAnimation from "../components/SitePppVideoAnimation";
 import { projects } from "../data/projects";
 
 export default function ProjectDetail() {
@@ -283,6 +284,29 @@ export default function ProjectDetail() {
                     className={`w-full ${
                       item.aspect ? "h-full object-cover object-center" : "h-auto object-cover"
                     }`}
+                  />
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+
+      {/* SITE PRONTO PRA PARTIR Custom Flow */}
+      {project.sitePppFlow && (
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 space-y-12 mb-16">
+          {project.sitePppFlow.map((item, idx) => {
+            if (item.type === "animation") {
+              return <SitePppVideoAnimation key={idx} />;
+            }
+
+            return (
+              <section key={idx} className="w-full">
+                <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
+                  <img
+                    src={item.src}
+                    alt={item.alt || `Site Pronto pra Partir detail ${idx + 1}`}
+                    className="w-full h-auto object-cover"
                   />
                 </div>
               </section>

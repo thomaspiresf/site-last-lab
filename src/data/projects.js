@@ -344,6 +344,54 @@ export const projects = [
       "/images/conquer/stone-triangle.png",
       "/images/conquer/hands-triangle.png"
     ]
+  },
+  {
+    id: "site-pronto-pra-partir",
+    slug: "site-pronto-pra-partir",
+    title: "Site Pronto pra partir",
+    category: "Website",
+    categories: ["Website", "UI/UX"],
+    typeTag: "LAST LAB",
+    subtitle: "Plataforma digital completa de vendas, área de membros e sistema administrativo para roteiros de viagem.",
+    coverImage: "/images/site-ppp/banner-site-ppp.png",
+    hoverImage: "/images/ppp-click.avif",
+    bannerImage: "/images/site-ppp/banner-site-ppp.png",
+    description: "O Pronto pra Partir nasceu com o objetivo de simplificar o planejamento de viagens por meio de roteiros digitais prontos para uso. O desafio do projeto foi transformar esse conceito em uma plataforma completa de vendas, capaz de oferecer uma experiência fluida desde a descoberta do destino até o acesso ao conteúdo adquirido.",
+    quote1: "Desenvolvido de forma end-to-end, o projeto envolveu a criação da experiência digital completa da marca. Foram concebidas páginas de venda individuais para cada destino, uma jornada de compra otimizada, área de membros para acesso aos guias digitais e um sistema administrativo para gerenciamento de produtos, pedidos e conteúdo.",
+    quote2: "O Pronto pra Partir foi concebido como uma plataforma digital completa. Da identidade visual às páginas de venda, checkout, área de membros e sistema administrativo, cada interface foi desenvolvida para tornar a compra e o consumo dos roteiros de viagem simples, rápidos e intuitivos.",
+    topGrid: [
+      "/images/site-ppp/top-1.png",
+      "/images/site-ppp/top-2.png",
+      "/images/site-ppp/top-3.png"
+    ],
+    expandDetails: {
+      paragraphs: [
+        "O Pronto pra Partir nasceu com o objetivo de simplificar o planejamento de viagens por meio de roteiros digitais prontos para uso. O desafio do projeto foi transformar esse conceito em uma plataforma completa de vendas, capaz de oferecer uma experiência fluida desde a descoberta do destino até o acesso ao conteúdo adquirido.",
+        "Desenvolvido de forma end-to-end, o projeto envolveu a criação da experiência digital completa da marca. Foram concebidas páginas de venda individuais para cada destino, uma jornada de compra otimizada, área de membros para acesso aos guias digitais e um sistema administrativo para gerenciamento de produtos, pedidos e conteúdo.",
+        "Cada etapa foi desenhada para equilibrar performance e usabilidade. A arquitetura das páginas prioriza conversão, enquanto a experiência pós-compra garante que o usuário encontre rapidamente seus roteiros, mapas e materiais de apoio, reduzindo atritos durante toda a jornada.",
+        "O resultado é uma plataforma proprietária que une branding, design de interface e experiência do usuário em um único ecossistema digital. Mais do que vender guias de viagem, o projeto cria uma experiência consistente do primeiro acesso ao site até a utilização do produto."
+      ],
+      portfolioLink: "Visualização de portfólio",
+      client: "Pronto pra partir",
+      sector: "Viagem e Turismo",
+      year: "2026",
+      team: "Thomás Pires",
+      partner: "",
+      expandImages: [
+        "/images/site-ppp/expand-1.png",
+        "/images/site-ppp/expand-2.png"
+      ]
+    },
+    sitePppFlow: [
+      { type: "single", src: "/images/site-ppp/paleta-cor.png", alt: "Paleta de Cores" },
+      { type: "animation" },
+      { type: "single", src: "/images/site-ppp/telas-desktop.png", alt: "Telas Desktop" },
+      { type: "single", src: "/images/site-ppp/checkout.png", alt: "Checkout e Área de Membros" },
+      { type: "single", src: "/images/site-ppp/meus-roteiros.png", alt: "Meus Roteiros" },
+      { type: "single", src: "/images/site-ppp/mobiles.png", alt: "Telas Mobile" },
+      { type: "single", src: "/images/site-ppp/3-telas-desktop.png", alt: "3 Telas Desktop" },
+      { type: "single", src: "/images/site-ppp/4-telas-desktop.png", alt: "4 Telas Desktop" }
+    ]
   }
 ];
 

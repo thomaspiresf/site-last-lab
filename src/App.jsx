@@ -31,6 +31,8 @@ export default function App() {
             <Route path="/projetos/:slug" element={<ProjectDetail />} />
             {/* Direct routes for legacy slug URLs */}
             <Route path="/semantix" element={<ProjectDetail />} />
+            <Route path="/site-pronto-pra-partir" element={<ProjectDetail />} />
+            <Route path="/site-ppp" element={<ProjectDetail />} />
             <Route path="/highline" element={<ProjectDetail />} />
             <Route path="/guarana-story" element={<ProjectDetail />} />
             <Route path="*" element={<Home />} />
