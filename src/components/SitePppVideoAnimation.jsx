@@ -35,10 +35,10 @@ export default function SitePppVideoAnimation() {
     imagesRef.current = loadedImages;
   }, []);
 
-  // Scroll tracking on exact card bounds as it passes through the fold
+  // Scroll tracking across 300vh so user is locked on the fold while playing the entire sequence
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 80%", "end 20%"]
+    offset: ["start start", "end end"]
   });
 
   const renderFrameOnCanvas = (canvas, img) => {
@@ -104,19 +104,21 @@ export default function SitePppVideoAnimation() {
   }, [scrollYProgress]);
 
   return (
-    <section ref={containerRef} className="w-full">
-      <div className="rounded-[24px] overflow-hidden bg-zinc-950 aspect-video relative shadow-sm border border-zinc-200/60 flex items-center justify-center">
-        <canvas
-          ref={canvasRef}
-          width={1280}
-          height={720}
-          className="w-full h-full object-cover"
-        />
-        {!imagesLoaded && (
-          <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center text-zinc-400 text-sm font-medium">
-            Carregando animação...
-          </div>
-        )}
+    <section ref={containerRef} className="relative h-[300vh] w-full">
+      <div className="sticky top-0 h-[100vh] w-full flex flex-col items-center justify-center">
+        <div className="w-full rounded-[24px] overflow-hidden bg-zinc-950 aspect-video relative shadow-sm border border-zinc-200/60 flex items-center justify-center">
+          <canvas
+            ref={canvasRef}
+            width={1280}
+            height={720}
+            className="w-full h-full object-cover"
+          />
+          {!imagesLoaded && (
+            <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center text-zinc-400 text-sm font-medium">
+              Carregando animação...
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
