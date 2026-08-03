@@ -292,6 +292,67 @@ export default function ProjectDetail() {
         </div>
       )}
 
+      {/* UNA Specific Sequential Gallery Sections */}
+      {project.slug === "una" && project.unaFlow && (
+        <div className="space-y-6 sm:space-y-12 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-16">
+          {project.unaFlow.map((item, idx) => {
+            if (item.type === "quote2") {
+              return (
+                <section key={idx} className="w-full my-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+                    <div className="hidden lg:block" />
+                    <div className="space-y-4 text-left">
+                      <p className="text-base sm:text-lg font-bold text-zinc-900 leading-snug">
+                        "{project.quote2}"
+                      </p>
+                      <button
+                        onClick={handleExpandAndScroll}
+                        className="text-[#0059ff] hover:underline font-semibold text-base block pt-1 focus:outline-none"
+                      >
+                        Saiba mais sobre o projeto
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              );
+            }
+
+            if (item.type === "grid2") {
+              return (
+                <section key={idx} className="w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {item.items.map((subItem, subIdx) => (
+                      <div
+                        key={subIdx}
+                        className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square"
+                      >
+                        <img
+                          src={subItem.src}
+                          alt={subItem.alt || `Detail ${subIdx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            }
+
+            return (
+              <section key={idx} className="w-full">
+                <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
+                  <img
+                    src={item.src}
+                    alt={item.alt || `Detail ${idx + 1}`}
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+
       {/* SITE PRONTO PRA PARTIR Custom Flow */}
       {project.sitePppFlow && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 space-y-12 mb-16">

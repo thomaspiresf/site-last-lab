@@ -283,6 +283,24 @@ export const projects = [
         "/images/una/expand-2.avif"
       ]
     },
+    unaFlow: [
+      { type: "single", src: "/images/una/circle-seal.png", alt: "UNA Circle Seal" },
+      { type: "single", src: "/images/una/img 5.png", alt: "UNA Laptop Mockup" },
+      { type: "grid2", items: [
+          { src: "/images/una/jornaling.png", alt: "UNA Journaling" },
+          { src: "/images/una/logo-black-drawer.png", alt: "UNA Instagram Phone" }
+        ]
+      },
+      { type: "quote2" },
+      { type: "single", src: "/images/una/cor.png", alt: "UNA Colors" },
+      { type: "single", src: "/images/una/phone.png", alt: "UNA Phone Screens" },
+      { type: "single", src: "/images/una/social.png", alt: "UNA Social Posts" },
+      { type: "grid2", items: [
+          { src: "/images/una/elements.png", alt: "UNA Elements" },
+          { src: "/images/una/detalhes.png", alt: "UNA Brandboard Details" }
+        ]
+      }
+    ],
     unaMiddle1: "/images/una/circle-seal.png",
     unaPalette: "/images/una/palette.png",
     unaPhoneCards: "/images/una/phone-cards.png",
