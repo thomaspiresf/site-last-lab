@@ -7,7 +7,7 @@ export default function Hero() {
     "/images/banner-vzo-home.png",
     "/images/banner-ppp-home.avif",
     "/images/banner-una-home.avif",
-    "/images/banner-conquer-home.avif"
+    "/images/banner-home-impacto-conquer.webp"
   ];
 
   const words = [
