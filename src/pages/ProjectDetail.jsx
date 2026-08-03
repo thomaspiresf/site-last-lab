@@ -300,6 +300,27 @@ export default function ProjectDetail() {
               return <SitePppVideoAnimation key={idx} />;
             }
 
+            if (item.type === "grid2") {
+              return (
+                <section key={idx} className="w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {item.items.map((subItem, subIdx) => (
+                      <div
+                        key={subIdx}
+                        className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square"
+                      >
+                        <img
+                          src={subItem.src}
+                          alt={subItem.alt || `Site Pronto pra Partir detail ${subIdx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            }
+
             return (
               <section key={idx} className="w-full">
                 <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">

@@ -361,8 +361,8 @@ export const projects = [
     quote2: "O Pronto pra Partir foi concebido como uma plataforma digital completa. Da identidade visual às páginas de venda, checkout, área de membros e sistema administrativo, cada interface foi desenvolvida para tornar a compra e o consumo dos roteiros de viagem simples, rápidos e intuitivos.",
     topGrid: [
       "/images/site-ppp/top-1.png",
-      "/images/site-ppp/top-2.png",
-      "/images/site-ppp/top-3.png"
+      "/images/site-ppp/top-3.png",
+      "/images/site-ppp/top-2.png"
     ],
     expandDetails: {
       paragraphs: [
@@ -383,11 +383,16 @@ export const projects = [
       ]
     },
     sitePppFlow: [
-      { type: "single", src: "/images/site-ppp/paleta-cor.png", alt: "Paleta de Cores" },
       { type: "animation" },
+      {
+        type: "grid2",
+        items: [
+          { src: "/images/site-ppp/paleta-cor.png", alt: "Paleta de Cores" },
+          { src: "/images/site-ppp/meus-roteiros.png", alt: "Meus Roteiros" }
+        ]
+      },
       { type: "single", src: "/images/site-ppp/telas-desktop.png", alt: "Telas Desktop" },
       { type: "single", src: "/images/site-ppp/checkout.png", alt: "Checkout e Área de Membros" },
-      { type: "single", src: "/images/site-ppp/meus-roteiros.png", alt: "Meus Roteiros" },
       { type: "single", src: "/images/site-ppp/mobiles.png", alt: "Telas Mobile" },
       { type: "single", src: "/images/site-ppp/3-telas-desktop.png", alt: "3 Telas Desktop" },
       { type: "single", src: "/images/site-ppp/4-telas-desktop.png", alt: "4 Telas Desktop" }
