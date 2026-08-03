@@ -35,10 +35,10 @@ export default function SitePppVideoAnimation() {
     imagesRef.current = loadedImages;
   }, []);
 
-  // Scroll tracking across extended 250vh height track so the animation plays smoothly & much slower
+  // Scroll tracking on card bounds as it passes through the viewport
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end end"]
+    offset: ["start 90%", "end 10%"]
   });
 
   const renderFrameOnCanvas = (canvas, img) => {
@@ -69,7 +69,7 @@ export default function SitePppVideoAnimation() {
   useEffect(() => {
     const loop = () => {
       const diff = targetFrame.current - currentFrame.current;
-      currentFrame.current += diff * 0.05;
+      currentFrame.current += diff * 0.08;
 
       const idx = Math.min(
         TOTAL_FRAMES,
@@ -104,21 +104,19 @@ export default function SitePppVideoAnimation() {
   }, [scrollYProgress]);
 
   return (
-    <section ref={containerRef} className="relative h-[250vh] w-full">
-      <div className="sticky top-24 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-6">
-        <div className="rounded-[24px] overflow-hidden bg-zinc-950 aspect-video relative shadow-sm border border-zinc-200/60 flex items-center justify-center">
-          <canvas
-            ref={canvasRef}
-            width={1280}
-            height={720}
-            className="w-full h-full object-cover"
-          />
-          {!imagesLoaded && (
-            <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center text-zinc-400 text-sm font-medium">
-              Carregando animação...
-            </div>
-          )}
-        </div>
+    <section ref={containerRef} className="w-full">
+      <div className="rounded-[24px] overflow-hidden bg-zinc-950 aspect-video relative shadow-sm border border-zinc-200/60 flex items-center justify-center">
+        <canvas
+          ref={canvasRef}
+          width={1280}
+          height={720}
+          className="w-full h-full object-cover"
+        />
+        {!imagesLoaded && (
+          <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center text-zinc-400 text-sm font-medium">
+            Carregando animação...
+          </div>
+        )}
       </div>
     </section>
   );
