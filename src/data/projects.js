@@ -172,7 +172,7 @@ export const projects = [
       client: "Conquer",
       sector: "Educação",
       year: "2023",
-      team: "Felipe dos Santos, Danilo Zanin, Isabella Ribeiro, José Augusto Silva, Sarah Azevedo, Leticia Graton e Thomás Pires",
+      team: "Felipe dos Santos, Danilo Zanin, Isabella Ribeiro, José Augusto Silva, Sarah Azevedo, Leticia Graton, Cathy Schroeder, Thiago Tavarnaro e Thomás Pires",
       partner: "",
       expandImages: [
         "/images/impacto-conquer/expand-1.png",

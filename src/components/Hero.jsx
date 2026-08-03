@@ -68,7 +68,7 @@ export default function Hero() {
               key={src}
               src={src}
               alt="Last Lab Showcase"
-              className={`absolute inset-0 w-full h-full object-cover object-left sm:object-center transform scale-[2] sm:scale-100 origin-left sm:origin-center transition-all duration-300 pointer-events-none ${
+              className={`absolute inset-0 w-full h-full object-cover object-left sm:object-center transform scale-[8] sm:scale-100 origin-[0%_50%] sm:origin-center transition-all duration-300 pointer-events-none ${
                 idx === imageIndex ? "opacity-100 z-0" : "opacity-0 z-0"
               }`}
             />
@@ -76,13 +76,13 @@ export default function Hero() {
 
           {/* Overlaid Content Block (Left Side) */}
           <div className="relative z-10 p-5 xs:p-6 sm:p-12 md:p-14 max-w-2xl w-full space-y-6 sm:space-y-6 mt-4 sm:mt-0">
-            <h1 className="text-[34px] xs:text-[38px] sm:text-5xl lg:text-6xl font-black text-black tracking-tight leading-[1.05] text-left break-words">
+            <h1 className="text-[40px] xs:text-[44px] sm:text-5xl lg:text-6xl font-black text-black tracking-tighter leading-[1] text-left break-words">
               Design que<br />
               <span className="sm:whitespace-nowrap">organiza, conecta</span><br />
               & comunica.
             </h1>
 
-            <div className="text-[17px] sm:text-lg font-medium text-zinc-900 leading-snug space-y-1 text-left max-w-full">
+            <div className="text-[19px] xs:text-[21px] sm:text-lg font-medium text-zinc-900 leading-snug space-y-1 text-left max-w-full">
               <p>Para sua marca ganhar força,</p>
               <div className="flex flex-wrap items-baseline gap-x-1.5 max-w-full">
                 <span>consistência e presença em</span>
