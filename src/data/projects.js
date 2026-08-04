@@ -227,7 +227,7 @@ export const projects = [
       client: "Quarteirão Mágico",
       sector: "Entretenimento & Eventos",
       year: "2018",
-      team: "Equipe Last Lab",
+      team: "Lucas de Cesare, Tayane Marquine e Thomás Pires",
       partner: "",
       expandImages: [
         "/images/quarteirao/bebidas.webp",
