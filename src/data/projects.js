@@ -341,35 +341,28 @@ export const projects = [
       team: "Aline Sarturi, Cathy Schroeder, Felipe dos Santos, Thiago Tavarnaro, Danilo Zanin, Hendel Favarin, Josef Rubin, Ana Pereira, Ariadne Grabowski, Gustavo de Morais, Isabella Ribeiro, José Augusto Silva, Laura Fronza e Thomás Pires",
       partner: "VVe Design Studio",
       expandImages: [
-        "/images/conquer/8OmxheoxYO5eZzpAQsnKzLKHLA0.avif",
-        "/images/conquer/CxWkMcp0B2vnBhaIRLLyueoVuQ.avif"
+        "/images/conquer/expand-1.avif",
+        "/images/conquer/expand-2.avif"
       ]
     },
     conquerFlow: [
-      { type: "single", src: "/images/conquer/doritos.png" },
-      { type: "single", src: "/images/conquer/transformar.png" },
+      { type: "single", src: "/images/conquer/img-1.png" },
+      { type: "single", src: "/images/conquer/img-2.png" },
       {
         type: "grid2",
         items: [
-          { src: "/images/conquer/img-pHPFE.png" },
-          { src: "/images/conquer/img-sySrb.png" }
+          { src: "/images/conquer/img-3.1.png" },
+          { src: "/images/conquer/img-3.2.png" }
         ]
       },
       { type: "single", src: "/images/conquer/in-comum.png" },
-      { type: "single", src: "/images/conquer/flag.png" },
-      { type: "single", src: "/images/conquer/welcome.png" },
+      { type: "single", src: "/images/conquer/img-5.png" },
+      { type: "single", src: "/images/conquer/img-6.png" },
       {
         type: "grid2",
         items: [
-          { src: "/images/conquer/stone-triangle.png" },
-          { src: "/images/conquer/hands-triangle.png" }
-        ]
-      },
-      {
-        type: "grid2",
-        items: [
-          { src: "/images/conquer/8OmxheoxYO5eZzpAQsnKzLKHLA0.avif" },
-          { src: "/images/conquer/CxWkMcp0B2vnBhaIRLLyueoVuQ.avif" }
+          { src: "/images/conquer/img-7.1.png" },
+          { src: "/images/conquer/img-7.2.png" }
         ]
       }
     ]
