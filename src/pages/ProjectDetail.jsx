@@ -633,35 +633,43 @@ export default function ProjectDetail() {
 
 
       {/* CONQUER Specific Gallery Sections */}
-      {project.slug === "conquer-business-school" && (
-        <>
-          {project.doritosImage && (
-            <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
-                <img src={project.doritosImage} alt="Conquer Doritos Concept" className="w-full h-auto object-cover" />
-              </div>
-            </section>
-          )}
+      {project.slug === "conquer-business-school" && project.conquerFlow && (
+        <div className="space-y-6 sm:space-y-12 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-16">
+          {project.conquerFlow.map((item, idx) => {
+            if (item.type === "grid2") {
+              return (
+                <section key={idx} className="w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {item.items.map((subItem, subIdx) => (
+                      <div
+                        key={subIdx}
+                        className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square"
+                      >
+                        <img
+                          src={subItem.src}
+                          alt={subItem.alt || `Conquer detail ${subIdx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            }
 
-          {project.transformarImage && (
-            <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
-                <img src={project.transformarImage} alt="Conquer Transformar" className="w-full h-auto object-cover" />
-              </div>
-            </section>
-          )}
-
-          <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/conquer/youxyou.png" alt="YOU X YOU" className="w-full h-full object-cover" />
-              </div>
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/conquer/house.png" alt="House drawing" className="w-full h-full object-cover" />
-              </div>
-            </div>
-          </section>
-        </>
+            return (
+              <section key={idx} className="w-full">
+                <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
+                  <img
+                    src={item.src}
+                    alt={item.alt || `Conquer detail ${idx + 1}`}
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </section>
+            );
+          })}
+        </div>
       )}
 
       {/* Quote 2 Section: Quote on right (50% / 50% Grid Split) */}

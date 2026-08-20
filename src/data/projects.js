@@ -345,18 +345,33 @@ export const projects = [
         "/images/conquer/CxWkMcp0B2vnBhaIRLLyueoVuQ.avif"
       ]
     },
-    doritosImage: "/images/conquer/doritos.png",
-    transformarImage: "/images/conquer/transformar.png",
-    youXyouGrid: [
-      "/images/conquer/img-pHPFE.png",
-      "/images/conquer/img-sySrb.png"
-    ],
-    inComumImage: "/images/conquer/in-comum.png",
-    flagImage: "/images/conquer/flag.png",
-    welcomeImage: "/images/conquer/welcome.png",
-    bottomPairGrid: [
-      "/images/conquer/stone-triangle.png",
-      "/images/conquer/hands-triangle.png"
+    conquerFlow: [
+      { type: "single", src: "/images/conquer/doritos.png" },
+      { type: "single", src: "/images/conquer/transformar.png" },
+      {
+        type: "grid2",
+        items: [
+          { src: "/images/conquer/img-pHPFE.png" },
+          { src: "/images/conquer/img-sySrb.png" }
+        ]
+      },
+      { type: "single", src: "/images/conquer/in-comum.png" },
+      { type: "single", src: "/images/conquer/flag.png" },
+      { type: "single", src: "/images/conquer/welcome.png" },
+      {
+        type: "grid2",
+        items: [
+          { src: "/images/conquer/stone-triangle.png" },
+          { src: "/images/conquer/hands-triangle.png" }
+        ]
+      },
+      {
+        type: "grid2",
+        items: [
+          { src: "/images/conquer/8OmxheoxYO5eZzpAQsnKzLKHLA0.avif" },
+          { src: "/images/conquer/CxWkMcp0B2vnBhaIRLLyueoVuQ.avif" }
+        ]
+      }
     ]
   },
   {
