@@ -10,6 +10,12 @@ import Thomas from "./pages/Thomas";
 import ThomasSobre from "./pages/ThomasSobre";
 import ThomasProjectDetail from "./pages/ThomasProjectDetail";
 import WhatsAppButton from "./components/WhatsAppButton";
+import AdminLogin from "./admin/AdminLogin";
+import AdminDashboard from "./admin/AdminDashboard";
+import AdminClientDetail from "./admin/AdminClientDetail";
+import AdminCalendarEditor from "./admin/AdminCalendarEditor";
+import ApprovalPage from "./approval/ApprovalPage";
+import ClientPortal from "./approval/ClientPortal";
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -30,7 +36,11 @@ function ScrollToTop() {
 
 function Shell() {
   const { pathname } = useLocation();
-  const hideAgencyChrome = pathname.startsWith("/thomas");
+  const hideAgencyChrome =
+    pathname.startsWith("/thomas") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/aprovar") ||
+    pathname.startsWith("/portal");
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 flex flex-col justify-between selection:bg-black selection:text-white font-sans w-full max-w-full">
@@ -43,6 +53,12 @@ function Shell() {
           <Route path="/thomas" element={<Thomas />} />
           <Route path="/thomas/sobre" element={<ThomasSobre />} />
           <Route path="/thomas/projetos/:slug" element={<ThomasProjectDetail />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/clientes/:clientId" element={<AdminClientDetail />} />
+          <Route path="/admin/calendarios/:calendarId" element={<AdminCalendarEditor />} />
+          <Route path="/aprovar/:token" element={<ApprovalPage />} />
+          <Route path="/portal/:clientId" element={<ClientPortal />} />
           <Route path="/projetos/:slug" element={<ProjectDetail />} />
           {/* Direct routes for legacy slug URLs */}
           <Route path="/semantix" element={<ProjectDetail />} />
