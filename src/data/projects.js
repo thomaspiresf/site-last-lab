@@ -341,22 +341,30 @@ export const projects = [
       team: "Aline Sarturi, Cathy Schroeder, Felipe dos Santos, Thiago Tavarnaro, Danilo Zanin, Hendel Favarin, Josef Rubin, Ana Pereira, Ariadne Grabowski, Gustavo de Morais, Isabella Ribeiro, José Augusto Silva, Laura Fronza e Thomás Pires",
       partner: "VVe Design Studio",
       expandImages: [
-        "/images/conquer/8OmxheoxYO5eZzpAQsnKzLKHLA0.avif",
-        "/images/conquer/CxWkMcp0B2vnBhaIRLLyueoVuQ.avif"
+        "/images/conquer/expand-1.avif",
+        "/images/conquer/expand-2.avif"
       ]
     },
-    doritosImage: "/images/conquer/doritos.png",
-    transformarImage: "/images/conquer/transformar.png",
-    youXyouGrid: [
-      "/images/conquer/img-pHPFE.png",
-      "/images/conquer/img-sySrb.png"
-    ],
-    inComumImage: "/images/conquer/in-comum.png",
-    flagImage: "/images/conquer/flag.png",
-    welcomeImage: "/images/conquer/welcome.png",
-    bottomPairGrid: [
-      "/images/conquer/stone-triangle.png",
-      "/images/conquer/hands-triangle.png"
+    conquerFlow: [
+      { type: "single", src: "/images/conquer/img-1.png" },
+      { type: "single", src: "/images/conquer/img-2.png" },
+      {
+        type: "grid2",
+        items: [
+          { src: "/images/conquer/img-3.1.png" },
+          { src: "/images/conquer/img-3.2.png" }
+        ]
+      },
+      { type: "single", src: "/images/conquer/in-comum.png" },
+      { type: "single", src: "/images/conquer/img-5.png" },
+      { type: "single", src: "/images/conquer/img-6.png" },
+      {
+        type: "grid2",
+        items: [
+          { src: "/images/conquer/img-7.1.png" },
+          { src: "/images/conquer/img-7.2.png" }
+        ]
+      }
     ]
   },
   {
@@ -416,6 +424,71 @@ export const projects = [
           { src: "/images/site-ppp/mobile-icones.png", alt: "Celulares e Ícones" }
         ]
       }
+    ]
+  },
+  {
+    id: "boo",
+    slug: "boo",
+    title: "Boo",
+    category: "Branding",
+    categories: ["Branding", "Website", "Apresentações"],
+    typeTag: "LAST LAB",
+    subtitle: "A Boo é uma empresa de tecnologia e inteligência de dados que transforma informações em clareza para apoiar decisões mais seguras.",
+    coverImage: "/images/boo/top-3.png",
+    hoverImage: "/images/boo/Image-1.png",
+    bannerImage: "/images/boo/Banner.png",
+    description: "A Boo é uma empresa de tecnologia e inteligência de dados que transforma informações em clareza para apoiar decisões mais seguras. O desafio do projeto foi reposicionar a marca para que seus pontos de contato refletissem essa proposta de forma mais clara, acessível e distinta em um mercado marcado por uma comunicação visual genérica.",
+    quote1: "Desenvolvemos um refresh de identidade visual, preservando o reconhecimento da marca e trabalhando principalmente na construção de um sistema mais consistente. O logo recebeu ajustes pontuais, enquanto tipografia, cores e uma nova família de ícones foram desenvolvidas para representar o ecossistema de produtos da Boo.",
+    quote2: "O resultado é uma marca que não apenas fala sobre clareza, mas passa a comunicar essa ideia em cada interação.",
+    topGrid: [
+      "/images/boo/top-1.png",
+      "/images/boo/top-2.png",
+      "/images/boo/top-3.png"
+    ],
+    expandDetails: {
+      paragraphs: [
+        "A Boo é uma empresa de tecnologia e inteligência de dados que transforma informações em clareza para apoiar decisões mais seguras. O desafio do projeto foi reposicionar a marca para que seus pontos de contato refletissem essa proposta de forma mais clara, acessível e distinta em um mercado marcado por uma comunicação visual genérica.",
+        "Desenvolvemos um refresh de identidade visual, preservando o reconhecimento da marca e trabalhando principalmente na construção de um sistema mais consistente. O logo recebeu ajustes pontuais, enquanto tipografia, cores e uma nova família de ícones foram desenvolvidas para representar o ecossistema de produtos da Boo.",
+        "O Ghost, elemento central da marca, passou a funcionar como ponto de partida para esse sistema. A partir de suas formas, criamos os ícones dos produtos e uma linguagem visual própria. O glass effect também foi incorporado como elemento recorrente, traduzindo visualmente conceitos como transparência, profundidade e clareza.",
+        "A identidade foi aplicada ao site, apresentações institucionais e demais pontos de contato da marca. A escolha por uma abordagem visual mais clara, com fundos light, espaço e respiro, reforça o posicionamento da Boo e cria uma experiência mais acessível. O resultado é uma marca que não apenas fala sobre clareza, mas passa a comunicar essa ideia em cada interação."
+      ],
+      portfolioLink: "Visualização de portfólio",
+      client: "Boo",
+      sector: "Tecnologia & Dados",
+      year: "2026",
+      team: "Thomás Pires e Pedro Etchebehere",
+      partner: "Studio Sete",
+      expandImages: [
+        "/images/boo/Expand-1.avif",
+        "/images/boo/Expand-2.avif"
+      ]
+    },
+    booFlow: [
+      { type: "single", src: "/images/boo/Image-1.png" },
+      { type: "single", src: "/images/boo/Image-2.png" },
+      { type: "single", src: "/images/boo/Image-3.png" },
+      {
+        type: "grid2-contain",
+        items: [
+          { src: "/images/boo/img-4.png" },
+          { src: "/images/boo/Img-5.png" }
+        ]
+      },
+      { type: "single", src: "/images/boo/Img-6.png" },
+      {
+        type: "grid2-contain",
+        items: [
+          { src: "/images/boo/Img-7.png" },
+          { src: "/images/boo/Img-8.png" }
+        ]
+      },
+      { type: "single", src: "/images/boo/img-9.png" },
+      { type: "single", src: "/images/boo/img-10.png" },
+      { type: "single", src: "/images/boo/img-11.png" },
+      { type: "single", src: "/images/boo/img-12.png" },
+      { type: "single", src: "/images/boo/img-13.png" },
+      { type: "single", src: "/images/boo/img-14.png" },
+      { type: "single", src: "/images/boo/img-15.avif" }
     ]
   }
 ];

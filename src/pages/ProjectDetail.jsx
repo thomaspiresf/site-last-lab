@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import ProjectCard from "../components/ProjectCard";
 import ImpactoVideoAnimation from "../components/ImpactoVideoAnimation";
@@ -8,6 +8,8 @@ import { projects } from "../data/projects";
 
 export default function ProjectDetail() {
   const { slug } = useParams();
+  const location = useLocation();
+  const isThomas = location.pathname.startsWith("/thomas");
   const detailSectionRef = useRef(null);
 
   // Find project by slug or fallback
@@ -369,6 +371,67 @@ export default function ProjectDetail() {
         </div>
       )}
 
+      {/* BOO Specific Sequential Gallery Sections */}
+      {project.slug === "boo" && project.booFlow && (
+        <div className="space-y-6 sm:space-y-12 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-16">
+          {project.booFlow.map((item, idx) => {
+            if (item.type === "grid2-contain") {
+              return (
+                <section key={idx} className="w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {item.items.map((subItem, subIdx) => (
+                      <div
+                        key={subIdx}
+                        className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm flex items-center justify-center p-4 bg-[#f8f9fa]"
+                      >
+                        <img
+                          src={subItem.src}
+                          alt={subItem.alt || `Boo detail ${subIdx + 1}`}
+                          className="w-full h-auto object-contain"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            }
+
+            if (item.type === "quote2") {
+              return (
+                <section key={idx} className="w-full my-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+                    <div className="hidden lg:block" />
+                    <div className="space-y-4 text-left">
+                      <p className="text-base sm:text-lg font-bold text-zinc-900 leading-snug">
+                        "{project.quote2}"
+                      </p>
+                      <button
+                        onClick={handleExpandAndScroll}
+                        className="text-[#0059ff] hover:underline font-semibold text-base block pt-1 focus:outline-none"
+                      >
+                        Saiba mais sobre o projeto
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              );
+            }
+
+            return (
+              <section key={idx} className="w-full">
+                <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
+                  <img
+                    src={item.src}
+                    alt={item.alt || `Boo detail ${idx + 1}`}
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+
       {/* SITE PRONTO PRA PARTIR Custom Flow */}
       {project.sitePppFlow && (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 space-y-12 mb-16">
@@ -572,35 +635,43 @@ export default function ProjectDetail() {
 
 
       {/* CONQUER Specific Gallery Sections */}
-      {project.slug === "conquer-business-school" && (
-        <>
-          {project.doritosImage && (
-            <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
-                <img src={project.doritosImage} alt="Conquer Doritos Concept" className="w-full h-auto object-cover" />
-              </div>
-            </section>
-          )}
+      {project.slug === "conquer-business-school" && project.conquerFlow && (
+        <div className="space-y-6 sm:space-y-12 max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-16">
+          {project.conquerFlow.map((item, idx) => {
+            if (item.type === "grid2") {
+              return (
+                <section key={idx} className="w-full">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {item.items.map((subItem, subIdx) => (
+                      <div
+                        key={subIdx}
+                        className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square"
+                      >
+                        <img
+                          src={subItem.src}
+                          alt={subItem.alt || `Conquer detail ${subIdx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            }
 
-          {project.transformarImage && (
-            <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
-                <img src={project.transformarImage} alt="Conquer Transformar" className="w-full h-auto object-cover" />
-              </div>
-            </section>
-          )}
-
-          <section className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 mb-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/conquer/youxyou.png" alt="YOU X YOU" className="w-full h-full object-cover" />
-              </div>
-              <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm aspect-square">
-                <img src="/images/conquer/house.png" alt="House drawing" className="w-full h-full object-cover" />
-              </div>
-            </div>
-          </section>
-        </>
+            return (
+              <section key={idx} className="w-full">
+                <div className="rounded-[24px] overflow-hidden border border-zinc-200/60 bg-zinc-100 shadow-sm">
+                  <img
+                    src={item.src}
+                    alt={item.alt || `Conquer detail ${idx + 1}`}
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              </section>
+            );
+          })}
+        </div>
       )}
 
       {/* Quote 2 Section: Quote on right (50% / 50% Grid Split) */}
@@ -796,7 +867,13 @@ export default function ProjectDetail() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {otherProjects.map((p, idx) => (
-            <ProjectCard key={p.id} project={p} index={idx} />
+            <ProjectCard
+              key={p.id}
+              project={p}
+              index={idx}
+              showTag={!isThomas}
+              linkPrefix={isThomas ? "/thomas/projetos" : "/projetos"}
+            />
           ))}
         </div>
       </section>

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
-export default function ProjectCard({ project, index }) {
+export default function ProjectCard({ project, index, showTag = true, linkPrefix = "/projetos" }) {
   const hasHoverImage = project.hoverImage && project.hoverImage !== project.coverImage;
 
   const displayTag = project.typeTag === "LAST LAB" 
@@ -18,7 +18,7 @@ export default function ProjectCard({ project, index }) {
       className="w-full"
     >
       <Link
-        to={`/projetos/${project.slug}`}
+        to={`${linkPrefix}/${project.slug}`}
         className="group block space-y-3"
       >
         {/* Square Cover Image Container */}
@@ -51,9 +51,11 @@ export default function ProjectCard({ project, index }) {
           <h3 className="text-base sm:text-lg font-bold text-black tracking-tight group-hover:text-zinc-600 transition-colors">
             {project.title}
           </h3>
-          <span className="text-xs sm:text-sm font-medium text-zinc-500 tracking-tight">
-            {displayTag}
-          </span>
+          {showTag && (
+            <span className="text-xs sm:text-sm font-medium text-zinc-500 tracking-tight">
+              {displayTag}
+            </span>
+          )}
         </div>
       </Link>
     </motion.div>
