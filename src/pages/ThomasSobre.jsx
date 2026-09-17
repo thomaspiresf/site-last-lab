@@ -99,7 +99,7 @@ export default function ThomasSobre() {
 
         {/* Experiência */}
         <section className="w-full py-12 sm:py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ export default function ThomasSobre() {
 
         {/* Formação Acadêmica */}
         <section className="w-full pb-12 sm:pb-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
