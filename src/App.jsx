@@ -13,6 +13,7 @@ import WhatsAppButton from "./components/WhatsAppButton";
 import AdminLogin from "./admin/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
 import AdminClientDetail from "./admin/AdminClientDetail";
+import AdminClientReferences from "./admin/AdminClientReferences";
 import AdminCalendarEditor from "./admin/AdminCalendarEditor";
 import ApprovalPage from "./approval/ApprovalPage";
 import ClientPortal from "./approval/ClientPortal";
@@ -56,6 +57,7 @@ function Shell() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/clientes/:clientId" element={<AdminClientDetail />} />
+          <Route path="/admin/clientes/:clientId/referencias" element={<AdminClientReferences />} />
           <Route path="/admin/calendarios/:calendarId" element={<AdminCalendarEditor />} />
           <Route path="/aprovar/:token" element={<ApprovalPage />} />
           <Route path="/portal/:clientId" element={<ClientPortal />} />

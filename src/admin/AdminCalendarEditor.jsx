@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
   Plus,
@@ -17,6 +17,8 @@ import {
   Loader2,
   Eye,
   CalendarCheck,
+  CalendarX,
+  Sparkles,
 } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import CalendarDragGrid from "./components/CalendarDragGrid";
@@ -33,6 +35,7 @@ import {
   setCalendarMonth,
   setPostScheduled,
   uploadPostMedia,
+  deleteCalendar,
 } from "../lib/api";
 import { tagColor } from "../lib/tagColor";
 import { PILLARS } from "../lib/contentPillars";
@@ -276,6 +279,7 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
 
 export default function AdminCalendarEditor() {
   const { calendarId } = useParams();
+  const navigate = useNavigate();
   const [calendar, setCalendar] = useState(null);
   const [client, setClient] = useState(null);
   const [posts, setPosts] = useState(null);
@@ -359,6 +363,20 @@ export default function AdminCalendarEditor() {
     setBusy(false);
   };
 
+  const handleUnapprove = async () => {
+    setBusy(true);
+    await setCalendarStage(calendarId, "pending");
+    await load();
+    setBusy(false);
+  };
+
+  const handleDeleteCalendar = async () => {
+    if (!confirm("Excluir esse calendário e todos os posts dele? Essa ação não pode ser desfeita.")) return;
+    setBusy(true);
+    await deleteCalendar(calendarId);
+    navigate(`/admin/clientes/${calendar.clientId}`);
+  };
+
   const handleTogglePostScheduled = async (post) => {
     await setPostScheduled(post.id, !post.scheduled);
     load();
@@ -437,6 +455,15 @@ export default function AdminCalendarEditor() {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          {calendar.status === "draft" && (
+            <Link
+              to={`/admin/clientes/${calendar.clientId}/referencias`}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] border border-zinc-300 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition-colors"
+            >
+              <Sparkles size={15} />
+              Gerar ideias com IA
+            </Link>
+          )}
           {calendar.status === "draft" ? (
             <button
               onClick={handlePublish}
@@ -456,12 +483,31 @@ export default function AdminCalendarEditor() {
               Voltar pra rascunho
             </button>
           )}
+          {calendar.status === "approved" && (
+            <button
+              onClick={handleUnapprove}
+              disabled={busy}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] border border-zinc-300 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition-colors"
+              title="Volta pra 'aguardando aprovação', sem esconder do cliente"
+            >
+              <CalendarX size={15} />
+              Desmarcar aprovação
+            </button>
+          )}
           <button
             onClick={handleCopy}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] border border-zinc-300 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition-colors"
           >
             {copied ? <Check size={15} /> : <Copy size={15} />}
             {copied ? "Link copiado!" : "Copiar link de aprovação"}
+          </button>
+          <button
+            onClick={handleDeleteCalendar}
+            disabled={busy}
+            title="Excluir calendário"
+            className="inline-flex items-center gap-2 px-3 py-2.5 rounded-[10px] border border-zinc-300 text-sm font-semibold text-zinc-500 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-colors disabled:opacity-40"
+          >
+            <Trash2 size={15} />
           </button>
         </div>
       </div>

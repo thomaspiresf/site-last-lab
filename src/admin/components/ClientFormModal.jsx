@@ -7,6 +7,7 @@ export default function ClientFormModal({ client, onClose, onSaved }) {
   const [name, setName] = useState(client?.name || "");
   const [handle, setHandle] = useState(client?.handle || "");
   const [avatarDataUrl, setAvatarDataUrl] = useState(client?.avatarDataUrl || null);
+  const [brandBrief, setBrandBrief] = useState(client?.brandBrief || "");
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -23,7 +24,7 @@ export default function ClientFormModal({ client, onClose, onSaved }) {
     if (!name.trim()) return;
     setSaving(true);
     if (isEdit) {
-      await updateClient(client.id, { name: name.trim(), handle, avatarDataUrl });
+      await updateClient(client.id, { name: name.trim(), handle, avatarDataUrl, brandBrief });
     } else {
       await createClient({ name: name.trim(), handle, avatarDataUrl });
     }
@@ -80,6 +81,21 @@ export default function ClientFormModal({ client, onClose, onSaved }) {
               placeholder="studiovzo"
             />
           </div>
+
+          {isEdit && (
+            <div>
+              <label className="block text-xs font-semibold text-zinc-600 mb-1">
+                Briefing de marca <span className="text-zinc-400 font-normal">(alimenta o gerador de IA)</span>
+              </label>
+              <textarea
+                value={brandBrief}
+                onChange={(e) => setBrandBrief(e.target.value)}
+                rows={4}
+                className="w-full px-3.5 py-2.5 rounded-[10px] border border-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-black/80 resize-none"
+                placeholder="Tom de voz, público-alvo, o que evitar dizer..."
+              />
+            </div>
+          )}
 
           <button
             type="submit"

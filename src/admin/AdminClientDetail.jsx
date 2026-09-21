@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { Plus, ChevronLeft, ChevronRight, Trash2, Copy, Check, Pencil } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Trash2, Copy, Check, Pencil, Sparkles } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import ClientFormModal from "./components/ClientFormModal";
 import { getClient, listCalendars, createCalendar, deleteClient } from "../lib/api";
@@ -100,6 +100,13 @@ export default function AdminClientDetail() {
           </button>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            to={`/admin/clientes/${clientId}/referencias`}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] border border-zinc-300 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition-colors"
+          >
+            <Sparkles size={15} />
+            Gerador de conteúdo
+          </Link>
           <button
             onClick={handleCopyPortal}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] border border-zinc-300 text-sm font-semibold text-zinc-700 hover:bg-zinc-100 transition-colors"

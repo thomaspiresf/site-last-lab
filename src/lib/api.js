@@ -17,6 +17,45 @@ function mapClient(row) {
     name: row.name,
     handle: row.handle,
     avatarDataUrl: row.avatar_url,
+    brandBrief: row.brand_brief,
+    createdAt: row.created_at,
+  };
+}
+
+function mapCompetitor(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    handle: row.handle,
+    fullName: row.full_name,
+    avatarUrl: row.avatar_url,
+    notes: row.notes,
+    createdAt: row.created_at,
+  };
+}
+
+function mapClientDate(row) {
+  if (!row) return null;
+  return { id: row.id, clientId: row.client_id, monthDay: row.month_day, label: row.label };
+}
+
+function mapRef(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    clientId: row.client_id,
+    kind: row.kind,
+    competitorId: row.competitor_id,
+    source: row.source,
+    imageUrl: row.image_url,
+    caption: row.caption,
+    notes: row.notes,
+    tag: row.tag,
+    postUrl: row.post_url,
+    likes: row.likes,
+    comments: row.comments,
+    postedAt: row.posted_at,
     createdAt: row.created_at,
   };
 }
@@ -30,8 +69,22 @@ function mapCalendar(row) {
     status: row.status,
     token: row.token,
     feedback: row.feedback,
+    aiNotes: row.ai_notes,
     createdAt: row.created_at,
     decidedAt: row.decided_at,
+  };
+}
+
+function mapPostIdea(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    calendarId: row.calendar_id,
+    caption: row.caption,
+    tag: row.tag,
+    scheduledDate: row.scheduled_date,
+    rationale: row.rationale,
+    createdAt: row.created_at,
   };
 }
 
@@ -144,15 +197,14 @@ export async function createClient({ name, handle, avatarDataUrl }) {
   return mapClient(data);
 }
 
-export async function updateClient(clientId, { name, handle, avatarDataUrl }) {
-  const { error } = await supabase
-    .from("clients")
-    .update({
-      name,
-      handle: handle?.replace(/^@/, "") || name.toLowerCase().replace(/\s+/g, ""),
-      avatar_url: avatarDataUrl || null,
-    })
-    .eq("id", clientId);
+export async function updateClient(clientId, { name, handle, avatarDataUrl, brandBrief }) {
+  const patch = {
+    name,
+    handle: handle?.replace(/^@/, "") || name.toLowerCase().replace(/\s+/g, ""),
+    avatar_url: avatarDataUrl || null,
+  };
+  if (brandBrief !== undefined) patch.brand_brief = brandBrief || null;
+  const { error } = await supabase.from("clients").update(patch).eq("id", clientId);
   if (error) throw error;
 }
 
@@ -276,6 +328,11 @@ export async function setCalendarMonth(calendarId, month) {
   if (error) throw error;
 }
 
+export async function setCalendarAiNotes(calendarId, aiNotes) {
+  const { error } = await supabase.from("calendars").update({ ai_notes: aiNotes || null }).eq("id", calendarId);
+  if (error) throw error;
+}
+
 // Called from the public approval page (by token, not id) — the only write
 // a client visitor can trigger. Runs through a SECURITY DEFINER RPC so the
 // client never gets direct UPDATE access to the calendars table.
@@ -349,4 +406,239 @@ export async function reorderPosts(calendarId, orderedIds) {
       supabase.from("posts").update({ order_index: idx }).eq("id", id).eq("calendar_id", calendarId)
     )
   );
+}
+
+// --- Competitors (per client, feed the AI generator + engagement tracking) ---
+
+export async function listCompetitors(clientId) {
+  const { data, error } = await supabase
+    .from("competitors")
+    .select("*")
+    .eq("client_id", clientId)
+    .order("created_at");
+  if (error) throw error;
+  return data.map(mapCompetitor);
+}
+
+export async function addCompetitor({ clientId, handle, notes }) {
+  const { data, error } = await supabase
+    .from("competitors")
+    .insert({ client_id: clientId, handle: handle.replace(/^@/, ""), notes: notes || null })
+    .select()
+    .single();
+  if (error) throw error;
+  return mapCompetitor(data);
+}
+
+export async function deleteCompetitor(competitorId) {
+  // refs cascade automatically via ON DELETE SET NULL (competitor_id) — the
+  // rows themselves stay unless removed explicitly, so clean them up too.
+  await supabase.from("refs").delete().eq("competitor_id", competitorId);
+  const { error } = await supabase.from("competitors").delete().eq("id", competitorId);
+  if (error) throw error;
+}
+
+// --- Client-specific commemorative dates (on top of the generic BR calendar) ---
+
+export async function listClientDates(clientId) {
+  const { data, error } = await supabase
+    .from("client_dates")
+    .select("*")
+    .eq("client_id", clientId)
+    .order("month_day");
+  if (error) throw error;
+  return data.map(mapClientDate);
+}
+
+export async function addClientDate({ clientId, monthDay, label }) {
+  const { data, error } = await supabase
+    .from("client_dates")
+    .insert({ client_id: clientId, month_day: monthDay, label })
+    .select()
+    .single();
+  if (error) throw error;
+  return mapClientDate(data);
+}
+
+export async function deleteClientDate(dateId) {
+  const { error } = await supabase.from("client_dates").delete().eq("id", dateId);
+  if (error) throw error;
+}
+
+// --- Reference library (own posts + competitor posts, manual or scraped) ---
+
+export async function listRefs(clientId) {
+  const { data, error } = await supabase
+    .from("refs")
+    .select("*")
+    .eq("client_id", clientId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data.map(mapRef);
+}
+
+export async function addRef({ clientId, kind, competitorId, imageUrl, caption, notes, tag, postUrl, likes, comments, postedAt }) {
+  const { data, error } = await supabase
+    .from("refs")
+    .insert({
+      client_id: clientId,
+      kind,
+      competitor_id: competitorId || null,
+      source: "manual",
+      image_url: imageUrl || null,
+      caption: caption || "",
+      notes: notes || null,
+      tag: tag || null,
+      post_url: postUrl || null,
+      likes: likes ?? null,
+      comments: comments ?? null,
+      posted_at: postedAt || null,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return mapRef(data);
+}
+
+export async function deleteRef(refId) {
+  const { error } = await supabase.from("refs").delete().eq("id", refId);
+  if (error) throw error;
+}
+
+// --- AI calendar generator + competitor scraping (Supabase Edge Functions) ---
+
+export async function listPostIdeas(calendarId) {
+  const { data, error } = await supabase
+    .from("post_ideas")
+    .select("*")
+    .eq("calendar_id", calendarId)
+    .order("scheduled_date", { ascending: true, nullsFirst: false });
+  if (error) throw error;
+  return data.map(mapPostIdea);
+}
+
+export async function generateIdeas(calendarId, postCount) {
+  const { data, error } = await supabase.functions.invoke("generate-calendar", {
+    body: { calendarId, postCount },
+  });
+  if (error) {
+    const message = data?.error || error.message;
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return (data?.ideas || []).map(mapPostIdea);
+}
+
+export async function regenerateIdea(ideaId, instruction) {
+  const { data, error } = await supabase.functions.invoke("generate-calendar", {
+    body: { ideaId, instruction },
+  });
+  if (error) {
+    const message = data?.error || error.message;
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return mapPostIdea(data.idea);
+}
+
+const IDEA_FIELD_MAP = {
+  scheduledDate: "scheduled_date",
+};
+
+export async function updatePostIdea(ideaId, patch) {
+  const row = {};
+  for (const [key, value] of Object.entries(patch)) {
+    row[IDEA_FIELD_MAP[key] || key] = value;
+  }
+  const { error } = await supabase.from("post_ideas").update(row).eq("id", ideaId);
+  if (error) throw error;
+}
+
+export async function deletePostIdea(ideaId) {
+  const { error } = await supabase.from("post_ideas").delete().eq("id", ideaId);
+  if (error) throw error;
+}
+
+// Moves selected ideas into real calendar posts, then clears them from the
+// idea workbench so they aren't offered again.
+export async function promoteIdeasToCalendar(calendarId, ideas) {
+  const { count: existingCount } = await supabase
+    .from("posts")
+    .select("*", { count: "exact", head: true })
+    .eq("calendar_id", calendarId);
+
+  const rows = ideas.map((idea, idx) => ({
+    calendar_id: calendarId,
+    order_index: (existingCount || 0) + idx,
+    media: [],
+    caption: idea.caption,
+    scheduled_date: idea.scheduledDate || null,
+    tag: idea.tag || "",
+  }));
+
+  const { data: inserted, error: insertError } = await supabase.from("posts").insert(rows).select();
+  if (insertError) throw insertError;
+
+  const { error: deleteError } = await supabase
+    .from("post_ideas")
+    .delete()
+    .in("id", ideas.map((idea) => idea.id));
+  if (deleteError) throw deleteError;
+
+  return inserted.map(mapPost);
+}
+
+export async function previewCalendarPrompt(calendarId, postCount) {
+  const { data, error } = await supabase.functions.invoke("generate-calendar", {
+    body: { calendarId, postCount, preview: true },
+  });
+  if (error) {
+    const message = data?.error || error.message;
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return data.prompt;
+}
+
+export async function fetchMonthDates(calendarId) {
+  const { data, error } = await supabase.functions.invoke("generate-calendar", {
+    body: { calendarId, mode: "dates" },
+  });
+  if (error) {
+    const message = data?.error || error.message;
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return (data.dates || []).map((d) => ({
+    monthDay: d.monthDay,
+    label: d.label,
+    reason: d.reason || null,
+    source: d.source,
+  }));
+}
+
+export async function scrapeCompetitors(clientId) {
+  const { data, error } = await supabase.functions.invoke("scrape-competitors", {
+    body: { clientId },
+  });
+  if (error) {
+    const message = data?.error || error.message;
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+
+// Fetches a competitor's display name + profile picture (mirrored into our
+// own Storage) right after it's added, so the chip shows more than the @.
+export async function fetchCompetitorProfile(competitorId) {
+  const { data, error } = await supabase.functions.invoke("scrape-competitors", {
+    body: { competitorId },
+  });
+  if (error) {
+    const message = data?.error || error.message;
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return mapCompetitor(data.competitor);
 }
