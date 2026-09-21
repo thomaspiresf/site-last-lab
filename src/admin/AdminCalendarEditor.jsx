@@ -109,7 +109,10 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (mediaList.length === 0) return;
+    // New posts need at least one image/video; editing an existing post
+    // (e.g. one promoted from an AI idea, which starts with no media) must
+    // stay saveable even before media gets added.
+    if (!isEdit && mediaList.length === 0) return;
     setSaving(true);
 
     if (isEdit) {
@@ -257,7 +260,7 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
       <div className="flex items-center gap-2">
         <button
           type="submit"
-          disabled={saving || uploading || mediaList.length === 0}
+          disabled={saving || uploading || (!isEdit && mediaList.length === 0)}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] bg-black text-white text-sm font-semibold hover:bg-zinc-800 transition-colors disabled:opacity-40"
         >
           {isEdit ? <Check size={16} /> : <Plus size={16} />}
