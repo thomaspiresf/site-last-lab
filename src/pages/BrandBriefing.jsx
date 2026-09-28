@@ -2,20 +2,9 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
-  Mail,
-  Phone,
   Building2,
-  Sparkles,
-  Briefcase,
   Users,
-  Award,
-  Heart,
   Palette,
-  Eye,
-  Paintbrush,
-  Star,
-  PlusCircle,
-  Ban,
   MessageSquare,
   Check,
   Pencil,
@@ -26,6 +15,7 @@ import {
   ClipboardCheck,
   Wand2,
   FileImage,
+  Sparkles,
   Sliders,
   PackageCheck,
 } from "lucide-react";
@@ -34,7 +24,7 @@ import { submitBrandBrief } from "../lib/api";
 const STEPS = [
   {
     key: "name",
-    icon: User,
+    image: "/images/briefing/name.png",
     label: "Bora começar!",
     question: "Qual o seu nome?",
     type: "text",
@@ -43,7 +33,7 @@ const STEPS = [
   },
   {
     key: "email",
-    icon: Mail,
+    image: "/images/briefing/email.png",
     label: "Conhecendo você...",
     question: "Qual o seu melhor e-mail?",
     type: "email",
@@ -52,7 +42,7 @@ const STEPS = [
   },
   {
     key: "phone",
-    icon: Phone,
+    image: "/images/briefing/phone.png",
     label: "Entendendo sua visão...",
     question: "Quer deixar um telefone de contato?",
     subtitle: "Opcional, mas ajuda no atendimento",
@@ -61,7 +51,7 @@ const STEPS = [
   },
   {
     key: "businessStage",
-    icon: Building2,
+    image: "/images/briefing/business-stage.png",
     label: "Estamos conhecendo sua marca...",
     question: "Você já tem uma empresa ou está começando do zero?",
     type: "single-select",
@@ -74,7 +64,7 @@ const STEPS = [
   },
   {
     key: "brandName",
-    icon: Sparkles,
+    image: "/images/briefing/brand-name.png",
     label: "Descobrindo sua essência...",
     question: "Qual o nome da sua marca?",
     type: "text",
@@ -82,7 +72,7 @@ const STEPS = [
   },
   {
     key: "activity",
-    icon: Briefcase,
+    image: "/images/briefing/activity.png",
     label: "Definindo seu estilo...",
     question: "O que você faz ou pretende fazer com a marca?",
     type: "textarea",
@@ -91,7 +81,7 @@ const STEPS = [
   },
   {
     key: "targetAudience",
-    icon: Users,
+    image: "/images/briefing/target-audience.png",
     label: "Moldando sua identidade...",
     question: "Quem é o seu público?",
     type: "textarea",
@@ -100,7 +90,7 @@ const STEPS = [
   },
   {
     key: "differentiators",
-    icon: Award,
+    image: "/images/briefing/differentiators.png",
     label: "Capturando sua personalidade...",
     question: "O que torna seu serviço ou produto diferente da concorrência?",
     type: "textarea",
@@ -108,7 +98,7 @@ const STEPS = [
   },
   {
     key: "desiredFeelings",
-    icon: Heart,
+    image: "/images/briefing/desired-feelings.png",
     label: "Refinando os detalhes...",
     question: "Quais sensações e mensagens você deseja transmitir com sua identidade visual?",
     type: "textarea",
@@ -116,7 +106,7 @@ const STEPS = [
   },
   {
     key: "styleAdjectives",
-    icon: Palette,
+    image: "/images/briefing/style-adjectives.png",
     label: "Refinando os detalhes...",
     question: "Quais adjetivos melhor descrevem o estilo da sua marca?",
     subtitle: "Escolha no máximo 3",
@@ -141,7 +131,7 @@ const STEPS = [
   },
   {
     key: "visualStyles",
-    icon: Eye,
+    image: "/images/briefing/visual-styles.png",
     label: "Quase lá!",
     question: "Qual estilo combina mais com a identidade que você imagina?",
     subtitle: "Pode escolher mais de um",
@@ -151,7 +141,7 @@ const STEPS = [
   },
   {
     key: "colorPreferences",
-    icon: Paintbrush,
+    image: "/images/briefing/color-preferences.png",
     label: "Finalizando...",
     question: "Possui alguma preferência de cor para a identidade visual? Se sim, qual?",
     type: "textarea",
@@ -159,7 +149,7 @@ const STEPS = [
   },
   {
     key: "admiredBrands",
-    icon: Star,
+    image: "/images/briefing/admired-brands.png",
     label: "Última pergunta!",
     question: "Tem alguma marca que você admira pelo estilo ou comunicação?",
     type: "textarea",
@@ -167,7 +157,7 @@ const STEPS = [
   },
   {
     key: "desiredElements",
-    icon: PlusCircle,
+    image: "/images/briefing/desired-elements.png",
     label: "Preparando a magia...",
     question: "Tem algo em mente que queira que esteja presente na identidade visual?",
     type: "textarea",
@@ -175,7 +165,7 @@ const STEPS = [
   },
   {
     key: "avoidElements",
-    icon: Ban,
+    image: "/images/briefing/avoid-elements.png",
     label: "Quase pronto...",
     question: "E o que você não quer de jeito nenhum na sua identidade visual?",
     type: "textarea",
@@ -183,7 +173,7 @@ const STEPS = [
   },
   {
     key: "extraInfo",
-    icon: MessageSquare,
+    image: "/images/briefing/extra-info.png",
     label: "Última etapa!",
     question: "Algo mais que você queira contar?",
     subtitle: "Campo opcional para informações extras",
@@ -358,7 +348,6 @@ function IntroScreen({ onStart }) {
 }
 
 function QuestionScreen({ step, value, onChange, onNext, onBack, showBack, canGoNext, submitLabel }) {
-  const Icon = step.icon;
   const isTextInput = step.type === "text" || step.type === "email" || step.type === "tel";
 
   const handleKeyDown = (e) => {
@@ -390,9 +379,7 @@ function QuestionScreen({ step, value, onChange, onNext, onBack, showBack, canGo
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="max-w-xl w-full text-center space-y-6"
       >
-        <div className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center mx-auto">
-          <Icon size={26} />
-        </div>
+        <img src={step.image} alt="" className="w-20 h-20 mx-auto" />
 
         <div>
           <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight leading-snug">
