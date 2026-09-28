@@ -408,7 +408,7 @@ function QuestionScreen({ step, value, onChange, onNext, onBack, showBack, canGo
             onKeyDown={handleKeyDown}
             placeholder={step.placeholder}
             rows={4}
-            className="w-full px-4 py-3.5 rounded-[10px] border border-zinc-300 text-base focus:outline-none focus:ring-2 focus:ring-black/80 resize-none"
+            className="w-full px-4 py-3.5 rounded-[10px] border border-zinc-300 text-base focus:outline-none focus:ring-2 focus:ring-black/80 resize-y"
           />
         )}
 
