@@ -7,6 +7,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import ProjectDetail from "./pages/ProjectDetail";
 import Thomas from "./pages/Thomas";
+import BrandBriefing from "./pages/BrandBriefing";
 import ThomasSobre from "./pages/ThomasSobre";
 import ThomasProjectDetail from "./pages/ThomasProjectDetail";
 import WhatsAppButton from "./components/WhatsAppButton";
@@ -41,7 +42,8 @@ function Shell() {
     pathname.startsWith("/thomas") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/aprovar") ||
-    pathname.startsWith("/portal");
+    pathname.startsWith("/portal") ||
+    pathname.startsWith("/briefing");
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 flex flex-col justify-between selection:bg-black selection:text-white font-sans w-full max-w-full">
@@ -54,6 +56,7 @@ function Shell() {
           <Route path="/thomas" element={<Thomas />} />
           <Route path="/thomas/sobre" element={<ThomasSobre />} />
           <Route path="/thomas/projetos/:slug" element={<ThomasProjectDetail />} />
+          <Route path="/briefing" element={<BrandBriefing />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/clientes/:clientId" element={<AdminClientDetail />} />

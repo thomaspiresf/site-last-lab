@@ -642,3 +642,27 @@ export async function fetchCompetitorProfile(competitorId) {
   if (data?.error) throw new Error(data.error);
   return mapCompetitor(data.competitor);
 }
+
+// --- Public brand-briefing form (/briefing) — anonymous insert, no auth ---
+
+export async function submitBrandBrief(answers) {
+  const { error } = await supabase.from("brand_briefs").insert({
+    name: answers.name,
+    email: answers.email,
+    phone: answers.phone || null,
+    business_stage: answers.businessStage,
+    brand_name: answers.brandName || null,
+    activity: answers.activity,
+    target_audience: answers.targetAudience,
+    differentiators: answers.differentiators,
+    desired_feelings: answers.desiredFeelings,
+    style_adjectives: answers.styleAdjectives || [],
+    visual_styles: answers.visualStyles || [],
+    color_preferences: answers.colorPreferences || null,
+    admired_brands: answers.admiredBrands || null,
+    desired_elements: answers.desiredElements || null,
+    avoid_elements: answers.avoidElements || null,
+    extra_info: answers.extraInfo || null,
+  });
+  if (error) throw error;
+}
