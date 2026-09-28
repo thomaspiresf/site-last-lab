@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Link, useLocation } from "react-router-dom";
-import { LayoutGrid, LogOut } from "lucide-react";
+import { LayoutGrid, LogOut, FileText } from "lucide-react";
 import { getAdminSession, onAdminAuthChange, adminLogout } from "../lib/api";
 
 export default function AdminLayout({ children }) {
@@ -37,13 +37,24 @@ export default function AdminLayout({ children }) {
             <LayoutGrid size={20} />
             Last Lab · Admin
           </Link>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-sm font-medium text-zinc-600 hover:text-black transition-colors"
-          >
-            <LogOut size={16} />
-            Sair
-          </button>
+          <div className="flex items-center gap-5">
+            <Link
+              to="/admin/briefings"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                location.pathname === "/admin/briefings" ? "text-black" : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <FileText size={16} />
+              Briefings
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-sm font-medium text-zinc-600 hover:text-black transition-colors"
+            >
+              <LogOut size={16} />
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 

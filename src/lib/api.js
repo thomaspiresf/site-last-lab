@@ -645,6 +645,46 @@ export async function fetchCompetitorProfile(competitorId) {
 
 // --- Public brand-briefing form (/briefing) — anonymous insert, no auth ---
 
+function mapBrandBrief(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    businessStage: row.business_stage,
+    brandName: row.brand_name,
+    activity: row.activity,
+    targetAudience: row.target_audience,
+    differentiators: row.differentiators,
+    desiredFeelings: row.desired_feelings,
+    styleAdjectives: row.style_adjectives || [],
+    visualStyles: row.visual_styles || [],
+    colorPreferences: row.color_preferences,
+    admiredBrands: row.admired_brands,
+    desiredElements: row.desired_elements,
+    avoidElements: row.avoid_elements,
+    extraInfo: row.extra_info,
+    createdAt: row.created_at,
+  };
+}
+
+// Admin-only (RLS requires auth.uid()) — lists every briefing submitted
+// through the public /briefing form, most recent first.
+export async function listBrandBriefs() {
+  const { data, error } = await supabase
+    .from("brand_briefs")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data.map(mapBrandBrief);
+}
+
+export async function deleteBrandBrief(id) {
+  const { error } = await supabase.from("brand_briefs").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function submitBrandBrief(answers) {
   const { error } = await supabase.from("brand_briefs").insert({
     name: answers.name,
