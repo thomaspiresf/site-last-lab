@@ -309,7 +309,7 @@ function ProgressHeader({ percent, label }) {
       </div>
       <div className="h-1.5 bg-zinc-100">
         <motion.div
-          className="h-full bg-gradient-to-r from-blue-500 to-emerald-400"
+          className="h-full bg-gradient-to-r from-orange-600 via-orange-500 to-amber-400"
           animate={{ width: `${percent}%` }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         />
