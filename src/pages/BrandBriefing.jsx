@@ -301,7 +301,7 @@ function ProgressHeader({ percent, label }) {
       <div className="max-w-2xl mx-auto px-6 pt-6 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="h-7 w-7 rounded-full bg-zinc-100 flex items-center justify-center overflow-hidden">
-            <img src="/images/logo.png" alt="" className="h-4 w-4 object-contain" />
+            <img src="/images/briefing/logo.png" alt="" className="h-4 w-4 object-contain" />
           </div>
           <span className="text-sm font-semibold text-zinc-500">{percent}%</span>
         </div>
@@ -328,7 +328,7 @@ function IntroScreen({ onStart }) {
         className="max-w-lg w-full text-center space-y-6"
       >
         <div className="w-24 h-24 rounded-full bg-white shadow-sm mx-auto flex items-center justify-center">
-          <img src="/images/logo.png" alt="Last Lab" className="h-10 w-10 object-contain" />
+          <img src="/images/briefing/logo.png" alt="Last Lab" className="h-10 w-10 object-contain" />
         </div>
         <h1 className="text-4xl sm:text-5xl font-black text-black tracking-tight leading-tight">
           Vamos dar vida à sua marca?
@@ -507,7 +507,7 @@ function ReviewScreen({ answers, onEdit, onSubmit, onBack, submitting, error }) 
       >
         <div className="text-center space-y-2">
           <div className="w-14 h-14 rounded-full bg-zinc-100 flex items-center justify-center mx-auto">
-            <img src="/images/logo.png" alt="" className="h-7 w-7 object-contain" />
+            <img src="/images/briefing/logo.png" alt="" className="h-7 w-7 object-contain" />
           </div>
           <h1 className="text-2xl font-black text-black tracking-tight">Revisão do Briefing</h1>
           <p className="text-sm text-zinc-500">Confira suas respostas antes de enviar</p>
