@@ -5,6 +5,7 @@ import {
   Mail,
   Phone,
   Trash2,
+  Download,
   Building2,
   Users,
   Palette,
@@ -74,6 +75,40 @@ function formatDate(timestamp) {
   });
 }
 
+function buildBriefingText(briefing) {
+  const lines = [
+    "BRIEFING DE IDENTIDADE VISUAL",
+    `Recebido em: ${formatDate(briefing.createdAt)}`,
+    "",
+    "CONTATO",
+    `Nome: ${briefing.name}`,
+    `E-mail: ${briefing.email}`,
+    `Telefone: ${briefing.phone || "—"}`,
+    "",
+  ];
+  for (const section of DETAIL_SECTIONS) {
+    lines.push(section.title.toUpperCase());
+    for (const field of section.fields) {
+      lines.push(`${field.label}: ${formatValue(briefing[field.key])}`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n");
+}
+
+function downloadBriefing(briefing) {
+  const text = buildBriefingText(briefing);
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `briefing-${briefing.name.trim().toLowerCase().replace(/\s+/g, "-")}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function BriefingCard({ briefing, onDeleted }) {
   const [expanded, setExpanded] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -87,12 +122,12 @@ function BriefingCard({ briefing, onDeleted }) {
 
   return (
     <div className="bg-white rounded-2xl border border-zinc-200/80 overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="w-full flex items-start justify-between gap-4 p-5 text-left"
-      >
-        <div className="min-w-0">
+      <div className="w-full flex items-start justify-between gap-4 p-5">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="min-w-0 flex-1 text-left"
+        >
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-bold text-black">{briefing.name}</p>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">
@@ -112,11 +147,25 @@ function BriefingCard({ briefing, onDeleted }) {
             )}
           </div>
           <p className="text-xs text-zinc-400 mt-1">{formatDate(briefing.createdAt)}</p>
+        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={() => downloadBriefing(briefing)}
+            title="Baixar briefing"
+            className="text-zinc-400 hover:text-black transition-colors"
+          >
+            <Download size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="text-zinc-400 hover:text-black transition-colors"
+          >
+            {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+          </button>
         </div>
-        <div className="shrink-0 text-zinc-400">
-          {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </div>
-      </button>
+      </div>
 
       {expanded && (
         <div className="px-5 pb-5 space-y-5 border-t border-zinc-100 pt-4">
