@@ -8,6 +8,7 @@ import Contact from "./pages/Contact";
 import ProjectDetail from "./pages/ProjectDetail";
 import Thomas from "./pages/Thomas";
 import BrandBriefing from "./pages/BrandBriefing";
+import Privacidade from "./pages/Privacidade";
 import ThomasSobre from "./pages/ThomasSobre";
 import ThomasProjectDetail from "./pages/ThomasProjectDetail";
 import WhatsAppButton from "./components/WhatsAppButton";
@@ -16,6 +17,10 @@ import AdminDashboard from "./admin/AdminDashboard";
 import AdminClientDetail from "./admin/AdminClientDetail";
 import AdminClientReferences from "./admin/AdminClientReferences";
 import AdminBriefings from "./admin/AdminBriefings";
+import AdminDiagnosticos from "./admin/AdminDiagnosticos";
+import AdminDiagnosticoAjustes from "./admin/AdminDiagnosticoAjustes";
+import AdminNamingList from "./admin/AdminNamingList";
+import AdminNamingStudy from "./admin/AdminNamingStudy";
 import AdminCalendarEditor from "./admin/AdminCalendarEditor";
 import ApprovalPage from "./approval/ApprovalPage";
 import ClientPortal from "./approval/ClientPortal";
@@ -54,6 +59,7 @@ function Shell() {
           <Route path="/" element={<Home />} />
           <Route path="/sobre" element={<About />} />
           <Route path="/contato" element={<Contact />} />
+          <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/thomas" element={<Thomas />} />
           <Route path="/thomas/sobre" element={<ThomasSobre />} />
           <Route path="/thomas/projetos/:slug" element={<ThomasProjectDetail />} />
@@ -63,6 +69,10 @@ function Shell() {
           <Route path="/admin/clientes/:clientId" element={<AdminClientDetail />} />
           <Route path="/admin/clientes/:clientId/referencias" element={<AdminClientReferences />} />
           <Route path="/admin/briefings" element={<AdminBriefings />} />
+          <Route path="/admin/diagnosticos" element={<AdminDiagnosticos />} />
+          <Route path="/admin/diagnosticos/ajustes" element={<AdminDiagnosticoAjustes />} />
+          <Route path="/admin/naming" element={<AdminNamingList />} />
+          <Route path="/admin/naming/:studyId" element={<AdminNamingStudy />} />
           <Route path="/admin/calendarios/:calendarId" element={<AdminCalendarEditor />} />
           <Route path="/aprovar/:token" element={<ApprovalPage />} />
           <Route path="/portal/:clientId" element={<ClientPortal />} />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Link, useLocation } from "react-router-dom";
-import { LayoutGrid, LogOut, FileText } from "lucide-react";
+import { LayoutGrid, LogOut, FileText, Sparkles, Gauge } from "lucide-react";
 import { getAdminSession, onAdminAuthChange, adminLogout } from "../lib/api";
 
 export default function AdminLayout({ children }) {
@@ -46,6 +46,24 @@ export default function AdminLayout({ children }) {
             >
               <FileText size={16} />
               Briefings
+            </Link>
+            <Link
+              to="/admin/diagnosticos"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                location.pathname.startsWith("/admin/diagnosticos") ? "text-black" : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <Gauge size={16} />
+              Diagnósticos
+            </Link>
+            <Link
+              to="/admin/naming"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                location.pathname.startsWith("/admin/naming") ? "text-black" : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <Sparkles size={16} />
+              Naming
             </Link>
             <button
               onClick={handleLogout}

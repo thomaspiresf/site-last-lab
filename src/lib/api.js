@@ -706,3 +706,270 @@ export async function submitBrandBrief(answers) {
   });
   if (error) throw error;
 }
+
+// --- Naming studies (admin tool, /admin/naming) ---
+
+function mapNamingStudy(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    clientName: row.client_name,
+    keywords: row.keywords,
+    dimensions: row.dimensions || [],
+    brainstormNames: row.brainstorm_names || [],
+    createdAt: row.created_at,
+  };
+}
+
+function mapNamingOption(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    studyId: row.study_id,
+    orderIndex: row.order_index,
+    name: row.name,
+    prefix: row.prefix,
+    meaningConcepts: row.meaning_concepts || [],
+    soundPoints: row.sound_points || [],
+    connectionText: row.connection_text,
+    tagline: row.tagline,
+  };
+}
+
+export async function listNamingStudies() {
+  const { data, error } = await supabase
+    .from("naming_studies")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data.map(mapNamingStudy);
+}
+
+export async function getNamingStudy(studyId) {
+  const { data, error } = await supabase.from("naming_studies").select("*").eq("id", studyId).maybeSingle();
+  if (error) throw error;
+  return mapNamingStudy(data);
+}
+
+export async function createNamingStudy({ clientName, keywords }) {
+  const { data, error } = await supabase
+    .from("naming_studies")
+    .insert({ client_name: clientName, keywords: keywords || null })
+    .select()
+    .single();
+  if (error) throw error;
+  return mapNamingStudy(data);
+}
+
+export async function updateNamingStudy(studyId, patch) {
+  const payload = {};
+  if (patch.clientName !== undefined) payload.client_name = patch.clientName;
+  if (patch.keywords !== undefined) payload.keywords = patch.keywords;
+  if (patch.dimensions !== undefined) payload.dimensions = patch.dimensions;
+  if (patch.brainstormNames !== undefined) payload.brainstorm_names = patch.brainstormNames;
+  const { data, error } = await supabase
+    .from("naming_studies")
+    .update(payload)
+    .eq("id", studyId)
+    .select()
+    .single();
+  if (error) throw error;
+  return mapNamingStudy(data);
+}
+
+export async function deleteNamingStudy(studyId) {
+  const { error } = await supabase.from("naming_studies").delete().eq("id", studyId);
+  if (error) throw error;
+}
+
+export async function listNamingOptions(studyId) {
+  const { data, error } = await supabase
+    .from("naming_options")
+    .select("*")
+    .eq("study_id", studyId)
+    .order("order_index", { ascending: true });
+  if (error) throw error;
+  return data.map(mapNamingOption);
+}
+
+export async function generateNamingOptions(studyId, names) {
+  const { data, error } = await supabase.functions.invoke("generate-naming", {
+    body: { studyId, names },
+  });
+  if (error) {
+    const message = data?.error || error.message;
+    throw new Error(message);
+  }
+  if (data?.error) throw new Error(data.error);
+  return (data.options || []).map(mapNamingOption);
+}
+
+export async function updateNamingOption(optionId, patch) {
+  const payload = {};
+  if (patch.name !== undefined) payload.name = patch.name;
+  if (patch.prefix !== undefined) payload.prefix = patch.prefix;
+  if (patch.meaningConcepts !== undefined) payload.meaning_concepts = patch.meaningConcepts;
+  if (patch.soundPoints !== undefined) payload.sound_points = patch.soundPoints;
+  if (patch.connectionText !== undefined) payload.connection_text = patch.connectionText;
+  if (patch.tagline !== undefined) payload.tagline = patch.tagline;
+  const { data, error } = await supabase
+    .from("naming_options")
+    .update(payload)
+    .eq("id", optionId)
+    .select()
+    .single();
+  if (error) throw error;
+  return mapNamingOption(data);
+}
+
+export async function deleteNamingOption(optionId) {
+  const { error } = await supabase.from("naming_options").delete().eq("id", optionId);
+  if (error) throw error;
+}
+
+// --- Diagnóstico de marca (leads de lastlab.com.br/diagnostico, aba /admin/diagnosticos) ---
+
+function mapDiagnostico(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    createdAt: row.created_at,
+    status: row.status,
+    anotacoes: row.anotacoes,
+    nome: row.nome,
+    email: row.email,
+    whatsapp: row.whatsapp,
+    qualificado: row.qualificado,
+    persona: row.persona,
+    notaGeral: row.nota_geral,
+    ofertaEntrada: row.oferta_entrada,
+    dados: row.dados || {},
+    token: row.token,
+    analise: row.analise || "",
+    publicadoEm: row.publicado_em,
+    emailEnviadoEm: row.email_enviado_em,
+    ofertaEscolhida: row.oferta_escolhida,
+    personaAvaliacao: row.persona_avaliacao,
+    personaSugerida: row.persona_sugerida,
+  };
+}
+
+export async function listDiagnosticos() {
+  const { data, error } = await supabase
+    .from("diagnosticos")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data.map(mapDiagnostico);
+}
+
+export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida }) {
+  const patch = {};
+  if (personaAvaliacao !== undefined) patch.persona_avaliacao = personaAvaliacao;
+  if (personaSugerida !== undefined) patch.persona_sugerida = personaSugerida;
+  if (status !== undefined) patch.status = status;
+  if (anotacoes !== undefined) patch.anotacoes = anotacoes;
+  if (analise !== undefined) patch.analise = analise;
+  const { error } = await supabase.from("diagnosticos").update(patch).eq("id", id);
+  if (error) throw error;
+}
+
+export async function deleteDiagnostico(id) {
+  const { error } = await supabase.from("diagnosticos").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// Link temporário (1h) para abrir a apresentação enviada (bucket privado).
+export async function getDiagnosticoArquivoUrl(path) {
+  const { data, error } = await supabase.storage
+    .from("diagnostico-arquivos")
+    .createSignedUrl(path, 3600);
+  if (error) throw error;
+  return data.signedUrl;
+}
+
+// Página de resultado do cliente (projeto diagnostico-lastlab, pasta /resultado).
+const DIAGNOSTICO_URL = import.meta.env.VITE_DIAGNOSTICO_URL || "https://www.lastlab.com.br/diagnostico";
+export const linkDevolutiva = (token) => `${DIAGNOSTICO_URL}/resultado/?t=${token}`;
+
+// Publica a devolutiva: gera o token do link (se ainda não tiver) e libera a página do cliente.
+export async function publicarDiagnostico(id, tokenAtual) {
+  const patch = { publicado_em: new Date().toISOString() };
+  if (!tokenAtual) patch.token = crypto.randomUUID().replace(/-/g, "");
+  const { data, error } = await supabase.from("diagnosticos").update(patch).eq("id", id).select().single();
+  if (error) throw error;
+  return mapDiagnostico(data);
+}
+
+export async function despublicarDiagnostico(id) {
+  const { error } = await supabase.from("diagnosticos").update({ publicado_em: null }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function enviarDevolutivaPorEmail(id, link) {
+  const { data, error } = await supabase.functions.invoke("enviar-devolutiva", { body: { id, link } });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return data;
+}
+
+// --- Ajustes de texto do diagnóstico (/admin/diagnosticos/ajustes) ---
+
+// Conteúdo-base (o JSON do código do diagnóstico), publicado em <diagnóstico>/conteudo.json.
+export async function getConteudoBaseDiagnostico() {
+  const res = await fetch(`${DIAGNOSTICO_URL}/conteudo.json`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Não consegui ler o conteúdo do diagnóstico (${res.status}).`);
+  return res.json();
+}
+
+export async function getAjustesDiagnostico() {
+  const { data, error } = await supabase
+    .from("diagnostico_ajustes")
+    .select("ajustes, criado_em")
+    .order("id", { ascending: false })
+    .limit(1);
+  if (error) throw error;
+  return data[0] ? { ajustes: data[0].ajustes || {}, criadoEm: data[0].criado_em } : { ajustes: {}, criadoEm: null };
+}
+
+export async function salvarAjustesDiagnostico(ajustes) {
+  const { data, error } = await supabase
+    .from("diagnostico_ajustes")
+    .insert({ ajustes })
+    .select("criado_em")
+    .single();
+  if (error) throw error;
+  return data.criado_em;
+}
+
+// Oferta que você vai propor (substitui a sugestão automática). null volta para a sugestão.
+export async function salvarOfertaEscolhida(id, oferta, ofertaSugerida) {
+  const { error } = await supabase
+    .from("diagnosticos")
+    .update({ oferta_escolhida: oferta, oferta_entrada: oferta?.principal?.nome ?? ofertaSugerida ?? null })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+// Catálogo de ofertas de entrada do diagnóstico (conteúdo do código + ajustes de texto).
+let catalogoOfertas = null;
+export async function getCatalogoOfertas() {
+  if (catalogoOfertas) return catalogoOfertas;
+  const [base, { ajustes }] = await Promise.all([getConteudoBaseDiagnostico(), getAjustesDiagnostico()]);
+  for (const [caminho, valor] of Object.entries(ajustes || {})) {
+    const partes = caminho.split(".");
+    let no = base;
+    for (const p of partes.slice(0, -1)) no = no?.[p];
+    const ultima = partes[partes.length - 1];
+    if (no && typeof no[ultima] === "string") no[ultima] = valor;
+  }
+  const o = base.ofertas_entrada;
+  const lista = [];
+  for (const def of Object.values(o.por_pilar)) {
+    if (def.por_pergunta_mais_fraca) lista.push(...Object.values(def.por_pergunta_mais_fraca));
+    else lista.push(def);
+  }
+  lista.push(o.ainda_no_comeco);
+  catalogoOfertas = lista.map(({ nome, descricao }) => ({ nome, descricao }));
+  return catalogoOfertas;
+}
