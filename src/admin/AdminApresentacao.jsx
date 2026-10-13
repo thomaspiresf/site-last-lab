@@ -306,19 +306,36 @@ function Painel({ item, ap, salvar, urls, dados }) {
 
 // ---------- dados ----------
 
-/** O que foi salvo para o lead, com as sugestões nos campos ainda vazios (o que você escreveu fica). */
+/**
+ * O que foi salvo para o lead, com as sugestões do serviço oferecido nos campos que você não escreveu.
+ * Guarda para qual serviço as sugestões foram feitas (servico): se a oferta mudar, o que ainda é
+ * sugestão automática troca pelas do serviço novo; o que você escreveu fica.
+ */
 export function apresentacaoInicial(item) {
   const a = item.apresentacao || {};
-  const visao = VISAO_PADRAO[ofertaDoLead(item).servicoId];
+  const atual = ofertaDoLead(item).servicoId;
+  const visao = VISAO_PADRAO[atual];
   const salvas = a.observacoes?.length ? a.observacoes : VAZIO3();
-  return {
+  const ehSugestao = (o, i, svc) => {
+    const b = VISAO_PADRAO[svc]?.observacoes[i];
+    return !!b && o.titulo === b.titulo && o.texto === b.texto;
+  };
+  // leads salvos antes de existir "servico": descobre pelas sugestões que estão gravadas
+  const anterior = a.servico || Object.keys(VISAO_PADRAO).find((svc) => salvas.some((o, i) => ehSugestao(o, i, svc)));
+  const trocou = anterior && anterior !== atual;
+  const igual = (x, y) => JSON.stringify(x) === JSON.stringify(y);
+  const novo = {
     ...a,
-    visaoTitulo: a.visaoTitulo || visao?.titulo || "",
+    servico: atual,
+    visaoTitulo: !a.visaoTitulo || (trocou && a.visaoTitulo === VISAO_PADRAO[anterior]?.titulo) ? visao?.titulo || "" : a.visaoTitulo,
     observacoes: salvas.map((o, i) => {
       const base = visao?.observacoes[i];
-      return base && !o.titulo && !o.texto ? { ...o, titulo: base.titulo, texto: base.texto, fonte: "provavel" } : o;
+      const sugestaoVelha = trocou && ehSugestao(o, i, anterior);
+      return base && ((!o.titulo && !o.texto) || sugestaoVelha) ? { ...o, titulo: base.titulo, texto: base.texto, fonte: "provavel" } : o;
     }),
   };
+  if (trocou && igual(a.casos, CASOS_PADRAO[anterior])) delete novo.casos; // volta aos casos do serviço novo
+  return novo;
 }
 
 // Sugestão do resumo: o pilar mais forte e o mais fraco, em linguagem de cliente.
