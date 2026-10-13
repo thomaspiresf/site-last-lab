@@ -7,3 +7,11 @@
   RewriteCond %{REQUEST_FILENAME} !-l
   RewriteRule . /index.html [L]
 </IfModule>
+
+# Páginas (HTML) sempre conferidas com o servidor: evita o navegador mostrar uma versão antiga
+# depois de uma publicação. Os arquivos de /assets têm nome com hash e podem ficar em cache.
+<IfModule mod_headers.c>
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
