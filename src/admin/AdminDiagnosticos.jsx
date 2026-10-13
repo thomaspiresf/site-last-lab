@@ -19,6 +19,7 @@ import {
   ImageDown,
   SlidersHorizontal,
   Pencil,
+  Presentation,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
@@ -383,6 +384,18 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
       </Bloco>
 
       <BlocoDevolutiva item={item} onAtualizar={onAtualizar} onSubstituir={onSubstituir} />
+
+      <Link to={`/admin/diagnosticos/${item.id}/apresentar`}
+        className="flex items-center justify-between gap-4 rounded-2xl bg-black text-white px-5 py-4 hover:bg-zinc-800">
+        <span className="flex items-center gap-3">
+          <Presentation size={20} className="text-[#ef4b3a]" />
+          <span>
+            <b className="block text-sm">Apresentação da reunião</b>
+            <span className="text-xs text-white/60">Slides com os dados do diagnóstico, para apresentar ou exportar em PDF</span>
+          </span>
+        </span>
+        <span className="text-sm font-semibold">Abrir →</span>
+      </Link>
 
       <div className="grid md:grid-cols-2 gap-4 items-start">
         <div className="rounded-2xl bg-zinc-900 text-white p-5">

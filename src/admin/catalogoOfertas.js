@@ -1,0 +1,181 @@
+// Catálogo dos serviços de entrada (doc "Catálogo de ofertas Last Lab"). As 19 ofertas que o
+// diagnóstico sugere viram 7 serviços; o nome que o cliente viu no diagnóstico continua sendo o título.
+// Prazo e investimento ficam null até serem definidos ("a definir" na apresentação).
+
+export const SERVICOS = {
+  revisao: {
+    nome: "Revisão de pontos de contato",
+    promessa: "Fazer o cliente perceber o valor antes de ver o preço.",
+    entregas: [
+      "Diagnóstico dos 5 pontos que mais pesam no preço",
+      "Perfil do Instagram ajustado: bio, destaques e capa",
+      "Proposta ou orçamento atual ajustado",
+      "Guia curto de tom e de fotos",
+    ],
+    naoInclui: "nova identidade visual, site e produção de fotos",
+    projeto: "Identidade e posicionamento",
+    prazo: null,
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  mensagem: {
+    nome: "Workshop de mensagem",
+    promessa: "Uma frase que qualquer cliente consegue repetir.",
+    entregas: [
+      "Guia de mensagem: frase, para quem é e o que diferencia",
+      "Tom de voz e 3 mensagens-chave",
+      "Bio do Instagram e apresentação reescritas",
+    ],
+    naoInclui: "identidade visual e produção de conteúdo",
+    projeto: "Identidade e posicionamento",
+    prazo: null,
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  pagina: {
+    nome: "Página que converte",
+    promessa: "Uma página que confirma a indicação e gera contato.",
+    entregas: [
+      "1 página com textos, projetos e contato",
+      "Bio e destaques do Instagram apontando para ela",
+      "Domínio e formulário configurados",
+    ],
+    naoInclui: "site com várias páginas, loja, fotos e hospedagem",
+    projeto: "Site completo",
+    prazo: null,
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  instagram: {
+    nome: "Instagram alinhado",
+    promessa: "Um perfil com a cara do negócio, fácil de manter.",
+    entregas: [
+      "Modelos editáveis de post, stories e carrossel",
+      "Capas de destaque e bio",
+      "Linha editorial com 4 temas fixos",
+      "Negócio local: perfil do Google organizado",
+    ],
+    naoInclui: "gestão mensal, fotos, vídeos e anúncios",
+    projeto: "Conteúdo mensal",
+    prazo: null,
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  apresentacao: {
+    nome: "Apresentação e proposta",
+    promessa: "Um material que vende quando você não está na sala.",
+    entregas: [
+      "Apresentação institucional de 10 a 15 slides",
+      "Modelo de proposta ou orçamento editável",
+      "Roteiro curto de como usar na reunião",
+    ],
+    naoInclui: "treinamento de vendas, vídeos e impressão",
+    projeto: "Sistema comercial",
+    prazo: null,
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  jornada: {
+    nome: "Jornada do cliente",
+    promessa: "Do primeiro contato ao pós-venda, um caminho pensado.",
+    entregas: [
+      "Mapa da jornada em uma página",
+      "Mensagens prontas para cada etapa",
+      "Material de boas-vindas",
+      "Roteiro de pós-venda e pedido de indicação",
+    ],
+    naoInclui: "automação e CRM",
+    projeto: "Sistema comercial",
+    prazo: null,
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  kit: {
+    nome: "Kit essencial de marca",
+    promessa: "Uma base simples para começar com cara de marca.",
+    entregas: [
+      "Logo simplificado, com versões",
+      "Paleta e 2 fontes",
+      "Frase de apresentação e bio do Instagram",
+      "3 modelos de post",
+    ],
+    naoInclui: "manual de marca completo, site e várias propostas de logo",
+    projeto: "Identidade e posicionamento",
+    prazo: null,
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+};
+
+// Nome da oferta no diagnóstico → serviço do catálogo.
+const MAPA = {
+  "Revisão de pontos de contato": "revisao",
+  "Workshop de mensagem": "mensagem",
+  "Landing page": "pagina",
+  "Presença que passa confiança": "pagina",
+  "Página de autoridade": "pagina",
+  "Portfólio que atrai": "pagina",
+  "Loja que vende": "pagina",
+  "Página de produto e embalagem": "pagina",
+  "Pack de artes para o Instagram": "instagram",
+  "Instagram e Google em dia": "instagram",
+  "Conteúdo que matricula": "instagram",
+  "Apresentação comercial essencial": "apresentacao",
+  "Proposta de honorários": "apresentacao",
+  "Proposta de projeto": "apresentacao",
+  "Plano de tratamento apresentado": "apresentacao",
+  "Kit de jornada": "jornada",
+  "Kit de atendimento no WhatsApp": "jornada",
+  "Jornada de matrícula": "jornada",
+  "Kit essencial de marca": "kit",
+};
+
+// Nome atual de cada momento da marca (o lead guarda o nome da época em que fez o diagnóstico).
+export const MOMENTOS = {
+  joia_escondida: "Joia Escondida",
+  talento_sem_palco: "Presença que Vende",
+  mensagem_difusa: "Uma História a Contar",
+  loja_sem_vitrine: "Pronto pra Aparecer",
+  jornada_no_improviso: "Experiência em Evolução",
+  marca_estruturada: "Marca Estruturada",
+  ainda_no_comeco: "Primeiros Passos",
+};
+
+// Texto padrão do slide "O custo de ficar como está", por momento da marca (editável por lead).
+export const CUSTO_PADRAO = {
+  joia_escondida: {
+    frase: "O cliente decide pelo preço antes de conhecer o seu valor.",
+    consequencias: ["Quem compara pela aparência escolhe o mais barato.", "Você negocia desconto em vez de valor.", "O trabalho bom não aparece na primeira impressão."],
+  },
+  talento_sem_palco: {
+    frase: "Quando você não está na sala, a venda depende da sorte.",
+    consequencias: ["A proposta chega sozinha e vira só um número.", "Quem decide junto com o cliente não te ouviu.", "Você repete a mesma explicação toda vez."],
+  },
+  mensagem_difusa: {
+    frase: "Se ninguém consegue explicar o que você faz, ninguém consegue te indicar.",
+    consequencias: ["Cada cliente entende uma coisa diferente.", "A indicação chega sem saber o que pedir.", "O preço vira a única comparação."],
+  },
+  loja_sem_vitrine: {
+    frase: "A indicação chega quente e esfria antes da primeira conversa.",
+    consequencias: ["Quem pesquisa e não encontra nada vai para quem aparece.", "Sem referência, o orçamento é comparado só pelo preço.", "Você depende de estar na sala para convencer."],
+  },
+  jornada_no_improviso: {
+    frase: "O cliente gosta do resultado, mas não do caminho até ele.",
+    consequencias: ["Cada atendimento sai de um jeito.", "O cliente não sabe o próximo passo e esfria.", "Pouca indicação, mesmo com cliente satisfeito."],
+  },
+  marca_estruturada: {
+    frase: "O que trouxe a marca até aqui não é o que leva ao próximo nível.",
+    consequencias: ["Os detalhes que faltam são os que o cliente mais nota.", "Concorrentes copiam o que funciona.", "Crescer pede consistência em escala."],
+  },
+  ainda_no_comeco: {
+    frase: "Começar sem base faz cada passo custar mais caro depois.",
+    consequencias: ["Cada material sai de um jeito.", "O cliente não reconhece a marca de um canal para outro.", "Refazer custa mais do que fazer certo agora."],
+  },
+};
+
+/** Oferta do lead (a escolhida no admin ou a sugerida) com a ficha do serviço correspondente. */
+export function ofertaDoLead(item) {
+  const oferta = (item.ofertaEscolhida ?? item.dados?.devolutiva?.oferta)?.principal;
+  const id = MAPA[oferta?.nome] || "pagina";
+  return { titulo: oferta?.nome || SERVICOS[id].nome, servicoId: id, servico: SERVICOS[id] };
+}

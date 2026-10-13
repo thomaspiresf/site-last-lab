@@ -19,6 +19,7 @@ import AdminClientReferences from "./admin/AdminClientReferences";
 import AdminBriefings from "./admin/AdminBriefings";
 import AdminDiagnosticos from "./admin/AdminDiagnosticos";
 import AdminDiagnosticoAjustes from "./admin/AdminDiagnosticoAjustes";
+import AdminApresentacao from "./admin/AdminApresentacao";
 import AdminNamingList from "./admin/AdminNamingList";
 import AdminNamingStudy from "./admin/AdminNamingStudy";
 import AdminCalendarEditor from "./admin/AdminCalendarEditor";
@@ -86,6 +87,7 @@ function Shell() {
           <Route path="/admin/briefings" element={<AdminBriefings />} />
           <Route path="/admin/diagnosticos" element={<AdminDiagnosticos />} />
           <Route path="/admin/diagnosticos/ajustes" element={<AdminDiagnosticoAjustes />} />
+          <Route path="/admin/diagnosticos/:id/apresentar" element={<AdminApresentacao />} />
           <Route path="/admin/naming" element={<AdminNamingList />} />
           <Route path="/admin/naming/:studyId" element={<AdminNamingStudy />} />
           <Route path="/admin/calendarios/:calendarId" element={<AdminCalendarEditor />} />

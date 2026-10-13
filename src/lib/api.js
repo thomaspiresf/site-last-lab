@@ -851,6 +851,7 @@ function mapDiagnostico(row) {
     ofertaEscolhida: row.oferta_escolhida,
     personaAvaliacao: row.persona_avaliacao,
     personaSugerida: row.persona_sugerida,
+    apresentacao: row.apresentacao || {},
   };
 }
 
@@ -863,8 +864,9 @@ export async function listDiagnosticos() {
   return data.map(mapDiagnostico);
 }
 
-export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida }) {
+export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao }) {
   const patch = {};
+  if (apresentacao !== undefined) patch.apresentacao = apresentacao;
   if (personaAvaliacao !== undefined) patch.persona_avaliacao = personaAvaliacao;
   if (personaSugerida !== undefined) patch.persona_sugerida = personaSugerida;
   if (status !== undefined) patch.status = status;
@@ -872,6 +874,21 @@ export async function updateDiagnostico(id, { status, anotacoes, analise, person
   if (analise !== undefined) patch.analise = analise;
   const { error } = await supabase.from("diagnosticos").update(patch).eq("id", id);
   if (error) throw error;
+}
+
+export async function getDiagnostico(id) {
+  const { data, error } = await supabase.from("diagnosticos").select("*").eq("id", id).single();
+  if (error) throw error;
+  return mapDiagnostico(data);
+}
+
+// Imagem da apresentação da reunião (prints "do que eu vi de fora"), no bucket privado.
+export async function enviarImagemApresentacao(id, arquivo) {
+  const nome = arquivo.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w.-]+/g, "-");
+  const caminho = `apresentacao/${id}/${crypto.randomUUID()}-${nome}`;
+  const { error } = await supabase.storage.from("diagnostico-arquivos").upload(caminho, arquivo, { contentType: arquivo.type });
+  if (error) throw error;
+  return caminho;
 }
 
 export async function deleteDiagnostico(id) {

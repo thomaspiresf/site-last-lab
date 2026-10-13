@@ -1,0 +1,139 @@
+/* Apresentação da reunião do diagnóstico: slides de 1920×1080 na linguagem da proposta comercial
+   (Poppins, preto, branco gelo e laranja). O palco escala o slide para caber onde for mostrado. */
+
+.apr-palco { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+.apr-palco > .apr-slide { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+
+.apr-slide {
+  --claro: #f2f2f6; --escuro: #050505; --laranja: #ef4b3a; --tinta: #0a0a0a; --suave: #55555d;
+  width: 1920px; height: 1080px; overflow: hidden; position: relative; box-sizing: border-box;
+  font-family: "Poppins", Arial, sans-serif; padding: 120px 128px 200px;
+  display: flex; flex-direction: column; gap: 56px;
+  background: var(--claro); color: var(--tinta);
+}
+.apr-slide * { box-sizing: border-box; margin: 0; }
+.apr-slide.escuro { background: var(--escuro); color: #f7f7f9; }
+.apr-slide.laranja { background: var(--laranja); color: var(--tinta); }
+
+.apr-titulo { display: flex; flex-direction: column; gap: 20px; }
+.apr-titulo h2 { font-size: 120px; font-weight: 300; line-height: 1.02; letter-spacing: -3px; }
+.apr-titulo p { font-size: 48px; font-weight: 300; line-height: 1.2; color: var(--laranja); }
+.apr-titulo.menor h2 { font-size: 104px; }
+
+.apr-rodape {
+  position: absolute; left: 128px; right: 128px; bottom: 56px; height: 64px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 24px; font-weight: 600; line-height: 1.25; text-transform: uppercase; color: var(--laranja);
+}
+.apr-rodape p { width: 420px; }
+.apr-rodape .barras { display: flex; gap: 8px; }
+.apr-rodape .barras i { width: 8px; height: 44px; background: currentColor; border-radius: 2px; }
+.apr-slide.laranja .apr-rodape { color: var(--tinta); }
+
+.apr-vazio { color: #a3a3ab; }
+.apr-slide.escuro .apr-vazio { color: #6b6b73; }
+
+/* capa */
+.apr-capa { justify-content: space-between; padding-top: 110px; }
+.apr-capa .logo { width: 280px; height: 70px; object-fit: contain; object-position: left; filter: invert(1); }
+.apr-capa svg { width: 1664px; height: 420px; display: block; }
+.apr-capa h1 { font-size: 104px; font-weight: 700; line-height: 1; letter-spacing: -2px; text-transform: uppercase; }
+.apr-capa .quem { font-size: 56px; font-weight: 300; text-transform: uppercase; margin-top: 8px; }
+
+/* nossa conversa */
+.apr-tres { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 64px; align-items: start; }
+.apr-tres .num { font-size: 160px; font-weight: 200; line-height: 1; color: var(--laranja); }
+.apr-tres h3 { font-size: 48px; font-weight: 600; line-height: 1.15; margin-top: 16px; }
+.apr-tres p.txt { font-size: 34px; line-height: 1.4; color: var(--suave); margin-top: 16px; }
+
+/* respostas */
+.apr-respostas { flex: 1; display: grid; grid-template-columns: 860px 1fr; gap: 88px; }
+.apr-momento {
+  display: flex; flex-direction: column; justify-content: space-between;
+  background: var(--escuro); color: #f7f7f9; border-radius: 36px; padding: 56px;
+}
+.apr-momento .chapeu { font-size: 26px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--laranja); }
+.apr-momento h3 { font-size: 76px; font-weight: 300; line-height: 1; letter-spacing: -2px; }
+.apr-momento .frase { font-size: 34px; line-height: 1.35; color: #c9c9d1; margin-top: 16px; }
+.apr-momento .base { display: flex; justify-content: space-between; align-items: flex-end; }
+.apr-momento .nota { font-size: 120px; font-weight: 300; line-height: 1; letter-spacing: -3px; }
+.apr-momento .nota span { color: var(--laranja); }
+.apr-momento .faixa { font-size: 26px; font-weight: 600; color: var(--laranja); border: 2px solid var(--laranja); border-radius: 999px; padding: 8px 20px; white-space: nowrap; }
+.apr-barras { display: flex; flex-direction: column; justify-content: space-between; }
+.apr-barra .linha { display: flex; justify-content: space-between; font-size: 36px; }
+.apr-barra .linha b { font-weight: 600; }
+.apr-barra .trilho { background: #dcdce2; border-radius: 999px; height: 14px; margin-top: 12px; }
+.apr-barra .cheia { background: var(--tinta); border-radius: 999px; height: 14px; }
+.apr-barra.fraco .linha { color: var(--laranja); font-weight: 600; }
+.apr-barra.fraco .cheia { background: var(--laranja); }
+
+/* visão de fora e casos */
+.apr-cards { flex: 1; display: grid; gap: 40px; }
+.apr-cards > div { display: flex; flex-direction: column; gap: 24px; min-height: 0; }
+.apr-cards .img { flex: 1; min-height: 0; background: #dcdce2; border-radius: 24px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #8a8a92; }
+.apr-cards .img img { width: 100%; height: 100%; object-fit: cover; }
+.apr-cards h3 { font-size: 40px; font-weight: 600; line-height: 1.15; }
+.apr-cards p { font-size: 32px; line-height: 1.4; color: var(--suave); }
+
+/* custo */
+.apr-custo .chapeu { font-size: 48px; font-weight: 300; text-transform: uppercase; }
+.apr-custo h2 { flex: 1; font-size: 128px; font-weight: 300; line-height: 1.02; letter-spacing: -3px; width: 1600px; }
+.apr-custo .cons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 56px; }
+.apr-custo .cons p { font-size: 36px; line-height: 1.4; border-top: 3px solid var(--tinta); padding-top: 28px; }
+
+/* caminho */
+.apr-degraus { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; align-items: end; }
+.apr-degraus > div { display: flex; flex-direction: column; justify-content: space-between; background: #1a1a1d; border-radius: 32px; padding: 44px; }
+.apr-degraus > div.on { background: var(--laranja); color: #fff; }
+.apr-degraus .et { font-size: 26px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--laranja); }
+.apr-degraus .on .et { color: #fff; }
+.apr-degraus h3 { font-size: 52px; font-weight: 300; line-height: 1.1; letter-spacing: -1px; }
+.apr-degraus p { font-size: 30px; line-height: 1.35; color: #b9b9c1; margin-top: 12px; }
+.apr-degraus .on p { color: #fff; }
+
+/* primeiro passo */
+.apr-passo { flex: 1; display: grid; grid-template-columns: 1fr 620px; gap: 96px; }
+.apr-passo .lista { display: flex; flex-direction: column; gap: 36px; justify-content: center; }
+.apr-passo .lista .rot { font-size: 34px; font-weight: 300; color: var(--laranja); text-transform: uppercase; }
+.apr-check { display: flex; gap: 20px; align-items: center; font-size: 42px; line-height: 1.3; }
+.apr-check i { flex: none; width: 40px; height: 40px; border: 3px solid var(--laranja); border-radius: 50%; position: relative; }
+.apr-check i::after { content: ""; position: absolute; left: 12px; top: 6px; width: 9px; height: 17px; border: solid var(--laranja); border-width: 0 3px 3px 0; transform: rotate(45deg); }
+.apr-invest { display: flex; flex-direction: column; justify-content: space-between; background: var(--escuro); color: #f7f7f9; border-radius: 36px; padding: 56px; }
+.apr-invest .t { font-size: 48px; font-weight: 300; }
+.apr-invest .serv { font-size: 34px; font-weight: 300; color: var(--laranja); }
+.apr-invest .valor { font-size: 80px; font-weight: 300; line-height: 1; margin-top: 12px; }
+.apr-invest .dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; border-top: 2px solid #2c2c31; padding-top: 28px; font-size: 30px; }
+.apr-invest .dupla span { display: block; color: #9a9aa2; }
+.apr-invest .nao { font-size: 24px; line-height: 1.4; color: #9a9aa2; }
+
+/* próximos passos */
+.apr-linha { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; align-items: center; }
+.apr-linha .topo { display: flex; align-items: center; gap: 16px; }
+.apr-linha .bola { width: 64px; height: 64px; border: 3px solid var(--laranja); border-radius: 50%; font-size: 30px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+.apr-linha .fio { flex: 1; height: 3px; background: var(--laranja); }
+.apr-linha > div:last-child .fio { background: transparent; }
+.apr-linha h3 { font-size: 44px; font-weight: 500; margin-top: 20px; }
+.apr-linha p { font-size: 32px; line-height: 1.4; color: var(--suave); margin-top: 20px; }
+
+/* fechamento */
+.apr-fim { display: grid; grid-template-columns: 1fr 1fr; gap: 96px; }
+.apr-fim .esq { display: flex; flex-direction: column; justify-content: space-between; }
+.apr-fim h2 { font-size: 112px; font-weight: 300; line-height: 1.02; letter-spacing: -3px; width: 860px; }
+.apr-fim .logo { width: 320px; height: 80px; object-fit: contain; object-position: left; filter: invert(1); }
+.apr-fim .assin { font-size: 34px; font-weight: 300; line-height: 1.4; color: var(--laranja); width: 760px; margin-top: 20px; }
+.apr-fim .dir { display: flex; flex-direction: column; justify-content: flex-end; gap: 20px; font-size: 36px; }
+
+/* modo apresentar: tela cheia, um slide por vez */
+.apr-show { position: fixed; inset: 0; z-index: 100; background: #000; display: flex; align-items: center; justify-content: center; cursor: none; }
+.apr-show .apr-palco { width: min(100vw, calc(100vh * 16 / 9)); }
+.apr-show-dica { position: fixed; bottom: 16px; right: 20px; color: #666; font: 12px/1 system-ui, sans-serif; }
+
+/* PDF: imprime só os slides, um por página */
+.apr-impressao { display: none; }
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  .apr-tela, .apr-show { display: none !important; }
+  .apr-impressao { display: block; }
+  html, body { background: #fff; }
+  .apr-impressao .apr-slide { break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
