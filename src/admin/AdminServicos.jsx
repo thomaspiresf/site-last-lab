@@ -204,6 +204,8 @@ const DEGRAUS = [
 
 /** Prazo curto: "3 a 4 semanas" → "3–4 sem". */
 const curto = (t = "") => t.replace(/ a /g, "–").replace(/semanas?/, "sem").replace(/dias úteis/, "dias");
+/** Faixa de valor curta: "R$ 3.500 a R$ 6.000" → "R$ 3.500–6.000". */
+const faixa = (t = "") => t.replace(/ a R\$ ?/g, "–");
 
 /** Maior valor em reais escrito num texto ("R$ 4.500 a R$ 9.000" → 9000); null se não houver. */
 const maiorValor = (t = "") => {
@@ -226,13 +228,17 @@ const Medidor = ({ n }) => (
   </span>
 );
 
+/** Item clicável: cartão branco com contorno fino e seta; escurece ao passar o mouse. */
 const Celula = ({ onClick, titulo, meta, n }) => (
-  <button onClick={onClick} className="text-left rounded-lg px-3 py-2 -mx-1 hover:bg-zinc-100 transition-colors min-w-0">
-    <p className="text-sm font-medium text-zinc-900 leading-snug">{titulo}</p>
-    <div className="flex items-center gap-2 mt-1 min-w-0">
-      {n && <Medidor n={n} />}
-      {meta && <p className="text-xs text-zinc-400 truncate">{meta}</p>}
+  <button onClick={onClick} className="group w-full text-left rounded-lg border border-zinc-200 bg-white px-3 py-2.5 hover:border-zinc-400 hover:shadow-sm transition flex items-center gap-2 min-w-0 cursor-pointer">
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-medium text-zinc-900 leading-snug">{titulo}</p>
+      <div className="flex items-center gap-2 mt-1 min-w-0">
+        {n && <Medidor n={n} />}
+        {meta && <p className="text-xs text-zinc-400 truncate">{meta}</p>}
+      </div>
     </div>
+    <ChevronRight size={15} className="shrink-0 text-zinc-300 group-hover:text-zinc-700 group-hover:translate-x-0.5 transition" />
   </button>
 );
 
@@ -241,7 +247,7 @@ export function VisaoGeral({ r, escolher }) {
     <div className="flex flex-col gap-8">
       {/* o caminho do cliente, numa linha */}
       <section>
-        <p className="text-sm text-zinc-500 mb-3">O diagnóstico aponta a área mais fraca. A reunião vende a entrada dessa área; depois o cliente sobe na mesma área e termina num plano mensal.</p>
+        <p className="text-sm text-zinc-500 mb-3">O diagnóstico aponta a área mais fraca. A reunião vende a entrada dessa área; depois o cliente sobe na mesma área e termina num plano mensal. <span className="text-zinc-900">Clique em qualquer item para editar os textos e ver a apresentação.</span></p>
         <ol className="flex items-stretch bg-white border border-zinc-200 rounded-xl divide-x divide-zinc-200">
           {DEGRAUS.map(([nome, papel], i) => (
             <li key={nome} className="flex-1 px-4 py-3">
@@ -256,28 +262,28 @@ export function VisaoGeral({ r, escolher }) {
       {/* áreas × degraus */}
       <section className="bg-white border border-zinc-200 rounded-xl overflow-hidden">
         <div className={`${COLUNAS} gap-4 px-5 py-3 border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold uppercase tracking-wider text-zinc-500`}>
-          <span className="pl-7">Área do diagnóstico</span><span className="pl-2">1 · Entrada</span><span className="pl-2">2 · Principal</span><span className="pl-2">3 · Premium</span>
+          <span className="pl-7">Área do diagnóstico</span><span className="pl-3">1 · Entrada</span><span className="pl-3">2 · Principal</span><span className="pl-3">3 · Premium</span>
         </div>
         {Object.entries(r.areas).map(([aid, a]) => {
           const Icone = ICONES[aid] || Gem;
           const area = () => escolher({ tipo: "area", id: aid });
           return (
             <div key={aid} className={`${COLUNAS} gap-4 px-5 py-3 border-b border-zinc-100 last:border-0 items-start`}>
-              <button onClick={area} className="flex items-start gap-3 text-left rounded-lg px-1 py-2 -mx-1 hover:bg-zinc-100 transition-colors min-w-0">
+              <button onClick={area} className="group flex items-start gap-3 text-left rounded-lg border border-transparent px-2 py-2.5 -mx-2 hover:border-zinc-200 hover:bg-white transition min-w-0 cursor-pointer">
                 <Icone size={16} className="text-zinc-400 mt-0.5 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-zinc-900">{a.nome}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-zinc-900 group-hover:underline underline-offset-2 decoration-zinc-300">{a.nome}</p>
                   <p className="text-xs text-zinc-500 leading-snug mt-0.5">{a.problema}</p>
                 </div>
               </button>
-              <div className="flex flex-col">
+              <div className="flex flex-col gap-2">
                 {a.entradas.map((sid) => r.servicos[sid] && (
                   <Celula key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} titulo={r.servicos[sid].nome} n={nivel(r.servicos[sid].investimento, "projeto", 1)}
                     meta={`${r.servicos[sid].investimento || "Valor a definir"} · ${curto(r.servicos[sid].prazo) || "prazo a definir"}`} />
                 ))}
               </div>
-              <Celula onClick={area} titulo={a.principal.nome} n={nivel(a.principal.valor, "projeto", 2)} meta={`${a.principal.valor} · ${curto(a.principal.prazo)}`} />
-              <Celula onClick={area} titulo={a.premium.nome} n={nivel(a.premium.valor, "projeto", 3)} meta={`${a.premium.valor} · ${curto(a.premium.prazo)}`} />
+              <Celula onClick={area} titulo={a.principal.nome} n={nivel(a.principal.valor, "projeto", 2)} meta={`${faixa(a.principal.valor)} · ${curto(a.principal.prazo)}`} />
+              <Celula onClick={area} titulo={a.premium.nome} n={nivel(a.premium.valor, "projeto", 3)} meta={`${faixa(a.premium.valor)} · ${curto(a.premium.prazo)}`} />
             </div>
           );
         })}
@@ -292,7 +298,7 @@ export function VisaoGeral({ r, escolher }) {
         <div className="grid grid-cols-4 gap-4 px-5 py-3">
           {Object.entries(r.continuidade).map(([pid, pl], i) => (
             <Celula key={pid} onClick={() => escolher({ tipo: "continuidade" })} titulo={pl.nome} n={i + 1}
-              meta={`${pl.valor}${/parceiro/i.test(pl.quem) ? " · com parceiro de tráfego" : ""}`} />
+              meta={`${faixa(pl.valor)}${/parceiro/i.test(pl.quem) ? " · com parceiro de tráfego" : ""}`} />
           ))}
         </div>
       </section>
