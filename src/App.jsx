@@ -42,6 +42,21 @@ function ScrollToTop() {
   return null;
 }
 
+// O diagnóstico é uma página estática em public/diagnostico. Se o app do site abrir em
+// /diagnostico (link interno ou página guardada em cache), recarrega a versão estática.
+function IrParaDiagnostico() {
+  const jaTentou = new URLSearchParams(window.location.search).has("r");
+  useEffect(() => {
+    if (jaTentou) return;
+    // ?r=1 muda o endereço, então o navegador não reaproveita a cópia antiga (e não entra em loop)
+    const resto = window.location.pathname.replace(/^\/diagnostico\/?/, "");
+    const busca = new URLSearchParams(window.location.search);
+    busca.set("r", "1");
+    window.location.replace(`/diagnostico/${resto}?${busca}${window.location.hash}`);
+  }, [jaTentou]);
+  return jaTentou ? <Home /> : null;
+}
+
 function Shell() {
   const { pathname } = useLocation();
   const hideAgencyChrome =
@@ -83,6 +98,7 @@ function Shell() {
           <Route path="/site-ppp" element={<ProjectDetail />} />
           <Route path="/highline" element={<ProjectDetail />} />
           <Route path="/guarana-story" element={<ProjectDetail />} />
+          <Route path="/diagnostico/*" element={<IrParaDiagnostico />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </main>
