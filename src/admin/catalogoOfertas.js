@@ -1,26 +1,10 @@
-// Catálogo dos serviços de entrada (doc "Catálogo de ofertas Last Lab"). As 19 ofertas que o
-// diagnóstico sugere viram 7 serviços; o nome que o cliente viu no diagnóstico continua sendo o título.
-// Prazo e investimento ficam null até serem definidos ("a definir" na apresentação).
+// Catálogo da escada de valor (doc "Escada de valor Last Lab"). SERVICOS são as ofertas de ENTRADA,
+// as que a reunião vende (cada uma tem slides próprios). AREAS liga cada área do diagnóstico às suas
+// entradas e aos degraus seguintes (principal e premium). CONTINUIDADE são os planos mensais.
+// O nome que o cliente viu no diagnóstico continua sendo o título da proposta.
+// Investimento fica null até ser definido ("R$ ____" na apresentação).
 
 export const SERVICOS = {
-  revisao: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião para entender o que mais pesa no preço"}, {"nome": "Revisão", "texto": "Ajuste de perfil, proposta e materiais"}, {"nome": "Entrega", "texto": "Reunião para mostrar tudo e o guia de uso"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
-    exemplo: "studio-vzo",
-    depois: ["O cliente percebe o valor antes de perguntar o preço", "Instagram, proposta e orçamento com a mesma cara de marca", "Menos pedido de desconto na hora de fechar"],
-    nome: "Revisão de pontos de contato",
-    promessa: "Fazer o cliente perceber o valor antes de ver o preço.",
-    entregas: [
-      "Diagnóstico dos 5 pontos que mais pesam no preço",
-      "Perfil do Instagram ajustado: bio, destaques e capa",
-      "Proposta ou orçamento atual ajustado",
-      "Guia curto de tom e de fotos",
-    ],
-    naoInclui: "nova identidade visual, site e produção de fotos",
-    projeto: "Identidade e posicionamento",
-    prazo: null,
-    investimento: null,
-    ajustes: "1 rodada",
-  },
   mensagem: {
     etapas: [{"nome": "Formulário", "texto": "Você responde 8 perguntas antes da sessão"}, {"nome": "Workshop", "texto": "2 horas, online, juntos"}, {"nome": "Guia de mensagem", "texto": "PDF entregue em até 7 dias úteis"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
     exemplo: "guia",
@@ -30,11 +14,44 @@ export const SERVICOS = {
     entregas: [
       "Guia de mensagem: frase, para quem é e o que diferencia",
       "Tom de voz e 3 mensagens-chave",
-      "Bio do Instagram e apresentação reescritas",
+      "Bio do Instagram reescrita",
     ],
-    naoInclui: "identidade visual e produção de conteúdo",
-    projeto: "Identidade e posicionamento",
-    prazo: null,
+    naoInclui: "identidade visual, site e produção de conteúdo",
+    prazo: "7 dias úteis",
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  revisao: {
+    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao que você usa hoje"}, {"nome": "Ajuste visual", "texto": "Logo, cores e fontes para aprovar"}, {"nome": "Aplicação", "texto": "Perfil, WhatsApp e brand board"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
+    exemplo: "studio-vzo",
+    depois: ["O cliente percebe o valor antes de perguntar o preço", "A mesma cara de marca no Instagram, no WhatsApp e no orçamento", "Fotos que valorizam o trabalho em vez de esconder"],
+    nome: "Revisão de imagem",
+    promessa: "Fazer a marca parecer tão boa quanto o seu trabalho.",
+    entregas: [
+      "Logo ajustado para uso digital, com versões",
+      "Paleta e fontes organizadas num brand board de 1 página",
+      "Perfil do Instagram e do WhatsApp com a mesma cara",
+      "Guia de fotos: como fotografar o seu trabalho",
+    ],
+    naoInclui: "nova identidade visual, textos e tom de voz, site",
+    prazo: "2 semanas",
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  kit: {
+    etapas: [{"nome": "Briefing", "texto": "Referências e o que você já tem"}, {"nome": "Proposta visual", "texto": "Logo, cores e fontes"}, {"nome": "Ajuste", "texto": "1 rodada"}, {"nome": "Entrega", "texto": "Arquivos e aplicações prontas"}],
+    exemplo: "una",
+    depois: ["Uma marca com cara de negócio sério desde o começo", "Cores, fontes e logo para usar em tudo, sem improviso", "Uma base pronta para crescer sem refazer depois"],
+    nome: "Kit essencial de marca",
+    promessa: "Uma base simples para começar com cara de marca.",
+    entregas: [
+      "Logo e 2 variações",
+      "Paleta de cores e tipografia",
+      "Brand board de 1 página",
+      "5 aplicações: perfil, cartão, assinatura de e-mail, capa e post",
+    ],
+    naoInclui: "manual de marca completo, site e textos",
+    prazo: "2 a 3 semanas",
     investimento: null,
     ajustes: "1 rodada",
   },
@@ -42,91 +59,142 @@ export const SERVICOS = {
     etapas: [{"nome": "Briefing", "texto": "Reunião e envio de fotos e textos"}, {"nome": "Estrutura", "texto": "Textos e organização para aprovar"}, {"nome": "Página no ar", "texto": "Com domínio, formulário e Instagram apontando para ela"}, {"nome": "Ajuste", "texto": "1 rodada"}],
     exemplo: "site-pronto-pra-partir",
     depois: ["Um link para mandar quando pedirem o seu trabalho", "Quem pesquisa o seu nome encontra o que você faz de melhor", "Contatos chegando pela página, não só por indicação"],
-    nome: "Página que converte",
+    nome: "Landing page que converte",
     promessa: "Uma página que confirma a indicação e gera contato.",
     entregas: [
-      "1 página com textos, projetos e contato",
-      "Bio e destaques do Instagram apontando para ela",
-      "Domínio e formulário configurados",
+      "1 página com textos, projetos, depoimentos e contato",
+      "Domínio, formulário e botão de WhatsApp",
+      "Pixel e Analytics para medir os contatos",
+      "Bio do Instagram apontando para a página",
     ],
-    naoInclui: "site com várias páginas, loja, fotos e hospedagem",
-    projeto: "Site completo",
-    prazo: null,
+    naoInclui: "site com várias páginas, loja, fotos e anúncios",
+    prazo: "2 a 3 semanas",
     investimento: null,
     ajustes: "1 rodada",
   },
   instagram: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao perfil"}, {"nome": "Modelos", "texto": "Posts, stories e capas para aprovar"}, {"nome": "Entrega", "texto": "Arquivos editáveis no Canva e linha editorial"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao perfil"}, {"nome": "Modelos", "texto": "Posts, stories e capas para aprovar"}, {"nome": "Entrega", "texto": "Arquivos editáveis no Canva e guia de uso"}, {"nome": "Ajuste", "texto": "1 rodada"}],
     exemplo: "impacto-conquer",
     depois: ["Um perfil que parece da mesma empresa do começo ao fim", "Posts fáceis de fazer, sem começar do zero toda vez", "Quem chega entende o que você faz e como contratar"],
-    nome: "Instagram alinhado",
+    nome: "Visual das redes e templates",
     promessa: "Um perfil com a cara do negócio, fácil de manter.",
     entregas: [
-      "Modelos editáveis de post, stories e carrossel",
-      "Capas de destaque e bio",
-      "Linha editorial com 4 temas fixos",
-      "Negócio local: perfil do Google organizado",
+      "Bio, destaques e capas",
+      "12 templates editáveis no Canva: post, carrossel e story",
+      "Guia de uso de 1 página",
     ],
-    naoInclui: "gestão mensal, fotos, vídeos e anúncios",
-    projeto: "Conteúdo mensal",
-    prazo: null,
+    naoInclui: "produção mensal de posts, fotos, vídeos e anúncios",
+    prazo: "2 semanas",
+    investimento: null,
+    ajustes: "1 rodada",
+  },
+  proposta: {
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio das propostas atuais"}, {"nome": "Estrutura", "texto": "Textos e ordem para aprovar"}, {"nome": "Design", "texto": "Modelo editável com a cara da marca"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    exemplo: "boo",
+    depois: ["Uma proposta que explica o valor sem você estar junto", "Menos propostas comparadas só pelo preço", "Orçamentos montados em minutos, sempre com a mesma cara"],
+    nome: "Modelo de proposta e orçamento",
+    promessa: "Uma proposta que mostra o valor antes do preço.",
+    entregas: [
+      "Modelo de proposta editável, no Canva ou no Google",
+      "Textos de escopo, etapas, condições e validade",
+      "Versão curta para mandar pelo WhatsApp",
+    ],
+    naoInclui: "apresentação institucional, catálogo e treinamento de vendas",
+    prazo: "1 a 2 semanas",
     investimento: null,
     ajustes: "1 rodada",
   },
   apresentacao: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e envio do material atual"}, {"nome": "Estrutura", "texto": "Roteiro e textos para aprovar"}, {"nome": "Design", "texto": "Apresentação e modelo de proposta"}, {"nome": "Ajuste", "texto": "1 rodada e entrega editável"}],
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio do material atual"}, {"nome": "Estrutura", "texto": "Roteiro e textos para aprovar"}, {"nome": "Design", "texto": "Apresentação editável"}, {"nome": "Ajuste", "texto": "1 rodada e entrega em PDF"}],
     exemplo: "boo",
-    depois: ["Uma proposta que explica o valor sem você estar junto", "Reuniões conduzidas por um material que reforça o que você diz", "Menos propostas comparadas só pelo preço"],
-    nome: "Apresentação e proposta",
+    depois: ["Reuniões conduzidas por um material que reforça o que você diz", "Quem decide junto com o cliente entende o seu valor", "A mesma história contada do mesmo jeito, toda vez"],
+    nome: "Apresentação comercial",
     promessa: "Um material que vende quando você não está na sala.",
     entregas: [
-      "Apresentação institucional de 10 a 15 slides",
-      "Modelo de proposta ou orçamento editável",
+      "Apresentação de 12 a 15 slides: quem somos, problema, método, casos, serviços e próximos passos",
+      "Arquivo editável e versão em PDF",
       "Roteiro curto de como usar na reunião",
     ],
-    naoInclui: "treinamento de vendas, vídeos e impressão",
-    projeto: "Sistema comercial",
-    prazo: null,
+    naoInclui: "modelo de proposta, vídeos e impressão",
+    prazo: "2 semanas",
     investimento: null,
     ajustes: "1 rodada",
   },
   jornada: {
-    etapas: [{"nome": "Mapeamento", "texto": "Reunião sobre como você atende hoje"}, {"nome": "Mapa e mensagens", "texto": "Jornada e textos para aprovar"}, {"nome": "Materiais", "texto": "Boas-vindas, pós-venda e pedido de indicação"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    etapas: [{"nome": "Mapeamento", "texto": "Reunião sobre como você atende hoje"}, {"nome": "Mensagens", "texto": "Textos de cada momento para aprovar"}, {"nome": "Configuração", "texto": "Perfil, catálogo e respostas rápidas"}, {"nome": "Ajuste", "texto": "1 rodada"}],
     exemplo: "pronto-pra-partir",
-    depois: ["Cada cliente atendido do mesmo jeito, do primeiro contato ao pós-venda", "O cliente sempre sabe qual é o próximo passo", "Mais indicações de quem já comprou"],
-    nome: "Jornada do cliente",
-    promessa: "Do primeiro contato ao pós-venda, um caminho pensado.",
+    depois: ["Cada cliente atendido do mesmo jeito, sem esquecer ninguém", "Resposta rápida, mesmo nos dias corridos", "O cliente sempre sabe qual é o próximo passo"],
+    nome: "Kit de atendimento no WhatsApp",
+    promessa: "Todo cliente bem atendido, do primeiro contato ao pós-venda.",
     entregas: [
-      "Mapa da jornada em uma página",
-      "Mensagens prontas para cada etapa",
-      "Material de boas-vindas",
-      "Roteiro de pós-venda e pedido de indicação",
+      "WhatsApp Business configurado: perfil, catálogo e etiquetas",
+      "Mensagens prontas para 8 momentos, do primeiro contato ao pós-venda",
+      "Respostas rápidas para as perguntas mais comuns",
     ],
-    naoInclui: "automação e CRM",
-    projeto: "Sistema comercial",
-    prazo: null,
-    investimento: null,
-    ajustes: "1 rodada",
-  },
-  kit: {
-    etapas: [{"nome": "Briefing", "texto": "Referências e o que você já tem"}, {"nome": "Proposta visual", "texto": "Logo, cores e fontes"}, {"nome": "Ajuste", "texto": "1 rodada"}, {"nome": "Entrega", "texto": "Arquivos e modelos de post"}],
-    exemplo: "una",
-    depois: ["Uma marca com cara de negócio sério desde o começo", "Cores, fontes e logo para usar em tudo, sem improviso", "Uma base pronta para crescer sem refazer depois"],
-    nome: "Kit essencial de marca",
-    promessa: "Uma base simples para começar com cara de marca.",
-    entregas: [
-      "Logo simplificado, com versões",
-      "Paleta e 2 fontes",
-      "Frase de apresentação e bio do Instagram",
-      "3 modelos de post",
-    ],
-    naoInclui: "manual de marca completo, site e várias propostas de logo",
-    projeto: "Identidade e posicionamento",
-    prazo: null,
+    naoInclui: "automação, CRM e atendimento por você",
+    prazo: "1 a 2 semanas",
     investimento: null,
     ajustes: "1 rodada",
   },
 };
+
+// A escada por área do diagnóstico: o problema, as ofertas de entrada (ids de SERVICOS) e os degraus
+// seguintes. O "principal" é o passo que o roteiro sugere no fechamento.
+export const AREAS = {
+  clareza: {
+    nome: "Clareza", foco: "O que dizer", problema: "Ninguém entende o que você faz.",
+    entradas: ["mensagem"],
+    principal: { nome: "Posicionamento de marca", entregas: "2 sessões, análise de 5 concorrentes, plataforma de marca (propósito, proposta de valor, público, personalidade, manifesto), guia de tom completo, textos do site e da apresentação", prazo: "3 a 4 semanas", valor: "R$ 3.500 a R$ 6.000" },
+    premium: { nome: "Posicionamento e arquitetura de marca", entregas: "Tudo do principal, organização das linhas de serviço ou submarcas, naming quando precisar, apresentação para a equipe", prazo: "5 a 8 semanas", valor: "R$ 8.000 a R$ 12.000" },
+    complementos: "Casos e prova social (R$ 600 a R$ 1.200); naming de serviço ou produto (R$ 1.500 a R$ 3.000)",
+  },
+  valor: {
+    nome: "Percepção de valor", foco: "Como parecer", problema: "O cliente acha caro; a marca parece mais barata que o trabalho.",
+    entradas: ["revisao", "kit"],
+    principal: { nome: "Identidade visual", entregas: "Conceito, logo e variações, sistema visual (cores, fontes, grafismos, fotos), manual de marca, papelaria e kit para redes", prazo: "4 a 6 semanas", valor: "R$ 4.500 a R$ 9.000" },
+    premium: { nome: "Rebranding", entregas: "Posicionamento + identidade + aplicações principais + plano de lançamento da nova marca", prazo: "8 a 12 semanas", valor: "R$ 12.000 a R$ 25.000" },
+    complementos: "Guia de direção de fotos (R$ 500 a R$ 900); embalagem ou etiqueta; sinalização ou fachada (sob orçamento)",
+  },
+  site: {
+    nome: "Presença: site", foco: "Onde te encontram", problema: "Quem pesquisa não encontra, ou o site não converte.",
+    entradas: ["pagina"],
+    principal: { nome: "Site institucional", entregas: "5 a 7 páginas, portfólio ou casos, SEO básico, painel para editar, treinamento de 1h", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 9.000" },
+    premium: { nome: "Site completo ou loja", entregas: "Site com blog e SEO, ou loja virtual com catálogo e pagamento, integrações", prazo: "6 a 10 semanas", valor: "R$ 10.000 a R$ 20.000" },
+    complementos: "Perfil no Google (R$ 400 a R$ 700); página extra (R$ 500 a R$ 900); 1º mês de campanha com o parceiro de tráfego (valor do parceiro, verba à parte)",
+  },
+  redes: {
+    nome: "Presença: redes", foco: "Como você aparece", problema: "O Instagram não mostra o negócio que você tem.",
+    entradas: ["instagram"],
+    principal: { nome: "Linha editorial e templates", entregas: "Pilares de conteúdo, calendário de 1 mês com temas, 16 templates, roteiros de stories, 1 sessão de treinamento", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.000" },
+    premium: { nome: "Lançamento ou campanha", entregas: "Conceito de campanha, peças para redes e anúncios, landing da campanha, gestão dos anúncios pelo parceiro de tráfego", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 10.000" },
+    complementos: "Pacote extra de 8 templates (R$ 500 a R$ 800)",
+  },
+  vendas: {
+    nome: "Apresentação e vendas", foco: "Como vender", problema: "O material não vende quando você não está; a proposta vira só um número.",
+    entradas: ["proposta", "apresentacao"],
+    principal: { nome: "Kit de vendas", entregas: "Apresentação + proposta + catálogo de serviços + 2 casos", prazo: "3 a 4 semanas", valor: "R$ 4.000 a R$ 7.000" },
+    premium: { nome: "Kit de vendas e roteiro comercial", entregas: "Tudo do kit, roteiro de reunião, respostas para objeções, treinamento da equipe de vendas", prazo: "5 a 6 semanas", valor: "R$ 8.000 a R$ 12.000" },
+    complementos: "Catálogo ou menu de serviços em PDF (R$ 800 a R$ 1.500)",
+  },
+  experiencia: {
+    nome: "Experiência de compra", foco: "Como atender", problema: "O cliente gosta do resultado, mas não do caminho, e não indica.",
+    entradas: ["jornada"],
+    principal: { nome: "Jornada do cliente", entregas: "Mapa da jornada, guia de boas-vindas, materiais de entrega, pós-venda com pedido de avaliação e indicação, modelos de mensagens e e-mails", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.500" },
+    premium: { nome: "Jornada com automação", entregas: "Jornada completa + CRM simples, follow-ups e e-mails automáticos, painel de acompanhamento", prazo: "5 a 8 semanas", valor: "R$ 6.000 a R$ 10.000" },
+    complementos: "Kit de pós-venda avulso: agradecimento, pedido de avaliação, programa de indicação (R$ 600 a R$ 1.000)",
+  },
+};
+
+// Planos mensais (degrau 4), para todas as áreas. O tráfego é do parceiro, vendido em pacote conjunto.
+export const CONTINUIDADE = {
+  design: { nome: "Design sob demanda", entregas: "Até 8 peças no padrão da marca (posts, stories, ajustes em materiais); entrega em até 3 dias úteis por pedido; 1 ajuste por peça", quem: "Last Lab", valor: "R$ 1.500 a R$ 2.000/mês" },
+  social: { nome: "Social media", entregas: "Planejamento mensal com calendário; 12 posts com legenda; stories 3 vezes por semana; publicação e organização do perfil; relatório mensal", quem: "Last Lab", valor: "R$ 2.000 a R$ 3.000/mês" },
+  crescimento: { nome: "Crescimento", entregas: "Tudo do Social media; campanhas no Instagram e Facebook (configuração, públicos, criativos da Last Lab, ajuste semanal); relatório único; reunião mensal com os dois", quem: "Last Lab + parceiro de tráfego", valor: "Social media + gestão do parceiro; verba paga pelo cliente" },
+  parceiro: { nome: "Parceiro", entregas: "Tudo do Crescimento; 1 material novo por mês (página, apresentação ou proposta); revisão trimestral da marca com novo diagnóstico", quem: "Last Lab + parceiro de tráfego", valor: "Crescimento + R$ 1.500 a R$ 2.000/mês" },
+};
+
+/** Área (id) a que pertence um serviço de entrada. */
+export const areaDoServico = (id) => Object.keys(AREAS).find((a) => AREAS[a].entradas.includes(id));
 
 // Nome da oferta no diagnóstico → serviço do catálogo.
 export const MAPA = {
@@ -142,9 +210,9 @@ export const MAPA = {
   "Instagram e Google em dia": "instagram",
   "Conteúdo que matricula": "instagram",
   "Apresentação comercial essencial": "apresentacao",
-  "Proposta de honorários": "apresentacao",
-  "Proposta de projeto": "apresentacao",
-  "Plano de tratamento apresentado": "apresentacao",
+  "Proposta de honorários": "proposta",
+  "Proposta de projeto": "proposta",
+  "Plano de tratamento apresentado": "proposta",
   "Kit de jornada": "jornada",
   "Kit de atendimento no WhatsApp": "jornada",
   "Jornada de matrícula": "jornada",
@@ -237,8 +305,16 @@ export const VISAO_PADRAO = {
       { titulo: "Nenhum caso ou depoimento", texto: "Nada prova que já deu certo com outros clientes." },
     ],
   },
+  proposta: {
+    titulo: "O cliente recebe um preço, mas não entende o que está comprando.",
+    observacoes: [
+      { titulo: "Orçamento só com o valor", texto: "Sem escopo nem etapas, o número fica sozinho." },
+      { titulo: "Cada proposta de um jeito", texto: "Montada do zero toda vez, sem a cara da marca." },
+      { titulo: "Nenhuma condição clara", texto: "Prazo, pagamento e validade ficam para depois." },
+    ],
+  },
   jornada: {
-    titulo: "O resultado encanta, mas o caminho até ele não acompanha.",
+    titulo: "O resultado encanta, mas o atendimento até ele não acompanha.",
     observacoes: [
       { titulo: "Resposta demorada no WhatsApp", texto: "Como cliente, esperei tempo demais pela primeira resposta." },
       { titulo: "Sem próximo passo claro", texto: "Depois do preço, ninguém explicou como seguir." },
@@ -261,6 +337,7 @@ export const CASOS_PADRAO = {
   mensagem: ["una", "studio-vzo"],
   pagina: ["site-pronto-pra-partir", "semantix"],
   instagram: ["impacto-conquer", "quarteirao-magico"],
+  proposta: ["boo", "semantix"],
   apresentacao: ["boo", "semantix"],
   jornada: ["pronto-pra-partir", "impacto-conquer"],
   kit: ["una", "studio-vzo"],
@@ -271,7 +348,7 @@ export const CASOS_PADRAO = {
 // Supabase (catalogo_servicos); carregarCatalogo() aplica por cima destes objetos, no lugar, para
 // que apresentação, roteiro e guia usem sempre os textos editados.
 
-const GRUPOS = { servicos: SERVICOS, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
+const GRUPOS = { servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
 const ORIGINAL = JSON.parse(JSON.stringify(GRUPOS));
 
 /** O catálogo padrão do código (para comparar e para "voltar ao padrão"). */
@@ -294,5 +371,7 @@ export function ofertaDoLead(item) {
   const oferta = (item.ofertaEscolhida ?? item.dados?.devolutiva?.oferta)?.principal;
   // nome da oferta do diagnóstico, ou o próprio nome do serviço (oferta escolhida no admin)
   const id = MAPA[oferta?.nome] || Object.keys(SERVICOS).find((k) => SERVICOS[k].nome === oferta?.nome) || "pagina";
-  return { titulo: oferta?.nome || SERVICOS[id].nome, servicoId: id, servico: SERVICOS[id] };
+  // o "projeto" (passo seguinte, no fechamento do roteiro) é o degrau principal da área
+  const area = AREAS[areaDoServico(id)];
+  return { titulo: oferta?.nome || SERVICOS[id].nome, servicoId: id, servico: { ...SERVICOS[id], projeto: area?.principal.nome || "" }, area };
 }

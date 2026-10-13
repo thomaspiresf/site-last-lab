@@ -1,23 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Play, Plus, RotateCcw, Save, X } from "lucide-react";
+import { ArrowRight, Play, Plus, RotateCcw, Save, X } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { salvarCatalogoServicos } from "../lib/api";
 import { projects } from "../data/projects";
-import { MOMENTOS, aplicarCatalogo, catalogoAtual, catalogoPadrao } from "./catalogoOfertas";
+import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import { Palco, SLIDES, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
 
-// Produtos e serviços: os textos-base de cada serviço (o que entra nas apresentações de todos os
-// leads). Editar aqui muda o padrão global; o que já foi editado lead a lead continua como está.
+// Produtos e serviços: a escada de valor por área do diagnóstico (entrada → principal → premium →
+// continuidade) e os textos-base das apresentações. Editar aqui muda o padrão global; o que já foi
+// editado lead a lead continua como está.
 
 const FONTE = "https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap";
 
 // momento usado na prévia de cada serviço (dá para trocar na tela)
 const MOMENTO_DO_SERVICO = {
   revisao: "joia_escondida", mensagem: "mensagem_difusa", pagina: "loja_sem_vitrine", instagram: "loja_sem_vitrine",
-  apresentacao: "talento_sem_palco", jornada: "jornada_no_improviso", kit: "ainda_no_comeco",
+  proposta: "joia_escondida", apresentacao: "talento_sem_palco", jornada: "jornada_no_improviso", kit: "ainda_no_comeco",
 };
 
 /** Lead fictício, só para a prévia: a oferta é o próprio serviço. */
@@ -89,7 +90,7 @@ function Bloco({ titulo, children, acao }) {
 export default function AdminServicos() {
   const [rascunho, setRascunho] = useState(null);
   const [salvo, setSalvo] = useState(null); // JSON do que está no banco, para saber se mudou
-  const [aba, setAba] = useState("revisao");
+  const [sel, setSel] = useState({ tipo: "servico", id: "mensagem" });
   const [persona, setPersona] = useState(null);
   const [estado, setEstado] = useState("");
   const padrao = useMemo(() => catalogoPadrao(), []);
@@ -139,15 +140,14 @@ export default function AdminServicos() {
 
   if (!rascunho) return <AdminLayout><p className="text-sm text-zinc-400">Carregando...</p></AdminLayout>;
 
-  const ids = Object.keys(rascunho.servicos);
-  const ehServico = ids.includes(aba);
+  const escolher = (novo) => { setSel(novo); setPersona(null); };
 
   return (
     <AdminLayout>
-      <div className="flex items-end justify-between gap-4 mb-6">
+      <div className="flex items-end justify-between gap-4 mb-5">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Produtos e serviços</h1>
-          <p className="text-sm text-zinc-500 mt-1">Os textos-base das apresentações. O que mudar aqui vale para todos os leads; o que já foi editado num lead continua como está.</p>
+          <p className="text-sm text-zinc-500 mt-1">O que a Last Lab vende, organizado pela escada de valor. Clique num item para editar; o que mudar aqui vale para todas as apresentações.</p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
           {estado && <span className="text-xs text-zinc-500">{estado}</span>}
@@ -156,37 +156,188 @@ export default function AdminServicos() {
         </div>
       </div>
 
-      <nav className="flex flex-wrap gap-2 mb-6">
-        {ids.map((id) => (
-          <button key={id} onClick={() => { setAba(id); setPersona(null); }} className={`px-3.5 py-1.5 rounded-full text-sm font-semibold border ${aba === id ? "bg-black text-white border-black" : "border-zinc-300 text-zinc-600 hover:border-black"}`}>
-            {rascunho.servicos[id].nome}
-          </button>
-        ))}
-        <span className="w-px bg-zinc-300 mx-1" />
-        {[["custo", "O custo, por momento"], ["mapa", "Ofertas do diagnóstico"]].map(([id, nome]) => (
-          <button key={id} onClick={() => setAba(id)} className={`px-3.5 py-1.5 rounded-full text-sm font-semibold border ${aba === id ? "bg-black text-white border-black" : "border-zinc-300 text-zinc-600 hover:border-black"}`}>{nome}</button>
-        ))}
-      </nav>
+      <ComoFunciona />
+      <Escada r={rascunho} sel={sel} escolher={escolher} />
 
-      {ehServico && (
+      <div className="flex flex-wrap items-center gap-2 mt-4 mb-8 text-sm">
+        <span className="text-zinc-400">Textos que valem para todas as áreas:</span>
+        {[["custo", "O custo de ficar como está (por momento)"], ["mapa", "Ofertas do diagnóstico → serviço"]].map(([id, nome]) => (
+          <button key={id} onClick={() => escolher({ tipo: id })} className={`px-3 py-1 rounded-full font-semibold border ${sel.tipo === id ? "bg-black text-white border-black" : "border-zinc-300 text-zinc-600 hover:border-black"}`}>{nome}</button>
+        ))}
+      </div>
+
+      {sel.tipo === "servico" && (
         <Servico
-          id={aba} r={rascunho} padrao={padrao} set={set} setServ={setServ}
-          persona={persona || MOMENTO_DO_SERVICO[aba] || "loja_sem_vitrine"} setPersona={setPersona}
+          id={sel.id} r={rascunho} padrao={padrao} set={set} setServ={setServ} escolher={escolher}
+          persona={persona || MOMENTO_DO_SERVICO[sel.id] || "loja_sem_vitrine"} setPersona={setPersona}
         />
       )}
-      {aba === "custo" && <Custos r={rascunho} padrao={padrao} set={set} />}
-      {aba === "mapa" && <Mapa r={rascunho} set={set} />}
+      {sel.tipo === "area" && <Area id={sel.id} r={rascunho} padrao={padrao} set={set} escolher={escolher} />}
+      {sel.tipo === "continuidade" && <Continuidade r={rascunho} padrao={padrao} set={set} />}
+      {sel.tipo === "custo" && <Custos r={rascunho} padrao={padrao} set={set} />}
+      {sel.tipo === "mapa" && <Mapa r={rascunho} set={set} />}
     </AdminLayout>
+  );
+}
+
+// ---------- a escada: visão geral ----------
+
+const PASSOS = [
+  ["0", "Diagnóstico", "Gratuito. Aponta a área mais fraca."],
+  ["1", "Entrada", "Vendida na reunião. Pequena, rápida, preço fechado."],
+  ["2", "Principal", "O projeto que dá margem. Sugerido no fechamento."],
+  ["3", "Premium", "Resolve a área inteira, ou várias."],
+  ["4", "Continuidade", "Plano mensal, oferecido no fim de todo projeto."],
+];
+
+function ComoFunciona() {
+  return (
+    <div className="grid grid-cols-5 gap-2 mb-4">
+      {PASSOS.map(([n, t, d], i) => (
+        <div key={n} className="relative bg-white rounded-xl border border-zinc-200 px-3.5 py-3">
+          <p className="text-xs font-bold text-zinc-400">DEGRAU {n}</p>
+          <p className="text-sm font-bold">{t}</p>
+          <p className="text-xs text-zinc-500 mt-0.5 leading-snug">{d}</p>
+          {i < PASSOS.length - 1 && <ArrowRight size={14} className="absolute -right-[11px] top-1/2 -translate-y-1/2 text-zinc-400 bg-zinc-50 rounded-full" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Escada({ r, sel, escolher }) {
+  const ativo = (tipo, id) => sel.tipo === tipo && sel.id === id;
+  const celula = (on) => `flex flex-col justify-start text-left w-full h-full rounded-lg px-3 py-2.5 border transition ${on ? "border-black bg-white ring-1 ring-black" : "border-transparent hover:border-zinc-300 hover:bg-white"}`;
+  return (
+    <div className="bg-zinc-100/70 rounded-2xl border border-zinc-200 overflow-hidden">
+      <div className="grid grid-cols-[1.1fr_1.6fr_1fr_1fr] text-[11px] font-bold uppercase tracking-wide text-zinc-500 px-3 pt-3 pb-1">
+        <span className="px-3">Área do diagnóstico</span>
+        <span className="px-3">1 · Entrada (tem slides)</span>
+        <span className="px-3">2 · Principal</span>
+        <span className="px-3">3 · Premium</span>
+      </div>
+      {Object.entries(r.areas).map(([aid, a]) => (
+        <div key={aid} className="grid grid-cols-[1.1fr_1.6fr_1fr_1fr] gap-1 px-3 py-1.5 border-t border-zinc-200/80">
+          <button onClick={() => escolher({ tipo: "area", id: aid })} className={celula(ativo("area", aid))}>
+            <p className="text-sm font-bold">{a.nome} <span className="font-normal text-zinc-400">· {a.foco}</span></p>
+            <p className="text-xs text-zinc-500 leading-snug mt-0.5">{a.problema}</p>
+          </button>
+          <div className="flex flex-col gap-1">
+            {a.entradas.map((sid) => {
+              const s = r.servicos[sid];
+              if (!s) return null;
+              return (
+                <button key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} className={celula(ativo("servico", sid))}>
+                  <p className="text-sm font-semibold">{s.nome}</p>
+                  <p className="text-xs text-zinc-500">{s.investimento || "Valor a definir"}{s.prazo ? ` · ${s.prazo}` : ""}</p>
+                </button>
+              );
+            })}
+          </div>
+          {["principal", "premium"].map((k) => (
+            <button key={k} onClick={() => escolher({ tipo: "area", id: aid })} className={celula(ativo("area", aid))}>
+              <p className="text-sm font-semibold">{a[k].nome}</p>
+              <p className="text-xs text-zinc-500">{a[k].valor}</p>
+            </button>
+          ))}
+        </div>
+      ))}
+      <div className="grid grid-cols-[1.1fr_3.6fr] gap-1 px-3 py-1.5 pb-3 border-t border-zinc-200/80">
+        <button onClick={() => escolher({ tipo: "continuidade" })} className={celula(sel.tipo === "continuidade")}>
+          <p className="text-sm font-bold">4 · Continuidade</p>
+          <p className="text-xs text-zinc-500 leading-snug mt-0.5">Para todas as áreas. Tráfego com o parceiro.</p>
+        </button>
+        <div className="grid grid-cols-4 gap-1">
+          {Object.entries(r.continuidade).map(([pid, pl]) => (
+            <button key={pid} onClick={() => escolher({ tipo: "continuidade" })} className={celula(sel.tipo === "continuidade")}>
+              <p className="text-sm font-semibold">{pl.nome}</p>
+              <p className="text-xs text-zinc-500 leading-snug">{pl.valor}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------- uma área: degraus principal e premium ----------
+
+function Area({ id, r, padrao, set, escolher }) {
+  const a = r.areas[id];
+  const igual = JSON.stringify(a) === JSON.stringify(padrao.areas[id]);
+  const mudar = (campoNome, valor) => set("areas", id, { ...a, [campoNome]: valor });
+  const degrau = (k, titulo, dica) => (
+    <Bloco titulo={titulo}>
+      <p className="text-xs text-zinc-400 -mt-2">{dica}</p>
+      <Campo label="Serviço" valor={a[k].nome} onChange={(x) => mudar(k, { ...a[k], nome: x })} />
+      <Campo label="Entregáveis" area valor={a[k].entregas} onChange={(x) => mudar(k, { ...a[k], entregas: x })} />
+      <div className="grid grid-cols-2 gap-2">
+        <Campo label="Prazo" valor={a[k].prazo} onChange={(x) => mudar(k, { ...a[k], prazo: x })} />
+        <Campo label="Valor" valor={a[k].valor} onChange={(x) => mudar(k, { ...a[k], valor: x })} />
+      </div>
+    </Bloco>
+  );
+  return (
+    <div className="grid grid-cols-[420px_1fr] gap-6 items-start">
+      <div className="flex flex-col gap-4">
+        <Bloco titulo={`Área: ${a.nome}`} acao={!igual && <button onClick={() => set("areas", id, padrao.areas[id])} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
+          <Campo label="Nome da área" valor={a.nome} onChange={(x) => mudar("nome", x)} />
+          <Campo label="Foco (em poucas palavras)" valor={a.foco} onChange={(x) => mudar("foco", x)} />
+          <Campo label="Problema que resolve" area valor={a.problema} onChange={(x) => mudar("problema", x)} />
+          <div>
+            <span className={rotulo}>Ofertas de entrada</span>
+            <div className="flex flex-wrap gap-1.5">
+              {a.entradas.map((sid) => (
+                <button key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} className="px-3 py-1 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black">{r.servicos[sid]?.nome} →</button>
+              ))}
+            </div>
+          </div>
+          <Campo label="Complementos (adicionais da proposta)" area valor={a.complementos} onChange={(x) => mudar("complementos", x)} />
+        </Bloco>
+      </div>
+      <div className="flex flex-col gap-4">
+        {degrau("principal", "2 · Principal", "É o passo seguinte que o roteiro sugere no fechamento da reunião.")}
+        {degrau("premium", "3 · Premium", "Para quem quer resolver a área inteira. Vendido sob proposta própria.")}
+      </div>
+    </div>
+  );
+}
+
+// ---------- planos mensais ----------
+
+function Continuidade({ r, padrao, set }) {
+  return (
+    <div className="flex flex-col gap-4">
+      <p className="text-sm text-zinc-500">Oferecidos no fim de todo projeto. O social media é da Last Lab; o tráfego é do parceiro, vendido em pacote conjunto (cada um fatura a sua parte, verba de anúncio paga pelo cliente). Tráfego só depois que a página e o perfil estão prontos.</p>
+      <div className="grid grid-cols-2 gap-4">
+        {Object.entries(r.continuidade).map(([pid, pl]) => {
+          const igual = JSON.stringify(pl) === JSON.stringify(padrao.continuidade[pid]);
+          const mudar = (k, v) => set("continuidade", pid, { ...pl, [k]: v });
+          return (
+            <Bloco key={pid} titulo={pl.nome} acao={!igual && <button onClick={() => set("continuidade", pid, padrao.continuidade[pid])} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
+              <Campo label="Nome do plano" valor={pl.nome} onChange={(x) => mudar("nome", x)} />
+              <Campo label="O que o cliente recebe por mês (texto da apresentação)" area valor={pl.entregas} onChange={(x) => mudar("entregas", x)} />
+              <div className="grid grid-cols-2 gap-2">
+                <Campo label="Quem entrega" valor={pl.quem} onChange={(x) => mudar("quem", x)} />
+                <Campo label="Valor" valor={pl.valor} onChange={(x) => mudar("valor", x)} />
+              </div>
+            </Bloco>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
 // ---------- um serviço: editor + todos os slides ----------
 
-function Servico({ id, r, padrao, set, setServ, persona, setPersona }) {
+function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher }) {
   const s = r.servicos[id];
   const v = r.visao[id] || { titulo: "", observacoes: [] };
   const casos = r.casos[id] || [];
   const ofertas = Object.entries(r.mapa).filter(([, sid]) => sid === id).map(([nome]) => nome);
+  const aid = areaDoServico(id);
+  const area = r.areas[aid];
   const igualPadrao = JSON.stringify([s, v, casos]) === JSON.stringify([padrao.servicos[id], padrao.visao[id], padrao.casos[id]]);
 
   const restaurar = () => {
@@ -198,7 +349,15 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona }) {
   return (
     <div className="grid grid-cols-[420px_1fr] gap-6 items-start">
       <div className="flex flex-col gap-4">
-        <Bloco titulo="O serviço" acao={!igualPadrao && <button onClick={restaurar} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
+        {area && (
+          <div className="bg-black text-white rounded-2xl p-5 flex flex-col gap-2">
+            <p className="text-[11px] font-bold uppercase tracking-wide text-zinc-400">{area.nome} · Entrada</p>
+            <p className="text-sm">Resolve: {area.problema}</p>
+            <p className="text-sm text-zinc-300">Depois dela: <b className="text-white">{area.principal.nome}</b> ({area.principal.valor}) → {area.premium.nome}</p>
+            <button onClick={() => escolher({ tipo: "area", id: aid })} className="self-start text-xs font-semibold text-zinc-300 hover:text-white underline underline-offset-2">Editar os próximos degraus</button>
+          </div>
+        )}
+        <Bloco titulo="O serviço (slides de proposta)" acao={!igualPadrao && <button onClick={restaurar} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
           <Campo label="Nome" valor={s.nome} onChange={(x) => setServ(id, "nome", x)} dica="Título da proposta quando a oferta foi escolhida no admin. Se veio do diagnóstico, o título é o nome que o cliente viu." />
           <Campo label="Promessa" area valor={s.promessa} onChange={(x) => setServ(id, "promessa", x)} />
           <Lista label="O que você recebe" itens={s.entregas} onChange={(x) => setServ(id, "entregas", x)} min={1} />
@@ -208,7 +367,6 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona }) {
             <Campo label="Prazo" valor={s.prazo} placeholder="__ dias úteis" onChange={(x) => setServ(id, "prazo", x || null)} />
             <Campo label="Ajustes" valor={s.ajustes} onChange={(x) => setServ(id, "ajustes", x)} />
           </div>
-          <Campo label="Passo seguinte (projeto maior)" valor={s.projeto} onChange={(x) => setServ(id, "projeto", x)} dica="Usado no fechamento do roteiro." />
         </Bloco>
 
         <Bloco titulo="Antes e depois">
