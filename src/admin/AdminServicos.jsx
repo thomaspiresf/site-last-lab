@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ChevronRight, Gem, Globe, HeartHandshake, MessageSquareText, Play, Plus, Presentation, Repeat, RotateCcw, Save, Settings2, Smartphone, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Gem, Globe, HeartHandshake, MessageSquareText, Play, Plus, Presentation, RotateCcw, Save, Settings2, Smartphone, X } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { salvarCatalogoServicos } from "../lib/api";
 import { projects } from "../data/projects";
@@ -188,120 +188,95 @@ export default function AdminServicos() {
   );
 }
 
-// ---------- visão geral: a escada ----------
+// ---------- visão geral ----------
 
-const LARANJA = "#ef4b3a";
 const ICONES = { clareza: MessageSquareText, valor: Gem, site: Globe, redes: Smartphone, vendas: Presentation, experiencia: HeartHandshake };
 
-// os degraus, do grátis ao recorrente (alturas crescentes = a escada)
+// colunas da tabela: área + os três degraus de cada área
+const COLUNAS = "grid grid-cols-[minmax(260px,1.2fr)_1fr_1fr_1fr]";
 const DEGRAUS = [
-  { n: 0, nome: "Diagnóstico", papel: "Atrai e mostra o problema", preco: "Grátis", altura: 124, cor: "bg-white text-black border border-zinc-200" },
-  { n: 1, nome: "Entrada", papel: "Vendida na reunião", preco: "Ticket baixo", altura: 152, cor: "text-white", fundo: LARANJA },
-  { n: 2, nome: "Principal", papel: "O projeto que dá margem", preco: "Ticket médio", altura: 180, cor: "bg-zinc-700 text-white" },
-  { n: 3, nome: "Premium", papel: "Resolve a área inteira", preco: "Ticket alto", altura: 208, cor: "bg-black text-white" },
-  { n: 4, nome: "Continuidade", papel: "Plano mensal, no fim de todo projeto", preco: "Recorrente", altura: 236, cor: "bg-zinc-900 text-white ring-2 ring-offset-2 ring-[#ef4b3a]" },
+  ["Diagnóstico", "gratuito, aponta a área mais fraca"],
+  ["Entrada", "vendida na reunião"],
+  ["Principal", "o projeto da área"],
+  ["Premium", "a área inteira"],
+  ["Continuidade", "plano mensal"],
 ];
 
-function VisaoGeral({ r, escolher }) {
-  return (
-    <div className="flex flex-col gap-10">
-      <section className="grid grid-cols-[1fr_1.5fr] gap-8 items-end">
-        <div className="pb-2">
-          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: LARANJA }}>Escada de valor</p>
-          <h2 className="text-3xl font-black tracking-tight leading-tight mt-2">O diagnóstico aponta a área mais fraca. A reunião vende a entrada dessa área.</h2>
-          <p className="text-sm text-zinc-500 mt-3 leading-relaxed">Depois da entrada, o cliente sobe na mesma área (principal, premium) e termina num plano mensal. Clique em qualquer item para editar os textos e ver a apresentação.</p>
-        </div>
-        <div className="flex items-end gap-2">
-          {DEGRAUS.map((d) => (
-            <div key={d.n} className={`flex-1 rounded-t-2xl rounded-b-md p-3.5 flex flex-col justify-between ${d.cor}`} style={{ height: d.altura, background: d.fundo }}>
-              <span className="text-[11px] font-bold opacity-60">{d.n}</span>
-              <div>
-                <p className="text-sm font-bold leading-tight">{d.nome}</p>
-                <p className="text-[11px] opacity-70 leading-snug mt-0.5">{d.papel}</p>
-                <p className="text-[11px] font-semibold mt-1.5">{d.preco}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+/** Prazo curto: "3 a 4 semanas" → "3–4 sem". */
+const curto = (t = "") => t.replace(/ a /g, "–").replace(/semanas?/, "sem").replace(/dias úteis/, "dias");
 
+const Celula = ({ onClick, titulo, meta }) => (
+  <button onClick={onClick} className="text-left rounded-lg px-3 py-2 -mx-1 hover:bg-zinc-100 transition-colors min-w-0">
+    <p className="text-sm font-medium text-zinc-900 leading-snug">{titulo}</p>
+    {meta && <p className="text-xs text-zinc-400 mt-0.5 truncate">{meta}</p>}
+  </button>
+);
+
+export function VisaoGeral({ r, escolher }) {
+  return (
+    <div className="flex flex-col gap-8">
+      {/* o caminho do cliente, numa linha */}
       <section>
-        <div className="flex items-baseline justify-between mb-4">
-          <h3 className="text-lg font-black tracking-tight">As 6 áreas do diagnóstico</h3>
-          <p className="text-xs text-zinc-400">Cada área sobe em três degraus</p>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          {Object.entries(r.areas).map(([aid, a]) => <CartaoArea key={aid} aid={aid} a={a} r={r} escolher={escolher} />)}
-        </div>
+        <p className="text-sm text-zinc-500 mb-3">O diagnóstico aponta a área mais fraca. A reunião vende a entrada dessa área; depois o cliente sobe na mesma área e termina num plano mensal.</p>
+        <ol className="flex items-stretch bg-white border border-zinc-200 rounded-xl divide-x divide-zinc-200">
+          {DEGRAUS.map(([nome, papel], i) => (
+            <li key={nome} className="flex-1 px-4 py-3">
+              <p className="text-[11px] text-zinc-400">{i}</p>
+              <p className="text-sm font-semibold text-zinc-900">{nome}</p>
+              <p className="text-xs text-zinc-400 leading-snug">{papel}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <section className="bg-zinc-900 text-white rounded-3xl p-6">
-        <div className="flex items-start justify-between gap-6 mb-5">
-          <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center"><Repeat size={18} /></span>
-            <div>
-              <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: LARANJA }}>Degrau 4 · Para todas as áreas</p>
-              <h3 className="text-lg font-bold">Continuidade: planos mensais</h3>
+      {/* áreas × degraus */}
+      <section className="bg-white border border-zinc-200 rounded-xl overflow-hidden">
+        <div className={`${COLUNAS} gap-4 px-5 py-3 border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold uppercase tracking-wider text-zinc-500`}>
+          <span className="pl-7">Área do diagnóstico</span><span className="pl-2">1 · Entrada</span><span className="pl-2">2 · Principal</span><span className="pl-2">3 · Premium</span>
+        </div>
+        {Object.entries(r.areas).map(([aid, a]) => {
+          const Icone = ICONES[aid] || Gem;
+          const area = () => escolher({ tipo: "area", id: aid });
+          return (
+            <div key={aid} className={`${COLUNAS} gap-4 px-5 py-3 border-b border-zinc-100 last:border-0 items-start`}>
+              <button onClick={area} className="flex items-start gap-3 text-left rounded-lg px-1 py-2 -mx-1 hover:bg-zinc-100 transition-colors min-w-0">
+                <Icone size={16} className="text-zinc-400 mt-0.5 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-zinc-900">{a.nome}</p>
+                  <p className="text-xs text-zinc-500 leading-snug mt-0.5">{a.problema}</p>
+                </div>
+              </button>
+              <div className="flex flex-col">
+                {a.entradas.map((sid) => r.servicos[sid] && (
+                  <Celula key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} titulo={r.servicos[sid].nome}
+                    meta={`${r.servicos[sid].investimento || "Valor a definir"} · ${curto(r.servicos[sid].prazo) || "prazo a definir"}`} />
+                ))}
+              </div>
+              <Celula onClick={area} titulo={a.principal.nome} meta={`${a.principal.valor} · ${curto(a.principal.prazo)}`} />
+              <Celula onClick={area} titulo={a.premium.nome} meta={`${a.premium.valor} · ${curto(a.premium.prazo)}`} />
             </div>
-          </div>
-          <button onClick={() => escolher({ tipo: "continuidade" })} className="shrink-0 px-4 py-2 rounded-full bg-white text-black text-sm font-semibold hover:bg-zinc-200">Editar planos</button>
+          );
+        })}
+      </section>
+
+      {/* planos mensais */}
+      <section className="bg-white border border-zinc-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-200 bg-zinc-50">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">4 · Continuidade · para todas as áreas</span>
+          <button onClick={() => escolher({ tipo: "continuidade" })} className="text-xs font-semibold text-zinc-500 hover:text-black">Editar planos</button>
         </div>
-        <div className="grid grid-cols-4 gap-3">
-          {Object.entries(r.continuidade).map(([pid, pl], i) => (
-            <button key={pid} onClick={() => escolher({ tipo: "continuidade" })} className="text-left rounded-2xl bg-white/5 hover:bg-white/10 p-4 flex flex-col gap-2 border border-white/10">
-              <div className="flex gap-1">{[0, 1, 2, 3].map((k) => <i key={k} className="h-1 flex-1 rounded-full" style={{ background: k <= i ? LARANJA : "rgba(255,255,255,.15)" }} />)}</div>
-              <p className="font-bold mt-1">{pl.nome}</p>
-              <p className="text-xs text-zinc-400 leading-snug line-clamp-3">{pl.entregas}</p>
-              <p className="text-xs font-semibold mt-auto pt-2">{pl.valor}</p>
-              {/parceiro/i.test(pl.quem) && <span className="self-start text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-white/10">+ tráfego com parceiro</span>}
-            </button>
+        <div className="grid grid-cols-4 gap-4 px-5 py-3">
+          {Object.entries(r.continuidade).map(([pid, pl]) => (
+            <Celula key={pid} onClick={() => escolher({ tipo: "continuidade" })} titulo={pl.nome}
+              meta={`${pl.valor}${/parceiro/i.test(pl.quem) ? " · com parceiro de tráfego" : ""}`} />
           ))}
         </div>
       </section>
 
-      <section className="flex items-center gap-3 text-sm border-t border-zinc-200 pt-6 pb-4">
-        <Settings2 size={16} className="text-zinc-400" />
-        <span className="text-zinc-500">Ajuste geral:</span>
-        <button onClick={() => escolher({ tipo: "mapa" })} className="px-3 py-1.5 rounded-full border border-zinc-300 font-semibold hover:border-black">Qual oferta do diagnóstico vai para qual serviço</button>
-      </section>
-    </div>
-  );
-}
-
-/** Uma área: o problema e a mini-escada entrada → principal → premium. */
-function CartaoArea({ aid, a, r, escolher }) {
-  const Icone = ICONES[aid] || Gem;
-  const area = () => escolher({ tipo: "area", id: aid });
-  // alturas da mini-escada: a entrada cresce com o número de ofertas e os degraus seguintes sobem junto
-  const base = 124 + (a.entradas.length - 1) * 76;
-  return (
-    <article className="bg-white rounded-3xl border border-zinc-200 p-5 flex flex-col gap-4 hover:shadow-md transition-shadow">
-      <button onClick={area} className="flex items-start gap-3 text-left group">
-        <span className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#fdecea", color: LARANJA }}><Icone size={19} /></span>
-        <div className="min-w-0">
-          <p className="font-bold leading-tight group-hover:underline underline-offset-2">{a.nome} <span className="font-normal text-zinc-400">· {a.foco}</span></p>
-          <p className="text-sm text-zinc-500 leading-snug mt-1">"{a.problema}"</p>
-        </div>
+      <button onClick={() => escolher({ tipo: "mapa" })} className="self-start inline-flex items-center gap-2 text-sm text-zinc-500 hover:text-black pb-4">
+        <Settings2 size={15} /> Qual oferta do diagnóstico vai para qual serviço
       </button>
-      <div className="flex items-end gap-2">
-        <div className="flex-1 rounded-t-xl rounded-b-md p-3 text-white flex flex-col justify-end gap-1.5" style={{ background: LARANJA, height: base }}>
-          <p className="text-[10px] font-bold uppercase tracking-wide opacity-80 mb-auto">1 · Entrada</p>
-          {a.entradas.map((sid) => r.servicos[sid] && (
-            <button key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} className="text-left rounded-lg bg-white/15 hover:bg-white/25 px-2.5 py-1.5">
-              <p className="text-[13px] font-semibold leading-tight">{r.servicos[sid].nome}</p>
-              <p className="text-[11px] opacity-80">{r.servicos[sid].investimento || "Valor a definir"} · {r.servicos[sid].prazo || "prazo a definir"}</p>
-            </button>
-          ))}
-        </div>
-        {[["principal", "2 · Principal", "bg-zinc-700", 30], ["premium", "3 · Premium", "bg-black", 60]].map(([k, rot, cor, mais]) => (
-          <button key={k} onClick={area} style={{ height: base + mais }} className={`flex-1 text-left rounded-t-xl rounded-b-md p-3 text-white flex flex-col justify-end gap-1 hover:opacity-90 ${cor}`}>
-            <p className="text-[10px] font-bold uppercase tracking-wide opacity-60 mb-auto">{rot}</p>
-            <p className="text-[13px] font-semibold leading-tight">{a[k].nome}</p>
-            <p className="text-[11px] opacity-70">{a[k].valor}</p>
-          </button>
-        ))}
-      </div>
-    </article>
+    </div>
   );
 }
 
@@ -402,19 +377,14 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     <div className="grid grid-cols-[420px_1fr] gap-6 items-start">
       <div className="flex flex-col gap-4">
         {area && (
-          <div className="bg-white rounded-2xl border border-zinc-200 p-4 flex flex-col gap-3">
-            <p className="text-sm text-zinc-500 leading-snug"><b className="text-black">{area.nome}.</b> Resolve: "{area.problema}"</p>
-            <div className="flex items-end gap-1.5">
-              <div className="flex-1 rounded-t-lg rounded-b p-2.5 text-white" style={{ background: LARANJA, height: 76 }}>
-                <p className="text-[10px] font-bold uppercase opacity-80">1 · Você está aqui</p>
-                <p className="text-xs font-semibold leading-tight mt-1">{s.nome}</p>
-              </div>
-              {[["principal", "2 · Depois", "bg-zinc-700", 92], ["premium", "3 · Premium", "bg-black", 108]].map(([k, rot, cor, h]) => (
-                <button key={k} onClick={() => escolher({ tipo: "area", id: aid })} style={{ height: h }} className={`flex-1 text-left rounded-t-lg rounded-b p-2.5 text-white hover:opacity-90 ${cor}`}>
-                  <p className="text-[10px] font-bold uppercase opacity-60">{rot}</p>
-                  <p className="text-xs font-semibold leading-tight mt-1">{area[k].nome}</p>
-                </button>
-              ))}
+          <div className="bg-white rounded-2xl border border-zinc-200 p-4 flex flex-col gap-2 text-sm">
+            <p className="text-zinc-500 leading-snug"><b className="text-zinc-900 font-semibold">{area.nome}</b> · {area.problema}</p>
+            <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-500">
+              <span className="px-2 py-1 rounded-md bg-zinc-100 text-zinc-900 font-medium">1 · {s.nome}</span>
+              <ChevronRight size={13} className="text-zinc-300" />
+              <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">2 · {area.principal.nome}</button>
+              <ChevronRight size={13} className="text-zinc-300" />
+              <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">3 · {area.premium.nome}</button>
             </div>
           </div>
         )}
