@@ -786,7 +786,7 @@ function Passo({ d, escala }) {
       <Titulo t="Investimento" />
       <div className="item">
         <p className="serv">{d.oferta.titulo}</p>
-        <p className="desc">{s.promessa} Inclui: {s.entregas.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}.</p>
+        <p className="desc">{s.pitch || s.promessa}</p>
       </div>
       <div className="total">
         <div>

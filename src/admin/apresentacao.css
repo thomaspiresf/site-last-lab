@@ -70,12 +70,12 @@
 .apr-barra.fraco .cheia { background: var(--laranja); }
 
 /* visão de fora e casos */
-.apr-cards { flex: 1; display: grid; gap: 40px; }
+.apr-cards { flex: 1; min-height: 0; display: grid; gap: 40px; grid-template-rows: minmax(0, 1fr); }
 .apr-cards > div { display: flex; flex-direction: column; gap: 24px; min-height: 0; }
 .apr-cards .img { flex: 1; min-height: 0; background: #dcdce2; border-radius: 24px; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #8a8a92; }
 .apr-cards .img img { width: 100%; height: 100%; object-fit: cover; }
 .apr-cards h3 { font-size: 40px; font-weight: 600; line-height: 1.15; }
-.apr-cards p { font-size: 32px; line-height: 1.4; color: var(--suave); }
+.apr-cards p { font-size: 28px; line-height: 1.4; color: var(--suave); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* custo */
 .apr-custo .chapeu { font-size: 48px; font-weight: 300; text-transform: uppercase; }
@@ -139,18 +139,19 @@
 .apr-sessao .m { font-size: 24px; color: var(--suave); }
 
 /* investimento (como a página da proposta) */
-.apr-investimento { gap: 48px; }
-.apr-investimento .item { border-bottom: 2px solid #2c2c31; padding-bottom: 40px; }
-.apr-investimento .serv { font-size: 52px; font-weight: 300; color: var(--laranja); }
-.apr-investimento .desc { font-size: 32px; line-height: 1.45; color: #c9c9d1; margin-top: 16px; width: 1500px; }
+.apr-investimento { gap: 36px; }
+.apr-investimento .apr-titulo h2 { font-size: 104px; }
+.apr-investimento .item { border-bottom: 2px solid #2c2c31; padding-bottom: 32px; }
+.apr-investimento .serv { font-size: 48px; font-weight: 300; color: var(--laranja); }
+.apr-investimento .desc { font-size: 30px; line-height: 1.4; color: #c9c9d1; margin-top: 12px; max-width: 1450px; }
 .apr-investimento .total { flex: 1; display: grid; grid-template-columns: 1fr 640px; gap: 80px; align-items: end; }
 .apr-investimento .rot { font-size: 40px; font-weight: 300; color: var(--laranja); }
 .apr-investimento .de { font-size: 40px; font-weight: 300; color: #8a8a92; text-decoration: line-through; margin-top: 12px; }
-.apr-investimento .valor { font-size: 150px; font-weight: 300; line-height: 1; letter-spacing: -4px; margin-top: 8px; }
+.apr-investimento .valor { font-size: 128px; font-weight: 300; line-height: 1; letter-spacing: -4px; margin-top: 8px; }
 .apr-investimento .parc { font-size: 44px; font-weight: 300; margin-top: 12px; }
-.apr-investimento .lado { display: flex; flex-direction: column; gap: 28px; }
-.apr-investimento .lado p { font-size: 32px; }
-.apr-investimento .lado span { display: block; font-size: 28px; color: #9a9aa2; margin-top: 4px; line-height: 1.35; }
+.apr-investimento .lado { display: flex; flex-direction: column; gap: 20px; }
+.apr-investimento .lado p { font-size: 28px; }
+.apr-investimento .lado span { display: block; font-size: 24px; color: #9a9aa2; margin-top: 4px; line-height: 1.35; }
 
 /* primeiro passo */
 .apr-passo { flex: 1; display: grid; grid-template-columns: 1fr 620px; gap: 96px; }
