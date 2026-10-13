@@ -87,7 +87,7 @@ ${story ? `${p("Também fiz uma imagem do seu resultado, se quiser postar nos st
 <p style="margin:0 0 8px"><a href="${esc(story)}"><img src="${esc(story)}" width="270" alt="Seu resultado no diagnóstico de marca" style="display:block;width:270px;max-width:100%;border-radius:12px"></a></p>
 <p style="margin:0 0 24px;font-size:13px;color:#5c5c63">(no celular, toque e segure a imagem para salvar)</p>` : ""}
 ${qualificado
-  ? p("E tem mais: nos próximos dias eu mesmo vou olhar a sua marca de fora (site, Instagram e o material que você mandou) e cruzar com as suas respostas. Te mando essa análise com a visão de fora assim que estiver pronta.")
+  ? p("E tem mais: vou olhar os materiais que você mandou (site, Instagram e material de venda) e, em breve, te envio uma devolutiva com a visão de fora da sua marca.")
   : p("Se quiser ajuda para colocar alguma dessas ideias em prática, é só responder este e-mail.")}
 ${p("Um abraço,<br>Thomás<br><span style=\"color:#5c5c63\">Last Lab</span>")}
 </div></body></html>`;
