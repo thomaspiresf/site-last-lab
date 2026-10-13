@@ -42,6 +42,10 @@ export default function AdminApresentacao() {
         setAp(apresentacaoInicial(d));
       })
       .catch((e) => setErro(e.message || "Não consegui carregar o lead."));
+    // ao voltar para esta janela, pega as etiquetas trocadas no roteiro
+    const voltar = () => getDiagnostico(id).then((d) => { setItem(d); setAp(apresentacaoInicial(d)); }).catch(() => {});
+    window.addEventListener("focus", voltar);
+    return () => window.removeEventListener("focus", voltar);
   }, [sessao, id]);
 
   // links temporários dos prints (bucket privado)
@@ -53,9 +57,15 @@ export default function AdminApresentacao() {
     });
   }, [ap, urls]);
 
-  const salvar = useCallback((novo) => {
+  const salvar = useCallback(async (novo) => {
     setAp(novo);
-    updateDiagnostico(id, { apresentacao: novo }).catch((e) => setErro(e.message || "Não salvou."));
+    try {
+      // o roteiro (outra janela) grava no mesmo campo: mantém o que ele salvou
+      const atual = await getDiagnostico(id);
+      await updateDiagnostico(id, { apresentacao: { ...novo, roteiro: atual.apresentacao?.roteiro } });
+    } catch (e) {
+      setErro(e.message || "Não salvou.");
+    }
   }, [id]);
 
   const dados = useMemo(() => (item && ap ? montarDados(item, ap, urls) : null), [item, ap, urls]);
