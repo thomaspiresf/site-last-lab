@@ -391,7 +391,7 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
           <Presentation size={20} className="text-[#ef4b3a]" />
           <span>
             <b className="block text-sm">Apresentação da reunião</b>
-            <span className="text-xs text-white/60">Slides com os dados do diagnóstico, para apresentar ou exportar em PDF</span>
+            <span className="text-xs text-white/60">Slides e roteiro da reunião, com a preparação do lead</span>
           </span>
         </span>
         <span className="text-sm font-semibold">Abrir →</span>

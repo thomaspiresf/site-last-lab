@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowLeft, Play, FileDown, ImagePlus, X } from "lucide-react";
+import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
 import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
@@ -37,19 +37,7 @@ export default function AdminApresentacao() {
     getDiagnostico(id)
       .then((d) => {
         setItem(d);
-        const a = d.apresentacao || {};
-        // ainda não editado: começa com as observações pensadas para o serviço que vamos oferecer
-        const visao = VISAO_PADRAO[ofertaDoLead(d).servicoId];
-        // o que você já escreveu fica; só os campos vazios recebem a sugestão
-        const salvas = a.observacoes?.length ? a.observacoes : VAZIO3();
-        setAp({
-          ...a,
-          visaoTitulo: a.visaoTitulo || visao?.titulo || "",
-          observacoes: salvas.map((o, i) => {
-            const base = visao?.observacoes[i];
-            return base && !o.titulo && !o.texto ? { ...o, titulo: base.titulo, texto: base.texto } : o;
-          }),
-        });
+        setAp(apresentacaoInicial(d));
       })
       .catch((e) => setErro(e.message || "Não consegui carregar o lead."));
   }, [sessao, id]);
@@ -69,7 +57,7 @@ export default function AdminApresentacao() {
   }, [id]);
 
   const dados = useMemo(() => (item && ap ? montarDados(item, ap, urls) : null), [item, ap, urls]);
-  const slides = useMemo(() => (dados ? SLIDES.map((S) => (props) => <S d={dados} {...props} />) : []), [dados]);
+  const slides = useMemo(() => (dados ? SLIDES.map(([sid, S]) => Object.assign((props) => <S d={dados} {...props} />, { sid })) : []), [dados]);
 
   if (sessao === undefined) return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Carregando...</div>;
   if (!sessao) return <Navigate to="/admin/login" replace />;
@@ -86,6 +74,7 @@ export default function AdminApresentacao() {
           <p className="text-xs text-zinc-500 truncate">{dados.momento} · {dados.oferta.titulo}</p>
         </div>
         {erro && <span className="text-xs text-red-600">{erro}</span>}
+        <button onClick={() => window.open(`/admin/diagnosticos/${id}/roteiro`, `roteiro-${id}`, "width=760,height=960")} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black" title="Abre numa janela à parte, para deixar fora da tela compartilhada"><ScrollText size={15} /> Roteiro</button>
         <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black"><FileDown size={15} /> Exportar PDF</button>
         <button onClick={() => abrirTelaCheia(setApresentando)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><Play size={15} /> Apresentar</button>
       </header>
@@ -103,7 +92,7 @@ export default function AdminApresentacao() {
 
       </div>
 
-      {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} onSair={() => setApresentando(null)} />}
+      {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal={`apr-${id}`} onSair={() => setApresentando(null)} />}
 
       <div className="apr-impressao" aria-hidden="true">
         {slides.map((S, i) => <S key={i} />)}
@@ -136,8 +125,14 @@ function Palco({ children }) {
   );
 }
 
-function TelaCheia({ slides, inicio, onSair }) {
+function TelaCheia({ slides, inicio, canal, onSair }) {
   const [i, setI] = useState(inicio);
+  // o roteiro (outra janela) acompanha o slide atual
+  useEffect(() => {
+    const bc = "BroadcastChannel" in window ? new BroadcastChannel(canal) : null;
+    bc?.postMessage({ slide: slides[i]?.sid, indice: i, total: slides.length });
+    return () => bc?.close();
+  }, [i, canal, slides]);
   useEffect(() => {
     const tecla = (e) => {
       if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) setI((x) => Math.min(slides.length - 1, x + 1));
@@ -196,6 +191,11 @@ function Painel({ item, ap, salvar, urls, dados }) {
       </div>
 
       <div>
+        <label className={rotulo}>Elogio para abrir (só no roteiro)</label>
+        <textarea rows={2} className={campo} value={rascunho.elogio || ""} onChange={(e) => mudar({ elogio: e.target.value })} onBlur={gravar} placeholder="Algo sincero que você viu no perfil ou no site" />
+      </div>
+
+      <div>
         <label className={rotulo}>Resumo em uma frase (slide das respostas)</label>
         <textarea rows={2} className={campo} value={rascunho.resumo || ""} onChange={(e) => mudar({ resumo: e.target.value })} onBlur={gravar} placeholder={dados.resumoSugerido || dados.frase} />
         <p className="mt-1 text-[11px] text-zinc-400">Vazio = a sugestão acima, montada com o pilar mais forte e o mais fraco.</p>
@@ -208,6 +208,12 @@ function Painel({ item, ap, salvar, urls, dados }) {
           <div key={i} className="rounded-xl border border-zinc-200 p-3 flex flex-col gap-2">
             <input className={campo} value={o.titulo} onChange={(e) => setRascunho(obs(i, { titulo: e.target.value }))} onBlur={gravar} placeholder={`Observação ${i + 1} (título curto)`} />
             <textarea rows={2} className={campo} value={o.texto} onChange={(e) => setRascunho(obs(i, { texto: e.target.value }))} onBlur={gravar} placeholder="Uma frase explicando" />
+            <div className="flex gap-1.5" title="De onde veio: só aparece no roteiro">
+              {[["visto", "Visto"], ["provavel", "Provável"]].map(([v, r]) => (
+                <button key={v} onClick={() => salvar(obs(i, { fonte: v }))}
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${(o.fonte || "provavel") === v ? "bg-black text-white border-black" : "border-zinc-300 text-zinc-500 hover:border-black"}`}>{r}</button>
+              ))}
+            </div>
             {o.imagem ? (
               <div className="flex items-center gap-2">
                 {urls[o.imagem] && <img src={urls[o.imagem]} alt="" className="w-16 h-10 object-cover rounded" />}
@@ -257,6 +263,21 @@ function Painel({ item, ap, salvar, urls, dados }) {
 
 // ---------- dados ----------
 
+/** O que foi salvo para o lead, com as sugestões nos campos ainda vazios (o que você escreveu fica). */
+export function apresentacaoInicial(item) {
+  const a = item.apresentacao || {};
+  const visao = VISAO_PADRAO[ofertaDoLead(item).servicoId];
+  const salvas = a.observacoes?.length ? a.observacoes : VAZIO3();
+  return {
+    ...a,
+    visaoTitulo: a.visaoTitulo || visao?.titulo || "",
+    observacoes: salvas.map((o, i) => {
+      const base = visao?.observacoes[i];
+      return base && !o.titulo && !o.texto ? { ...o, titulo: base.titulo, texto: base.texto, fonte: "provavel" } : o;
+    }),
+  };
+}
+
 // Sugestão do resumo: o pilar mais forte e o mais fraco, em linguagem de cliente.
 // Índices na ordem dos pilares (o 4º, apresentação/proposta, muda de nome por tipo de negócio).
 const FORTE = ["O valor do seu trabalho aparece", "Todo mundo entende o que você faz", "A sua marca aparece bem", "Você convence quando apresenta", "O cliente gosta de comprar com você"];
@@ -271,7 +292,7 @@ export function resumoSugerido(pilares) {
   return `${FORTE[forte.i]}, mas ${FRACO[fraco.i]}.`;
 }
 
-function montarDados(item, ap, urls) {
+export function montarDados(item, ap, urls = {}) {
   const d = item.dados || {};
   const oferta = ofertaDoLead(item);
   // o banco não guarda a ordem das chaves: volta para a ordem dos pilares (o 4º muda de nome por tipo de negócio)
@@ -288,6 +309,7 @@ function montarDados(item, ap, urls) {
   return {
     nome: item.nome,
     empresa: ap.empresa || "",
+    elogio: ap.elogio || "",
     momento: MOMENTOS[d.persona_id] || d.persona || "",
     frase: d.devolutiva?.persona_frase || "",
     resumoSugerido: resumoSugerido(pilares),
@@ -297,7 +319,7 @@ function montarDados(item, ap, urls) {
     pilares,
     segundo: segundo?.nome,
     visaoTitulo: ap.visaoTitulo || "",
-    observacoes: ap.observacoes.map((o) => ({ ...o, url: o.imagem ? urls[o.imagem] : "" })),
+    observacoes: (ap.observacoes || []).map((o) => ({ ...o, url: o.imagem ? urls[o.imagem] : "" })),
     custo,
     oferta,
     investimento: ap.investimento || oferta.servico.investimento || "",
@@ -360,18 +382,28 @@ function Capa({ d, escala }) {
 
 function Objetivo({ d, escala }) {
   const itens = [
-    ["O que você respondeu", "O momento da sua marca e a nota de cada pilar."],
-    ["O que eu vi de fora", "Site, Instagram e materiais, como o seu cliente vê."],
+    ["O seu momento", "Me conta do negócio, do cliente e de onde você quer chegar."],
+    ["O que eu vi", "As suas respostas e a sua marca vista de fora."],
     ["Por onde começar", "O primeiro passo, com prazo e investimento."],
   ];
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t="Nossa conversa" sub="Do que você respondeu até o primeiro passo." />
+      <Titulo t="Nossa conversa" sub="Primeiro eu escuto, depois eu mostro." />
       <div className="apr-tres">
         {itens.map(([t, p], i) => (
           <div key={t}><p className="num">{i + 1}</p><h3>{t}</h3><p className="txt">{p}</p></div>
         ))}
       </div>
+    </Slide>
+  );
+}
+
+function Conversa({ d, escala }) {
+  return (
+    <Slide tipo="escuro" classe="apr-conversa" escala={escala} d={d}>
+      <p className="chapeu">1 · O seu momento</p>
+      <h2>Antes de mostrar qualquer coisa, quero te ouvir.</h2>
+      <p className="sub">Me conta do seu negócio, do cliente que você quer atender e de onde você quer chegar.</p>
     </Slide>
   );
 }
@@ -533,4 +565,8 @@ function Fim({ d, escala }) {
   );
 }
 
-const SLIDES = [Capa, Objetivo, Respostas, Visao, Custo, Caminho, Passo, Casos, Proximos, Fim];
+// [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
+const SLIDES = [
+  ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
+  ["custo", Custo], ["caminho", Caminho], ["passo", Passo], ["casos", Casos], ["proximos", Proximos], ["fim", Fim],
+];

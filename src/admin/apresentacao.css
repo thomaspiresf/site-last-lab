@@ -46,6 +46,12 @@
 .apr-tres h3 { font-size: 48px; font-weight: 600; line-height: 1.15; margin-top: 16px; }
 .apr-tres p.txt { font-size: 34px; line-height: 1.4; color: var(--suave); margin-top: 16px; }
 
+/* conversa: pausa para ouvir */
+.apr-conversa { justify-content: center; gap: 40px; }
+.apr-conversa .chapeu { font-size: 30px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--laranja); }
+.apr-conversa h2 { font-size: 132px; font-weight: 300; line-height: 1.02; letter-spacing: -3px; width: 1500px; }
+.apr-conversa .sub { font-size: 44px; font-weight: 300; line-height: 1.3; color: #b9b9c1; width: 1300px; }
+
 /* respostas */
 .apr-respostas { flex: 1; display: grid; grid-template-columns: 860px 1fr; gap: 88px; }
 .apr-momento {
