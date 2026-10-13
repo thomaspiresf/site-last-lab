@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, Play, Plus, RotateCcw, Save, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Gem, Globe, HeartHandshake, MessageSquareText, Play, Plus, Presentation, Repeat, RotateCcw, Save, Settings2, Smartphone, X } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { salvarCatalogoServicos } from "../lib/api";
 import { projects } from "../data/projects";
@@ -90,7 +90,7 @@ function Bloco({ titulo, children, acao }) {
 export default function AdminServicos() {
   const [rascunho, setRascunho] = useState(null);
   const [salvo, setSalvo] = useState(null); // JSON do que está no banco, para saber se mudou
-  const [sel, setSel] = useState({ tipo: "servico", id: "mensagem" });
+  const [sel, setSel] = useState(null); // null = a escada; senão o item em edição
   const [persona, setPersona] = useState(null);
   const [estado, setEstado] = useState("");
   const padrao = useMemo(() => catalogoPadrao(), []);
@@ -140,123 +140,170 @@ export default function AdminServicos() {
 
   if (!rascunho) return <AdminLayout><p className="text-sm text-zinc-400">Carregando...</p></AdminLayout>;
 
-  const escolher = (novo) => { setSel(novo); setPersona(null); };
+  const escolher = (novo) => { setSel(novo); setPersona(null); window.scrollTo({ top: 0 }); };
+  const r = rascunho;
+  const aid = sel?.tipo === "area" ? sel.id : sel?.tipo === "servico" ? areaDoServico(sel.id) : null;
+  const trilha = !sel ? [] : [
+    aid && { nome: r.areas[aid].nome, ir: sel.tipo === "servico" ? { tipo: "area", id: aid } : null },
+    sel.tipo === "servico" && { nome: r.servicos[sel.id].nome },
+    sel.tipo === "continuidade" && { nome: "Continuidade" },
+    sel.tipo === "custo" && { nome: "O custo de ficar como está" },
+    sel.tipo === "mapa" && { nome: "Ofertas do diagnóstico" },
+  ].filter(Boolean);
 
   return (
     <AdminLayout>
-      <div className="flex items-end justify-between gap-4 mb-5">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight">Produtos e serviços</h1>
-          <p className="text-sm text-zinc-500 mt-1">O que a Last Lab vende, organizado pela escada de valor. Clique num item para editar; o que mudar aqui vale para todas as apresentações.</p>
-        </div>
-        <div className="flex items-center gap-3 shrink-0">
-          {estado && <span className="text-xs text-zinc-500">{estado}</span>}
-          <button disabled={!mudou} onClick={() => { setRascunho(JSON.parse(salvo)); setEstado(""); }} className="px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-40">Descartar</button>
-          <button disabled={!mudou} onClick={salvar} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800 disabled:opacity-40"><Save size={15} /> Salvar</button>
-        </div>
+      {/* barra fixa: onde estou + salvar */}
+      <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 mb-6 bg-zinc-50/90 backdrop-blur border-b border-zinc-200 flex items-center gap-3">
+        <nav className="flex items-center gap-1.5 text-sm min-w-0 flex-1">
+          {sel ? (
+            <button onClick={() => escolher(null)} className="inline-flex items-center gap-1.5 font-semibold text-zinc-500 hover:text-black"><ArrowLeft size={15} /> Escada de valor</button>
+          ) : (
+            <span className="font-black text-lg tracking-tight">Produtos e serviços</span>
+          )}
+          {trilha.map((t, i) => (
+            <React.Fragment key={i}>
+              <ChevronRight size={14} className="text-zinc-300 shrink-0" />
+              {t.ir ? <button onClick={() => escolher(t.ir)} className="font-semibold text-zinc-500 hover:text-black truncate">{t.nome}</button> : <span className="font-semibold truncate">{t.nome}</span>}
+            </React.Fragment>
+          ))}
+        </nav>
+        {estado && <span className="text-xs text-zinc-500">{estado}</span>}
+        {mudou && <span className="text-xs font-semibold text-[#ef4b3a]">Alterações não salvas</span>}
+        <button disabled={!mudou} onClick={() => { setRascunho(JSON.parse(salvo)); setEstado(""); }} className="px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-40">Descartar</button>
+        <button disabled={!mudou} onClick={salvar} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800 disabled:opacity-40"><Save size={15} /> Salvar</button>
       </div>
 
-      <ComoFunciona />
-      <Escada r={rascunho} sel={sel} escolher={escolher} />
-
-      <div className="flex flex-wrap items-center gap-2 mt-4 mb-8 text-sm">
-        <span className="text-zinc-400">Textos que valem para todas as áreas:</span>
-        {[["custo", "O custo de ficar como está (por momento)"], ["mapa", "Ofertas do diagnóstico → serviço"]].map(([id, nome]) => (
-          <button key={id} onClick={() => escolher({ tipo: id })} className={`px-3 py-1 rounded-full font-semibold border ${sel.tipo === id ? "bg-black text-white border-black" : "border-zinc-300 text-zinc-600 hover:border-black"}`}>{nome}</button>
-        ))}
-      </div>
-
-      {sel.tipo === "servico" && (
+      {!sel && <VisaoGeral r={r} escolher={escolher} />}
+      {sel?.tipo === "servico" && (
         <Servico
-          id={sel.id} r={rascunho} padrao={padrao} set={set} setServ={setServ} escolher={escolher}
+          id={sel.id} r={r} padrao={padrao} set={set} setServ={setServ} escolher={escolher}
           persona={persona || MOMENTO_DO_SERVICO[sel.id] || "loja_sem_vitrine"} setPersona={setPersona}
         />
       )}
-      {sel.tipo === "area" && <Area id={sel.id} r={rascunho} padrao={padrao} set={set} escolher={escolher} />}
-      {sel.tipo === "continuidade" && <Continuidade r={rascunho} padrao={padrao} set={set} />}
-      {sel.tipo === "custo" && <Custos r={rascunho} padrao={padrao} set={set} />}
-      {sel.tipo === "mapa" && <Mapa r={rascunho} set={set} />}
+      {sel?.tipo === "area" && <Area id={sel.id} r={r} padrao={padrao} set={set} escolher={escolher} />}
+      {sel?.tipo === "continuidade" && <Continuidade r={r} padrao={padrao} set={set} />}
+      {sel?.tipo === "custo" && <Custos r={r} padrao={padrao} set={set} />}
+      {sel?.tipo === "mapa" && <Mapa r={r} set={set} />}
     </AdminLayout>
   );
 }
 
-// ---------- a escada: visão geral ----------
+// ---------- visão geral: a escada ----------
 
-const PASSOS = [
-  ["0", "Diagnóstico", "Gratuito. Aponta a área mais fraca."],
-  ["1", "Entrada", "Vendida na reunião. Pequena, rápida, preço fechado."],
-  ["2", "Principal", "O projeto que dá margem. Sugerido no fechamento."],
-  ["3", "Premium", "Resolve a área inteira, ou várias."],
-  ["4", "Continuidade", "Plano mensal, oferecido no fim de todo projeto."],
+const LARANJA = "#ef4b3a";
+const ICONES = { clareza: MessageSquareText, valor: Gem, site: Globe, redes: Smartphone, vendas: Presentation, experiencia: HeartHandshake };
+
+// os degraus, do grátis ao recorrente (alturas crescentes = a escada)
+const DEGRAUS = [
+  { n: 0, nome: "Diagnóstico", papel: "Atrai e mostra o problema", preco: "Grátis", altura: 124, cor: "bg-white text-black border border-zinc-200" },
+  { n: 1, nome: "Entrada", papel: "Vendida na reunião", preco: "Ticket baixo", altura: 152, cor: "text-white", fundo: LARANJA },
+  { n: 2, nome: "Principal", papel: "O projeto que dá margem", preco: "Ticket médio", altura: 180, cor: "bg-zinc-700 text-white" },
+  { n: 3, nome: "Premium", papel: "Resolve a área inteira", preco: "Ticket alto", altura: 208, cor: "bg-black text-white" },
+  { n: 4, nome: "Continuidade", papel: "Plano mensal, no fim de todo projeto", preco: "Recorrente", altura: 236, cor: "bg-zinc-900 text-white ring-2 ring-offset-2 ring-[#ef4b3a]" },
 ];
 
-function ComoFunciona() {
+function VisaoGeral({ r, escolher }) {
   return (
-    <div className="grid grid-cols-5 gap-2 mb-4">
-      {PASSOS.map(([n, t, d], i) => (
-        <div key={n} className="relative bg-white rounded-xl border border-zinc-200 px-3.5 py-3">
-          <p className="text-xs font-bold text-zinc-400">DEGRAU {n}</p>
-          <p className="text-sm font-bold">{t}</p>
-          <p className="text-xs text-zinc-500 mt-0.5 leading-snug">{d}</p>
-          {i < PASSOS.length - 1 && <ArrowRight size={14} className="absolute -right-[11px] top-1/2 -translate-y-1/2 text-zinc-400 bg-zinc-50 rounded-full" />}
+    <div className="flex flex-col gap-10">
+      <section className="grid grid-cols-[1fr_1.5fr] gap-8 items-end">
+        <div className="pb-2">
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: LARANJA }}>Escada de valor</p>
+          <h2 className="text-3xl font-black tracking-tight leading-tight mt-2">O diagnóstico aponta a área mais fraca. A reunião vende a entrada dessa área.</h2>
+          <p className="text-sm text-zinc-500 mt-3 leading-relaxed">Depois da entrada, o cliente sobe na mesma área (principal, premium) e termina num plano mensal. Clique em qualquer item para editar os textos e ver a apresentação.</p>
         </div>
-      ))}
+        <div className="flex items-end gap-2">
+          {DEGRAUS.map((d) => (
+            <div key={d.n} className={`flex-1 rounded-t-2xl rounded-b-md p-3.5 flex flex-col justify-between ${d.cor}`} style={{ height: d.altura, background: d.fundo }}>
+              <span className="text-[11px] font-bold opacity-60">{d.n}</span>
+              <div>
+                <p className="text-sm font-bold leading-tight">{d.nome}</p>
+                <p className="text-[11px] opacity-70 leading-snug mt-0.5">{d.papel}</p>
+                <p className="text-[11px] font-semibold mt-1.5">{d.preco}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <div className="flex items-baseline justify-between mb-4">
+          <h3 className="text-lg font-black tracking-tight">As 6 áreas do diagnóstico</h3>
+          <p className="text-xs text-zinc-400">Cada área sobe em três degraus</p>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {Object.entries(r.areas).map(([aid, a]) => <CartaoArea key={aid} aid={aid} a={a} r={r} escolher={escolher} />)}
+        </div>
+      </section>
+
+      <section className="bg-zinc-900 text-white rounded-3xl p-6">
+        <div className="flex items-start justify-between gap-6 mb-5">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center"><Repeat size={18} /></span>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest" style={{ color: LARANJA }}>Degrau 4 · Para todas as áreas</p>
+              <h3 className="text-lg font-bold">Continuidade: planos mensais</h3>
+            </div>
+          </div>
+          <button onClick={() => escolher({ tipo: "continuidade" })} className="shrink-0 px-4 py-2 rounded-full bg-white text-black text-sm font-semibold hover:bg-zinc-200">Editar planos</button>
+        </div>
+        <div className="grid grid-cols-4 gap-3">
+          {Object.entries(r.continuidade).map(([pid, pl], i) => (
+            <button key={pid} onClick={() => escolher({ tipo: "continuidade" })} className="text-left rounded-2xl bg-white/5 hover:bg-white/10 p-4 flex flex-col gap-2 border border-white/10">
+              <div className="flex gap-1">{[0, 1, 2, 3].map((k) => <i key={k} className="h-1 flex-1 rounded-full" style={{ background: k <= i ? LARANJA : "rgba(255,255,255,.15)" }} />)}</div>
+              <p className="font-bold mt-1">{pl.nome}</p>
+              <p className="text-xs text-zinc-400 leading-snug line-clamp-3">{pl.entregas}</p>
+              <p className="text-xs font-semibold mt-auto pt-2">{pl.valor}</p>
+              {/parceiro/i.test(pl.quem) && <span className="self-start text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full bg-white/10">+ tráfego com parceiro</span>}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex items-center gap-3 text-sm border-t border-zinc-200 pt-6 pb-4">
+        <Settings2 size={16} className="text-zinc-400" />
+        <span className="text-zinc-500">Ajustes que valem para todas as áreas:</span>
+        <button onClick={() => escolher({ tipo: "custo" })} className="px-3 py-1.5 rounded-full border border-zinc-300 font-semibold hover:border-black">O custo de ficar como está</button>
+        <button onClick={() => escolher({ tipo: "mapa" })} className="px-3 py-1.5 rounded-full border border-zinc-300 font-semibold hover:border-black">Qual oferta do diagnóstico vai para qual serviço</button>
+      </section>
     </div>
   );
 }
 
-function Escada({ r, sel, escolher }) {
-  const ativo = (tipo, id) => sel.tipo === tipo && sel.id === id;
-  const celula = (on) => `flex flex-col justify-start text-left w-full h-full rounded-lg px-3 py-2.5 border transition ${on ? "border-black bg-white ring-1 ring-black" : "border-transparent hover:border-zinc-300 hover:bg-white"}`;
+/** Uma área: o problema e a mini-escada entrada → principal → premium. */
+function CartaoArea({ aid, a, r, escolher }) {
+  const Icone = ICONES[aid] || Gem;
+  const area = () => escolher({ tipo: "area", id: aid });
+  // alturas da mini-escada: a entrada cresce com o número de ofertas e os degraus seguintes sobem junto
+  const base = 124 + (a.entradas.length - 1) * 76;
   return (
-    <div className="bg-zinc-100/70 rounded-2xl border border-zinc-200 overflow-hidden">
-      <div className="grid grid-cols-[1.1fr_1.6fr_1fr_1fr] text-[11px] font-bold uppercase tracking-wide text-zinc-500 px-3 pt-3 pb-1">
-        <span className="px-3">Área do diagnóstico</span>
-        <span className="px-3">1 · Entrada (tem slides)</span>
-        <span className="px-3">2 · Principal</span>
-        <span className="px-3">3 · Premium</span>
-      </div>
-      {Object.entries(r.areas).map(([aid, a]) => (
-        <div key={aid} className="grid grid-cols-[1.1fr_1.6fr_1fr_1fr] gap-1 px-3 py-1.5 border-t border-zinc-200/80">
-          <button onClick={() => escolher({ tipo: "area", id: aid })} className={celula(ativo("area", aid))}>
-            <p className="text-sm font-bold">{a.nome} <span className="font-normal text-zinc-400">· {a.foco}</span></p>
-            <p className="text-xs text-zinc-500 leading-snug mt-0.5">{a.problema}</p>
+    <article className="bg-white rounded-3xl border border-zinc-200 p-5 flex flex-col gap-4 hover:shadow-md transition-shadow">
+      <button onClick={area} className="flex items-start gap-3 text-left group">
+        <span className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "#fdecea", color: LARANJA }}><Icone size={19} /></span>
+        <div className="min-w-0">
+          <p className="font-bold leading-tight group-hover:underline underline-offset-2">{a.nome} <span className="font-normal text-zinc-400">· {a.foco}</span></p>
+          <p className="text-sm text-zinc-500 leading-snug mt-1">"{a.problema}"</p>
+        </div>
+      </button>
+      <div className="flex items-end gap-2">
+        <div className="flex-1 rounded-t-xl rounded-b-md p-3 text-white flex flex-col justify-end gap-1.5" style={{ background: LARANJA, height: base }}>
+          <p className="text-[10px] font-bold uppercase tracking-wide opacity-80 mb-auto">1 · Entrada</p>
+          {a.entradas.map((sid) => r.servicos[sid] && (
+            <button key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} className="text-left rounded-lg bg-white/15 hover:bg-white/25 px-2.5 py-1.5">
+              <p className="text-[13px] font-semibold leading-tight">{r.servicos[sid].nome}</p>
+              <p className="text-[11px] opacity-80">{r.servicos[sid].investimento || "Valor a definir"} · {r.servicos[sid].prazo || "prazo a definir"}</p>
+            </button>
+          ))}
+        </div>
+        {[["principal", "2 · Principal", "bg-zinc-700", 30], ["premium", "3 · Premium", "bg-black", 60]].map(([k, rot, cor, mais]) => (
+          <button key={k} onClick={area} style={{ height: base + mais }} className={`flex-1 text-left rounded-t-xl rounded-b-md p-3 text-white flex flex-col justify-end gap-1 hover:opacity-90 ${cor}`}>
+            <p className="text-[10px] font-bold uppercase tracking-wide opacity-60 mb-auto">{rot}</p>
+            <p className="text-[13px] font-semibold leading-tight">{a[k].nome}</p>
+            <p className="text-[11px] opacity-70">{a[k].valor}</p>
           </button>
-          <div className="flex flex-col gap-1">
-            {a.entradas.map((sid) => {
-              const s = r.servicos[sid];
-              if (!s) return null;
-              return (
-                <button key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} className={celula(ativo("servico", sid))}>
-                  <p className="text-sm font-semibold">{s.nome}</p>
-                  <p className="text-xs text-zinc-500">{s.investimento || "Valor a definir"}{s.prazo ? ` · ${s.prazo}` : ""}</p>
-                </button>
-              );
-            })}
-          </div>
-          {["principal", "premium"].map((k) => (
-            <button key={k} onClick={() => escolher({ tipo: "area", id: aid })} className={celula(ativo("area", aid))}>
-              <p className="text-sm font-semibold">{a[k].nome}</p>
-              <p className="text-xs text-zinc-500">{a[k].valor}</p>
-            </button>
-          ))}
-        </div>
-      ))}
-      <div className="grid grid-cols-[1.1fr_3.6fr] gap-1 px-3 py-1.5 pb-3 border-t border-zinc-200/80">
-        <button onClick={() => escolher({ tipo: "continuidade" })} className={celula(sel.tipo === "continuidade")}>
-          <p className="text-sm font-bold">4 · Continuidade</p>
-          <p className="text-xs text-zinc-500 leading-snug mt-0.5">Para todas as áreas. Tráfego com o parceiro.</p>
-        </button>
-        <div className="grid grid-cols-4 gap-1">
-          {Object.entries(r.continuidade).map(([pid, pl]) => (
-            <button key={pid} onClick={() => escolher({ tipo: "continuidade" })} className={celula(sel.tipo === "continuidade")}>
-              <p className="text-sm font-semibold">{pl.nome}</p>
-              <p className="text-xs text-zinc-500 leading-snug">{pl.valor}</p>
-            </button>
-          ))}
-        </div>
+        ))}
       </div>
-    </div>
+    </article>
   );
 }
 
@@ -350,11 +397,20 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     <div className="grid grid-cols-[420px_1fr] gap-6 items-start">
       <div className="flex flex-col gap-4">
         {area && (
-          <div className="bg-black text-white rounded-2xl p-5 flex flex-col gap-2">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-zinc-400">{area.nome} · Entrada</p>
-            <p className="text-sm">Resolve: {area.problema}</p>
-            <p className="text-sm text-zinc-300">Depois dela: <b className="text-white">{area.principal.nome}</b> ({area.principal.valor}) → {area.premium.nome}</p>
-            <button onClick={() => escolher({ tipo: "area", id: aid })} className="self-start text-xs font-semibold text-zinc-300 hover:text-white underline underline-offset-2">Editar os próximos degraus</button>
+          <div className="bg-white rounded-2xl border border-zinc-200 p-4 flex flex-col gap-3">
+            <p className="text-sm text-zinc-500 leading-snug"><b className="text-black">{area.nome}.</b> Resolve: "{area.problema}"</p>
+            <div className="flex items-end gap-1.5">
+              <div className="flex-1 rounded-t-lg rounded-b p-2.5 text-white" style={{ background: LARANJA, height: 76 }}>
+                <p className="text-[10px] font-bold uppercase opacity-80">1 · Você está aqui</p>
+                <p className="text-xs font-semibold leading-tight mt-1">{s.nome}</p>
+              </div>
+              {[["principal", "2 · Depois", "bg-zinc-700", 92], ["premium", "3 · Premium", "bg-black", 108]].map(([k, rot, cor, h]) => (
+                <button key={k} onClick={() => escolher({ tipo: "area", id: aid })} style={{ height: h }} className={`flex-1 text-left rounded-t-lg rounded-b p-2.5 text-white hover:opacity-90 ${cor}`}>
+                  <p className="text-[10px] font-bold uppercase opacity-60">{rot}</p>
+                  <p className="text-xs font-semibold leading-tight mt-1">{area[k].nome}</p>
+                </button>
+              ))}
+            </div>
           </div>
         )}
         <Bloco titulo="O serviço (slides de proposta)" acao={!igualPadrao && <button onClick={restaurar} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
