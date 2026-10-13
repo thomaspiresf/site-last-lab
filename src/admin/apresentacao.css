@@ -381,3 +381,22 @@
 .apr-persona { padding: 14px; color: #fff; box-sizing: border-box; }
 .apr-persona svg { width: 100%; height: 100%; display: block; }
 .apr-persona svg * { stroke-width: 2px; }
+
+/* investimento com âncora */
+.apr-preco { background: #0a0a0a; color: #fff; padding: 44px 48px; display: flex; flex-direction: column; box-sizing: border-box; }
+.apr-preco .rot { font-size: 20px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: #999999; }
+.apr-preco .de { font-size: 30px; font-weight: 300; color: #8a8a92; text-decoration: line-through; margin-top: 18px; }
+.apr-preco .valor { font-size: 120px; font-weight: 600; line-height: 1; letter-spacing: -3px; margin-top: 18px; }
+.apr-preco .valor span { display: block; font-size: 26px; font-weight: 300; letter-spacing: 0; color: #c9c9d1; margin-bottom: 10px; }
+.apr-preco .linhas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; }
+.apr-preco .pilula { font-size: 20px; padding: 10px 22px; border: 1.5px solid #55555d; border-radius: 999px; color: #e4e4e7; }
+.apr-preco .validade { font-size: 18px; color: #8a8a92; margin-top: 20px; }
+.apr-outra { background: #fff; padding: 30px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
+.apr-outra .topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+.apr-outra .selo { font-size: 16px; letter-spacing: 2.5px; text-transform: uppercase; color: #999999; }
+.apr-outra .nome { font-size: 32px; color: #0a0a0a; margin-top: 4px; line-height: 1.15; }
+.apr-outra .topo > div { min-width: 0; }
+.apr-outra .valor { font-size: 48px; font-weight: 500; color: #0a0a0a; white-space: nowrap; line-height: 1.05; text-align: right; }
+.apr-outra .valor span { display: block; font-size: 18px; font-weight: 300; color: #8a8a92; letter-spacing: 0; }
+.apr-outra .texto { font-size: 20px; line-height: 1.35; color: #77777f; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.apr-outra .pag { font-size: 18px; font-weight: 600; color: #0a0a0a; }

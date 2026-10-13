@@ -293,6 +293,31 @@ function Painel({ item, ap, salvar, urls, dados }) {
         </div>
       </div>
       <div>
+        <label className={rotulo}>Em destaque no investimento</label>
+        <div className="flex gap-1.5">
+          {[["entrada", "Entrada"], ["projeto", "Projeto completo"]].map(([v, t]) => (
+            <button key={v} onClick={() => salvar({ ...rascunho, destaque: v })} className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold border ${(rascunho.destaque || "entrada") === v ? "bg-black text-white border-black" : "border-zinc-200 text-zinc-600 hover:border-zinc-400"}`}>{t}</button>
+          ))}
+        </div>
+        <p className="text-[11px] text-zinc-400 mt-1">O outro aparece ao lado, como âncora ou como opção mais enxuta.</p>
+      </div>
+      {dados.oferta.area && (
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={rotulo}>Valor do projeto completo</label>
+            <input className={campo} value={rascunho.investimentoProjeto || ""} onChange={(e) => mudar({ investimentoProjeto: e.target.value })} onBlur={gravar} placeholder={`a partir de ${aPartirDe(dados.oferta.area.principal.valor)}`} />
+          </div>
+          <div>
+            <label className={rotulo}>Pagamento do projeto</label>
+            <input className={campo} value={rascunho.parcelamentoProjeto || ""} onChange={(e) => mudar({ parcelamentoProjeto: e.target.value })} onBlur={gravar} placeholder="ou 6x de R$ ___" />
+          </div>
+        </div>
+      )}
+      <div>
+        <label className={rotulo}>A conta (frase em destaque)</label>
+        <textarea rows={3} className={campo} value={rascunho.conta || ""} onChange={(e) => mudar({ conta: e.target.value })} onBlur={gravar} placeholder="Ex.: Com 20 clientes por mês, um contrato a mais já paga o projeto." />
+      </div>
+      <div>
         <label className={rotulo}>Pagamento</label>
         <input className={campo} value={rascunho.pagamento || ""} onChange={(e) => mudar({ pagamento: e.target.value })} onBlur={gravar} placeholder={PAGAMENTO_PADRAO} />
       </div>
@@ -393,6 +418,10 @@ export function montarDados(item, ap, urls = {}) {
     faixa: faixa.charAt(0).toUpperCase() + faixa.slice(1),
     faixaTexto: d.faixa || "",
     personaId: d.persona_id || "indefinida",
+    destaque: ap.destaque || "entrada",
+    investimentoProjeto: ap.investimentoProjeto || "",
+    parcelamentoProjeto: ap.parcelamentoProjeto || "",
+    conta: ap.conta || "",
     pilares,
     segundo: segundo?.nome,
     visaoTitulo: ap.visaoTitulo || "",
@@ -779,28 +808,69 @@ function Sessao({ d, escala }) {
   );
 }
 
+/** Menor valor de uma faixa ("R$ 4.500 a R$ 9.000" → "R$ 4.500"). */
+const aPartirDe = (t = "") => (t.match(/R\$\s*[\d.]+/) || [""])[0];
+
+/**
+ * Investimento com âncora: duas opções, a recomendada em destaque (cartão escuro) e a outra ao lado
+ * (cartão branco). Por padrão a entrada é a recomendada e o projeto completo serve de âncora; no painel
+ * do lead dá para inverter. A frase da conta (ROI) e o crédito da entrada ficam à esquerda.
+ */
 function Passo({ d, escala }) {
   const s = d.oferta.servico;
+  const a = d.oferta.area;
+  const entrada = {
+    tipo: "entrada", selo: d.destaque === "projeto" ? "Caminho mais enxuto" : "Recomendado para começar", nome: d.oferta.titulo, texto: s.pitch || s.promessa,
+    valor: d.investimento || "R$ ____", de: d.investimentoDe, pagamento: d.parcelamento, prazo: `${d.cronograma.total} dias úteis`,
+  };
+  const projeto = a && {
+    tipo: "projeto", selo: d.destaque === "projeto" ? "Recomendado para o seu momento" : "Solução completa", nome: a.principal.nome, texto: a.principal.pitch || a.principal.entregas,
+    valor: d.investimentoProjeto || aPartirDe(a.principal.valor) || "R$ ____", aPartir: !d.investimentoProjeto,
+    pagamento: d.parcelamentoProjeto, prazo: a.principal.prazo,
+  };
+  const [principal, outra] = d.destaque === "projeto" && projeto ? [projeto, entrada] : [entrada, projeto];
   return (
-    <Slide tipo="escuro" classe="apr-investimento" escala={escala} d={d}>
-      <Titulo t="Investimento" />
-      <div className="item">
-        <p className="serv">{d.oferta.titulo}</p>
-        <p className="desc">{s.pitch || s.promessa}</p>
+    <Slide livre escala={escala} d={d}>
+      <Cabeca t="Investimento" sub={principal.tipo === "entrada" ? "Duas formas de seguir. A recomendada é começar pelo primeiro passo." : "Duas formas de seguir. A recomendada resolve tudo de uma vez."} />
+      {/* esquerda: a opção recomendada, em texto, e a conta */}
+      <div className="apr-p" style={{ left: 81, top: 330, width: 820 }}>
+        <p style={{ fontSize: 22, fontWeight: 300, letterSpacing: 3, color: "#999999", textTransform: "uppercase" }}>{principal.selo}</p>
+        <h3 style={{ fontSize: 64, lineHeight: 1.12, fontWeight: 500, color: "#000", marginTop: 12 }}>{principal.nome}</h3>
+        <p style={{ fontSize: 28, lineHeight: 1.4, color: "#55555d", marginTop: 20, width: 780 }}>{principal.texto}</p>
+        {d.conta && (
+          <div style={{ marginTop: 40, borderLeft: "5px solid #ef4b3a", paddingLeft: 28 }}>
+            <p style={{ fontSize: 34, lineHeight: 1.3, fontWeight: 500, color: "#ef4b3a" }}>{d.conta}</p>
+          </div>
+        )}
       </div>
-      <div className="total">
-        <div>
-          <p className="rot">Investimento total</p>
-          {d.investimentoDe && <p className="de">{d.investimentoDe}</p>}
-          <p className="valor">{d.investimento || "R$ ____"}</p>
-          {d.parcelamento && <p className="parc">{d.parcelamento}</p>}
+      {outra && principal.tipo === "entrada" && (
+        <p className="apr-p" style={{ left: 81, top: 880, width: 820, fontSize: 22, lineHeight: 1.35, color: "#999999" }}>
+          O valor da entrada vira desconto no {outra.nome.charAt(0).toLowerCase() + outra.nome.slice(1)} se você seguir em até 60 dias.
+        </p>
+      )}
+
+      {/* direita: o cartão escuro com o preço recomendado */}
+      <div className="apr-caixa apr-preco" style={{ left: 1000, top: 300, width: 839, height: outra ? 410 : 560 }}>
+        <p className="rot">Investimento · {principal.nome}</p>
+        {principal.de && <p className="de">{principal.de}</p>}
+        <p className="valor">{principal.aPartir && <span>a partir de</span>}{principal.valor}</p>
+        <div className="linhas">
+          {principal.pagamento && <p className="pilula">{principal.pagamento}</p>}
+          <p className="pilula">Entrega em {principal.prazo}</p>
         </div>
-        <div className="lado">
-          <div><p>Prazo estimado</p><span>{d.prazo || "__ dias úteis"}</span></div>
-          <div><p>Rodadas de ajuste</p><span>{s.ajustes}</span></div>
-          <div><p>Não inclui</p><span>{s.naoInclui}</span></div>
-        </div>
+        <p className="validade">Proposta válida por {d.validade} · {d.pagamento}</p>
       </div>
+      {/* o cartão branco com a outra opção */}
+      {outra && (
+        <div className="apr-caixa apr-outra" style={{ left: 1000, top: 730, width: 839, height: 200 }}>
+          <div className="topo">
+            <div><p className="selo">{outra.selo}</p><p className="nome">{outra.nome}</p></div>
+            <p className="valor">{outra.aPartir && <span>a partir de</span>}{outra.valor}</p>
+          </div>
+          <p className="texto">{outra.texto}</p>
+          {outra.pagamento && <p className="pag">{outra.pagamento}</p>}
+        </div>
+      )}
     </Slide>
   );
 }

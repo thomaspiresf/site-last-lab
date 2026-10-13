@@ -101,9 +101,12 @@ export function montarRoteiro(item, dados, prep) {
       id: "proposta", titulo: "Proposta", tempo: "27 a 35 min", slides: ["entrega", "produto", "sessao", "passo", "condicoes"], dica: "Fale o valor e fique em silêncio. Quem fala primeiro depois do preço perde.",
       falas: [
         `"Para começar, minha proposta é ${dados.oferta.titulo}. Você recebe: ${dados.oferta.servico.entregas.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}."`,
-        `"O investimento é ${dados.investimento || "[valor]"}${dados.parcelamento ? `, ${dados.parcelamento}` : ""}, com prazo de ${dados.prazo || "[prazo]"}."`,
+        dados.oferta.area
+          ? `"Tem dois caminhos. O completo é ${dados.oferta.area.principal.nome.charAt(0).toLowerCase() + dados.oferta.area.principal.nome.slice(1)}, ${dados.investimentoProjeto || `a partir de ${(dados.oferta.area.principal.valor.match(/R\$\s*[\d.]+/) || ["[valor]"])[0]}`}. ${dados.destaque === "projeto" ? "É o que eu recomendo para o seu momento." : `Mas eu recomendo começar por ${dados.oferta.titulo}: ${dados.investimento || "[valor]"}${dados.parcelamento ? `, ${dados.parcelamento}` : ""}, e o que você investir vira desconto se seguir para o completo em até 60 dias.`}"`
+          : `"O investimento é ${dados.investimento || "[valor]"}${dados.parcelamento ? `, ${dados.parcelamento}` : ""}, com prazo de ${dados.prazo || "[prazo]"}."`,
+        dados.conta && `Mostre a conta: "${dados.conta}"`,
         `"O que você acha?"`,
-      ],
+      ].filter(Boolean),
       objecoes: true,
     },
     {

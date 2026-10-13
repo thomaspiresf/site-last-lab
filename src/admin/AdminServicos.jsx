@@ -330,6 +330,7 @@ function Area({ id, r, padrao, set, escolher }) {
       <p className="text-xs text-zinc-400 -mt-2">{dica}</p>
       <Campo label="Serviço" valor={a[k].nome} onChange={(x) => mudar(k, { ...a[k], nome: x })} />
       <Campo label="Entregáveis" area valor={a[k].entregas} onChange={(x) => mudar(k, { ...a[k], entregas: x })} />
+      {k === "principal" && <Campo label="Texto comercial (aparece no investimento, ao lado da entrada)" area valor={a[k].pitch} onChange={(x) => mudar(k, { ...a[k], pitch: x })} />}
       <div className="grid grid-cols-2 gap-2">
         <Campo label="Prazo" valor={a[k].prazo} onChange={(x) => mudar(k, { ...a[k], prazo: x })} />
         <Campo label="Valor" valor={a[k].valor} onChange={(x) => mudar(k, { ...a[k], valor: x })} />
