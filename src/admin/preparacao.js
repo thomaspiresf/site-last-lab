@@ -101,11 +101,8 @@ export function montarRoteiro(item, dados, prep) {
         `"Para começar, minha proposta é ${dados.oferta.titulo}. Você recebe: ${dados.oferta.servico.entregas.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}."`,
         `"O investimento é ${dados.investimento || "[valor]"}${dados.parcelamento ? `, ${dados.parcelamento}` : ""}, com prazo de ${dados.prazo || "[prazo]"}."`,
         `"O que você acha?"`,
-        `Está caro: "Comparado a quê? Hoje, ${dados.custo.frase.charAt(0).toLowerCase()}${dados.custo.frase.slice(1)}"`,
-        `Preciso pensar: "Claro. O que exatamente você precisa avaliar? Posso te ajudar com isso agora."`,
-        `Preciso falar com alguém: "Faz sentido. Vamos marcar 15 minutos com essa pessoa ainda esta semana?"`,
-        `Não é o momento: "O que precisaria acontecer para ser? Esta proposta vale por ${dados.validade}."`,
       ],
+      objecoes: true,
     },
     {
       id: "fechamento", titulo: "Fechamento", tempo: "35 a 40 min", slides: ["proximos", "fim"],
@@ -114,6 +111,53 @@ export function montarRoteiro(item, dados, prep) {
         `Se fechou: marque a imersão antes de desligar.`,
         `Se não fechou: combine dia e canal do próximo contato e envie o PDF desta apresentação logo depois.`,
       ],
+    },
+  ];
+}
+
+/**
+ * Objeções mais comuns na hora da proposta: o que a pessoa diz, o que costuma estar por trás,
+ * o que responder e como seguir. Respostas usam os dados do lead.
+ */
+export function montarObjecoes(dados) {
+  const custo = `${dados.custo.frase.charAt(0).toLowerCase()}${dados.custo.frase.slice(1)}`;
+  const entrada = dados.oferta.titulo;
+  return [
+    {
+      id: "caro", diz: "Está caro.",
+      porTras: "Ainda não ficou claro o tamanho do problema, ou está comparando com algo mais simples.",
+      resposta: `"Entendo. Comparado a quê? Hoje, ${custo} ${entrada} é justamente o primeiro passo, menor, para resolver isso."`,
+      seguir: dados.parcelamento ? `Ofereça o parcelamento: ${dados.parcelamento}.` : "Se for o fluxo de caixa, ofereça parcelar ou dividir o pagamento.",
+    },
+    {
+      id: "pensar", diz: "Preciso pensar.",
+      porTras: "Ficou alguma dúvida que a pessoa não falou.",
+      resposta: `"Claro. Para eu te ajudar: o que exatamente você precisa avaliar? É o valor, o momento ou se isso resolve mesmo?"`,
+      seguir: "Responda a dúvida ali mesmo. Se ainda assim precisar de tempo, marque dia e hora para a resposta.",
+    },
+    {
+      id: "socio", diz: "Preciso falar com meu sócio (ou família).",
+      porTras: "Há outra pessoa na decisão, que não ouviu o argumento.",
+      resposta: `"Faz todo sentido. Que tal marcarmos 15 minutos com vocês dois ainda esta semana? Eu explico o que vimos e tiro as dúvidas."`,
+      seguir: "Marque a conversa antes de desligar. Mande o PDF da apresentação logo depois.",
+    },
+    {
+      id: "momento", diz: "Agora não é o momento.",
+      porTras: "Outra prioridade, ou ainda não sentiu urgência.",
+      resposta: `"Entendo. O que precisaria acontecer para ser o momento? Lembrando que, enquanto isso, ${custo}"`,
+      seguir: `Combine quando voltar a falar. A proposta vale por ${dados.validade}.`,
+    },
+    {
+      id: "orcamentos", diz: "Quero ver outros orçamentos.",
+      porTras: "Quer segurança de que está pagando o preço certo.",
+      resposta: `"Ótimo, faz parte. Só compare o que está incluso: o diagnóstico, o plano e ${entrada.charAt(0).toLowerCase()}${entrada.slice(1)} já pensado para o seu caso."`,
+      seguir: "Ofereça mandar a proposta por escrito e combine o dia da resposta.",
+    },
+    {
+      id: "sozinho", diz: "Eu mesmo consigo fazer isso.",
+      porTras: "Acha que o problema é simples, ou quer economizar.",
+      resposta: `"Consegue, sim, e o diagnóstico já te dá o caminho. A diferença é tempo e olhar de fora. Quanto custa esperar mais alguns meses do jeito que está?"`,
+      seguir: "Se for mesmo fazer sozinho, ofereça um acompanhamento menor, ou deixe a porta aberta.",
     },
   ];
 }

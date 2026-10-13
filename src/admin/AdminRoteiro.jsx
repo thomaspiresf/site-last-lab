@@ -3,7 +3,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico } from "../lib/api";
 import { apresentacaoInicial, montarDados } from "./AdminApresentacao";
-import { montarPreparacao, montarRoteiro } from "./preparacao";
+import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 
 // Roteiro da reunião, numa janela à parte (fora da tela compartilhada). Mostra a preparação e o que
 // dizer em cada etapa; acompanha o slide que está na apresentação em tela cheia.
@@ -93,6 +93,7 @@ export default function AdminRoteiro() {
   const dados = useMemo(() => (item ? montarDados(item, apresentacaoInicial(item)) : null), [item]);
   const prep = useMemo(() => (item && dados ? montarPreparacao(item, dados) : null), [item, dados]);
   const etapas = useMemo(() => (item && dados && prep ? montarRoteiro(item, dados, prep) : []), [item, dados, prep]);
+  const objecoes = useMemo(() => (dados ? montarObjecoes(dados) : []), [dados]);
   const atual = etapas.find((e) => e.slides.includes(slide))?.id;
   const refs = useRef({});
   useEffect(() => { if (atual) refs.current[atual]?.scrollIntoView({ behavior: "smooth", block: "start" }); }, [atual]);
@@ -223,6 +224,28 @@ export default function AdminRoteiro() {
               {e.dica && <p className={`mt-1 text-xs ${escuro ? "text-white/60" : "text-zinc-500"}`}>{e.dica}</p>}
               <ul className="mt-3 space-y-2.5">{linhas(e.id, e.falas.map((f) => ({ texto: f })), "pl-3 border-l-2 border-[#ef4b3a]")}</ul>
               {maisLinha(e.id, escuro)}
+              {e.objecoes && (
+                <div className="mt-5">
+                  <p className={`text-[11px] font-bold uppercase tracking-[0.16em] ${escuro ? "text-white/60" : "text-zinc-500"}`}>Se aparecer uma objeção</p>
+                  <div className="mt-2 flex flex-col gap-2">
+                    {objecoes.filter((o) => !edits[`obj-${o.id}|diz`]?.oculto).map((o) => (
+                      <details key={o.id} className={`group rounded-xl ${escuro ? "bg-white/10" : "bg-white ring-1 ring-black/5"}`}>
+                        <summary className="cursor-pointer list-none px-4 py-2.5 font-semibold flex items-center justify-between gap-3">
+                          <span>“{edits[`obj-${o.id}|diz`]?.texto ?? o.diz}”</span>
+                          <span className="text-[#ef4b3a] text-lg leading-none transition-transform group-open:rotate-45">+</span>
+                        </summary>
+                        <div className="px-4 pb-4 flex flex-col gap-2.5 text-[14px]">
+                          <p className={escuro ? "text-white/60" : "text-zinc-500"}>{o.porTras}</p>
+                          <ul className="space-y-2">
+                            {linhas(`obj-${o.id}`, [{ texto: o.resposta }], "pl-3 border-l-2 border-[#ef4b3a]")}
+                          </ul>
+                          <ul>{linhas(`obj-${o.id}-seguir`, [{ texto: o.seguir }], escuro ? "text-white/70" : "text-zinc-600")}</ul>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              )}
               {e.id === "clarear" && (
                 <ul className="mt-4 space-y-1.5 text-sm">
                   {dados.observacoes.map((o, i) => (
