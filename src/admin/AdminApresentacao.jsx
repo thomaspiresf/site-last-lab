@@ -4,7 +4,7 @@ import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText } from "lucide-reac
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
 import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
-import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
+import { CASOS_PADRAO, CONTINUIDADE, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import { Cena, FORMATOS, Peca } from "./mockups";
 import { dia, montarCronograma, periodo } from "./cronograma";
@@ -15,7 +15,7 @@ import "./apresentacao.css";
 // entram sozinhos; o que é escrito por lead fica em diagnosticos.apresentacao. Mesmo visual da
 // proposta comercial. "Apresentar" abre em tela cheia; "Exportar PDF" usa a impressão do navegador.
 
-const FONTE = "https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap";
+const FONTE = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500&family=Poppins:wght@200;300;400;500;600;700&display=swap";
 const LOGO = "/images/logo.png";
 const PAGAMENTO_PADRAO = "50% na contratação + 50% na entrega";
 const VALIDADE_PADRAO = "7 dias";
@@ -385,6 +385,7 @@ export function montarDados(item, ap, urls = {}) {
     resumo: ap.resumo || resumoSugerido(pilares) || d.devolutiva?.persona_frase || "",
     nota: d.nota_geral ?? item.notaGeral,
     faixa: faixa.charAt(0).toUpperCase() + faixa.slice(1),
+    faixaTexto: d.faixa || "",
     pilares,
     segundo: segundo?.nome,
     visaoTitulo: ap.visaoTitulo || "",
@@ -399,27 +400,32 @@ export function montarDados(item, ap, urls = {}) {
     validade: ap.validade || VALIDADE_PADRAO,
     casos,
     cronograma: montarCronograma(oferta.servico.etapas, ap.inicio),
+    continuidade: CONTINUIDADE[oferta.area?.continuidade] || null,
   };
 }
 
 // ---------- slides ----------
 
-function Slide({ tipo = "", classe = "", escala, d, children }) {
+function Slide({ tipo = "", classe = "", escala, d, children, livre }) {
   return (
-    <section className={`apr-slide ${tipo} ${classe}`} style={escala ? { transform: `scale(${escala})` } : undefined}>
+    <section className={`apr-slide ${livre ? "livre" : ""} ${tipo} ${classe}`} style={escala ? { transform: `scale(${escala})` } : undefined}>
       {children}
       <Rodape d={d} />
     </section>
   );
 }
 
+// Rodapé do layout (IBM Plex Sans Condensed): três colunas e o símbolo da Last Lab.
 function Rodape({ d }) {
   return (
     <div className="apr-rodape">
-      <p>Diagnóstico preparado<br />para {d.empresa || d.nome}</p>
-      <p>Diagnóstico de marca<br />Apresentação</p>
-      <p>Last Lab<br />Thomás Pires</p>
-      <span className="barras"><i /><i /></span>
+      <p style={{ left: 83 }}>Desenvolvido<br />para {d.empresa || d.nome}</p>
+      <p style={{ left: 723 }}>Diagnóstico de marca<br />Apresentação</p>
+      <p style={{ left: 1322 }}>Last Lab<br />Thomás Pires</p>
+      <svg className="simbolo" viewBox="0 0 20 46" aria-hidden="true">
+        <rect x="5" y="0" width="4" height="31" /><rect x="14" y="0" width="5" height="31" />
+        <polygon points="0,34 5,34 8,45 4,45" /><polygon points="11,34 14,34 18,45 14,45" />
+      </svg>
     </div>
   );
 }
@@ -433,124 +439,223 @@ const Titulo = ({ t, sub, menor }) => (
 
 const ou = (texto, reserva) => (texto ? texto : <span className="apr-vazio">{reserva}</span>);
 
+/**
+ * Texto posicionado como no layout desenhado (Google Slides, 1920×1080). `y` é o topo da linha do
+ * PDF (que usa altura de linha 1,4); com outra altura de linha, a primeira linha fica no mesmo lugar.
+ */
+const P = ({ x, y, s, lh = 1.4, w, peso = 400, cor, direita, como: Tag = "p", style, children, className }) => (
+  <Tag className={`apr-p ${className || ""}`} style={{
+    ...(direita !== undefined ? { right: 1920 - direita, textAlign: "right" } : { left: x }),
+    top: y + ((1.4 - lh) / 2) * s, fontSize: s, lineHeight: lh, fontWeight: peso, color: cor, width: w, ...style,
+  }}>{children}</Tag>
+);
+
+/** Título + subtítulo padrão dos slides claros (88 Regular + 36 Light). */
+const Cabeca = ({ t, sub, y = 63, corSub = "#999999" }) => (
+  <>
+    <P x={77} y={y} s={88} como="h2" cor="#000">{t}</P>
+    {sub && <P x={83} y={y + 124} s={36} peso={300} cor={corSub} w={1760} style={{ whiteSpace: "nowrap" }}>{sub}</P>}
+  </>
+);
+
+/** Frase com a parte entre ** em SemiBold. */
+const negrito = (txt = "") => txt.split("**").map((parte, i) => (i % 2 ? <b key={i}>{parte}</b> : parte));
+
+// as seis peças laranja da capa, contornadas do layout
+const PECAS_CAPA = [
+  "1119,370 1221,370 1321,485 1319,687 1217,687 1119,573",
+  "1336,370 1415,370 1492,486 1491,687 1413,687 1335,573",
+  "1507,370 1570,370 1635,490 1633,687 1569,687 1506,573",
+  "1650,370 1687,370 1726,492 1726,687 1687,687 1650,573",
+  "1744,370 1762,370 1789,495 1789,687 1766,687 1741,573",
+  "1803,372 1814,372 1814,686 1801,686",
+];
+
 function Capa({ d, escala }) {
-  const barras = [];
-  let x = 0, w = 150, s = 52;
-  for (let i = 0; i < 12; i++) {
-    barras.push(<polygon key={i} points={`${x},0 ${x + w},${s} ${x + w},${420 - s} ${x},420`} fill="#ef4b3a" />);
-    x += w + 26;
-    w = Math.max(22, Math.round(w * 0.82));
-    s = Math.max(0, Math.round(s * 0.78));
-  }
   return (
-    <Slide tipo="escuro" classe="apr-capa" escala={escala} d={d}>
-      <img className="logo" src={LOGO} alt="Last Lab" />
-      <svg viewBox={`0 0 ${x} 420`} preserveAspectRatio="none" aria-hidden="true">{barras}</svg>
-      <div>
-        <h1>Diagnóstico de marca</h1>
-        <p className="quem">{d.nome}{d.empresa ? ` · ${d.empresa}` : ""}</p>
-      </div>
+    <Slide livre tipo="escuro" escala={escala} d={d}>
+      <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
+      <P x={68} y={324} s={152} lh={1.15} cor="#fff" como="h1">Diagnóstico<br />de marca</P>
+      <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
+        {PECAS_CAPA.map((pts) => <polygon key={pts} points={pts} fill="#ef4b3a" />)}
+      </svg>
     </Slide>
   );
 }
 
+const Icone = ({ x, y = 197, t = 30, children }) => (
+  <svg style={{ position: "absolute", left: x, top: y, width: t, height: t }} viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{children}</svg>
+);
+
 function Objetivo({ d, escala }) {
-  const itens = [
-    ["O seu momento", "Me conta do negócio, do cliente e de onde você quer chegar."],
-    ["O que eu vi", "As suas respostas e a sua marca vista de fora."],
-    ["Por onde começar", "O primeiro passo e a proposta."],
+  const cols = [
+    [77, "01", "O seu momento", <>Me conta um pouco sobre<br />o negócio, o cliente e<br />onde quer chegar</>],
+    [722, "02", "Visão externa", <>Sua marca e suas respostas<br />vistas de fora.</>],
+    [1350, "03", "Por onde começar", <>Primeiros passos, prazos<br />e investimento</>],
   ];
   return (
-    <Slide escala={escala} d={d}>
-      <Titulo t="Nossa conversa" sub="Primeiro eu escuto, depois eu mostro." />
-      <div className="apr-tres">
-        {itens.map(([t, p], i) => (
-          <div key={t}><p className="num">{i + 1}</p><h3>{t}</h3><p className="txt">{p}</p></div>
-        ))}
-      </div>
+    <Slide livre escala={escala} d={d}>
+      <P x={77} y={63} s={88} como="h2" cor="#000">Nossa conversa</P>
+      <Icone x={82} y={196} t={34}><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" /></Icone>
+      <P x={129} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>Do diagnóstico à ação.</P>
+      <Icone x={619} y={197} t={32}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></Icone>
+      <P x={672} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>30 minutos</P>
+      <Icone x={943} y={200} t={34}><path d="M20 6 9 17l-5-5" /></Icone>
+      <P x={994} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>Avaliação sem compromisso</P>
+      {cols.map(([x, n, t, txt]) => (
+        <React.Fragment key={n}>
+          <P x={x} y={373} s={144} peso={200} cor="#ef4b3a">{n}</P>
+          <P x={x} y={566} s={42} cor="#434343" style={{ whiteSpace: "nowrap" }}>{t}</P>
+          <P x={x + 3} y={631} s={28} lh={1.2} cor="#999999" style={{ whiteSpace: "nowrap" }}>{txt}</P>
+        </React.Fragment>
+      ))}
     </Slide>
   );
 }
 
 function Conversa({ d, escala }) {
   return (
-    <Slide tipo="escuro" classe="apr-conversa" escala={escala} d={d}>
-      <p className="chapeu">1 · O seu momento</p>
-      <h2>Antes de mostrar qualquer coisa, quero te ouvir.</h2>
-      <p className="sub">Me conta do seu negócio, do cliente que você quer atender e de onde você quer chegar.</p>
+    <Slide livre tipo="laranja" escala={escala} d={d}>
+      <P x={89} y={73} s={56} cor="#d64434" style={{ whiteSpace: "nowrap" }}>01 - O seu momento</P>
+      <P x={82} y={242} s={124} lh={1.38} cor="#fff" style={{ whiteSpace: "nowrap" }}>Antes de mostrar<br />qualquer coisa,<br /><b>quero te ouvir.</b></P>
     </Slide>
   );
 }
 
+// radar do momento: três anéis de pentágono e a forma das notas
+const RADAR = { cx: 917.5, cy: 605.5, r: 162.5 };
+const ponto = (i, f) => {
+  const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5;
+  return `${(RADAR.cx + Math.cos(a) * RADAR.r * f).toFixed(1)},${(RADAR.cy + Math.sin(a) * RADAR.r * f).toFixed(1)}`;
+};
+
 function Respostas({ d, escala }) {
+  const pil = d.pilares.slice(0, 5);
   return (
-    <Slide escala={escala} d={d}>
-      <Titulo t="O que você respondeu" sub={d.resumo} />
-      <div className="apr-respostas">
-        <div className="apr-momento">
-          <p className="chapeu">Momento da sua marca</p>
-          <div><h3>{d.momento}</h3><p className="frase">{d.frase}</p></div>
-          <div className="base">
-            <p className="nota">{d.nota}<span>/100</span></p>
-            {d.faixa && <p className="faixa">{d.faixa}</p>}
-          </div>
-        </div>
-        <div className="apr-barras">
-          {d.pilares.map((p) => (
-            <div key={p.nome} className={`apr-barra ${p.fraco ? "fraco" : ""}`}>
-              <div className="linha"><span>{p.nome}{p.fraco ? " · a melhorar" : ""}</span><b>{p.nota}</b></div>
-              <div className="trilho"><div className="cheia" style={{ width: `${p.nota}%` }} /></div>
-            </div>
-          ))}
-        </div>
+    <Slide livre escala={escala} d={d}>
+      <Cabeca t="Visão interna" sub={d.resumo} corSub="#888888" />
+      <div className="apr-caixa" style={{ left: 71, top: 331, width: 557, height: 527, background: "#ef4b3a" }} />
+      <P x={114} y={375} s={22} peso={300} cor="#fff" style={{ whiteSpace: "nowrap" }}>MOMENTO DA SUA MARCA</P>
+      <P direita={592} y={362} s={34} peso={600} cor="#fff" style={{ whiteSpace: "nowrap" }}>{d.nota}<span style={{ fontSize: 28, fontWeight: 400, color: "#faada4" }}>/100</span></P>
+      <div className="apr-caixa" style={{ left: 109, top: 461, width: 130, height: 129, background: "#d64434", borderRadius: 22 }} />
+      <div className="apr-p" style={{ left: 266, top: 459, width: 340, height: 131, display: "flex", alignItems: "center" }}>
+        <p style={{ fontSize: 48, lineHeight: 1.2, fontWeight: 600, color: "#fff" }}>{d.momento}</p>
       </div>
+      <P x={117} y={624} s={26} lh={1.385} peso={300} cor="#fff" w={480}>{d.frase}</P>
+      {d.faixaTexto && <div className="apr-caixa apr-pilula" style={{ left: 109, top: 783, height: 42, background: "#d64434" }}>{d.faixaTexto}</div>}
+      <div className="apr-caixa" style={{ left: 662, top: 331, width: 1178, height: 525, background: "#ebebeb" }} />
+      <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
+        {[1, 0.766, 0.551].map((f) => <polygon key={f} points={[0, 1, 2, 3, 4].map((i) => ponto(i, f)).join(" ")} fill="none" stroke="#bfbfbf" strokeWidth="2" />)}
+        {pil.length === 5 && <polygon points={pil.map((p, i) => ponto(i, Math.max(0.06, (p.nota || 0) / 100))).join(" ")} fill="#262626" fillOpacity="0.08" stroke="#262626" strokeWidth="2.5" strokeLinejoin="round" />}
+      </svg>
+      {pil.map((p, i) => {
+        const y = 364 + i * 92.75;
+        return (
+          <React.Fragment key={p.nome}>
+            <P x={1172} y={y + 5} s={28} cor="#434343" style={{ whiteSpace: "nowrap" }}>{p.nome}</P>
+            <P direita={1792} y={y} s={32} cor={p.fraco ? "#ef4b3a" : "#434343"}>{p.nota}</P>
+            <div className="apr-caixa" style={{ left: 1170, top: y + 54.5, width: 620, height: 12, background: "#d1cfcf", borderRadius: 6 }}>
+              <div style={{ width: `${Math.min(100, p.nota || 0)}%`, height: "100%", borderRadius: 6, background: p.fraco ? "#ef4b3a" : "#262626" }} />
+            </div>
+          </React.Fragment>
+        );
+      })}
     </Slide>
   );
 }
 
 function Visao({ d, escala }) {
+  const xs = [[81, 83], [675, 676], [1269, 1270]];
   return (
-    <Slide escala={escala} d={d}>
-      <Titulo t="O que eu vi de fora" sub={d.visaoTitulo || <span className="apr-vazio">[A frase que resume o que você viu]</span>} />
-      <div className="apr-cards" style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>
-        {d.observacoes.map((o, i) => (
-          <div key={i}>
-            <div className="img">{o.url ? <img src={o.url} alt="" /> : `[print ${i + 1}]`}</div>
-            <h3>{ou(o.titulo, `[Observação ${i + 1}]`)}</h3>
-            <p>{ou(o.texto, "[Uma frase explicando]")}</p>
+    <Slide livre escala={escala} d={d}>
+      <Cabeca t="Visão externa" sub={d.visaoTitulo || <span className="apr-vazio">[A frase que resume o que você viu]</span>} />
+      {d.observacoes.slice(0, 3).map((o, i) => (
+        <React.Fragment key={i}>
+          <div className="apr-caixa" style={{ left: xs[i][0], top: 330, width: 566, height: 344, background: "#e7e6e6", overflow: "hidden" }}>
+            {o.url && <img src={o.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}
           </div>
-        ))}
-      </div>
+          <div className="apr-p" style={{ left: xs[i][1], top: 697, width: 566 }}>
+            <p style={{ fontSize: 40, lineHeight: 1.4, color: "#434343" }}>{ou(o.titulo, `[Observação ${i + 1}]`)}</p>
+            <p style={{ fontSize: 28, lineHeight: 1.21, color: "#999999", width: [480, 480, 360][i], marginTop: 19.7, marginLeft: 3 }}>{ou(o.texto, "[Uma frase explicando]")}</p>
+          </div>
+        </React.Fragment>
+      ))}
     </Slide>
   );
 }
 
 function Custo({ d, escala }) {
   return (
-    <Slide tipo="laranja" classe="apr-custo" escala={escala} d={d}>
-      <p className="chapeu">O custo de ficar como está</p>
-      <h2>{d.custo.frase}</h2>
-      <div className="cons">{d.custo.consequencias.map((c, i) => <p key={i}>{c}</p>)}</div>
+    <Slide livre tipo="escuro" escala={escala} d={d}>
+      <P x={89} y={73} s={56} cor="#999999" style={{ whiteSpace: "nowrap" }}>O custo de ficar como está</P>
+      <P x={82} y={311} s={102} lh={1.38} peso={300} cor="#fff" w={1400}>{negrito(d.custo.frase)}</P>
+    </Slide>
+  );
+}
+
+/** A escada para este lead: a entrada (o que vendemos agora), o projeto e a continuidade. */
+function Comeco({ d, escala }) {
+  const a = d.oferta.area;
+  const cards = [
+    ["01", "INÍCIO", d.oferta.titulo, d.oferta.servico.promessa, true],
+    ["02", "PROJETO", a?.principal.nome || d.oferta.servico.projeto, "Quando a entrada mostra resultado", false],
+    ["03", "CONTINUIDADE", d.continuidade?.nome || "Plano mensal", "Para a marca seguir consistente todo mês", false],
+  ];
+  const xs = [81, 675, 1269];
+  return (
+    <Slide livre escala={escala} d={d}>
+      <Cabeca t="Por onde começar" sub={<>Do diagnóstico à <span style={{ color: "#ef4b3a" }}>ação</span>.</>} />
+      {cards.map(([n, rot, t, txt, ativo], i) => (
+        <div key={n} className="apr-caixa apr-degrau" style={{ left: xs[i], top: 321, width: 565, height: 544, background: ativo ? "#ef4b3a" : "#e7e6e6", "--pn": `${[40, 51, 52][i]}px`, "--pt": `${[37, 48, 52][i]}px`, "--pr": `${[61, 50, 51][i]}px` }}>
+          <p className="n" style={{ color: ativo ? "#fff" : "#999999" }}>{n}</p>
+          <p className="rot" style={{ color: ativo ? "#fff" : "#999999" }}>{rot}</p>
+          <p className="t" style={{ color: ativo ? "#fff" : "#a5a5a5" }}>{t}</p>
+          <p className="txt" style={{ color: ativo ? "#fff" : "#a5a5a5" }}>{txt}</p>
+        </div>
+      ))}
+    </Slide>
+  );
+}
+
+/** Capa da oferta: o que estamos propondo agora. */
+function OfertaCapa({ d, escala }) {
+  return (
+    <Slide livre tipo="laranja" escala={escala} d={d}>
+      <P x={97} y={78} s={56} peso={300} cor="#fff">01</P>
+      <P direita={1837} y={78} s={48} peso={300} cor="#fff" style={{ top: 78 + 4 }}>INÍCIO</P>
+      <div className="apr-p" style={{ left: 94, top: 314 + 0.105 * 124, width: 1100, display: "flex", flexDirection: "column", gap: 58 }}>
+        <h2 style={{ fontSize: 124, lineHeight: 1.19, fontWeight: 500, color: "#fff" }}>{d.oferta.titulo}</h2>
+        <p style={{ fontSize: 36, lineHeight: 1.22, color: "#fff", width: 470 }}>{d.oferta.servico.promessa}</p>
+      </div>
     </Slide>
   );
 }
 
 function AntesDepois({ d, escala }) {
   const hoje = d.observacoes.map((o) => o.titulo).filter(Boolean).slice(0, 3);
+  const tops = [388, 525, 662];
   return (
-    <Slide escala={escala} d={d}>
-      <Titulo t="Antes e depois" sub={`O que muda com: ${d.oferta.titulo}.`} />
-      <div className="apr-antes-depois">
-        <div className="lado hoje">
-          <p className="rot">Hoje</p>
-          {(hoje.length ? hoje : ["[O que você viu de fora]"]).map((x) => <p key={x} className="item">{x}</p>)}
-        </div>
-        <div className="seta" aria-hidden="true">→</div>
-        <div className="lado depois">
-          <p className="rot">Depois</p>
-          {d.oferta.servico.depois.map((x) => <div key={x} className="apr-check"><i />{x}</div>)}
-        </div>
-      </div>
+    <Slide livre escala={escala} d={d}>
+      <P x={77} y={40} s={88} como="h2" cor="#000">Antes &amp; Depois</P>
+      <div className="apr-caixa" style={{ left: 81, top: 199, width: 852, height: 718, background: "#e7e6e6" }} />
+      <div className="apr-caixa" style={{ left: 977, top: 199, width: 852, height: 718, background: "#262626" }} />
+      <P x={133} y={239} s={36} peso={300} cor="#999999">ANTES</P>
+      <P x={1056} y={239} s={36} peso={300} cor="#999999">DEPOIS</P>
+      {(hoje.length ? hoje : ["[O que você viu de fora]"]).map((x, i) => (
+        <React.Fragment key={i}>
+          <span className="apr-bola" style={{ left: 134, top: tops[i] + 8.5 }} />
+          <P x={195} y={tops[i]} s={38} lh={1.21} cor="#434343" w={700}>{x}</P>
+        </React.Fragment>
+      ))}
+      {d.oferta.servico.depois.slice(0, 3).map((x, i) => (
+        <React.Fragment key={i}>
+          <svg style={{ position: "absolute", left: 1053, top: tops[i] + 11, width: 33, height: 33 }} viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10.5" /><path d="m7.5 12.2 3 3 6-6.2" /></svg>
+          <P x={1110} y={tops[i]} s={38} lh={1.21} cor="#f3f3f3" w={690}>{x}</P>
+        </React.Fragment>
+      ))}
+      <span className="apr-seta" style={{ left: 895, top: 498 }}>
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </span>
     </Slide>
   );
 }
@@ -781,5 +886,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["antesdepois", AntesDepois], ["casos", Casos], ["entrega", Entrega], ["produto", Produto], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["casos", Casos], ["entrega", Entrega], ["produto", Produto], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

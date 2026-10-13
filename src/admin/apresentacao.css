@@ -5,7 +5,7 @@
 .apr-palco > .apr-slide { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
 
 .apr-slide {
-  --claro: #f2f2f6; --escuro: #050505; --laranja: #ef4b3a; --tinta: #0a0a0a; --suave: #55555d;
+  --claro: #f2f2f2; --escuro: #000000; --laranja: #ef4b3a; --tinta: #0a0a0a; --suave: #55555d;
   width: 1920px; height: 1080px; overflow: hidden; position: relative; box-sizing: border-box;
   font-family: "Poppins", Arial, sans-serif; padding: 120px 128px 200px;
   display: flex; flex-direction: column; gap: 56px;
@@ -20,15 +20,11 @@
 .apr-titulo p { font-size: 48px; font-weight: 300; line-height: 1.2; color: var(--laranja); }
 .apr-titulo.menor h2 { font-size: 104px; }
 
-.apr-rodape {
-  position: absolute; left: 128px; right: 128px; bottom: 56px; height: 64px;
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 24px; font-weight: 600; line-height: 1.25; text-transform: uppercase; color: var(--laranja);
-}
-.apr-rodape p { width: 420px; }
-.apr-rodape .barras { display: flex; gap: 8px; }
-.apr-rodape .barras i { width: 8px; height: 44px; background: currentColor; border-radius: 2px; }
-.apr-slide.laranja .apr-rodape { color: var(--tinta); }
+.apr-rodape { position: absolute; inset: auto 0 0 0; height: 140px; color: var(--laranja); pointer-events: none; }
+.apr-rodape p { position: absolute; top: 967px; margin: 0; width: 520px; font-family: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif; font-weight: 500; font-size: 18px; line-height: 21px; text-transform: uppercase; }
+.apr-rodape .simbolo { position: absolute; left: 1816px; top: 959px; width: 20px; height: 46px; fill: currentColor; }
+.apr-rodape { top: 0; height: 1080px; }
+.apr-slide.laranja .apr-rodape { color: #fff; }
 
 .apr-vazio { color: #a3a3ab; }
 .apr-slide.escuro .apr-vazio { color: #6b6b73; }
@@ -367,3 +363,17 @@
 .apr-crono .ponta.fim .data { font-size: 40px; font-weight: 600; }
 .apr-crono-nota { display: flex; align-items: center; gap: 16px; font-size: 22px; color: var(--suave); margin-top: -12px; }
 .apr-crono-nota .losango { display: inline-block; width: 20px; height: 20px; background: var(--laranja); transform: rotate(45deg); flex-shrink: 0; }
+
+/* ---------- layout desenhado (posições absolutas, 1920×1080) ---------- */
+.apr-slide.livre { padding: 0; display: block; }
+.apr-p { position: absolute; margin: 0; }
+.apr-p b { font-weight: 600; }
+.apr-caixa { position: absolute; border-radius: 38px; }
+.apr-pilula { display: flex; align-items: center; padding: 0 20px; border-radius: 21px; font-size: 22px; color: #fff; white-space: nowrap; }
+.apr-degrau { display: flex; flex-direction: column; }
+.apr-degrau .n { position: absolute; left: var(--pn); top: 39px; font-size: 48px; line-height: 1.4; font-weight: 300; }
+.apr-degrau .rot { position: absolute; right: var(--pr); top: 48px; font-size: 40px; line-height: 1.4; font-weight: 300; }
+.apr-degrau .t { min-height: 136px; margin: 170px 40px 0 var(--pt); font-size: 56px; line-height: 1.21; font-weight: 500; }
+.apr-degrau .txt { margin: 53px 40px 0 var(--pt); font-size: 28px; line-height: 1.21; max-width: 450px; }
+.apr-bola { position: absolute; width: 36px; height: 36px; border-radius: 50%; border: 2.5px solid #bdbdbd; box-sizing: border-box; }
+.apr-seta { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: #fff; border: 19px solid var(--claro); box-sizing: border-box; display: flex; align-items: center; justify-content: center; }

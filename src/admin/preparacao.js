@@ -85,11 +85,11 @@ export function montarRoteiro(item, dados, prep) {
         `"O diagnóstico colocou a sua marca em ${dados.momento}. ${dados.frase}"`,
         `"Olhei de fora, como um cliente faria. Te mostro três coisas."`,
         `Depois de cada observação: "Faz sentido para você?"`,
-        `"O que isso custa hoje: ${dados.custo.frase.charAt(0).toLowerCase()}${dados.custo.frase.slice(1)}"`,
+        `"O que isso custa hoje: ${dados.custo.frase.replace(/\*\*/g, "").charAt(0).toLowerCase()}${dados.custo.frase.replace(/\*\*/g, "").slice(1)}"`,
       ],
     },
     {
-      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["antesdepois", "casos"], dica: "A hora da autoridade. Fale do resultado, não do serviço.",
+      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["comeco", "oferta", "antesdepois", "casos"], dica: "A hora da autoridade. Fale do resultado, não do serviço.",
       falas: [
         `"Independente de trabalharmos juntos, te falo o que eu faria se fosse você: começaria pelo ponto que mais pesa."`,
         `"Hoje é isto que a gente viu. Depois, é isto que muda." Leia o "depois" olhando para o cliente.`,
@@ -124,7 +124,8 @@ export function montarRoteiro(item, dados, prep) {
  * o que responder e como seguir. Respostas usam os dados do lead.
  */
 export function montarObjecoes(dados) {
-  const custo = `${dados.custo.frase.charAt(0).toLowerCase()}${dados.custo.frase.slice(1)}`;
+  const frase = dados.custo.frase.replace(/\*\*/g, "");
+  const custo = `${frase.charAt(0).toLowerCase()}${frase.slice(1)}`;
   const entrada = dados.oferta.titulo;
   return [
     {

@@ -14,7 +14,7 @@ import "./apresentacao.css";
 // continuidade) e os textos-base das apresentações. Editar aqui muda o padrão global; o que já foi
 // editado lead a lead continua como está.
 
-const FONTE = "https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap";
+const FONTE = "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500&family=Poppins:wght@200;300;400;500;600;700&display=swap";
 
 // momento usado na prévia de cada serviço (dá para trocar na tela)
 const MOMENTO_DO_SERVICO = {
