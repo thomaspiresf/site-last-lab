@@ -1,0 +1,79 @@
+/* Guia de mensagem (entregável do Workshop de mensagem): páginas A4 na linguagem da proposta comercial.
+   A página é desenhada em 794×1123 px (A4 a 96 dpi) e escalada na prévia. */
+
+.gm-palco { position: relative; width: 100%; aspect-ratio: 794 / 1123; overflow: hidden; }
+.gm-palco > .gm-pag { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+
+.gm-pag {
+  --claro: #f2f2f6; --escuro: #050505; --laranja: #ef4b3a; --tinta: #0a0a0a; --suave: #55555d;
+  width: 794px; height: 1123px; overflow: hidden; position: relative; box-sizing: border-box;
+  font-family: "Poppins", Arial, sans-serif; padding: 72px 56px 120px;
+  display: flex; flex-direction: column; gap: 28px;
+  background: var(--claro); color: var(--tinta);
+}
+.gm-pag * { box-sizing: border-box; margin: 0; }
+.gm-pag.escuro { background: var(--escuro); color: #f7f7f9; }
+.gm-pag.laranja { background: var(--laranja); color: var(--tinta); }
+
+.gm-pag h2 { font-size: 60px; font-weight: 300; line-height: 1.02; letter-spacing: -1.5px; }
+.gm-pag .sub { font-size: 24px; font-weight: 300; line-height: 1.3; color: var(--laranja); }
+.gm-pag .rot { font-size: 13px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--laranja); }
+.gm-pag .txt { font-size: 17px; line-height: 1.55; }
+.gm-pag .suave { color: var(--suave); }
+.gm-vazio { color: #a3a3ab; }
+
+.gm-rodape {
+  position: absolute; left: 56px; right: 56px; bottom: 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 11px; font-weight: 600; line-height: 1.3; text-transform: uppercase; color: var(--laranja);
+}
+.gm-rodape p { width: 200px; }
+.gm-rodape .barras { display: flex; gap: 4px; }
+.gm-rodape .barras i { width: 4px; height: 22px; background: currentColor; border-radius: 1px; }
+.gm-pag.laranja .gm-rodape { color: var(--tinta); }
+
+/* capa */
+.gm-capa { justify-content: space-between; }
+.gm-capa .logo { width: 150px; height: 38px; object-fit: contain; object-position: left; filter: invert(1); }
+.gm-capa svg { width: 682px; height: 300px; display: block; }
+.gm-capa h1 { font-size: 46px; font-weight: 700; line-height: 1; letter-spacing: -1px; text-transform: uppercase; }
+.gm-capa .marca { font-size: 26px; font-weight: 300; text-transform: uppercase; margin-top: 6px; }
+
+/* a frase */
+.gm-frase { justify-content: center; gap: 36px; }
+.gm-frase blockquote { font-size: 54px; font-weight: 300; line-height: 1.12; letter-spacing: -1px; }
+
+/* blocos com rótulo */
+.gm-bloco { display: flex; flex-direction: column; gap: 10px; border-top: 2px solid var(--tinta); padding-top: 16px; }
+.gm-grade2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.gm-dif { display: grid; grid-template-columns: 56px 1fr; gap: 6px 16px; border-top: 2px solid var(--tinta); padding-top: 18px; }
+.gm-dif .n { font-size: 52px; font-weight: 200; line-height: 1; color: var(--laranja); grid-row: span 2; }
+.gm-dif h3 { font-size: 24px; font-weight: 600; line-height: 1.2; }
+
+/* réguas de tom */
+.gm-regua { display: flex; flex-direction: column; gap: 8px; }
+.gm-regua .pontas { display: flex; justify-content: space-between; font-size: 15px; font-weight: 500; }
+.gm-regua .trilho { position: relative; height: 4px; background: #dcdce2; border-radius: 999px; }
+.gm-regua .marca-tom { position: absolute; top: -8px; width: 20px; height: 20px; border-radius: 50%; background: var(--laranja); transform: translateX(-50%); }
+.gm-palavras { display: flex; flex-wrap: wrap; gap: 8px; }
+.gm-palavras span { font-size: 15px; padding: 6px 14px; border-radius: 999px; border: 1.5px solid var(--tinta); }
+.gm-palavras.nao span { border-color: #b5b5bd; color: var(--suave); text-decoration: line-through; text-decoration-color: var(--laranja); }
+
+/* mensagens-chave */
+.gm-msg { display: grid; grid-template-columns: 56px 1fr; gap: 16px; align-items: baseline; border-top: 2px solid #f7f7f9; padding-top: 22px; }
+.gm-msg .n { font-size: 52px; font-weight: 200; line-height: 1; color: var(--laranja); }
+.gm-msg p { font-size: 28px; font-weight: 300; line-height: 1.25; }
+
+/* pronto para usar */
+.gm-caixa { background: #ffffff; border-radius: 18px; padding: 24px 26px; display: flex; flex-direction: column; gap: 10px; }
+.gm-caixa .txt { white-space: pre-line; }
+
+/* PDF: imprime só as páginas, uma por folha A4 */
+.gm-impressao { display: none; }
+@media print {
+  @page { size: A4; margin: 0; }
+  .gm-tela { display: none !important; }
+  .gm-impressao { display: block; }
+  html, body { background: #fff; }
+  .gm-impressao .gm-pag { break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

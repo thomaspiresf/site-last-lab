@@ -60,9 +60,9 @@ export default function AdminApresentacao() {
   const salvar = useCallback(async (novo) => {
     setAp(novo);
     try {
-      // o roteiro (outra janela) grava no mesmo campo: mantém o que ele salvou
+      // roteiro e guia (outras telas) gravam no mesmo campo: mantém o que eles salvaram
       const atual = await getDiagnostico(id);
-      await updateDiagnostico(id, { apresentacao: { ...novo, roteiro: atual.apresentacao?.roteiro } });
+      await updateDiagnostico(id, { apresentacao: { ...novo, roteiro: atual.apresentacao?.roteiro, guia: atual.apresentacao?.guia } });
     } catch (e) {
       setErro(e.message || "Não salvou.");
     }
