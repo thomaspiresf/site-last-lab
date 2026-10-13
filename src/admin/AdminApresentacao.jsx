@@ -831,12 +831,13 @@ function Passo({ d, escala }) {
   const [principal, outra] = d.destaque === "projeto" && projeto ? [projeto, entrada] : [entrada, projeto];
   return (
     <Slide livre escala={escala} d={d}>
-      <Cabeca t="Investimento" sub={principal.tipo === "entrada" ? "Duas formas de seguir. A recomendada é começar pelo primeiro passo." : "Duas formas de seguir. A recomendada resolve tudo de uma vez."} />
+      {/* "Investimento" pequeno, como chapéu; o nome da oferta é o título */}
+      <P x={89} y={73} s={56} cor="#999999" style={{ whiteSpace: "nowrap" }}>Investimento</P>
       {/* esquerda: a opção recomendada, em texto, e a conta */}
-      <div className="apr-p" style={{ left: 81, top: 330, width: 820 }}>
+      <div className="apr-p" style={{ left: 81, top: 205, width: 860 }}>
         <p style={{ fontSize: 22, fontWeight: 300, letterSpacing: 3, color: "#999999", textTransform: "uppercase" }}>{principal.selo}</p>
-        <h3 style={{ fontSize: 64, lineHeight: 1.12, fontWeight: 500, color: "#000", marginTop: 12 }}>{principal.nome}</h3>
-        <p style={{ fontSize: 28, lineHeight: 1.4, color: "#55555d", marginTop: 20, width: 780 }}>{principal.texto}</p>
+        <h3 style={{ fontSize: 104, lineHeight: 1.05, fontWeight: 500, letterSpacing: -2, color: "#000", marginTop: 14 }}>{principal.nome}</h3>
+        <p style={{ fontSize: 28, lineHeight: 1.4, color: "#55555d", marginTop: 28, width: 800 }}>{principal.texto}</p>
         {d.conta && (
           <div style={{ marginTop: 40, borderLeft: "5px solid #ef4b3a", paddingLeft: 28 }}>
             <p style={{ fontSize: 34, lineHeight: 1.3, fontWeight: 500, color: "#ef4b3a" }}>{d.conta}</p>
@@ -850,8 +851,8 @@ function Passo({ d, escala }) {
       )}
 
       {/* direita: o cartão escuro com o preço recomendado */}
-      <div className="apr-caixa apr-preco" style={{ left: 1000, top: 300, width: 839, height: outra ? 410 : 560 }}>
-        <p className="rot">Investimento · {principal.nome}</p>
+      <div className="apr-caixa apr-preco" style={{ left: 1000, top: 215, width: 839, height: outra ? 455 : 680 }}>
+        <p className="rot">Investimento total</p>
         {principal.de && <p className="de">{principal.de}</p>}
         <p className="valor">{principal.aPartir && <span>a partir de</span>}{principal.valor}</p>
         <div className="linhas">
@@ -862,7 +863,7 @@ function Passo({ d, escala }) {
       </div>
       {/* o cartão branco com a outra opção */}
       {outra && (
-        <div className="apr-caixa apr-outra" style={{ left: 1000, top: 730, width: 839, height: 200 }}>
+        <div className="apr-caixa apr-outra" style={{ left: 1000, top: 690, width: 839, height: 215 }}>
           <div className="topo">
             <div><p className="selo">{outra.selo}</p><p className="nome">{outra.nome}</p></div>
             <p className="valor">{outra.aPartir && <span>a partir de</span>}{outra.valor}</p>
