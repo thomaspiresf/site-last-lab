@@ -577,7 +577,9 @@ function BlocoDevolutiva({ item, onAtualizar, onSubstituir }) {
         )}
       </div>
 
-      <label className="block text-xs font-semibold text-zinc-500 mb-1.5">O que eu vi de fora (aparece na página do cliente)</label>
+      <label className="block text-xs font-semibold text-zinc-500 mb-1.5">
+        O que eu vi de fora (aparece na página do cliente{publicado ? ", que já está no ar: o texto entra assim que você sai do campo" : ""})
+      </label>
       <textarea
         rows={6}
         value={analise}

@@ -1,9 +1,10 @@
-// Análise automática para quem NÃO é qualificado (promessa do chat: "Você recebe por e-mail a
+// Análise automática por e-mail, para todos os leads (promessa do chat: "Você recebe por e-mail a
 // análise completa de cada pilar"). O diagnóstico chama esta função logo depois de salvar o lead;
 // ela publica a página de resultado (que já tem a análise de cada pilar) e manda o link por e-mail.
+// Para os qualificados, o e-mail avisa que a análise com a visão de fora (feita no admin) vem depois.
 //
 // É chamada sem login (pelo próprio diagnóstico), então só age em condições estreitas:
-// lead recém-criado (15 min), não qualificado, ainda não publicado nem enviado, e no máximo um
+// lead recém-criado (15 min), ainda não publicado nem enviado, e no máximo um
 // e-mail automático por endereço a cada 24h. O e-mail sempre vai para o endereço gravado no lead.
 // Publicar com: npx supabase functions deploy enviar-analise --no-verify-jwt
 import { createClient } from "npm:@supabase/supabase-js@2";
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
     const { data: d } = await supabase.from("diagnosticos").select("*").eq("id", id).maybeSingle();
     const recente = d && Date.now() - new Date(d.created_at).getTime() < 15 * 60 * 1000;
     // respostas iguais para "não existe" e "não se aplica": não revela nada sobre outros leads
-    if (!d || !recente || d.qualificado || d.publicado_em || d.email_enviado_em) return json({ ok: false });
+    if (!d || !recente || d.publicado_em || d.email_enviado_em) return json({ ok: false });
 
     const desde = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { count } = await supabase.from("diagnosticos").select("id", { count: "exact", head: true })
@@ -51,12 +52,15 @@ Deno.serve(async (req) => {
         from: REMETENTE,
         to: [d.email],
         subject: `${primeiroNome}, a análise da sua marca chegou`,
-        html: montarEmail(primeiroNome, link, d.dados),
+        html: montarEmail(primeiroNome, link, d.dados, d.qualificado),
       }),
     });
     if (!res.ok) return json({ error: `Resend: ${await res.text()}` }, 502);
 
-    await supabase.from("diagnosticos").update({ email_enviado_em: new Date().toISOString(), status: "devolutiva" }).eq("id", id);
+    // qualificado continua "novo": a devolutiva com a visão de fora ainda vai ser feita no admin
+    const patch: Record<string, unknown> = { email_enviado_em: new Date().toISOString() };
+    if (!d.qualificado) patch.status = "devolutiva";
+    await supabase.from("diagnosticos").update(patch).eq("id", id);
     return json({ ok: true });
   } catch (err) {
     return json({ error: String((err as Error)?.message || err) }, 500);
@@ -67,7 +71,7 @@ function esc(t: string) {
   return String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function montarEmail(nome: string, link: string, dados: Record<string, any>) {
+function montarEmail(nome: string, link: string, dados: Record<string, any>, qualificado: boolean) {
   const momento = dados?.persona;
   const nota = dados?.nota_geral;
   const story = dados?.story_url;
@@ -82,7 +86,9 @@ ${p("O link é só seu.")}
 ${story ? `${p("Também fiz uma imagem do seu resultado, se quiser postar nos stories:")}
 <p style="margin:0 0 8px"><a href="${esc(story)}"><img src="${esc(story)}" width="270" alt="Seu resultado no diagnóstico de marca" style="display:block;width:270px;max-width:100%;border-radius:12px"></a></p>
 <p style="margin:0 0 24px;font-size:13px;color:#5c5c63">(no celular, toque e segure a imagem para salvar)</p>` : ""}
-${p("Se quiser ajuda para colocar alguma dessas ideias em prática, é só responder este e-mail.")}
+${qualificado
+  ? p("E tem mais: nos próximos dias eu mesmo vou olhar a sua marca de fora (site, Instagram e o material que você mandou) e cruzar com as suas respostas. Te mando essa análise com a visão de fora assim que estiver pronta.")
+  : p("Se quiser ajuda para colocar alguma dessas ideias em prática, é só responder este e-mail.")}
 ${p("Um abraço,<br>Thomás<br><span style=\"color:#5c5c63\">Last Lab</span>")}
 </div></body></html>`;
 }
