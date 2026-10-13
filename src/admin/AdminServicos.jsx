@@ -205,10 +205,34 @@ const DEGRAUS = [
 /** Prazo curto: "3 a 4 semanas" → "3–4 sem". */
 const curto = (t = "") => t.replace(/ a /g, "–").replace(/semanas?/, "sem").replace(/dias úteis/, "dias");
 
-const Celula = ({ onClick, titulo, meta }) => (
+/** Maior valor em reais escrito num texto ("R$ 4.500 a R$ 9.000" → 9000); null se não houver. */
+const maiorValor = (t = "") => {
+  const v = [...String(t).matchAll(/R\$\s*([\d.]+)/g)].map((m) => Number(m[1].replace(/\./g, "")));
+  return v.length ? Math.max(...v) : null;
+};
+
+// faixas do medidor de preço (4 bolinhas), pelo maior valor do texto; os planos mensais usam a ordem
+const FAIXAS = { projeto: [3500, 9000, 15000] };
+const nivel = (valor, escala = "projeto", reserva = 1) => {
+  const v = maiorValor(valor);
+  if (v === null) return reserva;
+  return 1 + FAIXAS[escala].filter((limite) => v > limite).length;
+};
+
+/** Medidor de preço: 4 bolinhas, preenchidas até o nível. */
+const Medidor = ({ n }) => (
+  <span className="inline-flex gap-[3px] shrink-0" title={`Faixa de preço ${n} de 4`} aria-label={`Faixa de preço ${n} de 4`}>
+    {[1, 2, 3, 4].map((i) => <i key={i} className={`w-1.5 h-1.5 rounded-full ${i <= n ? "bg-zinc-800" : "bg-zinc-200"}`} />)}
+  </span>
+);
+
+const Celula = ({ onClick, titulo, meta, n }) => (
   <button onClick={onClick} className="text-left rounded-lg px-3 py-2 -mx-1 hover:bg-zinc-100 transition-colors min-w-0">
     <p className="text-sm font-medium text-zinc-900 leading-snug">{titulo}</p>
-    {meta && <p className="text-xs text-zinc-400 mt-0.5 truncate">{meta}</p>}
+    <div className="flex items-center gap-2 mt-1 min-w-0">
+      {n && <Medidor n={n} />}
+      {meta && <p className="text-xs text-zinc-400 truncate">{meta}</p>}
+    </div>
   </button>
 );
 
@@ -248,12 +272,12 @@ export function VisaoGeral({ r, escolher }) {
               </button>
               <div className="flex flex-col">
                 {a.entradas.map((sid) => r.servicos[sid] && (
-                  <Celula key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} titulo={r.servicos[sid].nome}
+                  <Celula key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} titulo={r.servicos[sid].nome} n={nivel(r.servicos[sid].investimento, "projeto", 1)}
                     meta={`${r.servicos[sid].investimento || "Valor a definir"} · ${curto(r.servicos[sid].prazo) || "prazo a definir"}`} />
                 ))}
               </div>
-              <Celula onClick={area} titulo={a.principal.nome} meta={`${a.principal.valor} · ${curto(a.principal.prazo)}`} />
-              <Celula onClick={area} titulo={a.premium.nome} meta={`${a.premium.valor} · ${curto(a.premium.prazo)}`} />
+              <Celula onClick={area} titulo={a.principal.nome} n={nivel(a.principal.valor, "projeto", 2)} meta={`${a.principal.valor} · ${curto(a.principal.prazo)}`} />
+              <Celula onClick={area} titulo={a.premium.nome} n={nivel(a.premium.valor, "projeto", 3)} meta={`${a.premium.valor} · ${curto(a.premium.prazo)}`} />
             </div>
           );
         })}
@@ -266,8 +290,8 @@ export function VisaoGeral({ r, escolher }) {
           <button onClick={() => escolher({ tipo: "continuidade" })} className="text-xs font-semibold text-zinc-500 hover:text-black">Editar planos</button>
         </div>
         <div className="grid grid-cols-4 gap-4 px-5 py-3">
-          {Object.entries(r.continuidade).map(([pid, pl]) => (
-            <Celula key={pid} onClick={() => escolher({ tipo: "continuidade" })} titulo={pl.nome}
+          {Object.entries(r.continuidade).map(([pid, pl], i) => (
+            <Celula key={pid} onClick={() => escolher({ tipo: "continuidade" })} titulo={pl.nome} n={i + 1}
               meta={`${pl.valor}${/parceiro/i.test(pl.quem) ? " · com parceiro de tráfego" : ""}`} />
           ))}
         </div>
