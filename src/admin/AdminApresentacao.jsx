@@ -11,6 +11,12 @@ import { dia, montarCronograma, periodo } from "./cronograma";
 import { carregarCatalogo } from "./carregarCatalogo";
 import "./apresentacao.css";
 
+// ícones das personas (os mesmos do diagnóstico, copiados de diagnostico-lastlab/src/assets/personas)
+const ICONES_PERSONA = Object.fromEntries(
+  Object.entries(import.meta.glob("./personas/*.svg", { query: "?raw", import: "default", eager: true }))
+    .map(([caminho, svg]) => [caminho.split("/").pop().replace(".svg", ""), svg]),
+);
+
 // Apresentação da reunião do diagnóstico (/admin/diagnosticos/:id/apresentar). Os dados do lead
 // entram sozinhos; o que é escrito por lead fica em diagnosticos.apresentacao. Mesmo visual da
 // proposta comercial. "Apresentar" abre em tela cheia; "Exportar PDF" usa a impressão do navegador.
@@ -386,6 +392,7 @@ export function montarDados(item, ap, urls = {}) {
     nota: d.nota_geral ?? item.notaGeral,
     faixa: faixa.charAt(0).toUpperCase() + faixa.slice(1),
     faixaTexto: d.faixa || "",
+    personaId: d.persona_id || "indefinida",
     pilares,
     segundo: segundo?.nome,
     visaoTitulo: ap.visaoTitulo || "",
@@ -537,7 +544,8 @@ function Respostas({ d, escala }) {
       <div className="apr-caixa" style={{ left: 71, top: 331, width: 557, height: 527, background: "#ef4b3a" }} />
       <P x={114} y={375} s={22} peso={300} cor="#fff" style={{ whiteSpace: "nowrap" }}>MOMENTO DA SUA MARCA</P>
       <P direita={592} y={362} s={34} peso={600} cor="#fff" style={{ whiteSpace: "nowrap" }}>{d.nota}<span style={{ fontSize: 28, fontWeight: 400, color: "#faada4" }}>/100</span></P>
-      <div className="apr-caixa" style={{ left: 109, top: 461, width: 130, height: 129, background: "#d64434", borderRadius: 22 }} />
+      <div className="apr-caixa apr-persona" style={{ left: 109, top: 461, width: 130, height: 129, background: "#d64434", borderRadius: 22 }}
+        dangerouslySetInnerHTML={{ __html: ICONES_PERSONA[d.personaId] || ICONES_PERSONA.indefinida || "" }} />
       <div className="apr-p" style={{ left: 266, top: 459, width: 340, height: 131, display: "flex", alignItems: "center" }}>
         <p style={{ fontSize: 48, lineHeight: 1.2, fontWeight: 600, color: "#fff" }}>{d.momento}</p>
       </div>
@@ -545,8 +553,11 @@ function Respostas({ d, escala }) {
       {d.faixaTexto && <div className="apr-caixa apr-pilula" style={{ left: 109, top: 783, height: 42, background: "#d64434" }}>{d.faixaTexto}</div>}
       <div className="apr-caixa" style={{ left: 662, top: 331, width: 1178, height: 525, background: "#ebebeb" }} />
       <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
-        {[1, 0.766, 0.551].map((f) => <polygon key={f} points={[0, 1, 2, 3, 4].map((i) => ponto(i, f)).join(" ")} fill="none" stroke="#bfbfbf" strokeWidth="2" />)}
-        {pil.length === 5 && <polygon points={pil.map((p, i) => ponto(i, Math.max(0.06, (p.nota || 0) / 100))).join(" ")} fill="#262626" fillOpacity="0.08" stroke="#262626" strokeWidth="2.5" strokeLinejoin="round" />}
+        {/* o radar do diagnóstico: quatro anéis, eixos, a área das notas e os pontos (o mais fraco em laranja) */}
+        {[0.25, 0.5, 0.75, 1].map((f) => <polygon key={f} points={[0, 1, 2, 3, 4].map((i) => ponto(i, f)).join(" ")} fill="none" stroke="#c9c9c9" strokeWidth="2" />)}
+        {[0, 1, 2, 3, 4].map((i) => { const [x, y] = ponto(i, 1).split(","); return <line key={i} x1={RADAR.cx} y1={RADAR.cy} x2={x} y2={y} stroke="#c9c9c9" strokeWidth="2" />; })}
+        {pil.length === 5 && <polygon points={pil.map((p, i) => ponto(i, (p.nota || 0) / 100)).join(" ")} fill="#262626" fillOpacity="0.12" stroke="#262626" strokeWidth="3" strokeLinejoin="round" />}
+        {pil.length === 5 && pil.map((p, i) => { const [x, y] = ponto(i, (p.nota || 0) / 100).split(","); return <circle key={p.nome} cx={x} cy={y} r="8" fill={p.fraco ? "#ef4b3a" : "#262626"} />; })}
       </svg>
       {pil.map((p, i) => {
         const y = 364 + i * 92.75;
