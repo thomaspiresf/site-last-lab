@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Plus, RotateCcw, Save, X } from "lucide-react";
+import { Play, Plus, RotateCcw, Save, X } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { salvarCatalogoServicos } from "../lib/api";
 import { projects } from "../data/projects";
 import { MOMENTOS, aplicarCatalogo, catalogoAtual, catalogoPadrao } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
-import { Palco, SLIDES, apresentacaoInicial, montarDados } from "./AdminApresentacao";
+import { Palco, SLIDES, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
 
@@ -277,19 +277,21 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona }) {
 
 function Previa({ servicoId, persona, setPersona, r }) {
   const [verRoteiro, setVerRoteiro] = useState(false);
-  const { dados, slides, roteiro, objecoes } = useMemo(() => {
+  const [apresentando, setApresentando] = useState(null);
+  const { slides, roteiro, objecoes } = useMemo(() => {
     aplicarCatalogo(r); // garante que os slides já leiam o rascunho
     const item = leadExemplo(r.servicos[servicoId], persona);
     const ap = { ...apresentacaoInicial(item), empresa: "Sua Empresa" };
     const d = montarDados(item, ap);
-    const lista = SLIDES.filter(([, , quando]) => !quando || quando(d));
-    return { dados: d, slides: lista, roteiro: montarRoteiro(item, d, montarPreparacao(item, d)), objecoes: montarObjecoes(d) };
+    const lista = SLIDES.filter(([, , quando]) => !quando || quando(d)).map(([sid, S]) => Object.assign((props) => <S d={d} {...props} />, { sid }));
+    return { slides: lista, roteiro: montarRoteiro(item, d, montarPreparacao(item, d)), objecoes: montarObjecoes(d) };
   }, [servicoId, persona, r]);
 
   return (
     <div className="flex flex-col gap-4 min-w-0">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-zinc-500">Prévia com um lead de exemplo · {slides.length} slides</p>
+        <p className="text-sm text-zinc-500 flex-1">Prévia com um lead de exemplo · {slides.length} slides</p>
+        <button onClick={() => abrirTelaCheia(setApresentando)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><Play size={15} /> Apresentar</button>
         <label className="flex items-center gap-2 text-sm">
           <span className="text-zinc-500">Momento</span>
           <select className="px-2 py-1 rounded-lg border border-zinc-200 text-sm bg-white" value={persona} onChange={(e) => setPersona(e.target.value)}>
@@ -297,11 +299,12 @@ function Previa({ servicoId, persona, setPersona, r }) {
           </select>
         </label>
       </div>
-      {slides.map(([sid, S]) => (
-        <div key={sid} className="rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5">
-          <Palco><S d={dados} /></Palco>
-        </div>
+      {slides.map((S, i) => (
+        <button key={S.sid} onClick={() => abrirTelaCheia(setApresentando, i)} className="block w-full rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 hover:ring-black/30 text-left" title="Apresentar a partir deste slide">
+          <Palco><S /></Palco>
+        </button>
       ))}
+      {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal="apr-exemplo" onSair={() => setApresentando(null)} />}
       <button onClick={() => setVerRoteiro((x) => !x)} className="self-start text-sm font-semibold text-zinc-600 hover:text-black">{verRoteiro ? "Esconder" : "Ver"} roteiro e objeções deste serviço</button>
       {verRoteiro && (
         <div className="bg-white rounded-2xl border border-zinc-200 p-5 text-sm flex flex-col gap-4">

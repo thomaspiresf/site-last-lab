@@ -128,7 +128,7 @@ export default function AdminApresentacao() {
   );
 }
 
-function abrirTelaCheia(set, i = 0) {
+export function abrirTelaCheia(set, i = 0) {
   set(i);
   document.documentElement.requestFullscreen?.().catch(() => {});
 }
@@ -152,7 +152,7 @@ export function Palco({ children }) {
   );
 }
 
-function TelaCheia({ slides, inicio, canal, onSair }) {
+export function TelaCheia({ slides, inicio, canal, onSair }) {
   const [i, setI] = useState(inicio);
   // o roteiro (outra janela) acompanha o slide atual
   useEffect(() => {
