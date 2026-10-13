@@ -431,6 +431,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
         <Bloco titulo="O serviço (slides de proposta)" acao={!igualPadrao && <button onClick={restaurar} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
           <Campo label="Nome" valor={s.nome} onChange={(x) => setServ(id, "nome", x)} dica="Título da proposta quando a oferta foi escolhida no admin. Se veio do diagnóstico, o título é o nome que o cliente viu." />
           <Campo label="Promessa" area valor={s.promessa} onChange={(x) => setServ(id, "promessa", x)} />
+          <Campo label="Frase do fechamento (último slide)" valor={s.fechamento} onChange={(x) => setServ(id, "fechamento", x)} dica="Uma pergunta que convida a fechar. O trecho entre ** fica em negrito." />
           <Campo label="Texto comercial (slide de investimento)" area valor={s.pitch} onChange={(x) => setServ(id, "pitch", x)} dica="O que o cliente ganha, em 1 ou 2 frases. Aparece ao lado do preço." />
           <Lista label="O que você recebe" itens={s.entregas} onChange={(x) => setServ(id, "entregas", x)} min={1} />
           <Campo label="Não inclui" valor={s.naoInclui} onChange={(x) => setServ(id, "naoInclui", x)} />

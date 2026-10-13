@@ -13,6 +13,7 @@ export const SERVICOS = {
     nome: "Workshop de mensagem",
     promessa: "Uma frase que qualquer cliente consegue repetir.",
     pitch: "Em 2 horas, a gente tira da sua cabeça o que torna o seu negócio único e transforma numa mensagem que qualquer cliente entende e repete: o que você faz, para quem e por que escolher você. Você sai com tudo pronto para usar na bio, no site e em cada conversa de venda.",
+    fechamento: "Vamos fazer todo mundo entender **o que você faz?**",
     entregas: [
       "Guia de mensagem: frase, para quem é e o que diferencia",
       "Tom de voz e 3 mensagens-chave",
@@ -30,6 +31,7 @@ export const SERVICOS = {
     nome: "Revisão de imagem",
     promessa: "Fazer a marca parecer tão boa quanto o seu trabalho.",
     pitch: "A sua marca passa a ter a cara do trabalho que você entrega. Ajustamos logo, cores, perfil e WhatsApp para o cliente perceber o valor antes de perguntar o preço, e parar de pedir desconto.",
+    fechamento: "Vamos fazer a sua marca **valer o que você cobra?**",
     entregas: [
       "Logo ajustado para uso digital, com versões",
       "Paleta e fontes organizadas num brand board de 1 página",
@@ -48,6 +50,7 @@ export const SERVICOS = {
     nome: "Kit essencial de marca",
     promessa: "Uma base simples para começar com cara de marca.",
     pitch: "Uma base profissional para começar do jeito certo: logo, cores, fontes e as primeiras peças prontas, para a sua marca parecer sólida desde o primeiro contato.",
+    fechamento: "Vamos dar à sua marca **um começo à altura?**",
     entregas: [
       "Logo e 2 variações",
       "Paleta de cores e tipografia",
@@ -66,6 +69,7 @@ export const SERVICOS = {
     nome: "Landing page que converte",
     promessa: "Uma página que confirma a indicação e gera contato.",
     pitch: "Uma página feita para transformar visita em contato. Quem chega por indicação ou pelo Instagram encontra o seu melhor trabalho, entende o que você faz e fala com você em um clique.",
+    fechamento: "Vamos transformar quem te procura **em cliente?**",
     entregas: [
       "1 página com textos, projetos, depoimentos e contato",
       "Domínio, formulário e botão de WhatsApp",
@@ -84,6 +88,7 @@ export const SERVICOS = {
     nome: "Visual das redes e templates",
     promessa: "Um perfil com a cara do negócio, fácil de manter.",
     pitch: "Um perfil que vende antes da primeira mensagem. Bio, destaques e templates prontos para você postar com cara de marca, toda semana, sem começar do zero.",
+    fechamento: "Vamos fazer o seu Instagram **vender por você?**",
     entregas: [
       "Bio, destaques e capas",
       "12 templates editáveis no Canva: post, carrossel e story",
@@ -101,6 +106,7 @@ export const SERVICOS = {
     nome: "Modelo de proposta e orçamento",
     promessa: "Uma proposta que mostra o valor antes do preço.",
     pitch: "Uma proposta que mostra o valor antes do preço. Modelo pronto com a sua marca, para montar orçamentos em minutos e deixar de ser comparado só pelo valor.",
+    fechamento: "Vamos fazer a sua proposta **valer cada real?**",
     entregas: [
       "Modelo de proposta editável, no Canva ou no Google",
       "Textos de escopo, etapas, condições e validade",
@@ -118,6 +124,7 @@ export const SERVICOS = {
     nome: "Apresentação comercial",
     promessa: "Um material que vende quando você não está na sala.",
     pitch: "Uma apresentação que vende por você, mesmo quando você não está na sala. A sua história, o seu método e os seus resultados organizados para convencer quem decide.",
+    fechamento: "Vamos fazer o seu material **vender por você?**",
     entregas: [
       "Apresentação de 12 a 15 slides: quem somos, problema, método, casos, serviços e próximos passos",
       "Arquivo editável e versão em PDF",
@@ -135,6 +142,7 @@ export const SERVICOS = {
     nome: "Kit de atendimento no WhatsApp",
     promessa: "Todo cliente bem atendido, do primeiro contato ao pós-venda.",
     pitch: "Nenhum cliente esquecido no WhatsApp. Mensagens prontas para cada momento, do primeiro contato ao pós-venda, para responder rápido, fechar mais e ganhar indicações.",
+    fechamento: "Vamos fazer cada cliente **voltar e indicar?**",
     entregas: [
       "WhatsApp Business configurado: perfil, catálogo e etiquetas",
       "Mensagens prontas para 8 momentos, do primeiro contato ao pós-venda",

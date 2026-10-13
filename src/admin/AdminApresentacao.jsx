@@ -314,6 +314,11 @@ function Painel({ item, ap, salvar, urls, dados }) {
         </div>
       )}
       <div>
+        <label className={rotulo}>Frase do fechamento</label>
+        <input className={campo} value={rascunho.fechamento || ""} onChange={(e) => mudar({ fechamento: e.target.value })} onBlur={gravar} placeholder={(dados.oferta.servico.fechamento || "").replace(/\*\*/g, "")} />
+        <p className="text-[11px] text-zinc-400 mt-1">Vazio: a frase do serviço. Use **assim** para o trecho em negrito.</p>
+      </div>
+      <div>
         <label className={rotulo}>A conta (frase em destaque)</label>
         <textarea rows={3} className={campo} value={rascunho.conta || ""} onChange={(e) => mudar({ conta: e.target.value })} onBlur={gravar} placeholder="Ex.: Com 20 clientes por mês, um contrato a mais já paga o projeto." />
       </div>
@@ -422,6 +427,7 @@ export function montarDados(item, ap, urls = {}) {
     investimentoProjeto: ap.investimentoProjeto || "",
     parcelamentoProjeto: ap.parcelamentoProjeto || "",
     conta: ap.conta || "",
+    fechamento: ap.fechamento || "",
     pilares,
     segundo: segundo?.nome,
     visaoTitulo: ap.visaoTitulo || "",
@@ -952,20 +958,34 @@ function Proximos({ d, escala }) {
   );
 }
 
+const CONTATOS = [
+  ["site", "lastlab.com.br", <><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></>],
+  ["e-mail", "contato@lastlab.com.br", <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>],
+  ["WhatsApp", "(15) 99129-5541", <><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></>],
+];
+
+/** Fechamento: a pergunta da oferta (com a parte em negrito), as datas e os contatos. */
 function Fim({ d, escala }) {
+  const frase = d.fechamento || d.oferta.servico.fechamento || "Vamos dar forma **à sua marca?**";
+  const c = d.cronograma;
   return (
-    <Slide tipo="escuro" classe="apr-fim" escala={escala} d={d}>
-      <div className="esq">
-        <h2>Vamos dar forma à sua marca?</h2>
-        <div>
-          <img className="logo" src={LOGO} alt="Last Lab" />
-          <p className="assin">Design, estratégia e identidade para marcas que querem crescer com clareza e personalidade.</p>
-        </div>
-      </div>
-      <div className="dir">
-        <p>www.lastlab.com.br</p>
-        <p>contato@lastlab.com.br</p>
-        <p>(15) 99129-5541</p>
+    <Slide livre tipo="escuro" escala={escala} d={d}>
+      <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
+      <svg viewBox="1100 360 730 340" style={{ position: "absolute", left: 1500, top: 72, width: 336, height: 156 }} aria-hidden="true">
+        {PECAS_CAPA.map((pts) => <polygon key={pts} points={pts} fill="#ef4b3a" />)}
+      </svg>
+      <P x={89} y={250} s={30} peso={300} cor="#999999" style={{ letterSpacing: 4, textTransform: "uppercase" }}>Próximo passo</P>
+      <P x={82} y={310} s={112} lh={1.12} peso={300} cor="#fff" w={1500}>{negrito(frase)}</P>
+      <P x={86} y={640} s={36} peso={300} cor="#999999" w={1500}>
+        Aprovando hoje, começamos em <span style={{ color: "#fff" }}>{dia(c.inicio)}</span> e você recebe tudo em <span style={{ color: "#ef4b3a" }}>{dia(c.fim)}</span>.
+      </P>
+      <div className="apr-p apr-contatos" style={{ left: 81, top: 770, width: 1758 }}>
+        {CONTATOS.map(([rot, txt, ic]) => (
+          <div key={rot}>
+            <span className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ic}</svg></span>
+            <div><p className="rot">{rot}</p><p className="txt">{txt}</p></div>
+          </div>
+        ))}
       </div>
     </Slide>
   );

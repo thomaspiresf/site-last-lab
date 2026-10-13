@@ -425,3 +425,11 @@
 .apr-crono2.aprova .info { color: #ef4b3a; }
 .apr-crono2-nota { display: flex; align-items: center; gap: 14px; font-size: 22px; color: #999999; }
 .apr-crono2-nota .losango { display: inline-block; width: 14px; height: 14px; background: #ef4b3a; border-radius: 2px; transform: rotate(45deg); }
+
+/* fechamento */
+.apr-contatos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1.5px solid #2a2a2e; padding-top: 44px; }
+.apr-contatos > div { display: flex; align-items: center; gap: 22px; }
+.apr-contatos .ic { width: 72px; height: 72px; border-radius: 50%; border: 1.5px solid #3a3a40; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.apr-contatos .ic svg { width: 30px; height: 30px; }
+.apr-contatos .rot { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; color: #77777f; }
+.apr-contatos .txt { font-size: 30px; color: #fff; margin-top: 4px; white-space: nowrap; }
