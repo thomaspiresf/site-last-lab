@@ -2,11 +2,12 @@
 // as que a reunião vende (cada uma tem slides próprios). AREAS liga cada área do diagnóstico às suas
 // entradas e aos degraus seguintes (principal e premium). CONTINUIDADE são os planos mensais.
 // O nome que o cliente viu no diagnóstico continua sendo o título da proposta.
-// Investimento fica null até ser definido ("R$ ____" na apresentação).
+// Investimento fica null até ser definido ("R$ ____" na apresentação). Cada etapa tem a duração em
+// dias úteis, o que depende do cliente e se termina numa aprovação: vira o cronograma da proposta.
 
 export const SERVICOS = {
   mensagem: {
-    etapas: [{"nome": "Formulário", "texto": "Você responde 8 perguntas antes da sessão"}, {"nome": "Workshop", "texto": "2 horas, online, juntos"}, {"nome": "Guia de mensagem", "texto": "PDF entregue em até 7 dias úteis"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
+    etapas: [{"nome": "Formulário", "texto": "Você responde 8 perguntas antes da sessão", "dias": 2, "cliente": "Responder o formulário", "aprovacao": false}, {"nome": "Workshop", "texto": "2 horas, online, juntos", "dias": 1, "cliente": "Reservar 2 horas na agenda", "aprovacao": false}, {"nome": "Guia de mensagem", "texto": "O PDF com tudo o que definimos", "dias": 5, "cliente": "Aprovar o guia", "aprovacao": true}, {"nome": "Ajuste", "texto": "1 rodada, por escrito", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "guia",
     depois: ["Uma frase que qualquer cliente consegue repetir", "Bio, site e apresentação dizendo a mesma coisa", "Um cliente ideal claro, para atrair mais gente certa"],
     nome: "Workshop de mensagem",
@@ -17,12 +18,12 @@ export const SERVICOS = {
       "Bio do Instagram reescrita",
     ],
     naoInclui: "identidade visual, site e produção de conteúdo",
-    prazo: "7 dias úteis",
+    prazo: "2 semanas",
     investimento: null,
     ajustes: "1 rodada",
   },
   revisao: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao que você usa hoje"}, {"nome": "Ajuste visual", "texto": "Logo, cores e fontes para aprovar"}, {"nome": "Aplicação", "texto": "Perfil, WhatsApp e brand board"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
+    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao que você usa hoje", "dias": 1, "cliente": "Enviar acessos e materiais atuais", "aprovacao": false}, {"nome": "Ajuste visual", "texto": "Logo, cores e fontes para aprovar", "dias": 4, "cliente": "Aprovar logo, cores e fontes", "aprovacao": true}, {"nome": "Aplicação", "texto": "Perfil, WhatsApp e brand board", "dias": 3, "cliente": "", "aprovacao": false}, {"nome": "Ajuste", "texto": "1 rodada, por escrito", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "marca",
     depois: ["O cliente percebe o valor antes de perguntar o preço", "A mesma cara de marca no Instagram, no WhatsApp e no orçamento", "Fotos que valorizam o trabalho em vez de esconder"],
     nome: "Revisão de imagem",
@@ -39,7 +40,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   kit: {
-    etapas: [{"nome": "Briefing", "texto": "Referências e o que você já tem"}, {"nome": "Proposta visual", "texto": "Logo, cores e fontes"}, {"nome": "Ajuste", "texto": "1 rodada"}, {"nome": "Entrega", "texto": "Arquivos e aplicações prontas"}],
+    etapas: [{"nome": "Briefing", "texto": "Referências e o que você já tem", "dias": 1, "cliente": "Enviar referências", "aprovacao": false}, {"nome": "Proposta visual", "texto": "Logo, cores e fontes", "dias": 6, "cliente": "Aprovar a proposta visual", "aprovacao": true}, {"nome": "Ajuste", "texto": "1 rodada", "dias": 3, "cliente": "", "aprovacao": false}, {"nome": "Entrega", "texto": "Arquivos e aplicações prontas", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "marca",
     depois: ["Uma marca com cara de negócio sério desde o começo", "Cores, fontes e logo para usar em tudo, sem improviso", "Uma base pronta para crescer sem refazer depois"],
     nome: "Kit essencial de marca",
@@ -56,7 +57,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   pagina: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e envio de fotos e textos"}, {"nome": "Estrutura", "texto": "Textos e organização para aprovar"}, {"nome": "Página no ar", "texto": "Com domínio e formulário funcionando"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio de fotos e textos", "dias": 2, "cliente": "Enviar fotos, textos e acesso ao domínio", "aprovacao": false}, {"nome": "Estrutura", "texto": "Textos e organização para aprovar", "dias": 4, "cliente": "Aprovar os textos", "aprovacao": true}, {"nome": "Página no ar", "texto": "Com domínio e formulário funcionando", "dias": 6, "cliente": "Aprovar a página", "aprovacao": true}, {"nome": "Ajuste", "texto": "1 rodada", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "pagina",
     depois: ["Um link para mandar quando pedirem o seu trabalho", "Quem pesquisa o seu nome encontra o que você faz de melhor", "Contatos chegando pela página, não só por indicação"],
     nome: "Landing page que converte",
@@ -73,7 +74,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   instagram: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao perfil"}, {"nome": "Modelos", "texto": "Posts, stories e capas para aprovar"}, {"nome": "Entrega", "texto": "Arquivos editáveis no Canva e guia de uso"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao perfil", "dias": 1, "cliente": "Enviar acesso ao perfil", "aprovacao": false}, {"nome": "Modelos", "texto": "Posts, stories e capas para aprovar", "dias": 5, "cliente": "Aprovar os modelos", "aprovacao": true}, {"nome": "Entrega", "texto": "Arquivos editáveis no Canva e guia de uso", "dias": 2, "cliente": "", "aprovacao": false}, {"nome": "Ajuste", "texto": "1 rodada", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "redes",
     depois: ["Um perfil que parece da mesma empresa do começo ao fim", "Posts fáceis de fazer, sem começar do zero toda vez", "Quem chega entende o que você faz e como contratar"],
     nome: "Visual das redes e templates",
@@ -89,7 +90,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   proposta: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e envio das propostas atuais"}, {"nome": "Estrutura", "texto": "Textos e ordem para aprovar"}, {"nome": "Design", "texto": "Modelo editável com a cara da marca"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio das propostas atuais", "dias": 1, "cliente": "Enviar as propostas atuais", "aprovacao": false}, {"nome": "Estrutura", "texto": "Textos e ordem para aprovar", "dias": 3, "cliente": "Aprovar os textos", "aprovacao": true}, {"nome": "Design", "texto": "Modelo editável com a cara da marca", "dias": 3, "cliente": "", "aprovacao": false}, {"nome": "Ajuste", "texto": "1 rodada", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "proposta",
     depois: ["Uma proposta que explica o valor sem você estar junto", "Menos propostas comparadas só pelo preço", "Orçamentos montados em minutos, sempre com a mesma cara"],
     nome: "Modelo de proposta e orçamento",
@@ -105,7 +106,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   apresentacao: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e envio do material atual"}, {"nome": "Estrutura", "texto": "Roteiro e textos para aprovar"}, {"nome": "Design", "texto": "Apresentação editável"}, {"nome": "Ajuste", "texto": "1 rodada e entrega em PDF"}],
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio do material atual", "dias": 1, "cliente": "Enviar o material atual", "aprovacao": false}, {"nome": "Estrutura", "texto": "Roteiro e textos para aprovar", "dias": 3, "cliente": "Aprovar o roteiro", "aprovacao": true}, {"nome": "Design", "texto": "Apresentação editável", "dias": 4, "cliente": "Aprovar o design", "aprovacao": true}, {"nome": "Ajuste", "texto": "1 rodada e entrega em PDF", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "slides",
     depois: ["Reuniões conduzidas por um material que reforça o que você diz", "Quem decide junto com o cliente entende o seu valor", "A mesma história contada do mesmo jeito, toda vez"],
     nome: "Apresentação comercial",
@@ -121,7 +122,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   jornada: {
-    etapas: [{"nome": "Mapeamento", "texto": "Reunião sobre como você atende hoje"}, {"nome": "Mensagens", "texto": "Textos de cada momento para aprovar"}, {"nome": "Configuração", "texto": "Perfil, catálogo e respostas rápidas"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    etapas: [{"nome": "Mapeamento", "texto": "Reunião sobre como você atende hoje", "dias": 1, "cliente": "Contar como atende hoje", "aprovacao": false}, {"nome": "Mensagens", "texto": "Textos de cada momento para aprovar", "dias": 3, "cliente": "Aprovar as mensagens", "aprovacao": true}, {"nome": "Configuração", "texto": "Perfil, catálogo e respostas rápidas", "dias": 2, "cliente": "Dar acesso ao WhatsApp Business", "aprovacao": false}, {"nome": "Ajuste", "texto": "1 rodada", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "whatsapp",
     depois: ["Cada cliente atendido do mesmo jeito, sem esquecer ninguém", "Resposta rápida, mesmo nos dias corridos", "O cliente sempre sabe qual é o próximo passo"],
     nome: "Kit de atendimento no WhatsApp",

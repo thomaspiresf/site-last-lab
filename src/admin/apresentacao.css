@@ -103,8 +103,9 @@
 /* o que você recebe */
 .apr-entrega { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 720px; gap: 72px; margin-top: -16px; }
 .apr-entrega .esq { display: flex; flex-direction: column; justify-content: space-between; gap: 28px; min-height: 0; }
-.apr-entrega .lista { display: flex; flex-direction: column; gap: 14px; }
-.apr-entrega .lista .apr-check { font-size: 30px; line-height: 1.25; }
+.apr-entrega .lista { display: flex; flex-direction: column; gap: 22px; }
+.apr-entrega .lista .apr-check { font-size: 34px; line-height: 1.25; }
+.apr-entrega .prazo { font-size: 26px; color: var(--suave); border-top: 3px solid var(--tinta); padding-top: 22px; }
 .apr-entrega .etapas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; border-top: 3px solid var(--tinta); padding-top: 24px; }
 .apr-entrega .etapas .n { font-size: 44px; font-weight: 200; line-height: 1; color: var(--laranja); }
 .apr-entrega .etapas h3 { font-size: 24px; font-weight: 600; margin-top: 6px; }
@@ -347,3 +348,22 @@
 .mk-board .post { aspect-ratio: 1; border-radius: 10px; background: #ef4b3a; display: flex; align-items: center; justify-content: center; }
 .mk-board .post .simbolo, .mk-board .avatar .simbolo { background: #fff; width: 34px; height: 34px; }
 .mk-board .avatar { aspect-ratio: 1; border-radius: 50%; background: #0a0a0a; display: flex; align-items: center; justify-content: center; }
+
+/* cronograma */
+.apr-crono { flex: 1; min-height: 0; display: grid; gap: 0 12px; align-content: center; }
+.apr-crono > div { display: flex; flex-direction: column; gap: 10px; }
+.apr-crono .trilho { position: relative; height: 56px; display: flex; align-items: center; }
+.apr-crono .barra { display: block; width: 100%; height: 18px; border-radius: 999px; background: var(--tinta); }
+.apr-crono .losango { display: inline-block; width: 30px; height: 30px; background: var(--laranja); transform: rotate(45deg); border: 4px solid var(--claro); }
+.apr-crono .trilho .losango { position: absolute; right: -6px; }
+.apr-crono h3 { font-size: 30px; font-weight: 600; line-height: 1.15; display: flex; gap: 12px; margin-top: 8px; }
+.apr-crono h3 b { color: var(--laranja); font-weight: 600; }
+.apr-crono .data { font-size: 24px; color: var(--tinta); }
+.apr-crono .voce { font-size: 20px; line-height: 1.3; color: var(--suave); }
+.apr-crono .etapa.aprova .voce { color: var(--laranja); font-weight: 500; }
+.apr-crono .ponta .marco { display: block; width: 56px; height: 56px; border-radius: 50%; border: 6px solid var(--tinta); background: var(--claro); }
+.apr-crono .ponta.fim .marco { border-color: var(--laranja); background: var(--laranja); }
+.apr-crono .ponta.fim h3, .apr-crono .ponta.fim .data { color: var(--laranja); }
+.apr-crono .ponta.fim .data { font-size: 40px; font-weight: 600; }
+.apr-crono-nota { display: flex; align-items: center; gap: 16px; font-size: 22px; color: var(--suave); margin-top: -12px; }
+.apr-crono-nota .losango { display: inline-block; width: 20px; height: 20px; background: var(--laranja); transform: rotate(45deg); flex-shrink: 0; }

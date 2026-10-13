@@ -7,6 +7,7 @@ import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as G
 import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import { Cena, FORMATOS, Peca } from "./mockups";
+import { dia, montarCronograma, periodo } from "./cronograma";
 import { carregarCatalogo } from "./carregarCatalogo";
 import "./apresentacao.css";
 
@@ -290,6 +291,11 @@ function Painel({ item, ap, salvar, urls, dados }) {
         <input className={campo} value={rascunho.pagamento || ""} onChange={(e) => mudar({ pagamento: e.target.value })} onBlur={gravar} placeholder={PAGAMENTO_PADRAO} />
       </div>
       <div>
+        <label className={rotulo}>Início do projeto (cronograma)</label>
+        <input type="date" className={campo} value={rascunho.inicio || ""} onChange={(e) => salvar({ ...rascunho, inicio: e.target.value })} />
+        <p className="text-[11px] text-zinc-400 mt-1">Vazio: 2 dias úteis depois do dia em que a apresentação é aberta. Entrega prevista: {dia(dados.cronograma.fim)}.</p>
+      </div>
+      <div>
         <label className={rotulo}>Validade da proposta</label>
         <input className={campo} value={rascunho.validade || ""} onChange={(e) => mudar({ validade: e.target.value })} onBlur={gravar} placeholder={VALIDADE_PADRAO} />
       </div>
@@ -392,6 +398,7 @@ export function montarDados(item, ap, urls = {}) {
     pagamento: ap.pagamento || PAGAMENTO_PADRAO,
     validade: ap.validade || VALIDADE_PADRAO,
     casos,
+    cronograma: montarCronograma(oferta.servico.etapas, ap.inicio),
   };
 }
 
@@ -581,11 +588,7 @@ function Entrega({ d, escala }) {
           <div className="lista">
             {s.entregas.map((x) => <div key={x} className="apr-check"><i />{x}</div>)}
           </div>
-          <div className="etapas">
-            {s.etapas.map((e, i) => (
-              <div key={e.nome}><p className="n">{i + 1}</p><h3>{e.nome}</h3><p className="t">{e.texto}</p></div>
-            ))}
-          </div>
+          <p className="prazo">Entrega em {d.cronograma.total} dias úteis · {d.oferta.servico.ajustes} de ajuste</p>
         </div>
         <PreviaEntrega d={d} />
       </div>
@@ -722,24 +725,36 @@ function Casos({ d, escala }) {
   );
 }
 
+/** Cronograma com datas reais: as etapas do serviço em dias úteis, a partir do início. */
 function Proximos({ d, escala }) {
-  const passos = [
-    ["Aprovação", "Você aprova a proposta e o escopo."],
-    ["Contrato", "Formalizamos e confirmamos o pagamento inicial."],
-    [d.oferta.servico.etapas[0]?.nome || "Briefing", d.oferta.servico.etapas[0]?.texto || "Reunião de briefing e envio dos materiais."],
-    ["Entrega", `Em ${d.prazo || "__ dias úteis"}, tudo pronto para usar.`],
-  ];
+  const c = d.cronograma;
+  const colunas = ["200px", ...c.etapas.map((e) => `minmax(210px, ${e.dias}fr)`), "200px"].join(" ");
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t="Próximos passos" sub="Aprovando hoje, começamos assim." />
-      <div className="apr-linha">
-        {passos.map(([t, p], i) => (
-          <div key={t}>
-            <div className="topo"><span className="bola">{i + 1}</span><span className="fio" /></div>
-            <h3>{t}</h3><p>{p}</p>
+      <Titulo t="Cronograma" sub={`Começando em ${dia(c.inicio)}, você recebe tudo em ${dia(c.fim)}.`} />
+      <div className="apr-crono" style={{ gridTemplateColumns: colunas }}>
+        <div className="ponta">
+          <span className="marco" />
+          <h3>Início</h3>
+          <p className="data">{dia(c.inicio)}</p>
+          <p className="voce">Contrato e pagamento inicial</p>
+        </div>
+        {c.etapas.map((e, i) => (
+          <div key={i} className={`etapa ${e.aprovacao ? "aprova" : ""}`}>
+            <div className="trilho"><span className="barra" />{e.aprovacao && <span className="losango" />}</div>
+            <h3><b>{i + 1}</b>{e.nome}</h3>
+            <p className="data">{periodo(e.ini, e.fim)} · {e.dias} {e.dias === 1 ? "dia" : "dias"}</p>
+            {e.cliente && <p className="voce">Você: {e.cliente.charAt(0).toLowerCase() + e.cliente.slice(1)}</p>}
           </div>
         ))}
+        <div className="ponta fim">
+          <span className="marco" />
+          <h3>Entrega</h3>
+          <p className="data">{dia(c.fim)}</p>
+          <p className="voce">{c.total} dias úteis</p>
+        </div>
       </div>
+      <p className="apr-crono-nota"><span className="losango" /> Sua aprovação. O prazo conta a partir do pagamento inicial e do envio dos materiais; cada aprovação em até 2 dias úteis mantém as datas.</p>
     </Slide>
   );
 }

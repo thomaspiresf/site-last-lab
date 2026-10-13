@@ -434,18 +434,27 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
           <Lista label="O que muda depois (3 frases)" itens={s.depois} onChange={(x) => setServ(id, "depois", x)} fixo />
         </Bloco>
 
-        <Bloco titulo="Como funciona (etapas)">
-          {s.etapas.map((e, i) => (
-            <div key={i} className="flex gap-1.5 items-start">
-              <span className="text-xs font-bold text-zinc-400 w-4 pt-2.5">{i + 1}</span>
-              <div className="flex-1 flex flex-col gap-1.5">
-                <input className={campo} value={e.nome} onChange={(ev) => setServ(id, "etapas", s.etapas.map((x, j) => (j === i ? { ...x, nome: ev.target.value } : x)))} />
-                <input className={`${campo} text-zinc-600`} value={e.texto} onChange={(ev) => setServ(id, "etapas", s.etapas.map((x, j) => (j === i ? { ...x, texto: ev.target.value } : x)))} />
+        <Bloco titulo="Cronograma (etapas)">
+          <p className="text-xs text-zinc-400 -mt-2">Vira o slide de cronograma, com datas reais a partir do início. Total: <b className="text-black">{s.etapas.reduce((t, e) => t + (Number(e.dias) || 1), 0)} dias úteis</b> (prazo escrito: {s.prazo || "—"}).</p>
+          {s.etapas.map((e, i) => {
+            const mudarEtapa = (k, v) => setServ(id, "etapas", s.etapas.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
+            return (
+              <div key={i} className="flex gap-1.5 items-start border-t border-zinc-100 pt-3 first:border-0 first:pt-0">
+                <span className="text-xs font-bold text-zinc-400 w-4 pt-2.5">{i + 1}</span>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <div className="flex gap-1.5">
+                    <input className={campo} value={e.nome} placeholder="Etapa" onChange={(ev) => mudarEtapa("nome", ev.target.value)} />
+                    <label className="flex items-center gap-1 text-xs text-zinc-500 shrink-0"><input type="number" min="1" max="30" className="w-14 px-2 py-2 rounded-lg border border-zinc-200 text-sm text-black" value={e.dias || 1} onChange={(ev) => mudarEtapa("dias", Math.max(1, Number(ev.target.value) || 1))} />dias</label>
+                  </div>
+                  <input className={`${campo} text-zinc-600`} value={e.texto} placeholder="O que acontece" onChange={(ev) => mudarEtapa("texto", ev.target.value)} />
+                  <input className={`${campo} text-zinc-600`} value={e.cliente || ""} placeholder="O que preciso do cliente (opcional)" onChange={(ev) => mudarEtapa("cliente", ev.target.value)} />
+                  <label className="flex items-center gap-2 text-xs text-zinc-600"><input type="checkbox" checked={!!e.aprovacao} onChange={(ev) => mudarEtapa("aprovacao", ev.target.checked)} /> Termina com uma aprovação do cliente</label>
+                </div>
+                {s.etapas.length > 2 && <button onClick={() => setServ(id, "etapas", s.etapas.filter((_, j) => j !== i))} className="px-2 pt-2 text-zinc-400 hover:text-red-600"><X size={15} /></button>}
               </div>
-              {s.etapas.length > 2 && <button onClick={() => setServ(id, "etapas", s.etapas.filter((_, j) => j !== i))} className="px-2 pt-2 text-zinc-400 hover:text-red-600"><X size={15} /></button>}
-            </div>
-          ))}
-          {s.etapas.length < 5 && <button onClick={() => setServ(id, "etapas", [...s.etapas, { nome: "", texto: "" }])} className="self-start inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><Plus size={13} /> Adicionar etapa</button>}
+            );
+          })}
+          {s.etapas.length < 5 && <button onClick={() => setServ(id, "etapas", [...s.etapas, { nome: "", texto: "", dias: 2, cliente: "", aprovacao: false }])} className="self-start inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><Plus size={13} /> Adicionar etapa</button>}
         </Bloco>
 
         <Bloco titulo="Como fica (ilustração do entregável)">

@@ -1,3 +1,5 @@
+import { dia } from "./cronograma";
+
 // Preparação e roteiro da reunião do diagnóstico (só para o Thomás, nunca vai para o cliente).
 // Cada informação diz de onde veio: "respondeu" (o lead disse no diagnóstico), "visto" (você viu no
 // perfil ou no site), "provável" (leitura sua) ou "na call" (perguntar).
@@ -107,6 +109,7 @@ export function montarRoteiro(item, dados, prep) {
     {
       id: "fechamento", titulo: "Fechamento", tempo: "35 a 40 min", slides: ["proximos", "fim"],
       falas: [
+        `No cronograma: "Começando em ${dia(dados.cronograma.inicio)}, você recebe tudo em ${dia(dados.cronograma.fim)}.${dados.cronograma.etapas.some((e) => e.aprovacao) ? ` Eu só preciso de você em ${dados.cronograma.etapas.filter((e) => e.aprovacao).length === 1 ? "um momento" : `${dados.cronograma.etapas.filter((e) => e.aprovacao).length} momentos`}: ${dados.cronograma.etapas.filter((e) => e.aprovacao).map((e) => e.cliente.charAt(0).toLowerCase() + e.cliente.slice(1)).join(" e ")}.` : ""}"`,
         `"Podemos começar? Te mando o contrato e o link de pagamento hoje."`,
         `Se fechou: marque a imersão antes de desligar.`,
         `Se a conversa abrir espaço (opcional): "Quando isso estiver de pé, o passo natural é ${dados.oferta.servico.projeto}."`,
