@@ -990,3 +990,21 @@ export async function getCatalogoOfertas() {
   catalogoOfertas = lista.map(({ nome, descricao }) => ({ nome, descricao }));
   return catalogoOfertas;
 }
+
+// --- Catálogo de produtos e serviços (/admin/servicos) ---
+
+export async function getCatalogoServicos() {
+  const { data, error } = await supabase
+    .from("catalogo_servicos")
+    .select("dados, criado_em")
+    .order("id", { ascending: false })
+    .limit(1);
+  if (error) throw error;
+  return data[0] ? { dados: data[0].dados || {}, criadoEm: data[0].criado_em } : { dados: {}, criadoEm: null };
+}
+
+export async function salvarCatalogoServicos(dados) {
+  const { data, error } = await supabase.from("catalogo_servicos").insert({ dados }).select("criado_em").single();
+  if (error) throw error;
+  return data.criado_em;
+}

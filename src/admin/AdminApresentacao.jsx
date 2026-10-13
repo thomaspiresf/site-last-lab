@@ -6,6 +6,7 @@ import { projects } from "../data/projects";
 import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
 import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
+import { carregarCatalogo } from "./carregarCatalogo";
 import "./apresentacao.css";
 
 // Apresentação da reunião do diagnóstico (/admin/diagnosticos/:id/apresentar). Os dados do lead
@@ -41,14 +42,14 @@ export default function AdminApresentacao() {
   }, []);
   useEffect(() => {
     if (!sessao) return;
-    getDiagnostico(id)
+    carregarCatalogo().then(() => getDiagnostico(id))
       .then((d) => {
         setItem(d);
         setAp(apresentacaoInicial(d));
       })
       .catch((e) => setErro(e.message || "Não consegui carregar o lead."));
     // ao voltar para esta janela, pega as etiquetas trocadas no roteiro
-    const voltar = () => getDiagnostico(id).then((d) => { setItem(d); setAp(apresentacaoInicial(d)); }).catch(() => {});
+    const voltar = () => carregarCatalogo(true).then(() => getDiagnostico(id)).then((d) => { setItem(d); setAp(apresentacaoInicial(d)); }).catch(() => {});
     window.addEventListener("focus", voltar);
     return () => window.removeEventListener("focus", voltar);
   }, [sessao, id]);
@@ -133,7 +134,7 @@ function abrirTelaCheia(set, i = 0) {
 }
 
 /** Encaixa o slide de 1920×1080 na largura disponível. */
-function Palco({ children }) {
+export function Palco({ children }) {
   const ref = useRef(null);
   const [escala, setEscala] = useState(0.4);
   useLayoutEffect(() => {
@@ -752,7 +753,7 @@ function Fim({ d, escala }) {
 }
 
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
-const SLIDES = [
+export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
   ["custo", Custo], ["antesdepois", AntesDepois], ["casos", Casos], ["entrega", Entrega], ["produto", Produto], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

@@ -129,7 +129,7 @@ export const SERVICOS = {
 };
 
 // Nome da oferta no diagnóstico → serviço do catálogo.
-const MAPA = {
+export const MAPA = {
   "Revisão de pontos de contato": "revisao",
   "Workshop de mensagem": "mensagem",
   "Landing page": "pagina",
@@ -266,9 +266,33 @@ export const CASOS_PADRAO = {
   kit: ["una", "studio-vzo"],
 };
 
+// ---------- catálogo editável (/admin/servicos) ----------
+// O que está acima é o padrão do código. A página Produtos e serviços grava uma versão editada no
+// Supabase (catalogo_servicos); carregarCatalogo() aplica por cima destes objetos, no lugar, para
+// que apresentação, roteiro e guia usem sempre os textos editados.
+
+const GRUPOS = { servicos: SERVICOS, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
+const ORIGINAL = JSON.parse(JSON.stringify(GRUPOS));
+
+/** O catálogo padrão do código (para comparar e para "voltar ao padrão"). */
+export const catalogoPadrao = () => JSON.parse(JSON.stringify(ORIGINAL));
+
+/** O catálogo em uso agora (padrão + edições). */
+export const catalogoAtual = () => JSON.parse(JSON.stringify(GRUPOS));
+
+/** Aplica um catálogo editado por cima do padrão, no lugar. */
+export function aplicarCatalogo(dados = {}) {
+  for (const [grupo, alvo] of Object.entries(GRUPOS)) {
+    const final = { ...ORIGINAL[grupo], ...(dados[grupo] || {}) };
+    for (const k of Object.keys(alvo)) delete alvo[k];
+    Object.assign(alvo, JSON.parse(JSON.stringify(final)));
+  }
+}
+
 /** Oferta do lead (a escolhida no admin ou a sugerida) com a ficha do serviço correspondente. */
 export function ofertaDoLead(item) {
   const oferta = (item.ofertaEscolhida ?? item.dados?.devolutiva?.oferta)?.principal;
-  const id = MAPA[oferta?.nome] || "pagina";
+  // nome da oferta do diagnóstico, ou o próprio nome do serviço (oferta escolhida no admin)
+  const id = MAPA[oferta?.nome] || Object.keys(SERVICOS).find((k) => SERVICOS[k].nome === oferta?.nome) || "pagina";
   return { titulo: oferta?.nome || SERVICOS[id].nome, servicoId: id, servico: SERVICOS[id] };
 }

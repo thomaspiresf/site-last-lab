@@ -3,6 +3,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico } from "../lib/api";
 import { apresentacaoInicial, montarDados } from "./AdminApresentacao";
+import { carregarCatalogo } from "./carregarCatalogo";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 
 // Roteiro da reunião, numa janela à parte (fora da tela compartilhada). Mostra a preparação e o que
@@ -70,10 +71,11 @@ export default function AdminRoteiro() {
   useEffect(() => { getAdminSession().then(setSessao); }, []);
   useEffect(() => {
     if (!sessao) return;
-    const carregar = () => getDiagnostico(id).then(setItem).catch(() => {});
+    const carregar = (forcar) => carregarCatalogo(forcar === true).then(() => getDiagnostico(id)).then(setItem).catch(() => {});
     carregar();
-    window.addEventListener("focus", carregar); // pega o que foi editado na apresentação
-    return () => window.removeEventListener("focus", carregar);
+    const voltar = () => carregar(true); // pega o que foi editado na apresentação e no catálogo
+    window.addEventListener("focus", voltar);
+    return () => window.removeEventListener("focus", voltar);
   }, [sessao, id]);
   // relógio: começa quando a apresentação manda o primeiro slide (ou no clique)
   useEffect(() => {

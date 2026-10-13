@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Link, useLocation } from "react-router-dom";
-import { LayoutGrid, LogOut, FileText, Sparkles, Gauge } from "lucide-react";
+import { LayoutGrid, LogOut, FileText, Sparkles, Gauge, Package } from "lucide-react";
 import { getAdminSession, onAdminAuthChange, adminLogout } from "../lib/api";
 
 export default function AdminLayout({ children }) {
@@ -55,6 +55,15 @@ export default function AdminLayout({ children }) {
             >
               <Gauge size={16} />
               Diagnósticos
+            </Link>
+            <Link
+              to="/admin/servicos"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                location.pathname.startsWith("/admin/servicos") ? "text-black" : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <Package size={16} />
+              Produtos e serviços
             </Link>
             <Link
               to="/admin/naming"
