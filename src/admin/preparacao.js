@@ -96,7 +96,7 @@ export function montarRoteiro(item, dados, prep) {
       ],
     },
     {
-      id: "proposta", titulo: "Proposta", tempo: "27 a 35 min", slides: ["entrega", "passo", "condicoes"], dica: "Fale o valor e fique em silêncio. Quem fala primeiro depois do preço perde.",
+      id: "proposta", titulo: "Proposta", tempo: "27 a 35 min", slides: ["entrega", "produto", "sessao", "passo", "condicoes"], dica: "Fale o valor e fique em silêncio. Quem fala primeiro depois do preço perde.",
       falas: [
         `"Para começar, minha proposta é ${dados.oferta.titulo}. Você recebe: ${dados.oferta.servico.entregas.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}."`,
         `"O investimento é ${dados.investimento || "[valor]"}${dados.parcelamento ? `, ${dados.parcelamento}` : ""}, com prazo de ${dados.prazo || "[prazo]"}."`,

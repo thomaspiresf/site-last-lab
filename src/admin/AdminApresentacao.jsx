@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
-import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO } from "./AdminGuia";
+import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
 import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import "./apresentacao.css";
 
@@ -70,7 +70,7 @@ export default function AdminApresentacao() {
   }, [id]);
 
   const dados = useMemo(() => (item && ap ? montarDados(item, ap, urls) : null), [item, ap, urls]);
-  const slides = useMemo(() => (dados ? SLIDES.map(([sid, S]) => Object.assign((props) => <S d={dados} {...props} />, { sid })) : []), [dados]);
+  const slides = useMemo(() => (dados ? SLIDES.filter(([, , quando]) => !quando || quando(dados)).map(([sid, S]) => Object.assign((props) => <S d={dados} {...props} />, { sid })) : []), [dados]);
 
   if (sessao === undefined) return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Carregando...</div>;
   if (!sessao) return <Navigate to="/admin/login" replace />;
@@ -559,6 +559,65 @@ function Entrega({ d, escala }) {
   );
 }
 
+/** Todas as imagens de um projeto do portfólio (capa, banner, grades), sem repetir. */
+function imagensDoProjeto(p) {
+  const achadas = [];
+  const andar = (v) => {
+    if (typeof v === "string" && /^\/images\/.+\.(png|jpe?g|webp|avif)$/i.test(v)) achadas.push(v);
+    else if (Array.isArray(v)) v.forEach(andar);
+    else if (v && typeof v === "object") Object.values(v).forEach(andar);
+  };
+  andar(p);
+  return [...new Set(achadas)];
+}
+
+/** "Mostrar o produto": as páginas do Guia (workshop) ou uma galeria do projeto de exemplo. */
+function Produto({ d, escala }) {
+  const ex = d.oferta.servico.exemplo;
+  if (ex === "guia") {
+    const g = { ...GUIA_VAZIO, marca: d.empresa || d.nome };
+    return (
+      <Slide escala={escala} d={d}>
+        <Titulo t="O Guia de mensagem" sub="8 páginas para usar na bio, no site, na apresentação e nos posts." />
+        <div className="apr-paginas">
+          {GUIA_PAGINAS.map((P, i) => (
+            <div key={i} className="item">
+              <div className="mini"><P g={g} nome={d.nome} /></div>
+              <p>{i + 1} · {GUIA_NOMES[i]}</p>
+            </div>
+          ))}
+        </div>
+      </Slide>
+    );
+  }
+  const p = projects.find((x) => x.id === ex);
+  const imgs = p ? imagensDoProjeto(p).slice(0, 5) : [];
+  return (
+    <Slide escala={escala} d={d}>
+      <Titulo t="Como fica" sub={p ? `Um projeto parecido: ${p.title}${p.expandDetails?.sector ? ` · ${p.expandDetails.sector}` : ""}.` : "Exemplos do portfólio."} />
+      <div className="apr-galeria">
+        {imgs.map((src, i) => <div key={src} className={`foto g${i}`}><img src={src} alt="" /></div>)}
+      </div>
+    </Slide>
+  );
+}
+
+/** Só no workshop: como é a sessão, com o quadro do FigJam. */
+function Sessao({ d, escala }) {
+  const blocos = [["Hoje", "0–15 min"], ["Para quem", "15–40 min"], ["Por que você", "40–65 min"], ["A frase", "65–90 min"], ["O tom", "90–110 min"], ["Fechar", "110–120 min"]];
+  return (
+    <Slide escala={escala} d={d}>
+      <Titulo t="Como é a sessão" sub="2 horas, online, num quadro que a gente preenche juntos." />
+      <div className="apr-sessao">
+        <div className="quadro"><img src="/images/kit/workshop-quadro.webp" alt="Quadro do workshop no FigJam" /></div>
+        <div className="blocos">
+          {blocos.map(([t, m], i) => <div key={t}><span className="n">{i + 1}</span><b>{t}</b><span className="m">{m}</span></div>)}
+        </div>
+      </div>
+    </Slide>
+  );
+}
+
 function Passo({ d, escala }) {
   const s = d.oferta.servico;
   return (
@@ -665,5 +724,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["antesdepois", AntesDepois], ["casos", Casos], ["entrega", Entrega], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["antesdepois", AntesDepois], ["casos", Casos], ["entrega", Entrega], ["produto", Produto], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

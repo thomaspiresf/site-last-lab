@@ -119,6 +119,28 @@
 .apr-previa.fotos .f0 { grid-column: span 2; }
 .apr-previa.fotos .legenda { position: absolute; right: 0; bottom: -40px; font-size: 22px; color: var(--suave); }
 
+/* produto: páginas do guia */
+.apr-paginas { flex: 1; display: grid; grid-template-columns: repeat(8, 1fr); gap: 16px; align-items: center; }
+.apr-paginas .mini { width: 194px; height: 274px; overflow: hidden; border-radius: 6px; box-shadow: 0 16px 32px -14px rgb(0 0 0 / .35); }
+.apr-paginas .mini > .gm-pag { transform: scale(.2443); transform-origin: 0 0; }
+.apr-paginas p { font-size: 22px; font-weight: 500; margin-top: 16px; color: var(--suave); }
+
+/* produto: galeria do portfólio */
+.apr-galeria { flex: 1; min-height: 0; display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 20px; }
+.apr-galeria .foto { border-radius: 24px; overflow: hidden; background: #dcdce2; min-height: 0; }
+.apr-galeria .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.apr-galeria .g0 { grid-row: span 2; }
+
+/* como é a sessão */
+.apr-sessao { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 420px; gap: 64px; }
+.apr-sessao .quadro { border-radius: 24px; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -24px rgb(0 0 0 / .3); }
+.apr-sessao .quadro img { width: 100%; height: 100%; object-fit: cover; object-position: top left; display: block; }
+.apr-sessao .blocos { display: flex; flex-direction: column; justify-content: space-between; }
+.apr-sessao .blocos div { display: grid; grid-template-columns: 56px 1fr auto; align-items: baseline; gap: 12px; border-top: 2px solid var(--tinta); padding-top: 14px; }
+.apr-sessao .n { font-size: 44px; font-weight: 200; color: var(--laranja); line-height: 1; }
+.apr-sessao b { font-size: 32px; font-weight: 600; }
+.apr-sessao .m { font-size: 24px; color: var(--suave); }
+
 /* investimento (como a página da proposta) */
 .apr-investimento { gap: 48px; }
 .apr-investimento .item { border-bottom: 2px solid #2c2c31; padding-bottom: 40px; }

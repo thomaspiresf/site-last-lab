@@ -301,4 +301,5 @@ function Pronto(p) {
   );
 }
 
-const PAGINAS = [Capa, Frase, ParaQuem, Resolve, PorQue, Tom, Mensagens, Pronto];
+export const PAGINAS = [Capa, Frase, ParaQuem, Resolve, PorQue, Tom, Mensagens, Pronto];
+export const PAGINAS_NOMES = ["Capa", "A frase", "Para quem", "O que resolve", "Por que você", "Como falamos", "Mensagens-chave", "Pronto para usar"];
