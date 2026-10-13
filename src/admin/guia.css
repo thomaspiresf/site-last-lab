@@ -69,11 +69,11 @@
 .gm-caixa .txt { white-space: pre-line; }
 
 /* PDF: imprime só as páginas, uma por folha A4 */
-.gm-impressao { display: none; }
+.gm-impressao { position: fixed; left: -100000px; top: 0; pointer-events: none; }
 @media print {
   @page { size: A4; margin: 0; }
   .gm-tela { display: none !important; }
-  .gm-impressao { display: block; }
+  .gm-impressao { display: block; position: static; }
   html, body { background: #fff; }
   .gm-impressao .gm-pag { break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

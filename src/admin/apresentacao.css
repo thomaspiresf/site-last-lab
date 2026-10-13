@@ -201,11 +201,11 @@
 .apr-show-dica { position: fixed; bottom: 16px; right: 20px; color: #666; font: 12px/1 system-ui, sans-serif; }
 
 /* PDF: imprime só os slides, um por página */
-.apr-impressao { display: none; }
+.apr-impressao { position: fixed; left: -100000px; top: 0; pointer-events: none; }
 @media print {
   @page { size: 1920px 1080px; margin: 0; }
   .apr-tela, .apr-show { display: none !important; }
-  .apr-impressao { display: block; }
+  .apr-impressao { display: block; position: static; }
   html, body { background: #fff; }
   .apr-impressao .apr-slide { break-after: page; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

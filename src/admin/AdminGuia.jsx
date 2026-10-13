@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico } from "../lib/api";
+import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import "./guia.css";
 
 // Guia de mensagem (/admin/diagnosticos/:id/guia): o entregável do Workshop de mensagem.
@@ -31,12 +32,15 @@ export default function AdminGuia() {
   const [item, setItem] = useState(null);
   const [g, setG] = useState(null);
   const [erro, setErro] = useState("");
+  const [gerando, setGerando] = useState(false);
+  const impressao = useRef(null);
 
   useEffect(() => { getAdminSession().then(setSessao); }, []);
   useEffect(() => {
     if (!document.querySelector(`link[href="${FONTE}"]`)) {
       const l = document.createElement("link");
       l.rel = "stylesheet";
+      l.crossOrigin = "anonymous";
       l.href = FONTE;
       document.head.appendChild(l);
     }
@@ -77,7 +81,16 @@ export default function AdminGuia() {
             <p className="text-xs text-zinc-500">Entregável do Workshop de mensagem · salva ao sair de cada campo</p>
           </div>
           {erro && <span className="text-xs text-red-600">{erro}</span>}
-          <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><FileDown size={15} /> Exportar PDF</button>
+          <button disabled={gerando} onClick={async () => {
+            setGerando(true);
+            try {
+              await exportarPdf([...impressao.current.children], { largura: 794, altura: 1123, nitidez: 2, nome: nomeArquivo("Guia de mensagem", g.marca || item.nome) });
+            } catch (e) {
+              setErro(`Não gerou o PDF: ${e.message || e}`);
+            } finally {
+              setGerando(false);
+            }
+          }} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800 disabled:opacity-50"><FileDown size={15} /> {gerando ? "Gerando PDF..." : "Exportar PDF"}</button>
         </header>
         <div className="grid grid-cols-[400px_1fr] gap-6 p-6 items-start">
           <Painel g={g} setG={setG} salvar={salvar} />
@@ -88,7 +101,7 @@ export default function AdminGuia() {
           </div>
         </div>
       </div>
-      <div className="gm-impressao" aria-hidden="true">{paginas.map((P, i) => <P key={i} />)}</div>
+      <div ref={impressao} className="gm-impressao" aria-hidden="true">{paginas.map((P, i) => <P key={i} />)}</div>
     </div>
   );
 }

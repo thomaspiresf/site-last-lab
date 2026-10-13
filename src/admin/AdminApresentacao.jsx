@@ -5,6 +5,7 @@ import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresen
 import { projects } from "../data/projects";
 import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
 import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
+import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import "./apresentacao.css";
 
 // Apresentação da reunião do diagnóstico (/admin/diagnosticos/:id/apresentar). Os dados do lead
@@ -25,12 +26,15 @@ export default function AdminApresentacao() {
   const [ap, setAp] = useState(null);
   const [urls, setUrls] = useState({}); // caminho no bucket → link temporário
   const [apresentando, setApresentando] = useState(null); // índice do slide em tela cheia
+  const [gerando, setGerando] = useState(false);
+  const impressao = useRef(null);
 
   useEffect(() => { getAdminSession().then(setSessao); }, []);
   useEffect(() => {
     if (!document.querySelector(`link[href="${FONTE}"]`)) {
       const l = document.createElement("link");
       l.rel = "stylesheet";
+      l.crossOrigin = "anonymous"; // o PDF embute a fonte
       l.href = FONTE;
       document.head.appendChild(l);
     }
@@ -88,7 +92,16 @@ export default function AdminApresentacao() {
         </div>
         {erro && <span className="text-xs text-red-600">{erro}</span>}
         <button onClick={() => window.open(`/admin/diagnosticos/${id}/roteiro`, `roteiro-${id}`, "width=760,height=960")} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black" title="Abre numa janela à parte, para deixar fora da tela compartilhada"><ScrollText size={15} /> Roteiro</button>
-        <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black"><FileDown size={15} /> Exportar PDF</button>
+        <button disabled={gerando} onClick={async () => {
+          setGerando(true);
+          try {
+            await exportarPdf([...impressao.current.children], { largura: 1920, altura: 1080, nome: nomeArquivo("Last Lab", "Diagnostico", dados.empresa || item.nome) });
+          } catch (e) {
+            setErro(`Não gerou o PDF: ${e.message || e}`);
+          } finally {
+            setGerando(false);
+          }
+        }} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-50"><FileDown size={15} /> {gerando ? "Gerando PDF..." : "Exportar PDF"}</button>
         <button onClick={() => abrirTelaCheia(setApresentando)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><Play size={15} /> Apresentar</button>
       </header>
 
@@ -107,7 +120,7 @@ export default function AdminApresentacao() {
 
       {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal={`apr-${id}`} onSair={() => setApresentando(null)} />}
 
-      <div className="apr-impressao" aria-hidden="true">
+      <div ref={impressao} className="apr-impressao" aria-hidden="true">
         {slides.map((S, i) => <S key={i} />)}
       </div>
     </div>
