@@ -12,6 +12,8 @@ import "./apresentacao.css";
 
 const FONTE = "https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap";
 const LOGO = "/images/logo.png";
+const PAGAMENTO_PADRAO = "50% na contratação + 50% na entrega";
+const VALIDADE_PADRAO = "7 dias";
 const VAZIO3 = () => [0, 1, 2].map(() => ({ titulo: "", texto: "", imagem: "" }));
 
 export default function AdminApresentacao() {
@@ -238,6 +240,7 @@ function Painel({ item, ap, salvar, urls, dados }) {
         ))}
       </div>
 
+      <span className={`${rotulo} -mb-3`}>Proposta</span>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className={rotulo}>Investimento</label>
@@ -247,6 +250,22 @@ function Painel({ item, ap, salvar, urls, dados }) {
           <label className={rotulo}>Prazo</label>
           <input className={campo} value={rascunho.prazo || ""} onChange={(e) => mudar({ prazo: e.target.value })} onBlur={gravar} placeholder={dados.oferta.servico.prazo || "__ dias úteis"} />
         </div>
+        <div>
+          <label className={rotulo}>Valor cheio (riscado)</label>
+          <input className={campo} value={rascunho.investimentoDe || ""} onChange={(e) => mudar({ investimentoDe: e.target.value })} onBlur={gravar} placeholder="Opcional" />
+        </div>
+        <div>
+          <label className={rotulo}>Parcelamento</label>
+          <input className={campo} value={rascunho.parcelamento || ""} onChange={(e) => mudar({ parcelamento: e.target.value })} onBlur={gravar} placeholder="ou 3x de R$ ___" />
+        </div>
+      </div>
+      <div>
+        <label className={rotulo}>Pagamento</label>
+        <input className={campo} value={rascunho.pagamento || ""} onChange={(e) => mudar({ pagamento: e.target.value })} onBlur={gravar} placeholder={PAGAMENTO_PADRAO} />
+      </div>
+      <div>
+        <label className={rotulo}>Validade da proposta</label>
+        <input className={campo} value={rascunho.validade || ""} onChange={(e) => mudar({ validade: e.target.value })} onBlur={gravar} placeholder={VALIDADE_PADRAO} />
       </div>
 
       <div className="flex flex-col gap-2">
@@ -324,6 +343,10 @@ export function montarDados(item, ap, urls = {}) {
     oferta,
     investimento: ap.investimento || oferta.servico.investimento || "",
     prazo: ap.prazo || oferta.servico.prazo || "",
+    investimentoDe: ap.investimentoDe || "",
+    parcelamento: ap.parcelamento || "",
+    pagamento: ap.pagamento || PAGAMENTO_PADRAO,
+    validade: ap.validade || VALIDADE_PADRAO,
     casos,
   };
 }
@@ -384,7 +407,7 @@ function Objetivo({ d, escala }) {
   const itens = [
     ["O seu momento", "Me conta do negócio, do cliente e de onde você quer chegar."],
     ["O que eu vi", "As suas respostas e a sua marca vista de fora."],
-    ["Por onde começar", "O primeiro passo, com prazo e investimento."],
+    ["Por onde começar", "O primeiro passo e a proposta."],
   ];
   return (
     <Slide escala={escala} d={d}>
@@ -495,13 +518,37 @@ function Passo({ d, escala }) {
         </div>
         <div className="apr-invest">
           <p className="t">Investimento</p>
-          <div><p className="serv">{d.oferta.titulo}</p><p className="valor">{d.investimento || "R$ ____"}</p></div>
+          <div>
+            <p className="serv">{d.oferta.titulo}</p>
+            {d.investimentoDe && <p className="de">{d.investimentoDe}</p>}
+            <p className="valor">{d.investimento || "R$ ____"}</p>
+            {d.parcelamento && <p className="parc">{d.parcelamento}</p>}
+          </div>
           <div className="dupla">
             <div>Prazo<span>{d.prazo || "__ dias úteis"}</span></div>
             <div>Ajustes<span>{s.ajustes}</span></div>
           </div>
           <p className="nao">Não inclui: {s.naoInclui}</p>
         </div>
+      </div>
+    </Slide>
+  );
+}
+
+function Condicoes({ d, escala }) {
+  const s = d.oferta.servico;
+  const itens = [
+    ["Escopo", `O projeto contempla os itens desta proposta. Demandas fora dele são orçadas à parte.`],
+    ["Ajustes", `Inclui ${s.ajustes} de ajustes.`],
+    ["Prazo", `${d.prazo || "__ dias úteis"}, a partir do pagamento inicial e do envio dos materiais.`],
+    ["Pagamento", d.pagamento],
+    ["Validade", `Esta proposta vale por ${d.validade}.`],
+  ];
+  return (
+    <Slide escala={escala} d={d}>
+      <Titulo t="Condições" sub="Tudo combinado antes de começar." />
+      <div className="apr-condicoes">
+        {itens.map(([t, p]) => <div key={t}><h3>{t}</h3><p>{p}</p></div>)}
       </div>
     </Slide>
   );
@@ -526,14 +573,14 @@ function Casos({ d, escala }) {
 
 function Proximos({ d, escala }) {
   const passos = [
-    ["Proposta", "Você recebe a proposta hoje, por WhatsApp."],
-    ["Aprovação", "Você aprova o escopo e formalizamos."],
+    ["Aprovação", "Você aprova a proposta e o escopo."],
+    ["Contrato", "Formalizamos e confirmamos o pagamento inicial."],
     ["Imersão", "Reunião de briefing e envio dos materiais."],
     ["Entrega", `Em ${d.prazo || "__ dias úteis"}, tudo pronto para usar.`],
   ];
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t="Próximos passos" sub="Se fizer sentido, começamos assim." />
+      <Titulo t="Próximos passos" sub="Aprovando hoje, começamos assim." />
       <div className="apr-linha">
         {passos.map(([t, p], i) => (
           <div key={t}>
@@ -568,5 +615,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["caminho", Caminho], ["passo", Passo], ["casos", Casos], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["caminho", Caminho], ["casos", Casos], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

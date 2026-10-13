@@ -87,19 +87,32 @@ export function montarRoteiro(item, dados, prep) {
       ],
     },
     {
-      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["caminho", "passo", "casos"], dica: "A hora da autoridade.",
+      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["caminho", "casos"], dica: "A hora da autoridade.",
       falas: [
         `"Independente de trabalharmos juntos, te falo o que eu faria se fosse você."`,
         `"Eu começaria pequeno, no ponto que mais pesa: ${dados.oferta.titulo}."`,
         `"Quando isso estiver de pé, o próximo passo natural é ${dados.oferta.servico.projeto}."`,
+        `Nos casos: "Foi o mesmo caminho que fizemos com estes clientes."`,
       ],
     },
     {
-      id: "fechamento", titulo: "Fechamento", tempo: "27 a 30 min", slides: ["proximos", "fim"],
+      id: "proposta", titulo: "Proposta", tempo: "27 a 35 min", slides: ["passo", "condicoes"], dica: "Fale o valor e fique em silêncio. Quem fala primeiro depois do preço perde.",
       falas: [
-        `"Faz sentido eu te mandar a proposta de ${dados.oferta.titulo} hoje, para você olhar com calma?"`,
-        `Se hesitar: "O que te faria ter certeza de que é o momento certo?"`,
-        `Combine o próximo contato: dia e canal.`,
+        `"Para começar, minha proposta é ${dados.oferta.titulo}. Você recebe: ${dados.oferta.servico.entregas.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}."`,
+        `"O investimento é ${dados.investimento || "[valor]"}${dados.parcelamento ? `, ${dados.parcelamento}` : ""}, com prazo de ${dados.prazo || "[prazo]"}."`,
+        `"O que você acha?"`,
+        `Está caro: "Comparado a quê? Hoje, ${dados.custo.frase.charAt(0).toLowerCase()}${dados.custo.frase.slice(1)}"`,
+        `Preciso pensar: "Claro. O que exatamente você precisa avaliar? Posso te ajudar com isso agora."`,
+        `Preciso falar com alguém: "Faz sentido. Vamos marcar 15 minutos com essa pessoa ainda esta semana?"`,
+        `Não é o momento: "O que precisaria acontecer para ser? Esta proposta vale por ${dados.validade}."`,
+      ],
+    },
+    {
+      id: "fechamento", titulo: "Fechamento", tempo: "35 a 40 min", slides: ["proximos", "fim"],
+      falas: [
+        `"Podemos começar? Te mando o contrato e o link de pagamento hoje."`,
+        `Se fechou: marque a imersão antes de desligar.`,
+        `Se não fechou: combine dia e canal do próximo contato e envie o PDF desta apresentação logo depois.`,
       ],
     },
   ];

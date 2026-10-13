@@ -112,6 +112,14 @@
 .apr-invest .dupla span { display: block; color: #9a9aa2; }
 .apr-invest .nao { font-size: 24px; line-height: 1.4; color: #9a9aa2; }
 
+.apr-invest .de { font-size: 34px; font-weight: 300; color: #9a9aa2; text-decoration: line-through; text-decoration-color: var(--laranja); margin-top: 12px; }
+.apr-invest .parc { font-size: 34px; font-weight: 300; margin-top: 8px; }
+
+/* condições */
+.apr-condicoes { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px 64px; align-content: center; }
+.apr-condicoes h3 { font-size: 44px; font-weight: 600; }
+.apr-condicoes p { font-size: 32px; line-height: 1.4; color: var(--suave); margin-top: 12px; }
+
 /* próximos passos */
 .apr-linha { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; align-items: center; }
 .apr-linha .topo { display: flex; align-items: center; gap: 16px; }
