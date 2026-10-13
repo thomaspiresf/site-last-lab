@@ -1,6 +1,6 @@
 // Envia por e-mail o link da devolutiva do diagnóstico (chamado pela aba /admin/diagnosticos).
 // Segredos necessários (Edge Functions → Secrets): RESEND_API_KEY e EMAIL_REMETENTE
-// (ex.: "Thomás · Last Lab <thomas@lastlab.com.br>", com o domínio verificado no Resend).
+// (ex.: "Thomás · Last Lab <contato@lastlab.com.br>", com o domínio verificado no Resend).
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const REMETENTE = Deno.env.get("EMAIL_REMETENTE") || "Thomás · Last Lab <thomas@lastlab.com.br>";
+const REMETENTE = Deno.env.get("EMAIL_REMETENTE") || "Thomás · Last Lab <contato@lastlab.com.br>";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
