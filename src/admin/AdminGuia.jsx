@@ -16,7 +16,7 @@ const REGUAS = [
   ["simples", "Simples", "Técnica"],
   ["discreta", "Discreta", "Ousada"],
 ];
-const VAZIO = {
+export const VAZIO = {
   marca: "", frase: "",
   cliente: { quem: "", quer: "", trava: "" }, naoE: "", problema: "",
   diferenciais: [{ titulo: "", prova: "" }, { titulo: "", prova: "" }, { titulo: "", prova: "" }],
@@ -189,7 +189,7 @@ function Pag({ tipo = "", classe = "", escala, g, nome, children }) {
   );
 }
 
-function Capa(p) {
+export function Capa(p) {
   const barras = [];
   let x = 0, w = 150, s = 52;
   for (let i = 0; i < 12; i++) {
@@ -207,7 +207,7 @@ function Capa(p) {
   );
 }
 
-function Frase(p) {
+export function Frase(p) {
   return (
     <Pag {...p} classe="gm-frase">
       <p className="rot">A frase</p>

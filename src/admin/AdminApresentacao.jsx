@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
+import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO } from "./AdminGuia";
 import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import "./apresentacao.css";
 
@@ -514,29 +515,70 @@ function AntesDepois({ d, escala }) {
   );
 }
 
-function Passo({ d, escala }) {
+/** Prévia visual da entrega: as páginas do Guia (workshop) ou imagens de um projeto parecido do portfólio. */
+function PreviaEntrega({ d }) {
+  const ex = d.oferta.servico.exemplo;
+  if (ex === "guia") {
+    const g = { ...GUIA_VAZIO, marca: d.empresa || d.nome };
+    return (
+      <div className="apr-previa guia">
+        <div className="pag p1"><GuiaCapa g={g} nome={d.nome} /></div>
+        <div className="pag p2"><GuiaFrase g={g} nome={d.nome} /></div>
+      </div>
+    );
+  }
+  const p = projects.find((x) => x.id === ex);
+  const imgs = [p?.coverImage, ...(p?.topGrid || [])].filter(Boolean).slice(0, 3);
+  return (
+    <div className="apr-previa fotos">
+      {imgs.map((src, i) => <div key={src} className={`foto f${i}`}><img src={src} alt="" /></div>)}
+      {p && <p className="legenda">Exemplo: {p.title}</p>}
+    </div>
+  );
+}
+
+function Entrega({ d, escala }) {
   const s = d.oferta.servico;
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t={d.oferta.titulo} sub={s.promessa} menor />
-      <div className="apr-passo">
-        <div className="lista">
-          <p className="rot">O que você recebe</p>
-          {s.entregas.map((x) => <div key={x} className="apr-check"><i />{x}</div>)}
+      <Titulo t="O que você recebe" sub={s.promessa} />
+      <div className="apr-entrega">
+        <div className="esq">
+          <div className="lista">
+            {s.entregas.map((x) => <div key={x} className="apr-check"><i />{x}</div>)}
+          </div>
+          <div className="etapas">
+            {s.etapas.map((e, i) => (
+              <div key={e.nome}><p className="n">{i + 1}</p><h3>{e.nome}</h3><p className="t">{e.texto}</p></div>
+            ))}
+          </div>
         </div>
-        <div className="apr-invest">
-          <p className="t">Investimento</p>
-          <div>
-            <p className="serv">{d.oferta.titulo}</p>
-            {d.investimentoDe && <p className="de">{d.investimentoDe}</p>}
-            <p className="valor">{d.investimento || "R$ ____"}</p>
-            {d.parcelamento && <p className="parc">{d.parcelamento}</p>}
-          </div>
-          <div className="dupla">
-            <div>Prazo<span>{d.prazo || "__ dias úteis"}</span></div>
-            <div>Ajustes<span>{s.ajustes}</span></div>
-          </div>
-          <p className="nao">Não inclui: {s.naoInclui}</p>
+        <PreviaEntrega d={d} />
+      </div>
+    </Slide>
+  );
+}
+
+function Passo({ d, escala }) {
+  const s = d.oferta.servico;
+  return (
+    <Slide tipo="escuro" classe="apr-investimento" escala={escala} d={d}>
+      <Titulo t="Investimento" />
+      <div className="item">
+        <p className="serv">{d.oferta.titulo}</p>
+        <p className="desc">{s.promessa} Inclui: {s.entregas.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}.</p>
+      </div>
+      <div className="total">
+        <div>
+          <p className="rot">Investimento total</p>
+          {d.investimentoDe && <p className="de">{d.investimentoDe}</p>}
+          <p className="valor">{d.investimento || "R$ ____"}</p>
+          {d.parcelamento && <p className="parc">{d.parcelamento}</p>}
+        </div>
+        <div className="lado">
+          <div><p>Prazo estimado</p><span>{d.prazo || "__ dias úteis"}</span></div>
+          <div><p>Rodadas de ajuste</p><span>{s.ajustes}</span></div>
+          <div><p>Não inclui</p><span>{s.naoInclui}</span></div>
         </div>
       </div>
     </Slide>
@@ -623,5 +665,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["antesdepois", AntesDepois], ["casos", Casos], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["antesdepois", AntesDepois], ["casos", Casos], ["entrega", Entrega], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

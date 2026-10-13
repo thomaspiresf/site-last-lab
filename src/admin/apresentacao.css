@@ -100,6 +100,39 @@
 .apr-antes-depois .depois .apr-check i { margin-top: 6px; }
 .apr-antes-depois .seta { align-self: center; text-align: center; font-size: 96px; font-weight: 200; color: var(--laranja); }
 
+/* o que você recebe */
+.apr-entrega { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 760px; gap: 80px; }
+.apr-entrega .esq { display: flex; flex-direction: column; justify-content: space-between; gap: 40px; }
+.apr-entrega .lista { display: flex; flex-direction: column; gap: 22px; }
+.apr-entrega .lista .apr-check { font-size: 36px; }
+.apr-entrega .etapas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; border-top: 3px solid var(--tinta); padding-top: 24px; }
+.apr-entrega .etapas .n { font-size: 56px; font-weight: 200; line-height: 1; color: var(--laranja); }
+.apr-entrega .etapas h3 { font-size: 28px; font-weight: 600; margin-top: 10px; }
+.apr-entrega .etapas .t { font-size: 22px; line-height: 1.35; color: var(--suave); margin-top: 6px; }
+.apr-previa { position: relative; min-height: 0; }
+.apr-previa.guia .pag { position: absolute; width: 794px; height: 1123px; transform-origin: 0 0; box-shadow: 0 30px 60px -20px rgb(0 0 0 / .35); }
+.apr-previa.guia .p1 { left: 0; top: 0; transform: scale(.44) rotate(-4deg); }
+.apr-previa.guia .p2 { left: 330px; top: 20px; transform: scale(.44) rotate(3deg); }
+.apr-previa.fotos { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1.4fr 1fr; gap: 20px; }
+.apr-previa.fotos .foto { border-radius: 24px; overflow: hidden; background: #dcdce2; min-height: 0; }
+.apr-previa.fotos .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.apr-previa.fotos .f0 { grid-column: span 2; }
+.apr-previa.fotos .legenda { position: absolute; right: 0; bottom: -40px; font-size: 22px; color: var(--suave); }
+
+/* investimento (como a página da proposta) */
+.apr-investimento { gap: 48px; }
+.apr-investimento .item { border-bottom: 2px solid #2c2c31; padding-bottom: 40px; }
+.apr-investimento .serv { font-size: 52px; font-weight: 300; color: var(--laranja); }
+.apr-investimento .desc { font-size: 32px; line-height: 1.45; color: #c9c9d1; margin-top: 16px; width: 1500px; }
+.apr-investimento .total { flex: 1; display: grid; grid-template-columns: 1fr 640px; gap: 80px; align-items: end; }
+.apr-investimento .rot { font-size: 40px; font-weight: 300; color: var(--laranja); }
+.apr-investimento .de { font-size: 40px; font-weight: 300; color: #8a8a92; text-decoration: line-through; margin-top: 12px; }
+.apr-investimento .valor { font-size: 150px; font-weight: 300; line-height: 1; letter-spacing: -4px; margin-top: 8px; }
+.apr-investimento .parc { font-size: 44px; font-weight: 300; margin-top: 12px; }
+.apr-investimento .lado { display: flex; flex-direction: column; gap: 28px; }
+.apr-investimento .lado p { font-size: 32px; }
+.apr-investimento .lado span { display: block; font-size: 28px; color: #9a9aa2; margin-top: 4px; line-height: 1.35; }
+
 /* primeiro passo */
 .apr-passo { flex: 1; display: grid; grid-template-columns: 1fr 620px; gap: 96px; }
 .apr-passo .lista { display: flex; flex-direction: column; gap: 36px; justify-content: center; }

@@ -4,6 +4,8 @@
 
 export const SERVICOS = {
   revisao: {
+    etapas: [{"nome": "Briefing", "texto": "Reunião para entender o que mais pesa no preço"}, {"nome": "Revisão", "texto": "Ajuste de perfil, proposta e materiais"}, {"nome": "Entrega", "texto": "Reunião para mostrar tudo e o guia de uso"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
+    exemplo: "studio-vzo",
     depois: ["O cliente percebe o valor antes de perguntar o preço", "Instagram, proposta e orçamento com a mesma cara de marca", "Menos pedido de desconto na hora de fechar"],
     nome: "Revisão de pontos de contato",
     promessa: "Fazer o cliente perceber o valor antes de ver o preço.",
@@ -20,6 +22,8 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   mensagem: {
+    etapas: [{"nome": "Formulário", "texto": "Você responde 8 perguntas antes da sessão"}, {"nome": "Workshop", "texto": "2 horas, online, juntos"}, {"nome": "Guia de mensagem", "texto": "PDF entregue em até 7 dias úteis"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
+    exemplo: "guia",
     depois: ["Uma frase que qualquer cliente consegue repetir", "Bio, site e apresentação dizendo a mesma coisa", "Um cliente ideal claro, para atrair mais gente certa"],
     nome: "Workshop de mensagem",
     promessa: "Uma frase que qualquer cliente consegue repetir.",
@@ -35,6 +39,8 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   pagina: {
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio de fotos e textos"}, {"nome": "Estrutura", "texto": "Textos e organização para aprovar"}, {"nome": "Página no ar", "texto": "Com domínio, formulário e Instagram apontando para ela"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    exemplo: "site-pronto-pra-partir",
     depois: ["Um link para mandar quando pedirem o seu trabalho", "Quem pesquisa o seu nome encontra o que você faz de melhor", "Contatos chegando pela página, não só por indicação"],
     nome: "Página que converte",
     promessa: "Uma página que confirma a indicação e gera contato.",
@@ -50,6 +56,8 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   instagram: {
+    etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao perfil"}, {"nome": "Modelos", "texto": "Posts, stories e capas para aprovar"}, {"nome": "Entrega", "texto": "Arquivos editáveis no Canva e linha editorial"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    exemplo: "impacto-conquer",
     depois: ["Um perfil que parece da mesma empresa do começo ao fim", "Posts fáceis de fazer, sem começar do zero toda vez", "Quem chega entende o que você faz e como contratar"],
     nome: "Instagram alinhado",
     promessa: "Um perfil com a cara do negócio, fácil de manter.",
@@ -66,6 +74,8 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   apresentacao: {
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio do material atual"}, {"nome": "Estrutura", "texto": "Roteiro e textos para aprovar"}, {"nome": "Design", "texto": "Apresentação e modelo de proposta"}, {"nome": "Ajuste", "texto": "1 rodada e entrega editável"}],
+    exemplo: "boo",
     depois: ["Uma proposta que explica o valor sem você estar junto", "Reuniões conduzidas por um material que reforça o que você diz", "Menos propostas comparadas só pelo preço"],
     nome: "Apresentação e proposta",
     promessa: "Um material que vende quando você não está na sala.",
@@ -81,6 +91,8 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   jornada: {
+    etapas: [{"nome": "Mapeamento", "texto": "Reunião sobre como você atende hoje"}, {"nome": "Mapa e mensagens", "texto": "Jornada e textos para aprovar"}, {"nome": "Materiais", "texto": "Boas-vindas, pós-venda e pedido de indicação"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    exemplo: "pronto-pra-partir",
     depois: ["Cada cliente atendido do mesmo jeito, do primeiro contato ao pós-venda", "O cliente sempre sabe qual é o próximo passo", "Mais indicações de quem já comprou"],
     nome: "Jornada do cliente",
     promessa: "Do primeiro contato ao pós-venda, um caminho pensado.",
@@ -97,6 +109,8 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   kit: {
+    etapas: [{"nome": "Briefing", "texto": "Referências e o que você já tem"}, {"nome": "Proposta visual", "texto": "Logo, cores e fontes"}, {"nome": "Ajuste", "texto": "1 rodada"}, {"nome": "Entrega", "texto": "Arquivos e modelos de post"}],
+    exemplo: "una",
     depois: ["Uma marca com cara de negócio sério desde o começo", "Cores, fontes e logo para usar em tudo, sem improviso", "Uma base pronta para crescer sem refazer depois"],
     nome: "Kit essencial de marca",
     promessa: "Uma base simples para começar com cara de marca.",
