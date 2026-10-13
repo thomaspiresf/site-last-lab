@@ -248,14 +248,23 @@ export function VisaoGeral({ r, escolher }) {
       {/* o caminho do cliente, numa linha */}
       <section>
         <p className="text-sm text-zinc-500 mb-3">O diagnóstico aponta a área mais fraca. A reunião vende a entrada dessa área; depois o cliente sobe na mesma área e termina num plano mensal. <span className="text-zinc-900">Clique em qualquer item para editar os textos e ver a apresentação.</span></p>
-        <ol className="flex items-stretch bg-white border border-zinc-200 rounded-xl divide-x divide-zinc-200">
-          {DEGRAUS.map(([nome, papel], i) => (
-            <li key={nome} className="flex-1 px-4 py-3">
-              <p className="text-[11px] text-zinc-400">{i}</p>
-              <p className="text-sm font-semibold text-zinc-900">{nome}</p>
-              <p className="text-xs text-zinc-400 leading-snug">{papel}</p>
-            </li>
-          ))}
+        {/* régua: uma linha laranja que ganha força a cada etapa */}
+        <ol className="flex items-stretch bg-white border border-zinc-200 rounded-xl px-5 pt-4 pb-3.5">
+          {DEGRAUS.map(([nome, papel], i) => {
+            const forca = 0.25 + (i / (DEGRAUS.length - 1)) * 0.75;
+            const ultima = i === DEGRAUS.length - 1;
+            return (
+              <li key={nome} className="flex-1 min-w-0">
+                <div className="flex items-center h-3 mb-2.5">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: "#ef4b3a", opacity: forca }} />
+                  {!ultima && <span className="flex-1 h-[2px] mx-1.5 rounded-full" style={{ background: "linear-gradient(90deg, #ef4b3a, #ef4b3a)", opacity: forca + 0.1 }} />}
+                  {ultima && <ChevronRight size={14} className="ml-1" style={{ color: "#ef4b3a" }} />}
+                </div>
+                <p className="text-sm font-semibold text-zinc-900 pr-3"><span className="text-zinc-400 font-normal mr-1.5">{i}</span>{nome}</p>
+                <p className="text-xs text-zinc-400 leading-snug pr-3">{papel}</p>
+              </li>
+            );
+          })}
         </ol>
       </section>
 
