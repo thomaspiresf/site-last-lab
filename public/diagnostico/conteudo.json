@@ -838,7 +838,7 @@
   "resultado": {
     "_nota": "Página de resultado que o cliente recebe depois da sua análise (diagnostico/resultado/?t=...). Textos por pilar valem para nota baixa (até 39), média (40 a 69) e alta (70+).",
     "titulo": "Diagnóstico de marca",
-    "chapeu_persona": "Sua persona",
+    "chapeu_persona": "Momento da sua marca",
     "secao_pilares": "Pilares",
     "secao_selos": "Selos",
     "secao_analise": "O que eu vi de fora",
@@ -890,7 +890,7 @@
     "painel_titulo": "Diagnóstico de marca",
     "painel_rotulo": "Last Lab",
     "painel_campos": { "nome": "Nome", "cargo": "Cargo", "segmento": "Segmento", "objetivo": "Objetivo" },
-    "painel_persona_vazia": "Sua persona aparece aqui quando você terminar de responder.",
+    "painel_persona_vazia": "O momento da sua marca aparece aqui quando você terminar de responder.",
     "painel_pilares": "Pilares",
     "painel_selos": "Selos",
     "selo_desbloqueado": "Selo desbloqueado",
@@ -899,7 +899,7 @@
     "aviso_pilar": "{pilar} ✓ {n} de {total}",
     "inicio_diagnostico": "Obrigado, {nome}. Agora são 12 perguntas sobre a sua marca, em 5 pilares. Responda pensando em como as coisas são hoje, não em como gostaria que fossem.",
     "resultado_pronto": "Pronto, {nome}. Aqui está o seu resultado.",
-    "resultado_persona": "Sua persona",
+    "resultado_persona": "Momento da sua marca",
     "links_pedido": "Me mande os links da sua marca:",
     "etapa_1_curto": "Vista por você",
     "etapa_2_curto": "Vista de fora",
@@ -939,7 +939,7 @@
     "recomecar": "Recomeçar",
     "ver_painel": "Ver resultado",
     "resumo_titulo": "Diagnóstico de Marca",
-    "resumo_definindo": "Definindo persona",
+    "resumo_definindo": "Definindo o momento",
     "fechar_painel": "Fechar"
   },
 
