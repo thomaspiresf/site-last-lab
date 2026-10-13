@@ -979,11 +979,8 @@ function Fim({ d, escala }) {
   return (
     <Slide livre tipo="escuro" escala={escala} d={d}>
       <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
-      <P x={89} y={300} s={30} peso={300} cor="#999999" style={{ letterSpacing: 4, textTransform: "uppercase" }}>Próximo passo</P>
-      <P x={82} y={360} s={104} lh={1.12} peso={300} cor="#fff" w={1040}>{negrito(frase)}</P>
-      <svg viewBox="1100 360 730 340" style={{ position: "absolute", left: 89, top: 760, width: 260, height: 121 }} aria-hidden="true">
-        {PECAS_CAPA.map((pts) => <polygon key={pts} points={pts} fill="#ef4b3a" />)}
-      </svg>
+      <P x={89} y={340} s={30} peso={300} cor="#999999" style={{ letterSpacing: 4, textTransform: "uppercase" }}>Próximo passo</P>
+      <P x={82} y={400} s={104} lh={1.12} peso={300} cor="#fff" w={1040}>{negrito(frase)}</P>
 
       <div className="apr-caixa apr-fecha" style={{ left: 1230, top: 72, width: 609, height: 840 }}>
         <p className="rot">Proposta válida até</p>
