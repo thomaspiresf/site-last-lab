@@ -876,21 +876,34 @@ function Passo({ d, escala }) {
   );
 }
 
+// ícones de traço (desenhos do Lucide), em laranja
+const ICONES_COND = {
+  escopo: <><path d="m3 17 2 2 4-4" /><path d="m3 7 2 2 4-4" /><path d="M13 6h8" /><path d="M13 12h8" /><path d="M13 18h8" /></>,
+  ajustes: <><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></>,
+  prazo: <><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4" /><path d="M8 2v4" /><path d="M3 10h18" /></>,
+  pagamento: <><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></>,
+  validade: <><path d="M5 22h14" /><path d="M5 2h14" /><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" /><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" /></>,
+};
+
 function Condicoes({ d, escala }) {
   const s = d.oferta.servico;
   const itens = [
-    ["Escopo", `O projeto contempla os itens desta proposta. Demandas fora dele são orçadas à parte.`],
-    ["Ajustes", `Inclui ${s.ajustes} de ajustes.`],
-    ["Prazo", `${d.prazo || "__ dias úteis"}, a partir do pagamento inicial e do envio dos materiais.`],
-    ["Pagamento", d.pagamento],
-    ["Validade", `Esta proposta vale por ${d.validade}.`],
+    ["escopo", "Escopo", "O projeto contempla os itens desta proposta. Demandas fora dele são orçadas à parte."],
+    ["ajustes", "Ajustes", `${s.ajustes.charAt(0).toUpperCase() + s.ajustes.slice(1)} de ajustes incluída, por escrito.`],
+    ["prazo", "Prazo", `${d.cronograma.total} dias úteis, contados do pagamento inicial e do envio dos materiais.`],
+    ["pagamento", "Pagamento", d.pagamento + "."],
+    ["validade", "Validade", `Esta proposta vale por ${d.validade}.`],
   ];
   return (
-    <Slide escala={escala} d={d}>
-      <Titulo t="Condições" sub="Tudo combinado antes de começar." />
-      <div className="apr-condicoes">
-        {itens.map(([t, p]) => <div key={t}><h3>{t}</h3><p>{p}</p></div>)}
-      </div>
+    <Slide livre escala={escala} d={d}>
+      <Cabeca t="Condições" sub="Tudo combinado antes de começar." />
+      {itens.map(([k, t, p], i) => (
+        <div key={k} className="apr-caixa apr-cond" style={{ left: 81 + i * 355.6, top: 330, width: 331, height: 520 }}>
+          <span className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONES_COND[k]}</svg></span>
+          <h3>{t}</h3>
+          <p>{p}</p>
+        </div>
+      ))}
     </Slide>
   );
 }
@@ -912,36 +925,29 @@ function Casos({ d, escala }) {
   );
 }
 
-/** Cronograma com datas reais: as etapas do serviço em dias úteis, a partir do início. */
+/** Cronograma com datas reais: uma linha fina, um ponto por etapa, datas em cima e o que acontece embaixo. */
 function Proximos({ d, escala }) {
   const c = d.cronograma;
-  const colunas = ["200px", ...c.etapas.map((e) => `minmax(210px, ${e.dias}fr)`), "200px"].join(" ");
+  const colunas = [
+    { tipo: "inicio", nome: "Início", data: dia(c.inicio), info: "Contrato e pagamento inicial" },
+    ...c.etapas.map((e, i) => ({ tipo: e.aprovacao ? "aprova" : "etapa", n: i + 1, nome: e.nome, data: periodo(e.ini, e.fim), dias: e.dias, info: e.cliente })),
+    { tipo: "fim", nome: "Entrega", data: dia(c.fim), info: `${c.total} dias úteis` },
+  ];
+  const w = 1758 / colunas.length;
   return (
-    <Slide escala={escala} d={d}>
-      <Titulo t="Cronograma" sub={`Começando em ${dia(c.inicio)}, você recebe tudo em ${dia(c.fim)}.`} />
-      <div className="apr-crono" style={{ gridTemplateColumns: colunas }}>
-        <div className="ponta">
+    <Slide livre escala={escala} d={d}>
+      <Cabeca t="Cronograma" sub={<>Começando em {dia(c.inicio)}, você recebe tudo em <span style={{ color: "#ef4b3a" }}>{dia(c.fim)}</span>.</>} />
+      <div className="apr-caixa" style={{ left: 90, top: 455, width: (colunas.length - 1) * w, height: 2, background: "#d4d4d8", borderRadius: 0 }} />
+      {colunas.map((col, i) => (
+        <div key={i} className={`apr-crono2 ${col.tipo}`} style={{ left: 81 + i * w, width: w - 24 }}>
+          <p className="data">{col.data}</p>
           <span className="marco" />
-          <h3>Início</h3>
-          <p className="data">{dia(c.inicio)}</p>
-          <p className="voce">Contrato e pagamento inicial</p>
+          <h3>{col.n && <b>{col.n}</b>}{col.nome}</h3>
+          {col.dias && <p className="dias">{col.dias} {col.dias === 1 ? "dia útil" : "dias úteis"}</p>}
+          {col.info && <p className="info">{col.tipo === "aprova" || col.tipo === "etapa" ? `Você: ${col.info.charAt(0).toLowerCase() + col.info.slice(1)}` : col.info}</p>}
         </div>
-        {c.etapas.map((e, i) => (
-          <div key={i} className={`etapa ${e.aprovacao ? "aprova" : ""}`}>
-            <div className="trilho"><span className="barra" />{e.aprovacao && <span className="losango" />}</div>
-            <h3><b>{i + 1}</b>{e.nome}</h3>
-            <p className="data">{periodo(e.ini, e.fim)} · {e.dias} {e.dias === 1 ? "dia" : "dias"}</p>
-            {e.cliente && <p className="voce">Você: {e.cliente.charAt(0).toLowerCase() + e.cliente.slice(1)}</p>}
-          </div>
-        ))}
-        <div className="ponta fim">
-          <span className="marco" />
-          <h3>Entrega</h3>
-          <p className="data">{dia(c.fim)}</p>
-          <p className="voce">{c.total} dias úteis</p>
-        </div>
-      </div>
-      <p className="apr-crono-nota"><span className="losango" /> Sua aprovação. O prazo conta a partir do pagamento inicial e do envio dos materiais; cada aprovação em até 2 dias úteis mantém as datas.</p>
+      ))}
+      <p className="apr-p apr-crono2-nota" style={{ left: 81, top: 860 }}><span className="losango" /> Sua aprovação. Cada uma em até 2 dias úteis mantém as datas.</p>
     </Slide>
   );
 }
