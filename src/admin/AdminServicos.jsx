@@ -5,6 +5,7 @@ import { salvarCatalogoServicos } from "../lib/api";
 import { projects } from "../data/projects";
 import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
+import { FORMATOS } from "./mockups";
 import { Palco, SLIDES, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
@@ -147,7 +148,6 @@ export default function AdminServicos() {
     aid && { nome: r.areas[aid].nome, ir: sel.tipo === "servico" ? { tipo: "area", id: aid } : null },
     sel.tipo === "servico" && { nome: r.servicos[sel.id].nome },
     sel.tipo === "continuidade" && { nome: "Continuidade" },
-    sel.tipo === "custo" && { nome: "O custo de ficar como está" },
     sel.tipo === "mapa" && { nome: "Ofertas do diagnóstico" },
   ].filter(Boolean);
 
@@ -183,7 +183,6 @@ export default function AdminServicos() {
       )}
       {sel?.tipo === "area" && <Area id={sel.id} r={r} padrao={padrao} set={set} escolher={escolher} />}
       {sel?.tipo === "continuidade" && <Continuidade r={r} padrao={padrao} set={set} />}
-      {sel?.tipo === "custo" && <Custos r={r} padrao={padrao} set={set} />}
       {sel?.tipo === "mapa" && <Mapa r={r} set={set} />}
     </AdminLayout>
   );
@@ -262,8 +261,7 @@ function VisaoGeral({ r, escolher }) {
 
       <section className="flex items-center gap-3 text-sm border-t border-zinc-200 pt-6 pb-4">
         <Settings2 size={16} className="text-zinc-400" />
-        <span className="text-zinc-500">Ajustes que valem para todas as áreas:</span>
-        <button onClick={() => escolher({ tipo: "custo" })} className="px-3 py-1.5 rounded-full border border-zinc-300 font-semibold hover:border-black">O custo de ficar como está</button>
+        <span className="text-zinc-500">Ajuste geral:</span>
         <button onClick={() => escolher({ tipo: "mapa" })} className="px-3 py-1.5 rounded-full border border-zinc-300 font-semibold hover:border-black">Qual oferta do diagnóstico vai para qual serviço</button>
       </section>
     </div>
@@ -338,6 +336,13 @@ function Area({ id, r, padrao, set, escolher }) {
                 <button key={sid} onClick={() => escolher({ tipo: "servico", id: sid })} className="px-3 py-1 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black">{r.servicos[sid]?.nome} →</button>
               ))}
             </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <span className={rotulo}>O custo de ficar como está (slide laranja)</span>
+            <textarea rows={2} className={campo} value={a.custo?.frase || ""} onChange={(e) => mudar("custo", { ...a.custo, frase: e.target.value })} />
+            {(a.custo?.consequencias || []).map((c, i) => (
+              <input key={i} className={`${campo} text-zinc-600`} value={c} onChange={(e) => mudar("custo", { ...a.custo, consequencias: a.custo.consequencias.map((x, j) => (j === i ? e.target.value : x)) })} />
+            ))}
           </div>
           <Campo label="Complementos (adicionais da proposta)" area valor={a.complementos} onChange={(x) => mudar("complementos", x)} />
         </Bloco>
@@ -443,11 +448,12 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
           {s.etapas.length < 5 && <button onClick={() => setServ(id, "etapas", [...s.etapas, { nome: "", texto: "" }])} className="self-start inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><Plus size={13} /> Adicionar etapa</button>}
         </Bloco>
 
-        <Bloco titulo="Como fica (exemplo do produto)">
+        <Bloco titulo="Como fica (ilustração do entregável)">
           <label className="block">
             <span className={rotulo}>Mostrar</span>
             <select className={campo} value={s.exemplo} onChange={(e) => setServ(id, "exemplo", e.target.value)}>
               <option value="guia">Páginas do Guia de mensagem (+ slide da sessão)</option>
+              {Object.entries(FORMATOS).map(([k, f]) => <option key={k} value={k}>Ilustração: {f.nome}</option>)}
               {projects.map((p) => <option key={p.id} value={p.id}>Projeto: {p.title}</option>)}
             </select>
           </label>
@@ -537,25 +543,6 @@ function Previa({ servicoId, persona, setPersona, r }) {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-// ---------- o custo de ficar como está (por momento) ----------
-
-function Custos({ r, padrao, set }) {
-  return (
-    <div className="grid grid-cols-2 gap-4">
-      {Object.entries(MOMENTOS).map(([k, nome]) => {
-        const c = r.custo[k] || { frase: "", consequencias: ["", "", ""] };
-        const igual = JSON.stringify(c) === JSON.stringify(padrao.custo[k]);
-        return (
-          <Bloco key={k} titulo={nome} acao={!igual && <button onClick={() => set("custo", k, padrao.custo[k])} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
-            <Campo label="Frase" area valor={c.frase} onChange={(x) => set("custo", k, { ...c, frase: x })} />
-            <Lista label="Consequências" itens={c.consequencias} onChange={(x) => set("custo", k, { ...c, consequencias: x })} fixo />
-          </Bloco>
-        );
-      })}
     </div>
   );
 }

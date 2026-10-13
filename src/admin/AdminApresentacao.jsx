@@ -6,6 +6,7 @@ import { projects } from "../data/projects";
 import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
 import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
+import { Cena, FORMATOS, Peca } from "./mockups";
 import { carregarCatalogo } from "./carregarCatalogo";
 import "./apresentacao.css";
 
@@ -191,7 +192,7 @@ function Painel({ item, ap, salvar, urls, dados }) {
   useEffect(() => setRascunho(ap), [ap]);
   const mudar = (patch) => setRascunho((r) => ({ ...r, ...patch }));
   const gravar = () => JSON.stringify(rascunho) !== JSON.stringify(ap) && salvar(rascunho);
-  const custoBase = CUSTO_PADRAO[item.dados?.persona_id] || CUSTO_PADRAO.loja_sem_vitrine;
+  const custoBase = dados.oferta.area?.custo || CUSTO_PADRAO[item.dados?.persona_id] || CUSTO_PADRAO.loja_sem_vitrine;
   const custo = rascunho.custo || custoBase;
   const casos = rascunho.casos || CASOS_PADRAO[dados.oferta.servicoId] || projects.slice(0, 2).map((p) => p.id);
 
@@ -365,7 +366,8 @@ export function montarDados(item, ap, urls = {}) {
     .map((p, i) => ({ ...p, i }));
   const segundo = [...pilares].filter((p) => !p.fraco).sort((a, b) => a.nota - b.nota)[0];
   const faixa = (d.faixa || "").replace(/^Marca /, "");
-  const custo = ap.custo || CUSTO_PADRAO[d.persona_id] || CUSTO_PADRAO.loja_sem_vitrine;
+  // o custo fala do problema que a oferta resolve (a área dela); o momento da marca fica de reserva
+  const custo = ap.custo || oferta.area?.custo || CUSTO_PADRAO[d.persona_id] || CUSTO_PADRAO.loja_sem_vitrine;
   const casos = (ap.casos || CASOS_PADRAO[oferta.servicoId] || projects.slice(0, 2).map((p) => p.id)).map((id) => projects.find((p) => p.id === id)).filter(Boolean);
   return {
     nome: item.nome,
@@ -558,6 +560,7 @@ function PreviaEntrega({ d }) {
       </div>
     );
   }
+  if (FORMATOS[ex]) return <Peca formato={ex} marca={d.empresa || d.nome} largura={720} altura={500} />;
   const p = projects.find((x) => x.id === ex);
   const imgs = [p?.coverImage, ...(p?.topGrid || [])].filter(Boolean).slice(0, 3);
   return (
@@ -618,6 +621,14 @@ function Produto({ d, escala }) {
             </div>
           ))}
         </div>
+      </Slide>
+    );
+  }
+  if (FORMATOS[ex]) {
+    return (
+      <Slide escala={escala} d={d}>
+        <Titulo t="Como fica" sub={FORMATOS[ex].sub} />
+        <Cena formato={ex} marca={d.empresa || d.nome} />
       </Slide>
     );
   }
@@ -715,7 +726,7 @@ function Proximos({ d, escala }) {
   const passos = [
     ["Aprovação", "Você aprova a proposta e o escopo."],
     ["Contrato", "Formalizamos e confirmamos o pagamento inicial."],
-    ["Imersão", "Reunião de briefing e envio dos materiais."],
+    [d.oferta.servico.etapas[0]?.nome || "Briefing", d.oferta.servico.etapas[0]?.texto || "Reunião de briefing e envio dos materiais."],
     ["Entrega", `Em ${d.prazo || "__ dias úteis"}, tudo pronto para usar.`],
   ];
   return (

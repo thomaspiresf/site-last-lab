@@ -23,7 +23,7 @@ export const SERVICOS = {
   },
   revisao: {
     etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao que você usa hoje"}, {"nome": "Ajuste visual", "texto": "Logo, cores e fontes para aprovar"}, {"nome": "Aplicação", "texto": "Perfil, WhatsApp e brand board"}, {"nome": "Ajuste", "texto": "1 rodada, por escrito"}],
-    exemplo: "studio-vzo",
+    exemplo: "marca",
     depois: ["O cliente percebe o valor antes de perguntar o preço", "A mesma cara de marca no Instagram, no WhatsApp e no orçamento", "Fotos que valorizam o trabalho em vez de esconder"],
     nome: "Revisão de imagem",
     promessa: "Fazer a marca parecer tão boa quanto o seu trabalho.",
@@ -40,7 +40,7 @@ export const SERVICOS = {
   },
   kit: {
     etapas: [{"nome": "Briefing", "texto": "Referências e o que você já tem"}, {"nome": "Proposta visual", "texto": "Logo, cores e fontes"}, {"nome": "Ajuste", "texto": "1 rodada"}, {"nome": "Entrega", "texto": "Arquivos e aplicações prontas"}],
-    exemplo: "una",
+    exemplo: "marca",
     depois: ["Uma marca com cara de negócio sério desde o começo", "Cores, fontes e logo para usar em tudo, sem improviso", "Uma base pronta para crescer sem refazer depois"],
     nome: "Kit essencial de marca",
     promessa: "Uma base simples para começar com cara de marca.",
@@ -56,8 +56,8 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   pagina: {
-    etapas: [{"nome": "Briefing", "texto": "Reunião e envio de fotos e textos"}, {"nome": "Estrutura", "texto": "Textos e organização para aprovar"}, {"nome": "Página no ar", "texto": "Com domínio, formulário e Instagram apontando para ela"}, {"nome": "Ajuste", "texto": "1 rodada"}],
-    exemplo: "site-pronto-pra-partir",
+    etapas: [{"nome": "Briefing", "texto": "Reunião e envio de fotos e textos"}, {"nome": "Estrutura", "texto": "Textos e organização para aprovar"}, {"nome": "Página no ar", "texto": "Com domínio e formulário funcionando"}, {"nome": "Ajuste", "texto": "1 rodada"}],
+    exemplo: "pagina",
     depois: ["Um link para mandar quando pedirem o seu trabalho", "Quem pesquisa o seu nome encontra o que você faz de melhor", "Contatos chegando pela página, não só por indicação"],
     nome: "Landing page que converte",
     promessa: "Uma página que confirma a indicação e gera contato.",
@@ -74,7 +74,7 @@ export const SERVICOS = {
   },
   instagram: {
     etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao perfil"}, {"nome": "Modelos", "texto": "Posts, stories e capas para aprovar"}, {"nome": "Entrega", "texto": "Arquivos editáveis no Canva e guia de uso"}, {"nome": "Ajuste", "texto": "1 rodada"}],
-    exemplo: "impacto-conquer",
+    exemplo: "redes",
     depois: ["Um perfil que parece da mesma empresa do começo ao fim", "Posts fáceis de fazer, sem começar do zero toda vez", "Quem chega entende o que você faz e como contratar"],
     nome: "Visual das redes e templates",
     promessa: "Um perfil com a cara do negócio, fácil de manter.",
@@ -90,7 +90,7 @@ export const SERVICOS = {
   },
   proposta: {
     etapas: [{"nome": "Briefing", "texto": "Reunião e envio das propostas atuais"}, {"nome": "Estrutura", "texto": "Textos e ordem para aprovar"}, {"nome": "Design", "texto": "Modelo editável com a cara da marca"}, {"nome": "Ajuste", "texto": "1 rodada"}],
-    exemplo: "boo",
+    exemplo: "proposta",
     depois: ["Uma proposta que explica o valor sem você estar junto", "Menos propostas comparadas só pelo preço", "Orçamentos montados em minutos, sempre com a mesma cara"],
     nome: "Modelo de proposta e orçamento",
     promessa: "Uma proposta que mostra o valor antes do preço.",
@@ -106,7 +106,7 @@ export const SERVICOS = {
   },
   apresentacao: {
     etapas: [{"nome": "Briefing", "texto": "Reunião e envio do material atual"}, {"nome": "Estrutura", "texto": "Roteiro e textos para aprovar"}, {"nome": "Design", "texto": "Apresentação editável"}, {"nome": "Ajuste", "texto": "1 rodada e entrega em PDF"}],
-    exemplo: "boo",
+    exemplo: "slides",
     depois: ["Reuniões conduzidas por um material que reforça o que você diz", "Quem decide junto com o cliente entende o seu valor", "A mesma história contada do mesmo jeito, toda vez"],
     nome: "Apresentação comercial",
     promessa: "Um material que vende quando você não está na sala.",
@@ -122,7 +122,7 @@ export const SERVICOS = {
   },
   jornada: {
     etapas: [{"nome": "Mapeamento", "texto": "Reunião sobre como você atende hoje"}, {"nome": "Mensagens", "texto": "Textos de cada momento para aprovar"}, {"nome": "Configuração", "texto": "Perfil, catálogo e respostas rápidas"}, {"nome": "Ajuste", "texto": "1 rodada"}],
-    exemplo: "pronto-pra-partir",
+    exemplo: "whatsapp",
     depois: ["Cada cliente atendido do mesmo jeito, sem esquecer ninguém", "Resposta rápida, mesmo nos dias corridos", "O cliente sempre sabe qual é o próximo passo"],
     nome: "Kit de atendimento no WhatsApp",
     promessa: "Todo cliente bem atendido, do primeiro contato ao pós-venda.",
@@ -146,6 +146,7 @@ export const AREAS = {
     entradas: ["mensagem"],
     principal: { nome: "Posicionamento de marca", entregas: "2 sessões, análise de 5 concorrentes, plataforma de marca (propósito, proposta de valor, público, personalidade, manifesto), guia de tom completo, textos do site e da apresentação", prazo: "3 a 4 semanas", valor: "R$ 3.500 a R$ 6.000" },
     premium: { nome: "Posicionamento e arquitetura de marca", entregas: "Tudo do principal, organização das linhas de serviço ou submarcas, naming quando precisar, apresentação para a equipe", prazo: "5 a 8 semanas", valor: "R$ 8.000 a R$ 12.000" },
+    custo: { frase: "Se ninguém consegue explicar o que você faz, ninguém consegue te indicar.", consequencias: ["Cada cliente entende uma coisa diferente.", "A indicação chega sem saber o que pedir.", "O preço vira a única comparação."] },
     complementos: "Casos e prova social (R$ 600 a R$ 1.200); naming de serviço ou produto (R$ 1.500 a R$ 3.000)",
   },
   valor: {
@@ -153,6 +154,7 @@ export const AREAS = {
     entradas: ["revisao", "kit"],
     principal: { nome: "Identidade visual", entregas: "Conceito, logo e variações, sistema visual (cores, fontes, grafismos, fotos), manual de marca, papelaria e kit para redes", prazo: "4 a 6 semanas", valor: "R$ 4.500 a R$ 9.000" },
     premium: { nome: "Rebranding", entregas: "Posicionamento + identidade + aplicações principais + plano de lançamento da nova marca", prazo: "8 a 12 semanas", valor: "R$ 12.000 a R$ 25.000" },
+    custo: { frase: "O cliente decide pelo preço antes de conhecer o seu valor.", consequencias: ["Quem compara pela aparência escolhe o mais barato.", "Você negocia desconto em vez de valor.", "O trabalho bom não aparece na primeira impressão."] },
     complementos: "Guia de direção de fotos (R$ 500 a R$ 900); embalagem ou etiqueta; sinalização ou fachada (sob orçamento)",
   },
   site: {
@@ -160,6 +162,7 @@ export const AREAS = {
     entradas: ["pagina"],
     principal: { nome: "Site institucional", entregas: "5 a 7 páginas, portfólio ou casos, SEO básico, painel para editar, treinamento de 1h", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 9.000" },
     premium: { nome: "Site completo ou loja", entregas: "Site com blog e SEO, ou loja virtual com catálogo e pagamento, integrações", prazo: "6 a 10 semanas", valor: "R$ 10.000 a R$ 20.000" },
+    custo: { frase: "A indicação chega quente e esfria antes da primeira conversa.", consequencias: ["Quem pesquisa e não encontra nada vai para quem aparece.", "Sem um link para mandar, o orçamento é comparado só pelo preço.", "Você depende de estar na sala para convencer."] },
     complementos: "Perfil no Google (R$ 400 a R$ 700); página extra (R$ 500 a R$ 900); 1º mês de campanha com o parceiro de tráfego (valor do parceiro, verba à parte)",
   },
   redes: {
@@ -167,6 +170,7 @@ export const AREAS = {
     entradas: ["instagram"],
     principal: { nome: "Linha editorial e templates", entregas: "Pilares de conteúdo, calendário de 1 mês com temas, 16 templates, roteiros de stories, 1 sessão de treinamento", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.000" },
     premium: { nome: "Lançamento ou campanha", entregas: "Conceito de campanha, peças para redes e anúncios, landing da campanha, gestão dos anúncios pelo parceiro de tráfego", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 10.000" },
+    custo: { frase: "Quem te procura no Instagram decide em segundos se você é a escolha certa.", consequencias: ["Um perfil parado parece empresa parada.", "Cada post de um jeito não constrói marca.", "Quem chega não descobre como contratar e vai embora."] },
     complementos: "Pacote extra de 8 templates (R$ 500 a R$ 800)",
   },
   vendas: {
@@ -174,6 +178,7 @@ export const AREAS = {
     entradas: ["proposta", "apresentacao"],
     principal: { nome: "Kit de vendas", entregas: "Apresentação + proposta + catálogo de serviços + 2 casos", prazo: "3 a 4 semanas", valor: "R$ 4.000 a R$ 7.000" },
     premium: { nome: "Kit de vendas e roteiro comercial", entregas: "Tudo do kit, roteiro de reunião, respostas para objeções, treinamento da equipe de vendas", prazo: "5 a 6 semanas", valor: "R$ 8.000 a R$ 12.000" },
+    custo: { frase: "Quando você não está na sala, a venda depende da sorte.", consequencias: ["A proposta chega sozinha e vira só um número.", "Quem decide junto com o cliente não te ouviu.", "Você repete a mesma explicação toda vez."] },
     complementos: "Catálogo ou menu de serviços em PDF (R$ 800 a R$ 1.500)",
   },
   experiencia: {
@@ -181,6 +186,7 @@ export const AREAS = {
     entradas: ["jornada"],
     principal: { nome: "Jornada do cliente", entregas: "Mapa da jornada, guia de boas-vindas, materiais de entrega, pós-venda com pedido de avaliação e indicação, modelos de mensagens e e-mails", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.500" },
     premium: { nome: "Jornada com automação", entregas: "Jornada completa + CRM simples, follow-ups e e-mails automáticos, painel de acompanhamento", prazo: "5 a 8 semanas", valor: "R$ 6.000 a R$ 10.000" },
+    custo: { frase: "O cliente gosta do resultado, mas não do caminho até ele.", consequencias: ["Mensagem sem resposta vira cliente perdido.", "O cliente não sabe o próximo passo e esfria.", "Pouca indicação, mesmo com cliente satisfeito."] },
     complementos: "Kit de pós-venda avulso: agradecimento, pedido de avaliação, programa de indicação (R$ 600 a R$ 1.000)",
   },
 };
