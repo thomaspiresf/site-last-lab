@@ -4,7 +4,8 @@ import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText } from "lucide-reac
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
 import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
-import { CASOS_PADRAO, CONTINUIDADE, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
+import { AREAS, CASOS_PADRAO, CONTINUIDADE, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
+const AREAS_ATUAIS = () => AREAS;
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import { Cena, FORMATOS, Peca } from "./mockups";
 import { dia, montarCronograma, periodo } from "./cronograma";
@@ -35,6 +36,7 @@ export default function AdminApresentacao() {
   const [ap, setAp] = useState(null);
   const [urls, setUrls] = useState({}); // caminho no bucket → link temporário
   const [apresentando, setApresentando] = useState(null); // índice do slide em tela cheia
+  const [atual, setAtual] = useState(0); // slide em foco no editor
   const [gerando, setGerando] = useState(false);
   const impressao = useRef(null);
 
@@ -85,6 +87,9 @@ export default function AdminApresentacao() {
   const dados = useMemo(() => (item && ap ? montarDados(item, ap, urls) : null), [item, ap, urls]);
   const slides = useMemo(() => (dados ? SLIDES.filter(([, , quando]) => !quando || quando(dados)).map(([sid, S]) => Object.assign((props) => <S d={dados} {...props} />, { sid })) : []), [dados]);
 
+  const indice = Math.min(atual, Math.max(0, slides.length - 1));
+  const SlideAtual = slides[indice] || (() => null);
+
   if (sessao === undefined) return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Carregando...</div>;
   if (!sessao) return <Navigate to="/admin/login" replace />;
   if (erro && !item) return <div className="p-10 text-red-600 text-sm">{erro}</div>;
@@ -114,15 +119,28 @@ export default function AdminApresentacao() {
         <button onClick={() => abrirTelaCheia(setApresentando)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><Play size={15} /> Apresentar</button>
       </header>
 
-      <div className="grid grid-cols-[380px_1fr] gap-6 p-6 items-start">
-        <Painel item={item} ap={ap} salvar={salvar} urls={urls} dados={dados} />
-        <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-[200px_1fr_380px] gap-5 p-5 items-start">
+        {/* miniaturas */}
+        <nav className="sticky top-[73px] max-h-[calc(100vh-93px)] overflow-y-auto flex flex-col gap-2.5 pr-1">
           {slides.map((S, i) => (
-            <button key={i} onClick={() => abrirTelaCheia(setApresentando, i)} className="block w-full rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 hover:ring-black/30 text-left" title="Apresentar a partir deste slide">
-              <Palco><S /></Palco>
+            <button key={S.sid} onClick={() => setAtual(i)} className={`text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white/70"}`}>
+              <div className="rounded overflow-hidden ring-1 ring-black/5 pointer-events-none"><Palco><S /></Palco></div>
+              <p className={`text-[11px] mt-1 px-0.5 truncate ${i === indice ? "font-semibold text-black" : "text-zinc-500"}`}>{i + 1} · {NOMES_SLIDES[S.sid] || S.sid}</p>
             </button>
           ))}
+        </nav>
+        {/* o slide em foco */}
+        <div className="flex flex-col gap-3 min-w-0 sticky top-[73px]">
+          <div className="rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5"><Palco><SlideAtual /></Palco></div>
+          <div className="flex items-center gap-2">
+            <button disabled={indice === 0} onClick={() => setAtual(indice - 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">‹ Anterior</button>
+            <button disabled={indice === slides.length - 1} onClick={() => setAtual(indice + 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">Próximo ›</button>
+            <span className="text-xs text-zinc-400 ml-1">{indice + 1} de {slides.length}</span>
+            <button onClick={() => abrirTelaCheia(setApresentando, indice)} className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
+          </div>
         </div>
+        {/* os campos deste slide */}
+        <Painel item={item} ap={ap} salvar={salvar} urls={urls} dados={dados} sid={slides[indice]?.sid} irPara={(sidAlvo) => setAtual(Math.max(0, slides.findIndex((x) => x.sid === sidAlvo)))} />
       </div>
 
       </div>
@@ -194,7 +212,7 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
 
 // ---------- painel de edição ----------
 
-function Painel({ item, ap, salvar, urls, dados }) {
+function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
   const [rascunho, setRascunho] = useState(ap);
   useEffect(() => setRascunho(ap), [ap]);
   const mudar = (patch) => setRascunho((r) => ({ ...r, ...patch }));
@@ -216,26 +234,40 @@ function Painel({ item, ap, salvar, urls, dados }) {
   const campo = "w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm outline-none focus:border-zinc-400";
   const rotulo = "block text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5";
 
-  return (
-    <aside className="sticky top-[73px] max-h-[calc(100vh-97px)] overflow-y-auto bg-white rounded-2xl ring-1 ring-black/5 p-5 flex flex-col gap-5 text-sm">
-      <p className="text-xs text-zinc-500">Os dados do diagnóstico entram sozinhos. Aqui fica o que você escreve para este lead; salva ao sair de cada campo.</p>
+  const svc = dados.oferta.servicoId;
+  const aid = dados.oferta.area ? Object.keys(AREAS_ATUAIS()).find((k) => AREAS_ATUAIS()[k] === dados.oferta.area) : null;
+  /** Aviso de texto que vem do catálogo, com atalho para editar lá. */
+  const doCatalogo = (texto, alvo = `s=${svc}`) => (
+    <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-3 text-xs text-zinc-500 leading-relaxed">
+      {texto} <a href={`/admin/servicos?${alvo}`} target="_blank" rel="noreferrer" className="font-semibold text-zinc-900 underline underline-offset-2">Editar em Produtos e serviços</a> (vale para todos os leads).
+    </div>
+  );
+  const fixo = (texto) => <p className="text-xs text-zinc-400 leading-relaxed">{texto}</p>;
 
+  const SEC = {
+    empresa: <>
       <div>
         <label className={rotulo}>Empresa</label>
         <input className={campo} value={rascunho.empresa || ""} onChange={(e) => mudar({ empresa: e.target.value })} onBlur={gravar} placeholder="Nome da empresa (capa e rodapé)" />
       </div>
 
+    </>,
+    elogio: <>
       <div>
         <label className={rotulo}>Elogio para abrir (só no roteiro)</label>
         <textarea rows={2} className={campo} value={rascunho.elogio || ""} onChange={(e) => mudar({ elogio: e.target.value })} onBlur={gravar} placeholder="Algo sincero que você viu no perfil ou no site" />
       </div>
 
+    </>,
+    resumo: <>
       <div>
         <label className={rotulo}>Resumo em uma frase (slide das respostas)</label>
         <textarea rows={2} className={campo} value={rascunho.resumo || ""} onChange={(e) => mudar({ resumo: e.target.value })} onBlur={gravar} placeholder={dados.resumoSugerido || dados.frase} />
         <p className="mt-1 text-[11px] text-zinc-400">Vazio = a sugestão acima, montada com o pilar mais forte e o mais fraco.</p>
       </div>
 
+    </>,
+    visao: <>
       <div className="flex flex-col gap-3">
         <span className={rotulo}>O que eu vi de fora</span>
         <input className={campo} value={rascunho.visaoTitulo || ""} onChange={(e) => mudar({ visaoTitulo: e.target.value })} onBlur={gravar} placeholder="Frase laranja do slide (ex.: Quem chega por indicação não encontra o seu trabalho.)" />
@@ -264,6 +296,8 @@ function Painel({ item, ap, salvar, urls, dados }) {
         ))}
       </div>
 
+    </>,
+    custo: <>
       <div className="flex flex-col gap-2">
         <span className={rotulo}>O custo de ficar como está</span>
         <textarea rows={2} className={campo} value={custo.frase} onChange={(e) => mudar({ custo: { ...custo, frase: e.target.value } })} onBlur={gravar} />
@@ -273,7 +307,8 @@ function Painel({ item, ap, salvar, urls, dados }) {
         ))}
       </div>
 
-      <span className={`${rotulo} -mb-3`}>Proposta</span>
+    </>,
+    invest: <>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className={rotulo}>Investimento</label>
@@ -313,29 +348,41 @@ function Painel({ item, ap, salvar, urls, dados }) {
           </div>
         </div>
       )}
+    </>,
+    fechamento: <>
       <div>
         <label className={rotulo}>Frase do fechamento</label>
         <input className={campo} value={rascunho.fechamento || ""} onChange={(e) => mudar({ fechamento: e.target.value })} onBlur={gravar} placeholder={(dados.oferta.servico.fechamento || "").replace(/\*\*/g, "")} />
         <p className="text-[11px] text-zinc-400 mt-1">Vazio: a frase do serviço. Use **assim** para o trecho em negrito.</p>
       </div>
+    </>,
+    conta: <>
       <div>
         <label className={rotulo}>A conta (frase em destaque)</label>
         <textarea rows={3} className={campo} value={rascunho.conta || ""} onChange={(e) => mudar({ conta: e.target.value })} onBlur={gravar} placeholder="Ex.: Com 20 clientes por mês, um contrato a mais já paga o projeto." />
       </div>
+    </>,
+    pagamento: <>
       <div>
         <label className={rotulo}>Pagamento</label>
         <input className={campo} value={rascunho.pagamento || ""} onChange={(e) => mudar({ pagamento: e.target.value })} onBlur={gravar} placeholder={PAGAMENTO_PADRAO} />
       </div>
+    </>,
+    inicio: <>
       <div>
         <label className={rotulo}>Início do projeto (cronograma)</label>
         <input type="date" className={campo} value={rascunho.inicio || ""} onChange={(e) => salvar({ ...rascunho, inicio: e.target.value })} />
         <p className="text-[11px] text-zinc-400 mt-1">Vazio: 2 dias úteis depois do dia em que a apresentação é aberta. Entrega prevista: {dia(dados.cronograma.fim)}.</p>
       </div>
+    </>,
+    validade: <>
       <div>
         <label className={rotulo}>Validade da proposta</label>
         <input className={campo} value={rascunho.validade || ""} onChange={(e) => mudar({ validade: e.target.value })} onBlur={gravar} placeholder={VALIDADE_PADRAO} />
       </div>
 
+    </>,
+    casos: <>
       <div className="flex flex-col gap-2">
         <span className={rotulo}>Casos do portfólio</span>
         {[0, 1].map((i) => (
@@ -344,9 +391,48 @@ function Painel({ item, ap, salvar, urls, dados }) {
           </select>
         ))}
       </div>
+    </>,
+  };
+
+  // o que dá para mudar em cada slide
+  const POR_SLIDE = {
+    capa: [SEC.empresa, fixo("O título e o desenho são fixos. A empresa aparece no rodapé de todos os slides.")],
+    objetivo: [fixo("Este slide é igual para todos os leads.")],
+    conversa: [fixo("O texto do slide é fixo. O elogio abaixo aparece só no roteiro, na abertura da conversa."), SEC.elogio],
+    respostas: [SEC.resumo, fixo("Momento, nota, faixa, ícone, radar e barras vêm do diagnóstico do lead.")],
+    visao: [SEC.visao, fixo("Os títulos das observações também viram o lado \"Antes\" do slide Antes & Depois.")],
+    custo: [SEC.custo, fixo("O texto padrão vem da área da oferta; aqui você ajusta só para este lead. Use **assim** para o negrito.")],
+    comeco: [doCatalogo("Os três cartões vêm da escada da área desta oferta.", aid ? `a=${aid}` : `s=${svc}`)],
+    oferta: [doCatalogo("O nome é a oferta escolhida no diagnóstico; a frase é a promessa do serviço.")],
+    antesdepois: [fixo("O lado \"Antes\" usa os títulos das observações da Visão externa."), <button key="b" onClick={() => irPara("visao")} className="self-start text-xs font-semibold underline underline-offset-2">Editar as observações</button>, doCatalogo("O lado \"Depois\" vem do serviço.")],
+    casos: [SEC.casos],
+    entrega: [doCatalogo("A lista do que o cliente recebe e a ilustração vêm do serviço.")],
+    produto: [doCatalogo("A ilustração do entregável vem do serviço (campo \"Como fica\").")],
+    sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
+    passo: [SEC.invest, SEC.conta, doCatalogo("Os textos comerciais das duas opções vêm do serviço e da área.")],
+    condicoes: [SEC.pagamento, SEC.validade, fixo("O prazo vem do cronograma do serviço.")],
+    proximos: [SEC.inicio, doCatalogo("As etapas, a duração e o que depende do cliente vêm do serviço.")],
+    fim: [SEC.fechamento, SEC.validade, SEC.inicio, fixo("Contatos e o chapéu \"Próximo passo\" são fixos.")],
+  };
+
+  return (
+    <aside className="sticky top-[73px] max-h-[calc(100vh-97px)] overflow-y-auto bg-white rounded-2xl ring-1 ring-black/5 p-5 flex flex-col gap-5 text-sm">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Editando</p>
+        <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>
+      </div>
+      {(POR_SLIDE[sid] || [fixo("Nada para editar neste slide.")]).map((el, i) => <React.Fragment key={i}>{el}</React.Fragment>)}
+      <p className="text-[11px] text-zinc-400 border-t border-zinc-100 pt-3">Salva sozinho ao sair de cada campo.</p>
     </aside>
   );
 }
+
+export const NOMES_SLIDES = {
+  capa: "Capa", objetivo: "Nossa conversa", conversa: "O seu momento", respostas: "Visão interna", visao: "Visão externa",
+  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", casos: "Casos",
+  entrega: "O que você recebe", produto: "Como fica", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
+  proximos: "Cronograma", fim: "Fechamento",
+};
 
 // ---------- dados ----------
 

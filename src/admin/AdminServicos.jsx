@@ -91,7 +91,11 @@ function Bloco({ titulo, children, acao }) {
 export default function AdminServicos() {
   const [rascunho, setRascunho] = useState(null);
   const [salvo, setSalvo] = useState(null); // JSON do que está no banco, para saber se mudou
-  const [sel, setSel] = useState(null); // null = a escada; senão o item em edição
+  const [sel, setSel] = useState(() => {
+    // ?s=<serviço> ou ?a=<área> abre direto no item (atalho vindo da apresentação)
+    const q = new URLSearchParams(window.location.search);
+    return q.get("s") ? { tipo: "servico", id: q.get("s") } : q.get("a") ? { tipo: "area", id: q.get("a") } : null;
+  }); // null = a escada; senão o item em edição
   const [persona, setPersona] = useState(null);
   const [estado, setEstado] = useState("");
   const padrao = useMemo(() => catalogoPadrao(), []);
