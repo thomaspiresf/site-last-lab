@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, Play, FileDown, ImagePlus, X } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
-import { CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
+import { CASOS_PADRAO, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import "./apresentacao.css";
 
 // Apresentação da reunião do diagnóstico (/admin/diagnosticos/:id/apresentar). Os dados do lead
@@ -171,7 +171,7 @@ function Painel({ item, ap, salvar, urls, dados }) {
   const gravar = () => JSON.stringify(rascunho) !== JSON.stringify(ap) && salvar(rascunho);
   const custoBase = CUSTO_PADRAO[item.dados?.persona_id] || CUSTO_PADRAO.loja_sem_vitrine;
   const custo = rascunho.custo || custoBase;
-  const casos = rascunho.casos || projects.slice(0, 2).map((p) => p.id);
+  const casos = rascunho.casos || CASOS_PADRAO[dados.oferta.servicoId] || projects.slice(0, 2).map((p) => p.id);
 
   const obs = (i, patch) => {
     const lista = rascunho.observacoes.map((o, j) => (j === i ? { ...o, ...patch } : o));
@@ -284,7 +284,7 @@ function montarDados(item, ap, urls) {
   const segundo = [...pilares].filter((p) => !p.fraco).sort((a, b) => a.nota - b.nota)[0];
   const faixa = (d.faixa || "").replace(/^Marca /, "");
   const custo = ap.custo || CUSTO_PADRAO[d.persona_id] || CUSTO_PADRAO.loja_sem_vitrine;
-  const casos = (ap.casos || projects.slice(0, 2).map((p) => p.id)).map((id) => projects.find((p) => p.id === id)).filter(Boolean);
+  const casos = (ap.casos || CASOS_PADRAO[oferta.servicoId] || projects.slice(0, 2).map((p) => p.id)).map((id) => projects.find((p) => p.id === id)).filter(Boolean);
   return {
     nome: item.nome,
     empresa: ap.empresa || "",

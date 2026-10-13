@@ -234,6 +234,17 @@ export const VISAO_PADRAO = {
   },
 };
 
+// Casos do portfólio (ids de src/data/projects.js) que mais conversam com cada serviço.
+export const CASOS_PADRAO = {
+  revisao: ["studio-vzo", "una"],
+  mensagem: ["una", "studio-vzo"],
+  pagina: ["site-pronto-pra-partir", "semantix"],
+  instagram: ["impacto-conquer", "quarteirao-magico"],
+  apresentacao: ["boo", "semantix"],
+  jornada: ["pronto-pra-partir", "impacto-conquer"],
+  kit: ["una", "studio-vzo"],
+};
+
 /** Oferta do lead (a escolhida no admin ou a sugerida) com a ficha do serviço correspondente. */
 export function ofertaDoLead(item) {
   const oferta = (item.ofertaEscolhida ?? item.dados?.devolutiva?.oferta)?.principal;
