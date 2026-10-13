@@ -494,23 +494,21 @@ function Custo({ d, escala }) {
   );
 }
 
-function Caminho({ d, escala }) {
-  const degraus = [
-    ["1 · Entrada · agora", d.oferta.titulo, d.oferta.servico.promessa, 360, true],
-    ["2 · Projeto", d.oferta.servico.projeto, "Quando a entrada mostrar resultado.", 460, false],
-    ["3 · Continuidade", d.oferta.servico.projeto === "Conteúdo mensal" ? "Novo projeto" : "Conteúdo mensal",
-      d.segundo ? `Ou o segundo ponto a melhorar: ${d.segundo}.` : "Para a marca continuar crescendo.", 560, false],
-  ];
+function AntesDepois({ d, escala }) {
+  const hoje = d.observacoes.map((o) => o.titulo).filter(Boolean).slice(0, 3);
   return (
-    <Slide tipo="escuro" escala={escala} d={d}>
-      <Titulo t="O caminho" sub="Começar pequeno, no ponto que mais pesa." />
-      <div className="apr-degraus">
-        {degraus.map(([et, t, p, h, on]) => (
-          <div key={et} className={on ? "on" : ""} style={{ height: h }}>
-            <p className="et">{et}</p>
-            <div><h3>{t}</h3><p>{p}</p></div>
-          </div>
-        ))}
+    <Slide escala={escala} d={d}>
+      <Titulo t="Antes e depois" sub={`O que muda com: ${d.oferta.titulo}.`} />
+      <div className="apr-antes-depois">
+        <div className="lado hoje">
+          <p className="rot">Hoje</p>
+          {(hoje.length ? hoje : ["[O que você viu de fora]"]).map((x) => <p key={x} className="item">{x}</p>)}
+        </div>
+        <div className="seta" aria-hidden="true">→</div>
+        <div className="lado depois">
+          <p className="rot">Depois</p>
+          {d.oferta.servico.depois.map((x) => <div key={x} className="apr-check"><i />{x}</div>)}
+        </div>
       </div>
     </Slide>
   );
@@ -625,5 +623,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["caminho", Caminho], ["casos", Casos], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["antesdepois", AntesDepois], ["casos", Casos], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

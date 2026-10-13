@@ -4,6 +4,7 @@
 
 export const SERVICOS = {
   revisao: {
+    depois: ["O cliente percebe o valor antes de perguntar o preço", "Instagram, proposta e orçamento com a mesma cara de marca", "Menos pedido de desconto na hora de fechar"],
     nome: "Revisão de pontos de contato",
     promessa: "Fazer o cliente perceber o valor antes de ver o preço.",
     entregas: [
@@ -19,6 +20,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   mensagem: {
+    depois: ["Uma frase que qualquer cliente consegue repetir", "Bio, site e apresentação dizendo a mesma coisa", "Um cliente ideal claro, para atrair mais gente certa"],
     nome: "Workshop de mensagem",
     promessa: "Uma frase que qualquer cliente consegue repetir.",
     entregas: [
@@ -33,6 +35,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   pagina: {
+    depois: ["Um link para mandar quando pedirem o seu trabalho", "Quem pesquisa o seu nome encontra o que você faz de melhor", "Contatos chegando pela página, não só por indicação"],
     nome: "Página que converte",
     promessa: "Uma página que confirma a indicação e gera contato.",
     entregas: [
@@ -47,6 +50,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   instagram: {
+    depois: ["Um perfil que parece da mesma empresa do começo ao fim", "Posts fáceis de fazer, sem começar do zero toda vez", "Quem chega entende o que você faz e como contratar"],
     nome: "Instagram alinhado",
     promessa: "Um perfil com a cara do negócio, fácil de manter.",
     entregas: [
@@ -62,6 +66,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   apresentacao: {
+    depois: ["Uma proposta que explica o valor sem você estar junto", "Reuniões conduzidas por um material que reforça o que você diz", "Menos propostas comparadas só pelo preço"],
     nome: "Apresentação e proposta",
     promessa: "Um material que vende quando você não está na sala.",
     entregas: [
@@ -76,6 +81,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   jornada: {
+    depois: ["Cada cliente atendido do mesmo jeito, do primeiro contato ao pós-venda", "O cliente sempre sabe qual é o próximo passo", "Mais indicações de quem já comprou"],
     nome: "Jornada do cliente",
     promessa: "Do primeiro contato ao pós-venda, um caminho pensado.",
     entregas: [
@@ -91,6 +97,7 @@ export const SERVICOS = {
     ajustes: "1 rodada",
   },
   kit: {
+    depois: ["Uma marca com cara de negócio sério desde o começo", "Cores, fontes e logo para usar em tudo, sem improviso", "Uma base pronta para crescer sem refazer depois"],
     nome: "Kit essencial de marca",
     promessa: "Uma base simples para começar com cara de marca.",
     entregas: [

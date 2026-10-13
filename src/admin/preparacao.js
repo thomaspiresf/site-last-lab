@@ -87,11 +87,11 @@ export function montarRoteiro(item, dados, prep) {
       ],
     },
     {
-      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["caminho", "casos"], dica: "A hora da autoridade.",
+      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["antesdepois", "casos"], dica: "A hora da autoridade. Fale do resultado, não do serviço.",
       falas: [
-        `"Independente de trabalharmos juntos, te falo o que eu faria se fosse você."`,
-        `"Eu começaria pequeno, no ponto que mais pesa: ${dados.oferta.titulo}."`,
-        `"Quando isso estiver de pé, o próximo passo natural é ${dados.oferta.servico.projeto}."`,
+        `"Independente de trabalharmos juntos, te falo o que eu faria se fosse você: começaria pelo ponto que mais pesa."`,
+        `"Hoje é isto que a gente viu. Depois, é isto que muda." Leia o "depois" olhando para o cliente.`,
+        `"Qual desses resultados faz mais diferença para você agora?"`,
         `Nos casos: "Foi o mesmo caminho que fizemos com estes clientes."`,
       ],
     },
@@ -109,6 +109,7 @@ export function montarRoteiro(item, dados, prep) {
       falas: [
         `"Podemos começar? Te mando o contrato e o link de pagamento hoje."`,
         `Se fechou: marque a imersão antes de desligar.`,
+        `Se a conversa abrir espaço (opcional): "Quando isso estiver de pé, o passo natural é ${dados.oferta.servico.projeto}."`,
         `Se não fechou: combine dia e canal do próximo contato e envie o PDF desta apresentação logo depois.`,
       ],
     },
