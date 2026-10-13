@@ -427,9 +427,15 @@
 .apr-crono2-nota .losango { display: inline-block; width: 14px; height: 14px; background: #ef4b3a; border-radius: 2px; transform: rotate(45deg); }
 
 /* fechamento */
-.apr-contatos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1.5px solid #2a2a2e; padding-top: 44px; }
-.apr-contatos > div { display: flex; align-items: center; gap: 22px; }
-.apr-contatos .ic { width: 72px; height: 72px; border-radius: 50%; border: 1.5px solid #3a3a40; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.apr-contatos .ic svg { width: 30px; height: 30px; }
-.apr-contatos .rot { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; color: #77777f; }
-.apr-contatos .txt { font-size: 30px; color: #fff; margin-top: 4px; white-space: nowrap; }
+.apr-fecha { background: #141416; border: 1.5px solid #26262b; padding: 56px 52px; box-sizing: border-box; display: flex; flex-direction: column; color: #fff; }
+.apr-fecha .rot { font-size: 17px; letter-spacing: 3px; text-transform: uppercase; color: #77777f; }
+.apr-fecha .validade { font-size: 96px; font-weight: 500; line-height: 1.05; color: #ef4b3a; margin-top: 14px; letter-spacing: -2px; }
+.apr-fecha .sub { font-size: 22px; color: #9a9aa2; margin-top: 8px; }
+.apr-fecha .datas { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; padding: 36px 0; border-top: 1.5px solid #26262b; border-bottom: 1.5px solid #26262b; }
+.apr-fecha .data { font-size: 44px; font-weight: 400; margin-top: 8px; }
+.apr-fecha .data.laranja { color: #ef4b3a; }
+.apr-fecha .contatos { display: flex; flex-direction: column; gap: 22px; margin-top: auto; }
+.apr-fecha .contatos > div { display: flex; align-items: center; gap: 20px; }
+.apr-fecha .ic { width: 60px; height: 60px; border-radius: 50%; border: 1.5px solid #3a3a40; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.apr-fecha .ic svg { width: 26px; height: 26px; }
+.apr-fecha .contatos .txt { font-size: 26px; color: #fff; margin-top: 2px; white-space: nowrap; }
