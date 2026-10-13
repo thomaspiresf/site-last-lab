@@ -751,7 +751,7 @@
 
   "personas": {
     "joia_escondida": { "nome": "Joia Escondida", "frase": "Seu produto vale mais do que a sua marca mostra.", "oferta": "Identidade visual ou reposicionamento", "prioridade": "alta" },
-    "talento_sem_palco": { "nome": "Talento sem palco", "frase": "Você vende bem pessoalmente. O problema é quando você não está na sala.", "oferta": "Apresentação comercial", "prioridade": "alta" },
+    "talento_sem_palco": { "nome": "Presença que Vende", "frase": "Você vende bem pessoalmente. O problema é quando você não está na sala.", "oferta": "Apresentação comercial", "prioridade": "alta" },
     "mensagem_difusa": { "nome": "Uma História a Contar", "frase": "Todo mundo gosta do seu trabalho. Pouca gente sabe explicar o que você faz.", "oferta": "Reposicionamento e mensagem", "prioridade": "media" },
     "loja_sem_vitrine": { "nome": "Pronto pra Aparecer", "frase": "Seu negócio é melhor do que aparece na internet.", "oferta": "Site ou landing page", "prioridade": "media" },
     "jornada_no_improviso": { "nome": "Experiência em Evolução", "frase": "Seu cliente gosta do resultado, mas o caminho até ele depende de sorte.", "oferta": "Experiência de compra", "prioridade": "media" },

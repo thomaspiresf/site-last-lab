@@ -779,7 +779,7 @@ function EditorOferta({ item, dev, onFechar, onSalvo }) {
 // os pesos estão errando (Ajustes do diagnóstico → Árvore de decisões).
 const PERSONAS_NOMES = {
   joia_escondida: "Joia Escondida",
-  talento_sem_palco: "Talento sem palco",
+  talento_sem_palco: "Presença que Vende",
   mensagem_difusa: "Uma História a Contar",
   loja_sem_vitrine: "Pronto pra Aparecer",
   jornada_no_improviso: "Experiência em Evolução",
