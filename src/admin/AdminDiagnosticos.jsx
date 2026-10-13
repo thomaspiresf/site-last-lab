@@ -778,13 +778,13 @@ function EditorOferta({ item, dev, onFechar, onSalvo }) {
 // "A persona fez sentido?": com alguns leads avaliados dá para ver em quais tipos de negócio
 // os pesos estão errando (Ajustes do diagnóstico → Árvore de decisões).
 const PERSONAS_NOMES = {
-  joia_escondida: "Joia escondida",
+  joia_escondida: "Joia Escondida",
   talento_sem_palco: "Talento sem palco",
-  mensagem_difusa: "Mensagem difusa",
-  loja_sem_vitrine: "Loja sem vitrine",
-  jornada_no_improviso: "Jornada no improviso",
-  marca_estruturada: "Marca estruturada",
-  ainda_no_comeco: "Ainda no começo",
+  mensagem_difusa: "Uma História a Contar",
+  loja_sem_vitrine: "Pronto pra Aparecer",
+  jornada_no_improviso: "Experiência em Evolução",
+  marca_estruturada: "Marca Estruturada",
+  ainda_no_comeco: "Primeiros Passos",
 };
 
 function AvaliacaoPersona({ item, onAtualizar }) {

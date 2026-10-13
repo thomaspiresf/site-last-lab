@@ -750,13 +750,13 @@
   },
 
   "personas": {
-    "joia_escondida": { "nome": "Joia escondida", "frase": "Seu produto vale mais do que a sua marca mostra.", "oferta": "Identidade visual ou reposicionamento", "prioridade": "alta" },
+    "joia_escondida": { "nome": "Joia Escondida", "frase": "Seu produto vale mais do que a sua marca mostra.", "oferta": "Identidade visual ou reposicionamento", "prioridade": "alta" },
     "talento_sem_palco": { "nome": "Talento sem palco", "frase": "Você vende bem pessoalmente. O problema é quando você não está na sala.", "oferta": "Apresentação comercial", "prioridade": "alta" },
-    "mensagem_difusa": { "nome": "Mensagem difusa", "frase": "Todo mundo gosta do seu trabalho. Pouca gente sabe explicar o que você faz.", "oferta": "Reposicionamento e mensagem", "prioridade": "media" },
-    "loja_sem_vitrine": { "nome": "Loja sem vitrine", "frase": "Seu negócio é melhor do que aparece na internet.", "oferta": "Site ou landing page", "prioridade": "media" },
-    "jornada_no_improviso": { "nome": "Jornada no improviso", "frase": "Seu cliente gosta do resultado, mas o caminho até ele depende de sorte.", "oferta": "Experiência de compra", "prioridade": "media" },
-    "marca_estruturada": { "nome": "Marca estruturada", "frase": "Sua marca está à altura do seu negócio. O próximo nível está nos detalhes.", "oferta": "Projeto pontual ou acompanhamento", "prioridade": "baixa" },
-    "ainda_no_comeco": { "nome": "Ainda no começo", "frase": "Você está construindo a base. Vamos te ajudar a fazer isso do jeito certo.", "oferta": "Conteúdo, sem oferta direta", "prioridade": "nutrir" }
+    "mensagem_difusa": { "nome": "Uma História a Contar", "frase": "Todo mundo gosta do seu trabalho. Pouca gente sabe explicar o que você faz.", "oferta": "Reposicionamento e mensagem", "prioridade": "media" },
+    "loja_sem_vitrine": { "nome": "Pronto pra Aparecer", "frase": "Seu negócio é melhor do que aparece na internet.", "oferta": "Site ou landing page", "prioridade": "media" },
+    "jornada_no_improviso": { "nome": "Experiência em Evolução", "frase": "Seu cliente gosta do resultado, mas o caminho até ele depende de sorte.", "oferta": "Experiência de compra", "prioridade": "media" },
+    "marca_estruturada": { "nome": "Marca Estruturada", "frase": "Sua marca está à altura do seu negócio. O próximo nível está nos detalhes.", "oferta": "Projeto pontual ou acompanhamento", "prioridade": "baixa" },
+    "ainda_no_comeco": { "nome": "Primeiros Passos", "frase": "Você está construindo a base. Vamos te ajudar a fazer isso do jeito certo.", "oferta": "Conteúdo, sem oferta direta", "prioridade": "nutrir" }
   },
 
   "selos": {
