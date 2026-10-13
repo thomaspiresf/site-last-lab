@@ -186,7 +186,8 @@ function Painel({ item, ap, salvar, urls, dados }) {
 
       <div>
         <label className={rotulo}>Resumo em uma frase (slide das respostas)</label>
-        <textarea rows={2} className={campo} value={rascunho.resumo || ""} onChange={(e) => mudar({ resumo: e.target.value })} onBlur={gravar} placeholder={dados.frase} />
+        <textarea rows={2} className={campo} value={rascunho.resumo || ""} onChange={(e) => mudar({ resumo: e.target.value })} onBlur={gravar} placeholder={dados.resumoSugerido || dados.frase} />
+        <p className="mt-1 text-[11px] text-zinc-400">Vazio = a sugestão acima, montada com o pilar mais forte e o mais fraco.</p>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -245,6 +246,20 @@ function Painel({ item, ap, salvar, urls, dados }) {
 
 // ---------- dados ----------
 
+// Sugestão do resumo: o pilar mais forte e o mais fraco, em linguagem de cliente.
+// Índices na ordem dos pilares (o 4º, apresentação/proposta, muda de nome por tipo de negócio).
+const FORTE = ["O valor do seu trabalho aparece", "Todo mundo entende o que você faz", "A sua marca aparece bem", "Você convence quando apresenta", "O cliente gosta de comprar com você"];
+const FRACO = ["a marca ainda parece mais barata do que o trabalho", "pouca gente consegue explicar o que você faz", "quase ninguém te encontra antes de falar com você", "o seu material não vende quando você não está", "o caminho até o resultado ainda depende de sorte"];
+
+export function resumoSugerido(pilares) {
+  if (pilares.length < 2) return "";
+  const ordenados = [...pilares].sort((a, b) => b.nota - a.nota);
+  const forte = ordenados[0];
+  const fraco = pilares.find((p) => p.fraco) || ordenados[ordenados.length - 1];
+  if (forte === fraco) return "";
+  return `${FORTE[forte.i]}, mas ${FRACO[fraco.i]}.`;
+}
+
 function montarDados(item, ap, urls) {
   const d = item.dados || {};
   const oferta = ofertaDoLead(item);
@@ -253,7 +268,8 @@ function montarDados(item, ap, urls) {
   const posicao = (nome) => (ORDEM.includes(nome) ? ORDEM.indexOf(nome) : 3);
   const pilares = Object.entries(d.notas || {})
     .map(([nome, nota]) => ({ nome, nota: nota ?? 0, fraco: nome === d.pilar_mais_fraco }))
-    .sort((a, b) => posicao(a.nome) - posicao(b.nome));
+    .sort((a, b) => posicao(a.nome) - posicao(b.nome))
+    .map((p, i) => ({ ...p, i }));
   const segundo = [...pilares].filter((p) => !p.fraco).sort((a, b) => a.nota - b.nota)[0];
   const faixa = (d.faixa || "").replace(/^Marca /, "");
   const custo = ap.custo || CUSTO_PADRAO[d.persona_id] || CUSTO_PADRAO.loja_sem_vitrine;
@@ -263,7 +279,8 @@ function montarDados(item, ap, urls) {
     empresa: ap.empresa || "",
     momento: MOMENTOS[d.persona_id] || d.persona || "",
     frase: d.devolutiva?.persona_frase || "",
-    resumo: ap.resumo || d.devolutiva?.persona_frase || "",
+    resumoSugerido: resumoSugerido(pilares),
+    resumo: ap.resumo || resumoSugerido(pilares) || d.devolutiva?.persona_frase || "",
     nota: d.nota_geral ?? item.notaGeral,
     faixa: faixa.charAt(0).toUpperCase() + faixa.slice(1),
     pilares,
