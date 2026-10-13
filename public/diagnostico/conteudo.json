@@ -1,0 +1,950 @@
+{
+  "meta": {
+    "nome": "Diagnóstico de marca Last Lab",
+    "versao": "1.0",
+    "guia": {
+      "nome": "Thomás",
+      "foto": "guia.png",
+      "abertura": "Oi. Sou o {guia} e vou guiar você durante esse diagnóstico."
+    }
+  },
+
+  "perfil": [
+    {
+      "id": "nome",
+      "pergunta": "Como você se chama?",
+      "tipo": "texto",
+      "comentario": "Veja, {nome}: conforme você responde, seu resultado já vai sendo preenchido automaticamente."
+    },
+    {
+      "id": "cargo",
+      "pergunta": "Qual é a sua posição na empresa?",
+      "tipo": "escolha",
+      "opcoes": [
+        { "id": "dono", "texto": "Dono(a) ou sócio(a)" },
+        { "id": "marketing", "texto": "Marketing" },
+        { "id": "comercial", "texto": "Comercial" },
+        { "id": "outro", "texto": "Outro" }
+      ]
+    },
+    {
+      "id": "segmento",
+      "pergunta": "Em que tipo de negócio você atua?",
+      "tipo": "escolha",
+      "opcoes": [
+        { "id": "local", "icone": "loja", "texto": "Atendimento no local", "exemplos": "barbearia, salão, academia, restaurante, pet shop, oficina, pousada" },
+        { "id": "saude", "icone": "saude", "texto": "Saúde, beleza e bem-estar", "exemplos": "médico, dentista, fisioterapeuta, psicólogo, nutricionista, clínica de estética" },
+        { "id": "liberal", "icone": "maleta", "texto": "Profissional liberal", "exemplos": "advogado, contador, consultor, corretor de imóveis ou seguros" },
+        { "id": "projetos", "icone": "regua", "texto": "Projetos sob medida", "exemplos": "arquiteto, marceneiro, reformas, fotógrafo, casamentos e eventos" },
+        { "id": "educacao", "icone": "capelo", "texto": "Educação e conteúdo", "exemplos": "escola, idiomas, cursos, mentoria, curso online" },
+        { "id": "empresas", "icone": "predio", "texto": "Vendo para empresas", "exemplos": "agência, software, indústria, distribuidora, consultoria empresarial" },
+        { "id": "produto", "icone": "sacola", "texto": "Produto e loja", "exemplos": "marca própria, e-commerce, loja física, moda, cosméticos, alimentos" },
+        { "id": "outro", "icone": "mais", "texto": "Outro" }
+      ]
+    },
+    {
+      "id": "ticket",
+      "pergunta": "Qual é o valor médio de uma venda?",
+      "tipo": "escolha",
+      "opcoes": [
+        { "id": "ate_500", "texto": "Até R$ 500" },
+        { "id": "500_5k", "texto": "R$ 500 a 5 mil" },
+        { "id": "5k_50k", "texto": "R$ 5 mil a 50 mil" },
+        { "id": "acima_50k", "texto": "Acima de R$ 50 mil" }
+      ]
+    },
+    {
+      "id": "faturamento",
+      "pergunta": "Qual é o faturamento mensal aproximado?",
+      "tipo": "escolha",
+      "opcoes": [
+        { "id": "ate_30k", "texto": "Até R$ 30 mil" },
+        { "id": "30k_100k", "texto": "R$ 30 a 100 mil" },
+        { "id": "100k_500k", "texto": "R$ 100 a 500 mil" },
+        { "id": "acima_500k", "texto": "Acima de R$ 500 mil" },
+        { "id": "nao_informado", "texto": "Prefiro não dizer" }
+      ]
+    },
+    {
+      "id": "objetivo",
+      "pergunta": "Por que você está fazendo este diagnóstico?",
+      "tipo": "escolha",
+      "opcoes": [
+        { "id": "cobrar_mais", "texto": "Quero cobrar mais", "comentario": "Boa, {nome}. Preço é percepção antes de ser número. Vamos ver o que a sua marca está comunicando hoje." },
+        { "id": "vender_mais", "texto": "Quero vender mais", "comentario": "Ótimo, {nome}. Muitas vezes o cliente certo já está olhando, mas a marca não dá o empurrão final. Vamos ver onde." },
+        { "id": "lancamento", "texto": "Vou lançar algo novo", "comentario": "Bom momento, {nome}. Um lançamento é a melhor hora para a marca começar do jeito certo. Vamos ver de onde você parte." },
+        { "id": "nao_representa", "texto": "A marca não representa mais a empresa", "comentario": "Isso é muito comum, {nome}: a empresa cresce e a marca fica para trás. Vamos medir essa distância." },
+        { "id": "curiosidade", "texto": "Só curiosidade", "comentario": "Curiosidade é um ótimo começo, {nome}. Vamos lá." }
+      ]
+    }
+  ],
+
+  "pilares": [
+    {
+      "id": "A",
+      "nome": "Percepção de valor",
+      "servico": "Identidade visual ou reposicionamento",
+      "perguntas": [
+        {
+          "id": "A1",
+          "pergunta": "Se alguém visse sua marca sem saber o preço, que valor você acha que chutaria?",
+          "opcoes": [
+            { "texto": "Bem abaixo do que eu cobro", "pontos": 0 },
+            { "texto": "Um pouco abaixo", "pontos": 1 },
+            { "texto": "Mais ou menos o que eu cobro", "pontos": 2 },
+            { "texto": "O que eu cobro ou mais", "pontos": 3 }
+          ],
+          "comentario": "O cliente decide se o preço é justo antes de ouvir o preço. Se a marca sugere um valor menor, cada proposta começa com você tendo que se justificar."
+        },
+        {
+          "id": "A2",
+          "pergunta": "Como a sua identidade visual foi criada?",
+          "opcoes": [
+            { "texto": "Fiz eu mesmo, com alguém próximo ou num editor online", "pontos": 0 },
+            { "texto": "Com um freelancer, focado só no logo", "pontos": 1 },
+            { "texto": "Com um estúdio ou agência, mas o negócio mudou bastante desde então", "pontos": 2, "modificador": "em_transicao" },
+            { "texto": "Com um projeto profissional recente, alinhado ao momento atual", "pontos": 3 }
+          ],
+          "comentario": "Marca não envelhece pelo visual, envelhece quando a empresa cresce e ela continua contando a história antiga."
+        },
+        {
+          "id": "A3",
+          "pergunta": "Quando um cliente compara você com um concorrente mais barato, o que costuma acontecer?",
+          "opcoes": [
+            { "texto": "Pede desconto e eu acabo cedendo", "pontos": 0 },
+            { "texto": "Pede desconto e às vezes eu cedo", "pontos": 1 },
+            { "texto": "Questiona o preço, mas fecha", "pontos": 2 },
+            { "texto": "Quase nunca questiona o preço", "pontos": 3 }
+          ],
+          "comentario": "Pedido de desconto quase sempre é sinal de valor que não ficou claro. Quando a marca carrega o valor, a conversa sai do preço."
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "nome": "Clareza",
+      "servico": "Reposicionamento e mensagem",
+      "perguntas": [
+        {
+          "id": "B1",
+          "pergunta": "Se três clientes descrevessem o que você faz em uma frase, as respostas seriam:",
+          "opcoes": [
+            { "texto": "Bem diferentes entre si", "pontos": 0 },
+            { "texto": "Parecidas, mas genéricas", "pontos": 1 },
+            { "texto": "Parecidas e específicas", "pontos": 2 },
+            { "texto": "Praticamente a frase que nós usamos", "pontos": 3 }
+          ],
+          "comentario": "Quem não sabe explicar o que você faz também não sabe te indicar. Clareza é o que transforma cliente satisfeito em indicação."
+        },
+        {
+          "id": "B2",
+          "pergunta": "A sua comunicação fala principalmente de:",
+          "opcoes": [
+            { "texto": "O que fazemos: serviços, estrutura, anos de mercado", "pontos": 0 },
+            { "texto": "Uma mistura do que fazemos com o que o cliente ganha", "pontos": 1 },
+            { "texto": "O problema que o cliente tem", "pontos": 2 },
+            { "texto": "O resultado do cliente e para quem é (e para quem não é)", "pontos": 3 }
+          ],
+          "comentario": "Ninguém compra serviço, compra o depois. Marcas que falam do resultado do cliente parecem mais caras, e conseguem ser."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "nome": "Presença digital",
+      "servico": "Site ou landing page",
+      "perguntas": [
+        {
+          "id": "C1",
+          "pergunta": "Qual é o papel do seu site hoje?",
+          "opcoes": [
+            { "texto": "Não tenho, ou está desatualizado", "pontos": 0 },
+            { "texto": "Funciona como cartão de visita", "pontos": 1 },
+            { "texto": "Apresenta bem a empresa, mas quase não gera contatos", "pontos": 2 },
+            { "texto": "Gera contatos qualificados com frequência", "pontos": 3 }
+          ],
+          "comentario": "Antes de falar com você, quase todo cliente pesquisa. O site é o vendedor que trabalha quando você não está lá."
+        },
+        {
+          "id": "C2",
+          "pergunta": "Seus canais (Instagram, site, Google, WhatsApp) parecem a mesma empresa?",
+          "opcoes": [
+            { "texto": "Não, cada um foi feito de um jeito", "pontos": 0 },
+            { "texto": "Mais ou menos", "pontos": 1 },
+            { "texto": "Sim, no visual", "pontos": 2 },
+            { "texto": "Sim, no visual, no tom e na promessa", "pontos": 3 }
+          ],
+          "comentario": "Cada canal diferente faz o cliente recomeçar a confiar do zero. Coerência é o que faz uma marca pequena parecer grande."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "nome": "Apresentação comercial",
+      "servico": "Apresentação comercial",
+      "perguntas": [
+        {
+          "id": "D1",
+          "pergunta": "Quando um cliente pede uma proposta, o que você envia?",
+          "opcoes": [
+            { "texto": "O preço por mensagem", "pontos": 0 },
+            { "texto": "Um orçamento ou PDF padrão", "pontos": 1 },
+            { "texto": "Uma apresentação institucional, igual para todos", "pontos": 2 },
+            { "texto": "Uma apresentação feita para aquele cliente, com diagnóstico e cases", "pontos": 3 }
+          ],
+          "comentario": "A proposta é o momento em que o cliente decide se você vale o preço. Se ela parece um orçamento, ele compara como orçamento."
+        },
+        {
+          "id": "D2",
+          "pergunta": "Numa reunião de venda importante, a sua apresentação:",
+          "opcoes": [
+            { "texto": "Não uso apresentação", "pontos": 0 },
+            { "texto": "Atrapalha mais do que ajuda, prefiro só conversar", "pontos": 1 },
+            { "texto": "Ajuda, mas é genérica", "pontos": 2 },
+            { "texto": "Conduz a conversa e reforça o valor", "pontos": 3 }
+          ],
+          "comentario": "Uma boa apresentação faz o cliente chegar sozinho à conclusão que você queria. E continua vendendo quando ele repassa o arquivo para o sócio."
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "nome": "Experiência de compra",
+      "servico": "Experiência de compra (jornada e materiais)",
+      "perguntas": [
+        {
+          "id": "E1",
+          "pergunta": "Do primeiro contato ao fechamento, o processo é:",
+          "opcoes": [
+            { "texto": "Cada vez de um jeito", "pontos": 0 },
+            { "texto": "Um roteiro informal, na cabeça de quem atende", "pontos": 1 },
+            { "texto": "Etapas definidas", "pontos": 2 },
+            { "texto": "Uma experiência desenhada, com materiais em cada etapa", "pontos": 3 }
+          ],
+          "comentario": "O cliente julga o serviço pela forma como é atendido antes de comprar. Uma jornada confusa faz um serviço ótimo parecer arriscado."
+        },
+        {
+          "id": "E2",
+          "pergunta": "Depois que o cliente fecha, o que acontece?",
+          "opcoes": [
+            { "texto": "Começamos o trabalho, sem nada especial", "pontos": 0 },
+            { "texto": "Uma mensagem de boas-vindas", "pontos": 1 },
+            { "texto": "Um processo de entrada, com materiais e próximos passos", "pontos": 2 },
+            { "texto": "Uma experiência pensada para gerar indicação", "pontos": 3 }
+          ],
+          "comentario": "O melhor momento para criar uma indicação é logo depois da compra, quando a expectativa está no alto."
+        },
+        {
+          "id": "E3",
+          "pergunta": "De onde vem a maioria dos seus clientes hoje?",
+          "opcoes": [
+            { "texto": "Quase só de indicação", "pontos": 0 },
+            { "texto": "Indicação e um pouco de Instagram", "pontos": 1 },
+            { "texto": "Vários canais, mas sem saber o que funciona melhor", "pontos": 2 },
+            { "texto": "Canais previsíveis, que eu consigo aumentar quando quero", "pontos": 3 }
+          ],
+          "comentario": "Indicação é ótima, mas não escala e não é você quem controla. Marca forte é o que faz um desconhecido confiar como se tivesse sido indicado."
+        }
+      ]
+    }
+  ],
+
+  "grupos": {
+    "_nota": "Diagnóstico por tipo de negócio (pergunta de segmento). pesos: quanto cada pilar pesa na nota geral e na escolha da persona (persona = pilar com maior (100 - nota) x peso). perguntas: textos que substituem os da pergunta-base; as opções seguem a ordem de pontos 0, 1, 2, 3. Os demais blocos substituem textos de pilares, personas, selos e ofertas de entrada para o grupo.",
+    "aliases": {
+      "b2b": "empresas",
+      "especialista": "liberal",
+      "marca_propria": "produto"
+    },
+    "local": {
+      "pesos": {
+        "A": 1,
+        "B": 0.75,
+        "C": 1.5,
+        "D": 0.75,
+        "E": 1.5
+      },
+      "links": { "apresentacao": { "exemplos": "cardápio, tabela de serviços e preços ou a mensagem que você manda no WhatsApp" } },
+      "pilares": {
+        "D": {
+          "nome": "Atendimento"
+        }
+      },
+      "perguntas": {
+        "C1": {
+          "pergunta": "Quando alguém procura um lugar como o seu na região, como você aparece?",
+          "opcoes": [
+            "Quase não apareço, ou o perfil está desatualizado",
+            "Tenho Instagram e Google, mas sem muito cuidado",
+            "Perfis bem cuidados, mas poucos clientes chegam por eles",
+            "Recebo agendamentos ou pedidos com frequência pelo Instagram e pelo Google"
+          ],
+          "comentario": "Antes de entrar, quase todo cliente procura no Google ou no Instagram. É ali que ele decide se você parece o lugar certo."
+        },
+        "D1": {
+          "pergunta": "Quando alguém pergunta preço ou horário pelo WhatsApp, o que acontece?",
+          "opcoes": [
+            "Respondo quando dá, só com o valor",
+            "Respondo rápido, mas só com o valor",
+            "Tenho uma mensagem pronta com serviços e valores",
+            "Atendimento organizado (resposta rápida, catálogo, agenda) que já leva ao agendamento"
+          ],
+          "comentario": "Quem pergunta preço pelo WhatsApp já está quase decidido. Uma resposta rápida e organizada vira agendamento; um valor solto vira comparação."
+        },
+        "D2": {
+          "pergunta": "Na primeira visita, o cliente percebe por que você é diferente?",
+          "opcoes": [
+            "É atendido como em qualquer lugar",
+            "Depende de quem atende",
+            "O espaço e o atendimento mostram",
+            "Tudo (ambiente, atendimento, detalhes) reforça a marca"
+          ],
+          "comentario": "A primeira visita é a sua melhor propaganda. Quando o lugar e o atendimento contam a mesma história da marca, o cliente volta e indica."
+        },
+        "E2": {
+          "pergunta": "Depois do primeiro atendimento, o que acontece?"
+        }
+      },
+      "personas": {
+        "talento_sem_palco": {
+          "frase": "Quem chega até você gosta. O desafio é a conversa antes de o cliente chegar."
+        }
+      },
+      "selos": {
+        "site_que_vende": {
+          "nome": "Fácil de achar",
+          "frase": "Quem procura na região encontra você."
+        },
+        "proposta_sob_medida": {
+          "nome": "Atendimento afiado",
+          "frase": "Quem pergunta preço já sai agendado."
+        },
+        "apresentacao_conduz": {
+          "nome": "Primeira visita marcante",
+          "frase": "O lugar e o atendimento contam a mesma história."
+        }
+      },
+      "ofertas": {
+        "C": {
+          "nome": "Instagram e Google em dia",
+          "descricao": "Perfil do Google e Instagram organizados para quem procura na região: fotos, informações, avaliações e destaques."
+        },
+        "D": {
+          "nome": "Kit de atendimento no WhatsApp",
+          "descricao": "Mensagens prontas, catálogo de serviços e um fluxo de agendamento com a cara da marca."
+        }
+      }
+    },
+    "saude": {
+      "pesos": {
+        "A": 1.25,
+        "B": 1,
+        "C": 1.25,
+        "D": 1,
+        "E": 1.25
+      },
+      "links": { "apresentacao": { "exemplos": "plano de tratamento, orçamento ou a mensagem que você manda para quem pede valores" } },
+      "pilares": {
+        "D": {
+          "nome": "Consulta e orçamento"
+        }
+      },
+      "perguntas": {
+        "C1": {
+          "pergunta": "Quando um paciente novo te pesquisa antes de marcar, o que ele encontra?",
+          "opcoes": [
+            "Pouca coisa, ou perfis desatualizados",
+            "Perfis que existem, mas não passam muita confiança",
+            "Perfis bem cuidados, mas que geram poucos agendamentos",
+            "Instagram, Google e site que passam confiança e trazem agendamentos"
+          ],
+          "comentario": "O paciente pesquisa antes de marcar. O que ele encontra decide se a primeira consulta vai ser com você ou com outro profissional."
+        },
+        "D1": {
+          "pergunta": "Quando um paciente pede orçamento de um tratamento, o que ele recebe?",
+          "opcoes": [
+            "O valor por mensagem",
+            "Um orçamento simples, impresso ou em PDF",
+            "Uma boa explicação na consulta, mas nada para levar",
+            "Um plano de tratamento explicado, com etapas e o que esperar, para levar para casa"
+          ],
+          "comentario": "Tratamento bem explicado parece mais seguro e vale mais. Um valor solto por mensagem faz o paciente comparar só pelo preço."
+        },
+        "D2": {
+          "pergunta": "Na primeira consulta, o paciente sai entendendo o valor do tratamento?",
+          "opcoes": [
+            "Ele sai só com a receita ou o orçamento",
+            "Depende do dia e de quanto tempo sobra",
+            "Explico bem, mas ele esquece o que conversamos",
+            "Sai com tudo claro e com um material que ajuda a decidir em casa"
+          ],
+          "comentario": "O paciente decide em casa, com a família. Se ele sai sem entender o valor do tratamento, a conversa da consulta se perde no caminho."
+        },
+        "E2": {
+          "pergunta": "Depois que o paciente começa o tratamento, o que acontece?"
+        }
+      },
+      "personas": {
+        "talento_sem_palco": {
+          "frase": "Você atende muito bem. O paciente só não leva para casa o valor do tratamento."
+        }
+      },
+      "selos": {
+        "site_que_vende": {
+          "nome": "Confiança antes da consulta",
+          "frase": "O paciente já chega confiando."
+        },
+        "proposta_sob_medida": {
+          "nome": "Tratamento bem explicado",
+          "frase": "O paciente entende o que está contratando."
+        },
+        "apresentacao_conduz": {
+          "nome": "Consulta que esclarece",
+          "frase": "O paciente decide em casa com tudo claro."
+        }
+      },
+      "ofertas": {
+        "C": {
+          "nome": "Presença que passa confiança",
+          "descricao": "Instagram, Google e página com informações claras sobre você, a estrutura e os tratamentos."
+        },
+        "D": {
+          "nome": "Plano de tratamento apresentado",
+          "descricao": "Material para explicar o tratamento na consulta e para o paciente levar para casa."
+        }
+      }
+    },
+    "liberal": {
+      "pesos": {
+        "A": 1.25,
+        "B": 1.25,
+        "C": 1,
+        "D": 1.25,
+        "E": 0.75
+      },
+      "links": { "apresentacao": { "exemplos": "proposta de honorários, apresentação do escritório ou o e-mail que você manda para um cliente novo" } },
+      "pilares": {
+        "D": {
+          "nome": "Proposta"
+        }
+      },
+      "perguntas": {
+        "C1": {
+          "pergunta": "Quando alguém te pesquisa depois de uma indicação, o que encontra?",
+          "opcoes": [
+            "Quase nada sobre mim ou meu escritório",
+            "Um perfil ou site parado, de cartão de visita",
+            "Uma presença boa, mas que quase não gera contatos novos",
+            "Uma presença que mostra minha especialidade e traz clientes novos"
+          ],
+          "comentario": "Mesmo indicado, o cliente pesquisa antes de ligar. Sua presença online confirma (ou enfraquece) a indicação."
+        },
+        "D1": {
+          "pergunta": "Quando um cliente pergunta seus honorários, o que você envia?",
+          "opcoes": [
+            "O valor por mensagem",
+            "Uma proposta padrão",
+            "Uma proposta com escopo detalhado, igual para todos",
+            "Uma proposta feita para o caso, com diagnóstico e próximos passos"
+          ],
+          "comentario": "Honorário sem contexto vira número para comparar. Uma proposta que mostra que você entendeu o caso justifica o valor."
+        },
+        "D2": {
+          "pergunta": "Numa reunião com um cliente novo, o que te ajuda a mostrar o valor?",
+          "opcoes": [
+            "Só a conversa",
+            "Uma apresentação institucional antiga",
+            "Uma apresentação boa, mas genérica",
+            "Um material que conduz a conversa e reforça o valor"
+          ],
+          "comentario": "Na primeira reunião o cliente avalia você tanto quanto a solução. Um material que conduz a conversa mostra método, não só simpatia."
+        }
+      },
+      "selos": {
+        "site_que_vende": {
+          "nome": "Indicação confirmada",
+          "frase": "Quem te pesquisa encontra o especialista que esperava."
+        }
+      },
+      "ofertas": {
+        "C": {
+          "nome": "Página de autoridade",
+          "descricao": "Uma página que mostra sua especialidade e confirma a indicação, com Instagram ou LinkedIn alinhados."
+        },
+        "D": {
+          "nome": "Proposta de honorários",
+          "descricao": "Modelo de proposta que mostra que você entendeu o caso e justifica o valor."
+        }
+      }
+    },
+    "projetos": {
+      "pesos": {
+        "A": 1.25,
+        "B": 1,
+        "C": 1.25,
+        "D": 1.5,
+        "E": 1
+      },
+      "links": { "apresentacao": { "exemplos": "orçamento, apresentação de projeto ou portfólio em PDF" } },
+      "pilares": {
+        "D": {
+          "nome": "Orçamento e proposta"
+        }
+      },
+      "perguntas": {
+        "C1": {
+          "pergunta": "Como está o seu portfólio online (site, Instagram, Behance)?",
+          "opcoes": [
+            "Não tenho portfólio organizado",
+            "Alguns trabalhos soltos, sem muita curadoria",
+            "Portfólio bonito, mas gera poucos pedidos de orçamento",
+            "Portfólio que traz pedidos de orçamento do cliente certo"
+          ],
+          "comentario": "Em projeto sob medida, o portfólio é a prova. É ele que faz o cliente certo pedir orçamento, e o errado desistir antes."
+        },
+        "D1": {
+          "pergunta": "Quando alguém pede um orçamento, o que você envia?",
+          "opcoes": [
+            "O valor por mensagem",
+            "Um orçamento em planilha ou PDF simples",
+            "Uma apresentação com portfólio, igual para todos",
+            "Uma proposta feita para aquele cliente, com referências, etapas e cronograma"
+          ],
+          "comentario": "O orçamento é o momento em que o cliente decide se você vale o preço. Se ele parece uma planilha, ele compara como planilha."
+        },
+        "D2": {
+          "pergunta": "Na reunião de apresentação do orçamento, o cliente...",
+          "opcoes": [
+            "Recebe o valor e fica de pensar",
+            "Compara com outros orçamentos pelo preço",
+            "Entende o projeto, mas negocia o valor",
+            "Fica convencido pelo processo e pelas referências"
+          ],
+          "comentario": "Quando o cliente entende o processo e vê referências, a conversa sai do preço. Sem isso, ganha o orçamento mais barato."
+        }
+      },
+      "personas": {
+        "talento_sem_palco": {
+          "frase": "Seu trabalho é ótimo. O orçamento ainda não mostra isso."
+        }
+      },
+      "selos": {
+        "site_que_vende": {
+          "nome": "Portfólio que atrai",
+          "frase": "O cliente certo pede orçamento."
+        },
+        "apresentacao_conduz": {
+          "nome": "Orçamento que convence",
+          "frase": "A conversa sai do preço."
+        }
+      },
+      "ofertas": {
+        "C": {
+          "nome": "Portfólio que atrai",
+          "descricao": "Portfólio organizado (site ou Instagram) para trazer pedidos de orçamento do cliente certo."
+        },
+        "D": {
+          "nome": "Proposta de projeto",
+          "descricao": "Modelo de orçamento e apresentação com processo, referências e cronograma."
+        }
+      }
+    },
+    "educacao": {
+      "pesos": {
+        "A": 1,
+        "B": 1.25,
+        "C": 1.25,
+        "D": 1,
+        "E": 1.25
+      },
+      "links": { "apresentacao": { "exemplos": "folder do curso, tabela de valores ou a mensagem que você manda para quem pede informações" } },
+      "pilares": {
+        "D": {
+          "nome": "Matrícula"
+        }
+      },
+      "perguntas": {
+        "C1": {
+          "pergunta": "Seu Instagram e seu site fazem alguém querer estudar com você?",
+          "opcoes": [
+            "Quase não uso, ou estão desatualizados",
+            "Uso para avisos e divulgação de turmas",
+            "Conteúdo bom, mas que gera poucos interessados",
+            "Conteúdo que atrai alunos e enche turmas"
+          ],
+          "comentario": "Antes de se matricular, o aluno quer sentir como é aprender com você. Conteúdo bom é a aula experimental que trabalha 24 horas."
+        },
+        "D1": {
+          "pergunta": "Quando alguém pede informações sobre o curso, o que acontece?",
+          "opcoes": [
+            "Mando os valores",
+            "Mando um PDF ou folder",
+            "Convido para uma aula experimental ou visita",
+            "Uma jornada pensada: conversa, aula experimental e material que ajuda a decidir"
+          ],
+          "comentario": "Quem pede informação já tem interesse. Mandar só o valor desperdiça esse interesse; uma jornada até a matrícula aproveita."
+        },
+        "D2": {
+          "pergunta": "Na aula experimental (ou visita), o aluno sai querendo se matricular?",
+          "opcoes": [
+            "Não ofereço aula experimental ou visita",
+            "Ofereço, mas poucos se matriculam",
+            "A maioria gosta, mas a matrícula depende de insistir",
+            "A experiência já leva à matrícula"
+          ],
+          "comentario": "A aula experimental é o seu melhor argumento de venda. Quando ela é pensada para isso, a matrícula vem quase sozinha."
+        },
+        "E2": {
+          "pergunta": "Depois que o aluno se matricula, o que acontece?"
+        }
+      },
+      "personas": {
+        "talento_sem_palco": {
+          "frase": "Quem conhece suas aulas gosta. O desafio é transformar interesse em matrícula."
+        }
+      },
+      "selos": {
+        "site_que_vende": {
+          "nome": "Conteúdo que matricula",
+          "frase": "Seu conteúdo enche turmas."
+        },
+        "proposta_sob_medida": {
+          "nome": "Caminho até a matrícula",
+          "frase": "Quem se interessa sabe o próximo passo."
+        },
+        "apresentacao_conduz": {
+          "nome": "Aula que matricula",
+          "frase": "A aula experimental já vende sozinha."
+        }
+      },
+      "ofertas": {
+        "C": {
+          "nome": "Conteúdo que matricula",
+          "descricao": "Pack de artes e linha editorial para o Instagram atrair alunos."
+        },
+        "D": {
+          "nome": "Jornada de matrícula",
+          "descricao": "Do primeiro contato à matrícula: mensagens, material do curso e roteiro da aula experimental."
+        }
+      }
+    },
+    "empresas": {
+      "pesos": {
+        "A": 1.25,
+        "B": 1.25,
+        "C": 0.75,
+        "D": 1.5,
+        "E": 1
+      },
+      "links": { "apresentacao": { "exemplos": "apresentação comercial, proposta ou one-page" } }
+    },
+    "produto": {
+      "pesos": {
+        "A": 1.25,
+        "B": 1,
+        "C": 1.5,
+        "D": 0.75,
+        "E": 1.5
+      },
+      "links": { "apresentacao": { "exemplos": "catálogo, apresentação da marca ou uma página de produto" } },
+      "pilares": {
+        "D": {
+          "nome": "Página de venda"
+        }
+      },
+      "perguntas": {
+        "C1": {
+          "pergunta": "Sua loja online (site, marketplace ou Instagram) vende sem você precisar estar lá?",
+          "opcoes": [
+            "Não vendo online",
+            "Vendo só conversando pelo direct ou pelo WhatsApp",
+            "Tenho loja online, mas vende pouco",
+            "Minha loja online vende com frequência"
+          ],
+          "comentario": "Sua loja online é o vendedor que não dorme. Se ela depende de conversa no direct, você vende só quando está disponível."
+        },
+        "D1": {
+          "pergunta": "Sua página de produto (ou post de venda) mostra por que vale o preço?",
+          "opcoes": [
+            "Foto e preço",
+            "Foto, preço e uma descrição básica",
+            "Boas fotos e uma descrição caprichada",
+            "Fotos, benefícios, provas e dúvidas respondidas"
+          ],
+          "comentario": "Na internet, o cliente não pode tocar no produto. A página precisa fazer esse trabalho: mostrar, provar e responder."
+        },
+        "D2": {
+          "pergunta": "Quando o cliente recebe o produto ou compra na loja, a experiência reforça o valor?",
+          "opcoes": [
+            "Chega numa embalagem qualquer, sem nada especial",
+            "Embalagem boa, mas sem identidade",
+            "Embalagem com a marca e algum cuidado",
+            "Uma experiência pensada, que dá vontade de postar e de comprar de novo"
+          ],
+          "comentario": "A entrega é a primeira vez que o cliente toca na sua marca. Uma boa experiência ali vira foto, recompra e indicação."
+        },
+        "E2": {
+          "pergunta": "Depois da compra, o que acontece?"
+        }
+      },
+      "personas": {
+        "talento_sem_palco": {
+          "frase": "Seu produto é bom. A página e a entrega ainda não mostram isso."
+        }
+      },
+      "selos": {
+        "site_que_vende": {
+          "nome": "Loja que vende sozinha",
+          "frase": "Vende mesmo quando você não está online."
+        },
+        "proposta_sob_medida": {
+          "nome": "Página que vende",
+          "frase": "Sua página mostra por que vale o preço."
+        },
+        "apresentacao_conduz": {
+          "nome": "Entrega de marca",
+          "frase": "Dá vontade de postar e comprar de novo."
+        }
+      },
+      "ofertas": {
+        "C": {
+          "nome": "Loja que vende",
+          "descricao": "Ajuste da loja online e das páginas principais para vender sem depender do direct."
+        },
+        "D": {
+          "nome": "Página de produto e embalagem",
+          "descricao": "Página de produto que mostra o valor e uma experiência de entrega com a marca."
+        }
+      }
+    },
+    "outro": {
+      "pesos": {
+        "A": 1,
+        "B": 1,
+        "C": 1,
+        "D": 1,
+        "E": 1
+      }
+    }
+  },
+
+  "pontuacao": {
+    "nota_pilar": "soma dos pontos do pilar / máximo do pilar * 100, arredondado",
+    "nota_geral": "média simples das 5 notas de pilar, arredondada",
+    "faixas": [
+      { "min": 0, "max": 29, "nome": "Marca em construção" },
+      { "min": 30, "max": 54, "nome": "Marca com espaço para crescer" },
+      { "min": 55, "max": 74, "nome": "Marca em ajuste fino" },
+      { "min": 75, "max": 100, "nome": "Marca estruturada" }
+    ],
+    "regras_persona": [
+      "1. nota_geral < 30 → ainda_no_comeco",
+      "2. nota_geral >= 75 e nenhum pilar < 50 → marca_estruturada",
+      "3. senão → persona do pilar com menor nota; em empate, prioridade A, D, B, C, E"
+    ],
+    "persona_por_pilar": { "A": "joia_escondida", "B": "mensagem_difusa", "C": "loja_sem_vitrine", "D": "talento_sem_palco", "E": "jornada_no_improviso" },
+    "modificadores": {
+      "em_transicao": "Ativo se A2 = opção com modificador em_transicao OU objetivo = nao_representa. Acrescenta: 'Sua empresa mudou, e a marca ainda conta a história antiga.'",
+      "segundo_ponto_fraco": "Ativo se outro pilar (além do mais fraco) tiver nota < 40. Acrescenta: 'Depois disso, vale olhar para {nome do pilar}.'"
+    }
+  },
+
+  "personas": {
+    "joia_escondida": { "nome": "Joia escondida", "frase": "Seu produto vale mais do que a sua marca mostra.", "oferta": "Identidade visual ou reposicionamento", "prioridade": "alta" },
+    "talento_sem_palco": { "nome": "Talento sem palco", "frase": "Você vende bem pessoalmente. O problema é quando você não está na sala.", "oferta": "Apresentação comercial", "prioridade": "alta" },
+    "mensagem_difusa": { "nome": "Mensagem difusa", "frase": "Todo mundo gosta do seu trabalho. Pouca gente sabe explicar o que você faz.", "oferta": "Reposicionamento e mensagem", "prioridade": "media" },
+    "loja_sem_vitrine": { "nome": "Loja sem vitrine", "frase": "Seu negócio é melhor do que aparece na internet.", "oferta": "Site ou landing page", "prioridade": "media" },
+    "jornada_no_improviso": { "nome": "Jornada no improviso", "frase": "Seu cliente gosta do resultado, mas o caminho até ele depende de sorte.", "oferta": "Experiência de compra", "prioridade": "media" },
+    "marca_estruturada": { "nome": "Marca estruturada", "frase": "Sua marca está à altura do seu negócio. O próximo nível está nos detalhes.", "oferta": "Projeto pontual ou acompanhamento", "prioridade": "baixa" },
+    "ainda_no_comeco": { "nome": "Ainda no começo", "frase": "Você está construindo a base. Vamos te ajudar a fazer isso do jeito certo.", "oferta": "Conteúdo, sem oferta direta", "prioridade": "nutrir" }
+  },
+
+  "selos": {
+    "_regras": "resposta: pontos da pergunta >= min_pontos | pilar: nota do pilar >= min_nota (pilar completo) | geral: nenhum_pilar_abaixo ou nota_geral_min (diagnóstico completo)",
+    "lista": [
+      {"id": "preco_de_respeito", "icone": "💎", "nome": "Preço de respeito", "frase": "Quem vê sua marca já imagina o valor certo.", "regra": {"tipo": "resposta", "pergunta": "A1", "min_pontos": 3}},
+      {"id": "marca_em_dia", "icone": "✨", "nome": "Marca em dia", "frase": "A identidade acompanha o momento da empresa.", "regra": {"tipo": "resposta", "pergunta": "A2", "min_pontos": 3}},
+      {"id": "blindado_desconto", "icone": "🛡️", "nome": "Blindado contra desconto", "frase": "A conversa não gira em torno do preço.", "regra": {"tipo": "resposta", "pergunta": "A3", "min_pontos": 3}},
+      {"id": "frase_de_bolso", "icone": "🗣️", "nome": "Frase de bolso", "frase": "Seus clientes sabem explicar o que você faz.", "regra": {"tipo": "resposta", "pergunta": "B1", "min_pontos": 2}},
+      {"id": "fala_do_depois", "icone": "🎯", "nome": "Fala do depois", "frase": "Você vende o resultado, não o serviço.", "regra": {"tipo": "resposta", "pergunta": "B2", "min_pontos": 3}},
+      {"id": "site_que_vende", "icone": "🧲", "nome": "Site que vende", "frase": "Seu site trabalha enquanto você dorme.", "regra": {"tipo": "resposta", "pergunta": "C1", "min_pontos": 3}},
+      {"id": "mesma_voz", "icone": "🔗", "nome": "Mesma voz em todo canal", "frase": "Site e Instagram contam a mesma história.", "regra": {"tipo": "resposta", "pergunta": "C2", "min_pontos": 3}},
+      {"id": "proposta_sob_medida", "icone": "✂️", "nome": "Proposta sob medida", "frase": "Cada cliente recebe uma proposta só dele.", "regra": {"tipo": "resposta", "pergunta": "D1", "min_pontos": 3}},
+      {"id": "apresentacao_conduz", "icone": "🎤", "nome": "Apresentação que conduz", "frase": "Seu material vende até quando é repassado.", "regra": {"tipo": "resposta", "pergunta": "D2", "min_pontos": 3}},
+      {"id": "caminho_no_trilho", "icone": "🧭", "nome": "Caminho no trilho", "frase": "Do primeiro contato ao fechamento, ninguém se perde.", "regra": {"tipo": "resposta", "pergunta": "E1", "min_pontos": 2}},
+      {"id": "boas_vindas", "icone": "🎁", "nome": "Boas-vindas de verdade", "frase": "O cliente fecha e já sente que acertou.", "regra": {"tipo": "resposta", "pergunta": "E2", "min_pontos": 2}},
+      {"id": "demanda_sob_controle", "icone": "📈", "nome": "Demanda sob controle", "frase": "Você sabe de onde vem o próximo cliente.", "regra": {"tipo": "resposta", "pergunta": "E3", "min_pontos": 3}},
+      {"id": "joia_a_mostra", "icone": "💍", "nome": "Joia à mostra", "frase": "Seu valor aparece antes do preço.", "regra": {"tipo": "pilar", "pilar": "A", "min_nota": 100}},
+      {"id": "mensagem_cristalina", "icone": "💡", "nome": "Mensagem cristalina", "frase": "Todo mundo entende, e todo mundo indica.", "regra": {"tipo": "pilar", "pilar": "B", "min_nota": 100}},
+      {"id": "vitrine_acesa", "icone": "🏬", "nome": "Vitrine acesa", "frase": "Seu negócio aparece tão bem quanto é.", "regra": {"tipo": "pilar", "pilar": "C", "min_nota": 100}},
+      {"id": "dono_do_palco", "icone": "🎭", "nome": "Dono do palco", "frase": "Você vende até quando não está na sala.", "regra": {"tipo": "pilar", "pilar": "D", "min_nota": 100}},
+      {"id": "jornada_de_primeira", "icone": "🛤️", "nome": "Jornada de primeira", "frase": "O caminho até o resultado é tão bom quanto ele.", "regra": {"tipo": "pilar", "pilar": "E", "min_nota": 100}},
+      {"id": "sem_ponto_cego", "icone": "🧱", "nome": "Sem ponto cego", "frase": "Nenhum pilar ficou para trás.", "regra": {"tipo": "geral", "nenhum_pilar_abaixo": 50}},
+      {"id": "marca_a_altura", "icone": "🏆", "nome": "Marca à altura", "frase": "Sua marca está à altura do que você entrega.", "regra": {"tipo": "geral", "nota_geral_min": 75}}
+    ]
+  },
+
+  "ofertas_entrada": {
+    "_nota": "Serviço de entrada sugerido para o retorno (não aparece na página, vai para a planilha). Regra: pilar mais fraco → oferta do pilar; 'Ainda no começo' → oferta própria; 'Marca estruturada' → oferta do pilar mais fraco, como refinamento. Segundo ponto fraco vira complemento.",
+    "por_pilar": {
+      "A": { "nome": "Revisão de pontos de contato", "descricao": "Ajuste da proposta, do perfil e dos materiais que mais pesam na percepção de preço." },
+      "B": { "nome": "Workshop de mensagem", "descricao": "Um encontro para definir a frase, para quem é e o tom da marca, entregue como guia." },
+      "C": {
+        "_nota": "Escolhe pela pergunta mais fraca do pilar (empate: a primeira).",
+        "por_pergunta_mais_fraca": {
+          "C1": { "nome": "Landing page", "descricao": "Uma página feita para gerar contato, com bio e destaques do Instagram alinhados a ela." },
+          "C2": { "nome": "Pack de artes para o Instagram", "descricao": "Modelos de post editáveis, capas de destaque e bio alinhados ao site e ao posicionamento da marca." }
+        }
+      },
+      "D": { "nome": "Apresentação comercial essencial", "descricao": "Apresentação e modelo de proposta para vender mesmo quando você não está na sala." },
+      "E": { "nome": "Kit de jornada", "descricao": "Mapa da jornada do cliente e materiais de boas-vindas e próximos passos." }
+    },
+    "ainda_no_comeco": { "nome": "Kit essencial de marca", "descricao": "Base visual e mensagem simples para começar do jeito certo." },
+    "prefixo_estruturada": "Refinamento: ",
+    "nota_em_transicao": "A empresa mudou e a marca ficou para trás: alinhar o posicionamento antes (ou junto) da peça, para não produzir material novo contando a história antiga."
+  },
+
+  "encerramento": {
+    "fala_pos_resultado": "Essa é a sua marca vista por você. Agora falta a outra metade: como ela é vista de fora.",
+    "links": [
+      { "id": "site", "tipo": "texto", "rotulo": "Site", "obrigatorio": false, "nao_tenho": "Não tenho", "nao_tenho_resposta": "Não tenho site" },
+      { "id": "instagram", "tipo": "texto", "rotulo": "@ do Instagram", "obrigatorio": true, "nao_tenho": "Não tenho", "nao_tenho_resposta": "Não tenho Instagram" },
+      {
+        "id": "apresentacao", "tipo": "arquivo", "rotulo": "Material que você usa para vender", "obrigatorio": false,
+        "exemplos": "apresentação, proposta, orçamento, catálogo ou a mensagem que você manda no WhatsApp",
+        "nao_tenho": "Não tenho", "nao_tenho_resposta": "Não tenho material de venda",
+        "arraste": "Arraste o arquivo aqui",
+        "buscar": "Buscar arquivos",
+        "abrir_arquivo": "Enviar arquivo",
+        "arraste_celular": "Envie o arquivo",
+        "formatos": "PDF, PowerPoint, Keynote, Word ou imagem, até 15 MB",
+        "aceita": ".pdf,.ppt,.pptx,.key,.doc,.docx,.odp,.odt,.png,.jpg,.jpeg,.webp",
+        "max_mb": 15,
+        "ou_link": "Cole aqui um link ou um texto (ex.: a mensagem que você manda para quem pede preço)"
+      },
+      {
+        "id": "referencias", "tipo": "lista", "rotulo": "Concorrentes ou marcas que você admira no seu setor", "obrigatorio": false,
+        "placeholder": "Nome do concorrente {n}",
+        "campos_iniciais": 1,
+        "maximo": 5,
+        "adicionar": "Adicionar outro"
+      }
+    ],
+    "contato": ["email", "whatsapp"],
+    "promessa_qualificado": "Vou olhar sua marca de fora e comparar com o que você respondeu. Em breve eu te conto o que encontrei.",
+    "promessa_nao_qualificado": "Você recebe por e-mail a análise completa de cada pilar."
+  },
+
+  "resultado": {
+    "_nota": "Página de resultado que o cliente recebe depois da sua análise (diagnostico/resultado/?t=...). Textos por pilar valem para nota baixa (até 39), média (40 a 69) e alta (70+).",
+    "titulo": "Diagnóstico de marca",
+    "chapeu_persona": "Sua persona",
+    "secao_pilares": "Pilares",
+    "secao_selos": "Selos",
+    "secao_analise": "O que eu vi de fora",
+    "secao_quadro": "Resumo",
+    "quadro_forcas": "O que já funciona",
+    "quadro_melhorar": "Onde dá para crescer",
+    "quadro_oportunidade": "Por onde eu começaria",
+    "quadro_proximo": "Próximo passo",
+    "proximo_texto": "Se fizer sentido, a gente conversa sobre como colocar isso em prática na sua marca.",
+    "botao_conversar": "Quero conversar sobre isso",
+    "mensagem_whatsapp": "Oi, Thomás! Vi minha devolutiva do diagnóstico de marca e quero conversar.",
+    "whatsapp_lastlab": "5515991295541",
+    "botao_stories": "Baixar imagem para os stories",
+    "stories_rodape": "Esse foi o diagnóstico da minha marca. Faça o seu:",
+    "stories_link": "lastlab.com.br/diagnostico",
+    "nao_encontrado": "Esse link não existe ou ainda não foi publicado.",
+    "carregando": "Carregando sua devolutiva…",
+    "pilares_textos": {
+      "A": [
+        "Hoje a marca sugere um valor menor do que você entrega. Isso aparece na negociação: o cliente pede desconto antes de entender o que está comprando.",
+        "A marca já sustenta parte do seu preço, mas ainda deixa espaço para comparação. Alguns ajustes de posicionamento fazem a conversa sair do preço.",
+        "Sua marca carrega o valor antes de você falar. O cliente chega preparado para o preço, e isso é raro."
+      ],
+      "B": [
+        "Quem conhece seu trabalho gosta, mas tem dificuldade de explicar o que você faz. Sem uma frase clara, a indicação perde força no caminho.",
+        "A mensagem existe, mas ainda fala mais do que você faz do que do resultado do cliente. Afinar isso deixa a marca mais fácil de indicar.",
+        "Sua mensagem é clara e específica. Os clientes repetem o que você diz, e é assim que uma marca cresce por indicação."
+      ],
+      "C": [
+        "Na internet, seu negócio parece menor do que é. Para quem pesquisa antes de falar com você, isso pesa na decisão.",
+        "Sua presença digital apresenta bem a empresa, mas ainda trabalha pouco por você. Site e Instagram podem gerar mais contatos e contar a mesma história.",
+        "Site e redes trabalham juntos e geram contatos. Sua vitrine está acesa."
+      ],
+      "D": [
+        "A proposta é o momento em que o cliente decide se você vale o preço, e hoje ela chega como um orçamento. Uma boa apresentação muda a comparação.",
+        "Você já usa apresentação, mas ela ainda é genérica. Feita para cada cliente, ela conduz a conversa e continua vendendo quando é repassada.",
+        "Sua apresentação conduz a venda e reforça o valor, até quando você não está na sala."
+      ],
+      "E": [
+        "O cliente gosta do resultado, mas o caminho até ele muda a cada venda. Uma jornada desenhada faz o serviço parecer mais seguro antes da compra.",
+        "Existem etapas, mas a experiência ainda depende de quem atende. Materiais em cada etapa deixam o processo previsível e geram indicação.",
+        "Do primeiro contato ao pós-venda, seu cliente sabe o que esperar. Isso transforma clientes em indicações."
+      ]
+    }
+  },
+
+  "interface": {
+    "_nota": "Textos de interface (botões, avisos, rótulos). Não fazem parte do conteúdo do diagnóstico e podem ser editados livremente.",
+    "painel_titulo": "Diagnóstico de marca",
+    "painel_rotulo": "Last Lab",
+    "painel_campos": { "nome": "Nome", "cargo": "Cargo", "segmento": "Segmento", "objetivo": "Objetivo" },
+    "painel_persona_vazia": "Sua persona aparece aqui quando você terminar de responder.",
+    "painel_pilares": "Pilares",
+    "painel_selos": "Selos",
+    "selo_desbloqueado": "Selo desbloqueado",
+    "painel_nota_geral": "Nota geral",
+    "painel_ponto_fraco": "Ponto a melhorar",
+    "aviso_pilar": "{pilar} ✓ {n} de {total}",
+    "inicio_diagnostico": "Obrigado, {nome}. Agora são 12 perguntas sobre a sua marca, em 5 pilares. Responda pensando em como as coisas são hoje, não em como gostaria que fossem.",
+    "resultado_pronto": "Pronto, {nome}. Aqui está o seu resultado.",
+    "resultado_persona": "Sua persona",
+    "links_pedido": "Me mande os links da sua marca:",
+    "etapa_1_curto": "Vista por você",
+    "etapa_2_curto": "Vista de fora",
+    "etapa_1_rotulo": "Parte 1 de 2",
+    "etapa_1_titulo": "Sua marca vista por você",
+    "etapa_1_texto": "12 perguntas rápidas sobre como a sua marca funciona hoje.",
+    "etapa_2_rotulo": "Parte 2 de 2",
+    "etapa_2_titulo": "Sua marca vista de fora",
+    "etapa_2_texto": "Agora é a minha vez: com os seus links, eu olho a sua marca como um cliente olharia.",
+    "links_botao": "Enviar",
+    "links_nao_tem": "não tem",
+    "arquivo_enviando": "Enviando arquivo…",
+    "arquivo_erro": "Não consegui enviar o arquivo. Tente de novo ou cole um link.",
+    "arquivo_grande": "Arquivo maior que {max} MB. Tente um PDF mais leve ou cole um link.",
+    "arquivo_remover": "Remover",
+    "contato_pedido": "Para onde eu mando?",
+    "contato_email": "E-mail",
+    "contato_whatsapp": "WhatsApp",
+    "contato_consentimento": "Concordo em receber a análise e outros contatos da Last Lab, conforme a",
+    "contato_politica": "política de privacidade",
+    "contato_politica_url": "https://www.lastlab.com.br/privacidade",
+    "contato_botao": "Receber minha análise",
+    "contato_enviando": "Enviando…",
+    "contato_erro": "Não consegui enviar. Confira sua conexão e tente de novo.",
+    "erro_email": "Confira o e-mail: parece que falta alguma coisa (ex.: nome@empresa.com.br).",
+    "erro_whatsapp": "Confira o WhatsApp: use DDD + número, como (11) 98765-4321.",
+    "erro_aceite": "Para receber a análise, marque que você concorda.",
+    "erro_obrigatorio": "Preencha este campo ou marque “Não tenho”.",
+    "erro_arquivo_enviando": "Espere o arquivo terminar de enviar.",
+    "confirmacao": "Recebido, {nome}! Enquanto isso, dá uma olhada em alguns projetos da Last Lab.",
+    "portfolio_rotulo": "Ver portfólio da Last Lab",
+    "portfolio_url": "https://www.lastlab.com.br/",
+    "digite_aqui": "Digite aqui",
+    "enviar": "Enviar",
+    "editar": "Editar resposta",
+    "cancelar": "Cancelar",
+    "recomecar": "Recomeçar",
+    "ver_painel": "Ver resultado",
+    "resumo_titulo": "Diagnóstico de Marca",
+    "resumo_definindo": "Definindo persona",
+    "fechar_painel": "Fechar"
+  },
+
+  "qualificacao": {
+    "regra": "qualificado = cargo == dono E faturamento NOT IN [ate_30k] E ticket != ate_500 E objetivo != curiosidade",
+    "observacao": "Faturamento 'nao_informado' conta como qualificado. Critério provisório, ajustar com os dados dos primeiros testes."
+  }
+}
