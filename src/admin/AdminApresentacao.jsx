@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, Play, FileDown, ImagePlus, X } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
-import { CUSTO_PADRAO, MOMENTOS, ofertaDoLead } from "./catalogoOfertas";
+import { CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 import "./apresentacao.css";
 
 // Apresentação da reunião do diagnóstico (/admin/diagnosticos/:id/apresentar). Os dados do lead
@@ -38,7 +38,18 @@ export default function AdminApresentacao() {
       .then((d) => {
         setItem(d);
         const a = d.apresentacao || {};
-        setAp({ ...a, observacoes: a.observacoes?.length ? a.observacoes : VAZIO3() });
+        // ainda não editado: começa com as observações pensadas para o serviço que vamos oferecer
+        const visao = VISAO_PADRAO[ofertaDoLead(d).servicoId];
+        // o que você já escreveu fica; só os campos vazios recebem a sugestão
+        const salvas = a.observacoes?.length ? a.observacoes : VAZIO3();
+        setAp({
+          ...a,
+          visaoTitulo: a.visaoTitulo || visao?.titulo || "",
+          observacoes: salvas.map((o, i) => {
+            const base = visao?.observacoes[i];
+            return base && !o.titulo && !o.texto ? { ...o, titulo: base.titulo, texto: base.texto } : o;
+          }),
+        });
       })
       .catch((e) => setErro(e.message || "Não consegui carregar o lead."));
   }, [sessao, id]);
