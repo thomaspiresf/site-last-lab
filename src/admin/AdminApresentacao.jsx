@@ -1089,7 +1089,8 @@ function frase(texto = "", palavra) {
 }
 
 /** O resumo de um caso, a partir dos textos do site (projects.js). */
-export function resumoDoCaso(p) {
+/** `servico`: as fotos do caso são escolhidas por serviço (servico.fotosCasos[id do projeto]). */
+export function resumoDoCaso(p, servico) {
   const ps = p.expandDetails?.paragraphs?.length ? p.expandDetails.paragraphs : [p.description || p.subtitle || ""];
   const editado = CASOS_TEXTOS[p.id] || {};
   return {
@@ -1098,7 +1099,7 @@ export function resumoDoCaso(p) {
     resultado: editado.resultado || frase(ps[ps.length - 1]),
     setor: [p.expandDetails?.sector, p.expandDetails?.year].filter(Boolean).join(" · "),
     imagens: [p.bannerImage || p.coverImage, ...(p.topGrid || []), ...(p.expandDetails?.expandImages || [])].filter(Boolean).filter((x, k, a) => a.indexOf(x) === k).slice(0, 3),
-    escolhidas: editado.imagens?.length ? editado.imagens : null, // fotos escolhidas em Produtos e serviços (1ª = grande)
+    escolhidas: servico?.fotosCasos?.[p.id]?.length ? servico.fotosCasos[p.id] : null, // fotos escolhidas para este serviço (1ª = grande)
   };
 }
 
@@ -1107,7 +1108,7 @@ function Caso({ d, escala, n }) {
   const p = d.casos[n];
   const [proporcao, setProporcao] = useState(2);
   if (!p) return <Slide livre escala={escala} d={d}><Cabeca t={tx("casos", "titulo")} sub="Escolha os casos no painel." /></Slide>;
-  const c = resumoDoCaso(p);
+  const c = resumoDoCaso(p, d.oferta.servico);
   const [grande, ...outras] = c.escolhidas || (c.imagens.length ? c.imagens : [p.coverImage]);
   const menores = c.escolhidas
     ? outras.slice(0, 3)

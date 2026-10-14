@@ -552,8 +552,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     comeco: [B.promessa, B.projeto, B.continuidade],
     oferta: [B.nome, B.promessa],
     antesdepois: [B.depois, fixo("O lado \"Antes\" usa os títulos das observações da Visão externa.")],
-    casos: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[0]} />],
-    casos2: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[1]} />],
+    casos: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[0]} s={s} setServ={(k, v) => setServ(id, k, v)} />],
+    casos2: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[1]} s={s} setServ={(k, v) => setServ(id, k, v)} />],
     entrega: [B.promessa, B.entregas, B.exemplo],
     produto: [B.exemplo],
     sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
@@ -644,14 +644,14 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
   );
 }
 
-/** Escolha das fotos do caso entre as do projeto no site: clique na ordem (1ª = grande, até 4). */
-function FotosDoCaso({ p, escolhidas, onChange }) {
+/** Escolha das fotos do caso para este serviço, entre as do projeto no site: clique na ordem (1ª = grande, até 4). */
+function FotosDoCaso({ p, servico, escolhidas, onChange }) {
   const todas = imagensDoProjeto(p);
   const alternar = (src) => onChange(escolhidas.includes(src) ? escolhidas.filter((x) => x !== src) : escolhidas.length < 4 ? [...escolhidas, src] : escolhidas);
   return (
     <div className="flex flex-col gap-2 border-t border-zinc-200 pt-3">
       <div className="flex items-center justify-between gap-2">
-        <span className={rotulo}>Fotos do slide</span>
+        <span className={rotulo}>Fotos do slide <span className="normal-case tracking-normal font-normal text-zinc-400">· só em {servico}</span></span>
         {escolhidas.length > 0 && <button onClick={() => onChange([])} className="text-[11px] font-semibold text-zinc-500 hover:text-black">Automático</button>}
       </div>
       <p className="text-[11px] text-zinc-400 -mt-1">Clique na ordem: a 1ª é a grande, as próximas 3 vão embaixo. {escolhidas.length ? `${escolhidas.length} de 4.` : "Nenhuma escolhida: o slide escolhe sozinho."}</p>
@@ -672,7 +672,7 @@ function FotosDoCaso({ p, escolhidas, onChange }) {
 }
 
 /** Os três textos de um caso: vêm do site; aqui dá para reescrever (vale em todas as apresentações). */
-function TextosDoCaso({ r, set, pid }) {
+function TextosDoCaso({ r, set, pid, s, setServ }) {
   const p = projects.find((x) => x.id === pid);
   if (!p) return <p className="text-xs text-zinc-400">Marque os casos acima. Os 2 primeiros viram os slides Caso 1 e Caso 2.</p>;
   const editado = r.casosTextos?.[pid] || {};
@@ -680,7 +680,7 @@ function TextosDoCaso({ r, set, pid }) {
   const mudar = (k, v) => set("casosTextos", pid, { ...editado, [k]: v });
   return (
     <div className="flex flex-col gap-2.5 rounded-xl border border-zinc-200 bg-zinc-50/60 p-3.5">
-      <p className="text-xs font-semibold text-zinc-700">Textos do caso {p.title} <span className="font-normal text-zinc-400">· vazio = o texto do site</span></p>
+      <p className="text-xs font-semibold text-zinc-700">Textos do caso {p.title} <span className="font-normal text-zinc-400">· valem para todos os serviços; vazio = o texto do site</span></p>
       {[["desafio", "O desafio"], ["fizemos", "O que fizemos"], ["resultado", "Resultado"]].map(([k, rot]) => (
         <label key={k} className="block">
           <span className={rotulo}>{rot}</span>
@@ -688,7 +688,7 @@ function TextosDoCaso({ r, set, pid }) {
         </label>
       ))}
       <p className="text-[11px] text-zinc-400">Até ~190 caracteres por texto.</p>
-      <FotosDoCaso p={p} escolhidas={editado.imagens || []} onChange={(lista) => mudar("imagens", lista)} />
+      <FotosDoCaso p={p} servico={s.nome} escolhidas={s.fotosCasos?.[pid] || []} onChange={(lista) => setServ("fotosCasos", { ...(s.fotosCasos || {}), [pid]: lista })} />
     </div>
   );
 }
