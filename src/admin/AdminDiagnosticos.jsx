@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
+import { AREAS } from "./catalogoOfertas";
+import { carregarCatalogo } from "./carregarCatalogo";
 import {
   listDiagnosticos,
   updateDiagnostico,
@@ -702,8 +704,14 @@ function EditorOferta({ item, dev, onFechar, onSalvo }) {
   const [modoC, setModoC] = useState("");
 
   useEffect(() => {
-    getCatalogoOfertas()
-      .then((lista) => {
+    // além das ofertas de entrada do diagnóstico, os projetos (degrau 2) e premium (degrau 3) de cada área
+    Promise.all([getCatalogoOfertas(), carregarCatalogo()])
+      .then(([base]) => {
+        const degraus = Object.values(AREAS).flatMap((a) => [
+          { nome: a.principal.nome, descricao: a.principal.pitch || a.principal.entregas, grupo: "Projeto (degrau 2)" },
+          { nome: a.premium.nome, descricao: a.premium.pitch || a.premium.entregas, grupo: "Premium (degrau 3)" },
+        ]);
+        const lista = [...base, ...degraus.filter((x) => !base.some((b) => b.nome === x.nome))];
         setCatalogo(lista);
         const acha = (o) => (o ? (lista.some((x) => x.nome === o.nome) ? o.nome : OUTRA) : NENHUM);
         setModoP(acha(atual.principal));
@@ -748,7 +756,14 @@ function EditorOferta({ item, dev, onFechar, onSalvo }) {
           <div>
             <label className="text-xs font-semibold text-zinc-500">Oferta principal</label>
             <select value={modoP} onChange={(e) => escolherP(e.target.value)} className={`${campo} border border-zinc-200 mt-1`}>
-              {catalogo.map((o) => <option key={o.nome} value={o.nome}>{o.nome}</option>)}
+              <optgroup label="Entrada (sugeridas pelo diagnóstico)">
+                {catalogo.filter((o) => !o.grupo).map((o) => <option key={o.nome} value={o.nome}>{o.nome}</option>)}
+              </optgroup>
+              {["Projeto (degrau 2)", "Premium (degrau 3)"].map((g) => (
+                <optgroup key={g} label={g}>
+                  {catalogo.filter((o) => o.grupo === g).map((o) => <option key={o.nome} value={o.nome}>{o.nome}</option>)}
+                </optgroup>
+              ))}
               <option value={OUTRA}>Outra (escrever)</option>
             </select>
           </div>

@@ -153,6 +153,719 @@ export const SERVICOS = {
     investimento: null,
     ajustes: "1 rodada",
   },
+  // ---------- degraus 2 e 3 (principal e premium de cada área) ----------
+  // nome, valor, prazo e texto comercial vêm da área (AREAS[x].principal / .premium)
+  clareza_principal: {
+    "degrau": "principal",
+    "etapas": [
+      {
+        "nome": "Imersão",
+        "texto": "2 sessões com você e a equipe",
+        "dias": 3,
+        "cliente": "Participar das 2 sessões",
+        "aprovacao": false
+      },
+      {
+        "nome": "Pesquisa",
+        "texto": "Concorrentes e público",
+        "dias": 4,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Plataforma de marca",
+        "texto": "Propósito, proposta de valor e personalidade",
+        "dias": 5,
+        "cliente": "Aprovar a plataforma",
+        "aprovacao": true
+      },
+      {
+        "nome": "Textos",
+        "texto": "Site e apresentação",
+        "dias": 4,
+        "cliente": "Aprovar os textos",
+        "aprovacao": true
+      },
+      {
+        "nome": "Ajuste",
+        "texto": "2 rodadas",
+        "dias": 2,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "slides",
+    "depois": [
+      "Uma marca com um lugar claro no mercado",
+      "Todo mundo da equipe falando a mesma língua",
+      "Textos prontos que vendem em cada canal"
+    ],
+    "promessa": "Uma marca com lugar claro no mercado e as palavras certas em cada canal.",
+    "fechamento": "Vamos dar à sua marca **um lugar só dela?**",
+    "entregas": [
+      "2 sessões de imersão com você e a equipe",
+      "Análise de 5 concorrentes e do seu público",
+      "Plataforma de marca: propósito, proposta de valor, público e personalidade",
+      "Guia de tom de voz completo e manifesto",
+      "Textos do site e da apresentação"
+    ],
+    "naoInclui": "identidade visual e produção de conteúdo",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  clareza_premium: {
+    "degrau": "premium",
+    "etapas": [
+      {
+        "nome": "Imersão",
+        "texto": "Sessões com sócios e equipe",
+        "dias": 4,
+        "cliente": "Reunir sócios e equipe",
+        "aprovacao": false
+      },
+      {
+        "nome": "Pesquisa",
+        "texto": "Concorrentes e entrevistas com clientes",
+        "dias": 6,
+        "cliente": "Indicar clientes para entrevistar",
+        "aprovacao": false
+      },
+      {
+        "nome": "Plataforma de marca",
+        "texto": "Propósito, proposta de valor e personalidade",
+        "dias": 6,
+        "cliente": "Aprovar a plataforma",
+        "aprovacao": true
+      },
+      {
+        "nome": "Arquitetura e naming",
+        "texto": "Linhas de serviço e nomes",
+        "dias": 6,
+        "cliente": "Aprovar a arquitetura e os nomes",
+        "aprovacao": true
+      },
+      {
+        "nome": "Textos e apresentação",
+        "texto": "Para a equipe e para o mercado",
+        "dias": 5,
+        "cliente": "Aprovar os textos",
+        "aprovacao": true
+      },
+      {
+        "nome": "Ajuste",
+        "texto": "2 rodadas",
+        "dias": 3,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "slides",
+    "depois": [
+      "Uma marca organizada do topo às linhas de serviço",
+      "Nomes e mensagens que fazem sentido juntos",
+      "Uma equipe inteira contando a mesma história"
+    ],
+    "promessa": "Uma marca organizada do topo às linhas de serviço, pronta para crescer.",
+    "fechamento": "Vamos organizar a sua marca **para crescer sem se perder?**",
+    "entregas": [
+      "Tudo do Posicionamento de marca",
+      "Entrevistas com clientes",
+      "Arquitetura das linhas de serviço ou submarcas",
+      "Naming quando precisar",
+      "Apresentação da marca para a equipe"
+    ],
+    "naoInclui": "identidade visual e produção de conteúdo",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  valor_principal: {
+    "degrau": "principal",
+    "etapas": [
+      {
+        "nome": "Briefing",
+        "texto": "Reunião e referências",
+        "dias": 2,
+        "cliente": "Responder o briefing e enviar referências",
+        "aprovacao": false
+      },
+      {
+        "nome": "Conceito",
+        "texto": "Caminho criativo apresentado em reunião",
+        "dias": 6,
+        "cliente": "Aprovar o conceito",
+        "aprovacao": true
+      },
+      {
+        "nome": "Identidade",
+        "texto": "Logo, cores, tipografia e grafismos",
+        "dias": 7,
+        "cliente": "Aprovar a identidade",
+        "aprovacao": true
+      },
+      {
+        "nome": "Aplicações",
+        "texto": "Papelaria e kit para redes",
+        "dias": 5,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Manual",
+        "texto": "Regras de uso da marca",
+        "dias": 3,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Ajuste",
+        "texto": "2 rodadas",
+        "dias": 3,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "marca",
+    "depois": [
+      "Uma marca que mostra o valor do seu trabalho",
+      "Tudo com a mesma cara, do cartão ao Instagram",
+      "Um manual para qualquer pessoa aplicar certo"
+    ],
+    "promessa": "Uma identidade que mostra o valor antes do preço.",
+    "fechamento": "Vamos criar a marca **que o seu trabalho merece?**",
+    "entregas": [
+      "Conceito criativo apresentado em reunião",
+      "Logo e variações",
+      "Sistema visual: cores, tipografia, grafismos e fotografia",
+      "Manual de marca",
+      "Papelaria e kit para redes sociais"
+    ],
+    "naoInclui": "site, fotos e produção de conteúdo",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  valor_premium: {
+    "degrau": "premium",
+    "etapas": [
+      {
+        "nome": "Imersão",
+        "texto": "Sessões com sócios e equipe",
+        "dias": 4,
+        "cliente": "Reunir sócios e equipe",
+        "aprovacao": false
+      },
+      {
+        "nome": "Posicionamento",
+        "texto": "Estratégia e mensagem",
+        "dias": 10,
+        "cliente": "Aprovar o posicionamento",
+        "aprovacao": true
+      },
+      {
+        "nome": "Identidade",
+        "texto": "Conceito, logo e sistema visual",
+        "dias": 15,
+        "cliente": "Aprovar a identidade",
+        "aprovacao": true
+      },
+      {
+        "nome": "Aplicações",
+        "texto": "Papelaria, redes, apresentação e sinalização",
+        "dias": 8,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Lançamento",
+        "texto": "Plano para apresentar a nova marca",
+        "dias": 5,
+        "cliente": "Aprovar o plano de lançamento",
+        "aprovacao": true
+      },
+      {
+        "nome": "Ajuste",
+        "texto": "2 rodadas",
+        "dias": 3,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "marca",
+    "depois": [
+      "Uma marca nova à altura de onde a empresa chegou",
+      "Estratégia e visual contando a mesma história",
+      "Um lançamento que faz o mercado notar a mudança"
+    ],
+    "promessa": "A marca inteira renovada, da estratégia ao lançamento.",
+    "fechamento": "Vamos **reinventar a sua marca** do jeito certo?",
+    "entregas": [
+      "Posicionamento completo",
+      "Identidade visual nova",
+      "Aplicações principais: papelaria, redes, apresentação e sinalização",
+      "Plano de lançamento da nova marca"
+    ],
+    "naoInclui": "site, fotos e produção de conteúdo",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  site_principal: {
+    "degrau": "principal",
+    "etapas": [
+      {
+        "nome": "Briefing",
+        "texto": "Reunião, fotos e textos",
+        "dias": 2,
+        "cliente": "Enviar fotos, textos e acessos",
+        "aprovacao": false
+      },
+      {
+        "nome": "Arquitetura e textos",
+        "texto": "Páginas e conteúdo para aprovar",
+        "dias": 6,
+        "cliente": "Aprovar os textos",
+        "aprovacao": true
+      },
+      {
+        "nome": "Design",
+        "texto": "Layout de todas as páginas",
+        "dias": 8,
+        "cliente": "Aprovar o design",
+        "aprovacao": true
+      },
+      {
+        "nome": "Desenvolvimento",
+        "texto": "Site no ar, com SEO e painel",
+        "dias": 7,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Ajuste e treinamento",
+        "texto": "2 rodadas e 1 hora de treinamento",
+        "dias": 3,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "pagina",
+    "depois": [
+      "Um site que trabalha por você 24 horas",
+      "Encontrado no Google por quem procura o que você faz",
+      "Fácil de atualizar, sem depender de ninguém"
+    ],
+    "promessa": "Um site que é encontrado no Google e transforma visita em cliente.",
+    "fechamento": "Vamos colocar a sua marca **onde o cliente procura?**",
+    "entregas": [
+      "5 a 7 páginas com textos",
+      "Portfólio ou casos",
+      "SEO básico para o Google",
+      "Painel para você editar",
+      "Treinamento de 1 hora"
+    ],
+    "naoInclui": "loja virtual, fotos, hospedagem e anúncios",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  site_premium: {
+    "degrau": "premium",
+    "etapas": [
+      {
+        "nome": "Briefing",
+        "texto": "Reunião, conteúdo e integrações",
+        "dias": 3,
+        "cliente": "Enviar conteúdo e acessos",
+        "aprovacao": false
+      },
+      {
+        "nome": "Arquitetura",
+        "texto": "Páginas, fluxos e catálogo",
+        "dias": 7,
+        "cliente": "Aprovar a arquitetura",
+        "aprovacao": true
+      },
+      {
+        "nome": "Design",
+        "texto": "Layout completo",
+        "dias": 10,
+        "cliente": "Aprovar o design",
+        "aprovacao": true
+      },
+      {
+        "nome": "Desenvolvimento",
+        "texto": "Site ou loja, com integrações",
+        "dias": 15,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Testes e publicação",
+        "texto": "Tudo no ar e treinamento da equipe",
+        "dias": 5,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "pagina",
+    "depois": [
+      "Um site que vende enquanto você atende",
+      "Clientes encontrando, comprando e voltando",
+      "Uma operação digital que cresce com o negócio"
+    ],
+    "promessa": "Um site que vende e cresce com o seu negócio.",
+    "fechamento": "Vamos fazer o seu site **vender por você?**",
+    "entregas": [
+      "Site com blog e SEO, ou loja com catálogo e pagamento",
+      "Integrações: CRM, e-mail e pagamento",
+      "Painel para editar e gerenciar",
+      "Treinamento da equipe"
+    ],
+    "naoInclui": "fotos, hospedagem, anúncios e produção de conteúdo",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  redes_principal: {
+    "degrau": "principal",
+    "etapas": [
+      {
+        "nome": "Briefing",
+        "texto": "Reunião e acesso ao perfil",
+        "dias": 2,
+        "cliente": "Enviar acesso ao perfil",
+        "aprovacao": false
+      },
+      {
+        "nome": "Pilares e calendário",
+        "texto": "Temas e 1 mês planejado",
+        "dias": 4,
+        "cliente": "Aprovar o calendário",
+        "aprovacao": true
+      },
+      {
+        "nome": "Templates",
+        "texto": "16 modelos editáveis",
+        "dias": 6,
+        "cliente": "Aprovar os templates",
+        "aprovacao": true
+      },
+      {
+        "nome": "Roteiros",
+        "texto": "Stories e legendas",
+        "dias": 3,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Treinamento",
+        "texto": "1 sessão para usar tudo",
+        "dias": 1,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "redes",
+    "depois": [
+      "Saber o que postar toda semana",
+      "Posts com cara de marca em minutos",
+      "Um perfil que atrai o cliente certo"
+    ],
+    "promessa": "O seu Instagram trabalhando todo mês, sem depender de inspiração.",
+    "fechamento": "Vamos fazer o seu Instagram **trabalhar todo mês?**",
+    "entregas": [
+      "Pilares de conteúdo",
+      "Calendário de 1 mês com temas",
+      "16 templates editáveis",
+      "Roteiros de stories",
+      "1 sessão de treinamento"
+    ],
+    "naoInclui": "produção mensal de posts, fotos, vídeos e anúncios",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  redes_premium: {
+    "degrau": "premium",
+    "etapas": [
+      {
+        "nome": "Briefing",
+        "texto": "Objetivo e público da campanha",
+        "dias": 2,
+        "cliente": "Definir objetivo e verba",
+        "aprovacao": false
+      },
+      {
+        "nome": "Conceito",
+        "texto": "Ideia central da campanha",
+        "dias": 5,
+        "cliente": "Aprovar o conceito",
+        "aprovacao": true
+      },
+      {
+        "nome": "Peças",
+        "texto": "Redes e anúncios",
+        "dias": 8,
+        "cliente": "Aprovar as peças",
+        "aprovacao": true
+      },
+      {
+        "nome": "Landing page",
+        "texto": "Página da campanha",
+        "dias": 5,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Anúncios",
+        "texto": "Gestão com o parceiro de tráfego",
+        "dias": 5,
+        "cliente": "Aprovar a verba de anúncios",
+        "aprovacao": true
+      }
+    ],
+    "exemplo": "redes",
+    "depois": [
+      "Uma campanha com começo, meio e fim",
+      "Gente nova conhecendo a marca toda semana",
+      "Resultado medido, não no achismo"
+    ],
+    "promessa": "Uma campanha completa para lançar e vender.",
+    "fechamento": "Vamos **lançar com força?**",
+    "entregas": [
+      "Conceito de campanha",
+      "Peças para redes e anúncios",
+      "Landing page da campanha",
+      "Gestão dos anúncios com o parceiro de tráfego"
+    ],
+    "naoInclui": "verba de anúncios, fotos e vídeos",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  vendas_principal: {
+    "degrau": "principal",
+    "etapas": [
+      {
+        "nome": "Briefing",
+        "texto": "Reunião e material atual",
+        "dias": 2,
+        "cliente": "Enviar o material atual",
+        "aprovacao": false
+      },
+      {
+        "nome": "Estrutura",
+        "texto": "Roteiro e textos",
+        "dias": 4,
+        "cliente": "Aprovar o roteiro",
+        "aprovacao": true
+      },
+      {
+        "nome": "Design",
+        "texto": "Apresentação, proposta e catálogo",
+        "dias": 7,
+        "cliente": "Aprovar o design",
+        "aprovacao": true
+      },
+      {
+        "nome": "Casos",
+        "texto": "2 casos escritos",
+        "dias": 3,
+        "cliente": "Indicar os clientes",
+        "aprovacao": false
+      },
+      {
+        "nome": "Ajuste",
+        "texto": "2 rodadas",
+        "dias": 2,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "slides",
+    "depois": [
+      "Um material para cada etapa da venda",
+      "Propostas que explicam o valor sozinhas",
+      "Mais fechamento sem depender de você na sala"
+    ],
+    "promessa": "Tudo o que você precisa para vender com segurança em qualquer reunião.",
+    "fechamento": "Vamos **vender mais** em cada reunião?",
+    "entregas": [
+      "Apresentação comercial",
+      "Modelo de proposta",
+      "Catálogo de serviços",
+      "2 casos escritos"
+    ],
+    "naoInclui": "treinamento de vendas, vídeos e impressão",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  vendas_premium: {
+    "degrau": "premium",
+    "etapas": [
+      {
+        "nome": "Briefing",
+        "texto": "Reunião e material atual",
+        "dias": 2,
+        "cliente": "Enviar o material atual",
+        "aprovacao": false
+      },
+      {
+        "nome": "Estrutura",
+        "texto": "Roteiro e textos",
+        "dias": 4,
+        "cliente": "Aprovar o roteiro",
+        "aprovacao": true
+      },
+      {
+        "nome": "Design",
+        "texto": "Todo o kit de vendas",
+        "dias": 10,
+        "cliente": "Aprovar o design",
+        "aprovacao": true
+      },
+      {
+        "nome": "Roteiro e objeções",
+        "texto": "O que falar e como responder",
+        "dias": 5,
+        "cliente": "Aprovar o roteiro de venda",
+        "aprovacao": true
+      },
+      {
+        "nome": "Treinamento",
+        "texto": "Equipe de vendas",
+        "dias": 3,
+        "cliente": "Reunir a equipe",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "slides",
+    "depois": [
+      "Um processo comercial que qualquer pessoa da equipe segue",
+      "Respostas prontas para as objeções de sempre",
+      "Mais propostas fechadas, com previsibilidade"
+    ],
+    "promessa": "Um processo comercial completo, do material ao discurso.",
+    "fechamento": "Vamos montar **uma máquina de vendas?**",
+    "entregas": [
+      "Tudo do Kit de vendas",
+      "Roteiro de reunião",
+      "Respostas para objeções",
+      "Treinamento da equipe de vendas"
+    ],
+    "naoInclui": "CRM, vídeos e impressão",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  experiencia_principal: {
+    "degrau": "principal",
+    "etapas": [
+      {
+        "nome": "Mapeamento",
+        "texto": "Como você atende hoje",
+        "dias": 3,
+        "cliente": "Contar como atende hoje",
+        "aprovacao": false
+      },
+      {
+        "nome": "Mapa da jornada",
+        "texto": "Do primeiro contato ao pós-venda",
+        "dias": 4,
+        "cliente": "Aprovar a jornada",
+        "aprovacao": true
+      },
+      {
+        "nome": "Materiais",
+        "texto": "Boas-vindas, entrega e mensagens",
+        "dias": 7,
+        "cliente": "Aprovar os materiais",
+        "aprovacao": true
+      },
+      {
+        "nome": "Pós-venda",
+        "texto": "Avaliação e indicação",
+        "dias": 3,
+        "cliente": "",
+        "aprovacao": false
+      },
+      {
+        "nome": "Ajuste",
+        "texto": "2 rodadas",
+        "dias": 2,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "whatsapp",
+    "depois": [
+      "Cada cliente bem atendido do começo ao fim",
+      "Mais avaliações e indicações",
+      "Um processo que funciona mesmo sem você"
+    ],
+    "promessa": "Cada etapa do atendimento desenhada para encantar e gerar indicação.",
+    "fechamento": "Vamos transformar clientes **em fãs?**",
+    "entregas": [
+      "Mapa da jornada",
+      "Guia de boas-vindas",
+      "Materiais de entrega",
+      "Pós-venda com pedido de avaliação e indicação",
+      "Modelos de mensagens e e-mails"
+    ],
+    "naoInclui": "automação, CRM e atendimento por você",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
+  experiencia_premium: {
+    "degrau": "premium",
+    "etapas": [
+      {
+        "nome": "Mapeamento",
+        "texto": "Como você atende hoje",
+        "dias": 3,
+        "cliente": "Contar como atende hoje",
+        "aprovacao": false
+      },
+      {
+        "nome": "Jornada",
+        "texto": "Do primeiro contato ao pós-venda",
+        "dias": 5,
+        "cliente": "Aprovar a jornada",
+        "aprovacao": true
+      },
+      {
+        "nome": "Materiais",
+        "texto": "Boas-vindas, entrega e mensagens",
+        "dias": 7,
+        "cliente": "Aprovar os materiais",
+        "aprovacao": true
+      },
+      {
+        "nome": "Automação e CRM",
+        "texto": "Follow-ups e e-mails automáticos",
+        "dias": 10,
+        "cliente": "Dar acesso às ferramentas",
+        "aprovacao": false
+      },
+      {
+        "nome": "Testes e treinamento",
+        "texto": "Tudo rodando e a equipe treinada",
+        "dias": 4,
+        "cliente": "",
+        "aprovacao": false
+      }
+    ],
+    "exemplo": "whatsapp",
+    "depois": [
+      "Nenhum cliente esquecido, mesmo com a agenda cheia",
+      "Follow-up no tempo certo, sem você lembrar",
+      "Um painel mostrando cada cliente em cada etapa"
+    ],
+    "promessa": "Um atendimento que funciona no automático, sem perder o toque pessoal.",
+    "fechamento": "Vamos colocar o seu atendimento **no automático?**",
+    "entregas": [
+      "Tudo da Jornada do cliente",
+      "CRM simples configurado",
+      "Follow-ups e e-mails automáticos",
+      "Painel de acompanhamento"
+    ],
+    "naoInclui": "mensalidade das ferramentas e atendimento por você",
+    "investimento": null,
+    "ajustes": "2 rodadas"
+  },
 };
 
 // A escada por área do diagnóstico: o problema, as ofertas de entrada (ids de SERVICOS) e os degraus
@@ -161,8 +874,8 @@ export const AREAS = {
   clareza: {
     nome: "Clareza", foco: "O que dizer", problema: "Ninguém entende o que você faz.",
     entradas: ["mensagem"],
-    principal: { nome: "Posicionamento de marca", pitch: "Do posicionamento ao texto final: uma proposta de valor clara, uma personalidade definida e as palavras certas em cada canal da sua marca.", entregas: "2 sessões, análise de 5 concorrentes, plataforma de marca (propósito, proposta de valor, público, personalidade, manifesto), guia de tom completo, textos do site e da apresentação", prazo: "3 a 4 semanas", valor: "R$ 3.500 a R$ 6.000" },
-    premium: { nome: "Posicionamento e arquitetura de marca", entregas: "Tudo do principal, organização das linhas de serviço ou submarcas, naming quando precisar, apresentação para a equipe", prazo: "5 a 8 semanas", valor: "R$ 8.000 a R$ 12.000" },
+    principal: { servico: "clareza_principal", nome: "Posicionamento de marca", pitch: "Do posicionamento ao texto final: uma proposta de valor clara, uma personalidade definida e as palavras certas em cada canal da sua marca.", entregas: "2 sessões, análise de 5 concorrentes, plataforma de marca (propósito, proposta de valor, público, personalidade, manifesto), guia de tom completo, textos do site e da apresentação", prazo: "3 a 4 semanas", valor: "R$ 3.500 a R$ 6.000" },
+    premium: { servico: "clareza_premium", nome: "Posicionamento e arquitetura de marca", entregas: "Tudo do principal, organização das linhas de serviço ou submarcas, naming quando precisar, apresentação para a equipe", prazo: "5 a 8 semanas", valor: "R$ 8.000 a R$ 12.000" },
     custo: { frase: "Se o cliente não sabe explicar o que você faz, ele **não consegue te indicar.**", consequencias: ["Cada cliente entende uma coisa diferente.", "A indicação chega sem saber o que pedir.", "O preço vira a única comparação."] },
     continuidade: "social",
     complementos: "Casos e prova social (R$ 600 a R$ 1.200); naming de serviço ou produto (R$ 1.500 a R$ 3.000)",
@@ -170,8 +883,8 @@ export const AREAS = {
   valor: {
     nome: "Percepção de valor", foco: "Como parecer", problema: "O cliente acha caro; a marca parece mais barata que o trabalho.",
     entradas: ["revisao", "kit"],
-    principal: { nome: "Identidade visual", pitch: "Uma identidade visual completa, pensada para o seu negócio, que faz o cliente perceber o valor antes de ver o preço.", entregas: "Conceito, logo e variações, sistema visual (cores, fontes, grafismos, fotos), manual de marca, papelaria e kit para redes", prazo: "4 a 6 semanas", valor: "R$ 4.500 a R$ 9.000" },
-    premium: { nome: "Rebranding", entregas: "Posicionamento + identidade + aplicações principais + plano de lançamento da nova marca", prazo: "8 a 12 semanas", valor: "R$ 12.000 a R$ 25.000" },
+    principal: { servico: "valor_principal", nome: "Identidade visual", pitch: "Uma identidade visual completa, pensada para o seu negócio, que faz o cliente perceber o valor antes de ver o preço.", entregas: "Conceito, logo e variações, sistema visual (cores, fontes, grafismos, fotos), manual de marca, papelaria e kit para redes", prazo: "4 a 6 semanas", valor: "R$ 4.500 a R$ 9.000" },
+    premium: { servico: "valor_premium", nome: "Rebranding", entregas: "Posicionamento + identidade + aplicações principais + plano de lançamento da nova marca", prazo: "8 a 12 semanas", valor: "R$ 12.000 a R$ 25.000" },
     custo: { frase: "O cliente decide pelo preço **antes de conhecer o seu valor.**", consequencias: ["Quem compara pela aparência escolhe o mais barato.", "Você negocia desconto em vez de valor.", "O trabalho bom não aparece na primeira impressão."] },
     continuidade: "design",
     complementos: "Guia de direção de fotos (R$ 500 a R$ 900); embalagem ou etiqueta; sinalização ou fachada (sob orçamento)",
@@ -179,8 +892,8 @@ export const AREAS = {
   site: {
     nome: "Presença: site", foco: "Onde te encontram", problema: "Quem pesquisa não encontra, ou o site não converte.",
     entradas: ["pagina"],
-    principal: { nome: "Site institucional", pitch: "Um site completo, com o seu portfólio e os seus serviços, feito para ser encontrado no Google e transformar visita em cliente.", entregas: "5 a 7 páginas, portfólio ou casos, SEO básico, painel para editar, treinamento de 1h", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 9.000" },
-    premium: { nome: "Site completo ou loja", entregas: "Site com blog e SEO, ou loja virtual com catálogo e pagamento, integrações", prazo: "6 a 10 semanas", valor: "R$ 10.000 a R$ 20.000" },
+    principal: { servico: "site_principal", nome: "Site institucional", pitch: "Um site completo, com o seu portfólio e os seus serviços, feito para ser encontrado no Google e transformar visita em cliente.", entregas: "5 a 7 páginas, portfólio ou casos, SEO básico, painel para editar, treinamento de 1h", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 9.000" },
+    premium: { servico: "site_premium", nome: "Site completo ou loja", entregas: "Site com blog e SEO, ou loja virtual com catálogo e pagamento, integrações", prazo: "6 a 10 semanas", valor: "R$ 10.000 a R$ 20.000" },
     custo: { frase: "A indicação chega quente e **esfria antes da primeira conversa.**", consequencias: ["Quem pesquisa e não encontra nada vai para quem aparece.", "Sem um link para mandar, o orçamento é comparado só pelo preço.", "Você depende de estar na sala para convencer."] },
     continuidade: "crescimento",
     complementos: "Perfil no Google (R$ 400 a R$ 700); página extra (R$ 500 a R$ 900); 1º mês de campanha com o parceiro de tráfego (valor do parceiro, verba à parte)",
@@ -188,8 +901,8 @@ export const AREAS = {
   redes: {
     nome: "Presença: redes", foco: "Como você aparece", problema: "O Instagram não mostra o negócio que você tem.",
     entradas: ["instagram"],
-    principal: { nome: "Linha editorial e templates", pitch: "Temas, calendário e templates para o seu Instagram trabalhar todo mês, sem depender de inspiração.", entregas: "Pilares de conteúdo, calendário de 1 mês com temas, 16 templates, roteiros de stories, 1 sessão de treinamento", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.000" },
-    premium: { nome: "Lançamento ou campanha", entregas: "Conceito de campanha, peças para redes e anúncios, landing da campanha, gestão dos anúncios pelo parceiro de tráfego", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 10.000" },
+    principal: { servico: "redes_principal", nome: "Linha editorial e templates", pitch: "Temas, calendário e templates para o seu Instagram trabalhar todo mês, sem depender de inspiração.", entregas: "Pilares de conteúdo, calendário de 1 mês com temas, 16 templates, roteiros de stories, 1 sessão de treinamento", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.000" },
+    premium: { servico: "redes_premium", nome: "Lançamento ou campanha", entregas: "Conceito de campanha, peças para redes e anúncios, landing da campanha, gestão dos anúncios pelo parceiro de tráfego", prazo: "4 a 6 semanas", valor: "R$ 5.000 a R$ 10.000" },
     custo: { frase: "Quem te procura no Instagram decide **em segundos** se você é a escolha certa.", consequencias: ["Um perfil parado parece empresa parada.", "Cada post de um jeito não constrói marca.", "Quem chega não descobre como contratar e vai embora."] },
     continuidade: "social",
     complementos: "Pacote extra de 8 templates (R$ 500 a R$ 800)",
@@ -197,8 +910,8 @@ export const AREAS = {
   vendas: {
     nome: "Apresentação e vendas", foco: "Como vender", problema: "O material não vende quando você não está; a proposta vira só um número.",
     entradas: ["proposta", "apresentacao"],
-    principal: { nome: "Kit de vendas", pitch: "Apresentação, proposta, catálogo e casos com a mesma cara: tudo o que você precisa para vender com segurança em qualquer reunião.", entregas: "Apresentação + proposta + catálogo de serviços + 2 casos", prazo: "3 a 4 semanas", valor: "R$ 4.000 a R$ 7.000" },
-    premium: { nome: "Kit de vendas e roteiro comercial", entregas: "Tudo do kit, roteiro de reunião, respostas para objeções, treinamento da equipe de vendas", prazo: "5 a 6 semanas", valor: "R$ 8.000 a R$ 12.000" },
+    principal: { servico: "vendas_principal", nome: "Kit de vendas", pitch: "Apresentação, proposta, catálogo e casos com a mesma cara: tudo o que você precisa para vender com segurança em qualquer reunião.", entregas: "Apresentação + proposta + catálogo de serviços + 2 casos", prazo: "3 a 4 semanas", valor: "R$ 4.000 a R$ 7.000" },
+    premium: { servico: "vendas_premium", nome: "Kit de vendas e roteiro comercial", entregas: "Tudo do kit, roteiro de reunião, respostas para objeções, treinamento da equipe de vendas", prazo: "5 a 6 semanas", valor: "R$ 8.000 a R$ 12.000" },
     custo: { frase: "Quando você não está na sala, **a venda depende da sorte.**", consequencias: ["A proposta chega sozinha e vira só um número.", "Quem decide junto com o cliente não te ouviu.", "Você repete a mesma explicação toda vez."] },
     continuidade: "design",
     complementos: "Catálogo ou menu de serviços em PDF (R$ 800 a R$ 1.500)",
@@ -206,8 +919,8 @@ export const AREAS = {
   experiencia: {
     nome: "Experiência de compra", foco: "Como atender", problema: "O cliente gosta do resultado, mas não do caminho, e não indica.",
     entradas: ["jornada"],
-    principal: { nome: "Jornada do cliente", pitch: "Do primeiro contato ao pós-venda, cada etapa do atendimento desenhada para encantar o cliente e gerar indicação.", entregas: "Mapa da jornada, guia de boas-vindas, materiais de entrega, pós-venda com pedido de avaliação e indicação, modelos de mensagens e e-mails", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.500" },
-    premium: { nome: "Jornada com automação", entregas: "Jornada completa + CRM simples, follow-ups e e-mails automáticos, painel de acompanhamento", prazo: "5 a 8 semanas", valor: "R$ 6.000 a R$ 10.000" },
+    principal: { servico: "experiencia_principal", nome: "Jornada do cliente", pitch: "Do primeiro contato ao pós-venda, cada etapa do atendimento desenhada para encantar o cliente e gerar indicação.", entregas: "Mapa da jornada, guia de boas-vindas, materiais de entrega, pós-venda com pedido de avaliação e indicação, modelos de mensagens e e-mails", prazo: "3 a 4 semanas", valor: "R$ 2.500 a R$ 4.500" },
+    premium: { servico: "experiencia_premium", nome: "Jornada com automação", entregas: "Jornada completa + CRM simples, follow-ups e e-mails automáticos, painel de acompanhamento", prazo: "5 a 8 semanas", valor: "R$ 6.000 a R$ 10.000" },
     custo: { frase: "O cliente gosta do resultado, **mas não do caminho até ele.**", consequencias: ["Mensagem sem resposta vira cliente perdido.", "O cliente não sabe o próximo passo e esfria.", "Pouca indicação, mesmo com cliente satisfeito."] },
     continuidade: "social",
     complementos: "Kit de pós-venda avulso: agradecimento, pedido de avaliação, programa de indicação (R$ 600 a R$ 1.000)",
@@ -223,7 +936,19 @@ export const CONTINUIDADE = {
 };
 
 /** Área (id) a que pertence um serviço de entrada. */
-export const areaDoServico = (id) => Object.keys(AREAS).find((a) => AREAS[a].entradas.includes(id));
+export const areaDoServico = (id) => Object.keys(AREAS).find((a) => AREAS[a].entradas.includes(id) || AREAS[a].principal?.servico === id || AREAS[a].premium?.servico === id);
+
+/** Degrau de um serviço: "entrada", "principal" ou "premium". */
+export const degrauDoServico = (id) => SERVICOS[id]?.degrau || "entrada";
+
+/** O serviço completo: nos degraus 2 e 3, nome, texto comercial e prazo vêm da área. */
+export function servicoCompleto(id) {
+  const s = SERVICOS[id];
+  if (!s) return s;
+  const deg = s.degrau;
+  const a = deg && AREAS[areaDoServico(id)]?.[deg];
+  return a ? { ...s, nome: a.nome, pitch: a.pitch || s.pitch || "", prazo: a.prazo, valorFaixa: a.valor } : s;
+}
 
 // Nome da oferta no diagnóstico → serviço do catálogo.
 export const MAPA = {
@@ -372,6 +1097,15 @@ export const CASOS_PADRAO = {
   kit: ["una", "studio-vzo"],
 };
 
+// degraus 2 e 3 começam com a visão de fora e os casos da primeira entrada da área
+for (const [aid, a] of Object.entries(AREAS)) {
+  for (const deg of ["principal", "premium"]) {
+    const sid = a[deg]?.servico;
+    if (sid && !VISAO_PADRAO[sid]) VISAO_PADRAO[sid] = JSON.parse(JSON.stringify(VISAO_PADRAO[a.entradas[0]]));
+    if (sid && !CASOS_PADRAO[sid]) CASOS_PADRAO[sid] = [...(CASOS_PADRAO[a.entradas[0]] || [])];
+  }
+}
+
 // ---------- catálogo editável (/admin/servicos) ----------
 // O que está acima é o padrão do código. A página Produtos e serviços grava uma versão editada no
 // Supabase (catalogo_servicos); carregarCatalogo() aplica por cima destes objetos, no lugar, para
@@ -400,6 +1134,11 @@ export function aplicarCatalogo(dados = {}) {
     const final = { ...ORIGINAL[grupo], ...(dados[grupo] || {}) };
     // textos dos slides: mescla campo a campo (campos novos do código continuam aparecendo)
     if (grupo === "textos") for (const k of Object.keys(ORIGINAL.textos)) final[k] = { ...ORIGINAL.textos[k], ...((dados.textos || {})[k] || {}) };
+    // áreas salvas antes dos degraus virarem serviços: completa o vínculo (principal.servico, premium.servico)
+    if (grupo === "areas") for (const k of Object.keys(final)) {
+      if (!ORIGINAL.areas[k]) continue;
+      for (const deg of ["principal", "premium"]) final[k] = { ...final[k], [deg]: { ...ORIGINAL.areas[k][deg], ...(final[k][deg] || {}) } };
+    }
     for (const k of Object.keys(alvo)) delete alvo[k];
     Object.assign(alvo, JSON.parse(JSON.stringify(final)));
   }
@@ -409,8 +1148,11 @@ export function aplicarCatalogo(dados = {}) {
 export function ofertaDoLead(item) {
   const oferta = (item.ofertaEscolhida ?? item.dados?.devolutiva?.oferta)?.principal;
   // nome da oferta do diagnóstico, ou o próprio nome do serviço (oferta escolhida no admin)
-  const id = MAPA[oferta?.nome] || Object.keys(SERVICOS).find((k) => SERVICOS[k].nome === oferta?.nome) || "pagina";
-  // o "projeto" (passo seguinte, no fechamento do roteiro) é o degrau principal da área
+  const id = MAPA[oferta?.nome] || Object.keys(SERVICOS).find((k) => servicoCompleto(k).nome === oferta?.nome) || "pagina";
   const area = AREAS[areaDoServico(id)];
-  return { titulo: oferta?.nome || SERVICOS[id].nome, servicoId: id, servico: { ...SERVICOS[id], projeto: area?.principal.nome || "" }, area };
+  const degrau = degrauDoServico(id);
+  const servico = servicoCompleto(id);
+  // o passo seguinte (fechamento do roteiro): entrada → principal, principal → premium, premium → recorrência
+  const projeto = degrau === "entrada" ? area?.principal.nome : degrau === "principal" ? area?.premium.nome : CONTINUIDADE[area?.continuidade]?.nome;
+  return { titulo: oferta?.nome || servico.nome, servicoId: id, servico: { ...servico, projeto: projeto || "" }, area, degrau };
 }

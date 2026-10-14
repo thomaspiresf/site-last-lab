@@ -451,3 +451,6 @@
 .apr-caso-txt .bloco + .bloco { margin-top: 26px; }
 .apr-caso-txt .rot { font-size: 17px; letter-spacing: 3px; text-transform: uppercase; color: #ef4b3a; }
 .apr-caso-txt .txt { font-size: 23px; line-height: 1.42; color: #3f3f46; margin-top: 8px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.apr-crono2.densa h3 { font-size: 24px; gap: 8px; }
+.apr-crono2.densa .data { font-size: 20px; }
+.apr-crono2.densa .dias, .apr-crono2.densa .info { font-size: 19px; }

@@ -151,7 +151,7 @@ export default function AdminServicos() {
   const aid = sel?.tipo === "area" ? sel.id : sel?.tipo === "servico" ? areaDoServico(sel.id) : null;
   const trilha = !sel ? [] : [
     aid && { nome: r.areas[aid].nome, ir: sel.tipo === "servico" ? { tipo: "area", id: aid } : null },
-    sel.tipo === "servico" && { nome: r.servicos[sel.id].nome },
+    sel.tipo === "servico" && { nome: nomeDoServico(r, sel.id) },
     sel.tipo === "continuidade" && { nome: "Recorrência" },
     sel.tipo === "mapa" && { nome: "Ofertas do diagnóstico" },
   ].filter(Boolean);
@@ -184,7 +184,7 @@ export default function AdminServicos() {
         <Servico
           key={sel.id}
           id={sel.id} r={r} padrao={padrao} set={set} setServ={setServ} escolher={escolher}
-          persona={persona || MOMENTO_DO_SERVICO[sel.id] || "loja_sem_vitrine"} setPersona={setPersona}
+          persona={persona || MOMENTO_DO_SERVICO[sel.id] || MOMENTO_DO_SERVICO[r.areas[areaDoServico(sel.id)]?.entradas[0]] || "loja_sem_vitrine"} setPersona={setPersona}
         />
       )}
       {sel?.tipo === "area" && <Area id={sel.id} r={r} padrao={padrao} set={set} escolher={escolher} />}
@@ -207,6 +207,13 @@ const DEGRAUS = [
   ["Premium", "a área inteira"],
   ["Recorrência", "plano mensal"],
 ];
+
+/** Nome de um serviço: nos degraus 2 e 3 (principal e premium), o nome é o da área. */
+const nomeDoServico = (r, id) => {
+  const s = r.servicos[id];
+  const a = s?.degrau && r.areas[areaDoServico(id)];
+  return a ? a[s.degrau].nome : s?.nome;
+};
 
 /** Prazo curto: "3 a 4 semanas" → "3–4 sem". */
 const curto = (t = "") => t.replace(/ a /g, "–").replace(/semanas?/, "sem").replace(/dias úteis/, "dias");
@@ -290,7 +297,7 @@ export function VisaoGeral({ r, escolher, set }) {
             const Icone = ICONES[aid] || Gem;
             const itens = filtro === 1
               ? a.entradas.filter((sid) => r.servicos[sid]).map((sid) => ({ k: sid, nome: r.servicos[sid].nome, n: nivel(r.servicos[sid].investimento, "projeto", 1), meta: `${r.servicos[sid].investimento || "Valor a definir"} · ${curto(r.servicos[sid].prazo) || "prazo a definir"}`, ir: { tipo: "servico", id: sid }, texto: r.servicos[sid].promessa }))
-              : [{ k: aid, nome: a[filtro === 2 ? "principal" : "premium"].nome, n: nivel(a[filtro === 2 ? "principal" : "premium"].valor, "projeto", filtro), meta: `${faixa(a[filtro === 2 ? "principal" : "premium"].valor)} · ${curto(a[filtro === 2 ? "principal" : "premium"].prazo)}`, ir: { tipo: "area", id: aid }, texto: filtro === 2 ? a.principal.pitch || a.principal.entregas : a.premium.entregas }];
+              : [{ k: aid, nome: a[filtro === 2 ? "principal" : "premium"].nome, n: nivel(a[filtro === 2 ? "principal" : "premium"].valor, "projeto", filtro), meta: `${faixa(a[filtro === 2 ? "principal" : "premium"].valor)} · ${curto(a[filtro === 2 ? "principal" : "premium"].prazo)}`, ir: { tipo: "servico", id: a[filtro === 2 ? "principal" : "premium"].servico }, texto: filtro === 2 ? a.principal.pitch || a.principal.entregas : a.premium.pitch || a.premium.entregas }];
             return itens.map((it) => (
               <button key={it.k} onClick={() => escolher(it.ir)} className="group text-left bg-white rounded-xl border border-zinc-200 hover:border-zinc-400 hover:shadow-sm transition p-4 flex flex-col gap-2">
                 <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-400"><Icone size={13} /> {a.nome}</p>
@@ -329,8 +336,8 @@ export function VisaoGeral({ r, escolher, set }) {
                     meta={`${r.servicos[sid].investimento || "Valor a definir"} · ${curto(r.servicos[sid].prazo) || "prazo a definir"}`} />
                 ))}
               </div>
-              <Celula onClick={area} titulo={a.principal.nome} n={nivel(a.principal.valor, "projeto", 2)} meta={`${faixa(a.principal.valor)} · ${curto(a.principal.prazo)}`} />
-              <Celula onClick={area} titulo={a.premium.nome} n={nivel(a.premium.valor, "projeto", 3)} meta={`${faixa(a.premium.valor)} · ${curto(a.premium.prazo)}`} />
+              <Celula onClick={() => escolher({ tipo: "servico", id: a.principal.servico })} titulo={a.principal.nome} n={nivel(a.principal.valor, "projeto", 2)} meta={`${faixa(a.principal.valor)} · ${curto(a.principal.prazo)}`} />
+              <Celula onClick={() => escolher({ tipo: "servico", id: a.premium.servico })} titulo={a.premium.nome} n={nivel(a.premium.valor, "projeto", 3)} meta={`${faixa(a.premium.valor)} · ${curto(a.premium.prazo)}`} />
             </div>
           );
         })}
@@ -367,8 +374,9 @@ function Area({ id, r, padrao, set, escolher }) {
     <Bloco titulo={titulo}>
       <p className="text-xs text-zinc-400 -mt-2">{dica}</p>
       <Campo label="Serviço" valor={a[k].nome} onChange={(x) => mudar(k, { ...a[k], nome: x })} />
+      {a[k].servico && <button onClick={() => escolher({ tipo: "servico", id: a[k].servico })} className="self-start text-xs font-semibold underline underline-offset-2 text-zinc-600 hover:text-black">Abrir a apresentação deste serviço</button>}
       <Campo label="Entregáveis" area valor={a[k].entregas} onChange={(x) => mudar(k, { ...a[k], entregas: x })} />
-      {k === "principal" && <Campo label="Texto comercial (aparece no investimento, ao lado da entrada)" area valor={a[k].pitch} onChange={(x) => mudar(k, { ...a[k], pitch: x })} />}
+      {<Campo label="Texto comercial (aparece no investimento)" area valor={a[k].pitch} onChange={(x) => mudar(k, { ...a[k], pitch: x })} />}
       <div className="grid grid-cols-2 gap-2">
         <Campo label="Prazo" valor={a[k].prazo} onChange={(x) => mudar(k, { ...a[k], prazo: x })} />
         <Campo label="Valor" valor={a[k].valor} onChange={(x) => mudar(k, { ...a[k], valor: x })} />
@@ -454,11 +462,15 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     set("casos", id, padrao.casos[id]);
   };
   const mudarArea = (campoNome, valor) => set("areas", aid, { ...area, [campoNome]: valor });
+  const deg = s.degrau; // "principal" ou "premium" (undefined nas entradas)
+  // nome, texto comercial e prazo: nas entradas ficam no serviço; nos degraus 2 e 3, na área
+  const campoDe = (k) => (deg ? area?.[deg]?.[k] : s[k]);
+  const mudarCampo = (k, v) => (deg ? mudarArea(deg, { ...area[deg], [k]: v }) : setServ(id, k, v));
 
   // prévia com um lead de exemplo (o rascunho já aplicado no catálogo em uso)
   const { slides, roteiro, objecoes } = useMemo(() => {
     aplicarCatalogo(r);
-    const item = leadExemplo(r.servicos[id], persona);
+    const item = leadExemplo({ ...r.servicos[id], nome: nomeDoServico(r, id) }, persona);
     const ap = { ...apresentacaoInicial(item), empresa: "Sua Empresa" };
     const d = montarDados(item, ap);
     const lista = ordenarSlides(SLIDES.filter(([, , quando]) => !quando || quando(d)).map(([sid, S]) => Object.assign((props) => <S d={d} {...props} />, { sid })), r.estrutura?.ordem || []);
@@ -480,13 +492,15 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
   const doLead = (t) => <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-3 text-xs text-zinc-500 leading-relaxed">{t} Isso é editado em cada lead, na apresentação dele.</div>;
 
   const B = {
-    nome: <Campo label="Nome do serviço" valor={s.nome} onChange={(x) => setServ(id, "nome", x)} dica="Título da proposta quando a oferta foi escolhida no admin. Se veio do diagnóstico, o título é o nome que o cliente viu." />,
+    nome: <Campo label="Nome do serviço" valor={campoDe("nome")} onChange={(x) => mudarCampo("nome", x)} dica={deg ? "É o mesmo nome do degrau na escada da área." : "Título da proposta quando a oferta foi escolhida no admin. Se veio do diagnóstico, o título é o nome que o cliente viu."} />,
     promessa: <Campo label="Promessa (frase curta)" area valor={s.promessa} onChange={(x) => setServ(id, "promessa", x)} />,
-    pitch: <Campo label="Texto comercial" area valor={s.pitch} onChange={(x) => setServ(id, "pitch", x)} dica="O que o cliente ganha, em 1 ou 2 frases. Aparece ao lado do preço." />,
+    pitch: <Campo label="Texto comercial" area valor={campoDe("pitch")} onChange={(x) => mudarCampo("pitch", x)} dica="O que o cliente ganha, em 1 ou 2 frases. Aparece ao lado do preço." />,
     preco: (
       <div className="grid grid-cols-2 gap-2">
-        <Campo label="Investimento" valor={s.investimento} placeholder="R$ ____" onChange={(x) => setServ(id, "investimento", x || null)} />
-        <Campo label="Prazo escrito" valor={s.prazo} placeholder="__ dias úteis" onChange={(x) => setServ(id, "prazo", x || null)} />
+        {deg
+          ? <Campo label="Faixa de valor (escada)" valor={area[deg].valor} onChange={(x) => mudarArea(deg, { ...area[deg], valor: x })} />
+          : <Campo label="Investimento" valor={s.investimento} placeholder="R$ ____" onChange={(x) => setServ(id, "investimento", x || null)} />}
+        <Campo label="Prazo escrito" valor={campoDe("prazo")} placeholder="__ dias úteis" onChange={(x) => mudarCampo("prazo", x || null)} />
       </div>
     ),
     ajustes: <Campo label="Rodadas de ajuste" valor={s.ajustes} onChange={(x) => setServ(id, "ajustes", x)} />,
@@ -584,8 +598,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     comeco: [B.promessa, B.projeto, B.continuidade],
     oferta: [B.nome, B.promessa],
     antesdepois: [B.depois, fixo("O lado \"Antes\" usa os títulos das observações da Visão externa.")],
-    casos: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[0]} s={s} setServ={(k, v) => setServ(id, k, v)} />],
-    casos2: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[1]} s={s} setServ={(k, v) => setServ(id, k, v)} />],
+    casos: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[0]} s={s} nome={nomeDoServico(r, id)} setServ={(k, v) => setServ(id, k, v)} />],
+    casos2: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[1]} s={s} nome={nomeDoServico(r, id)} setServ={(k, v) => setServ(id, k, v)} />],
     entrega: [B.promessa, B.entregas, B.exemplo],
     produto: [B.exemplo],
     sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
@@ -601,11 +615,18 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
         <div className="bg-white rounded-2xl border border-zinc-200 px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
           <p className="text-zinc-500"><b className="text-zinc-900 font-semibold">{area.nome}</b> · {area.problema}</p>
           <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-500">
-            <span className="px-2 py-1 rounded-md bg-zinc-100 text-zinc-900 font-medium">1 · {s.nome}</span>
-            <ChevronRight size={13} className="text-zinc-300" />
-            <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">2 · {area.principal.nome}</button>
-            <ChevronRight size={13} className="text-zinc-300" />
-            <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">3 · {area.premium.nome}</button>
+            {[
+              ["1", deg ? area.entradas.map((e) => nomeDoServico(r, e)).join(" / ") : s.nome, !deg, deg ? area.entradas[0] : id],
+              ["2", area.principal.nome, deg === "principal", area.principal.servico],
+              ["3", area.premium.nome, deg === "premium", area.premium.servico],
+            ].map(([n, nome, atual, alvo], k) => (
+              <React.Fragment key={n}>
+                {k > 0 && <ChevronRight size={13} className="text-zinc-300" />}
+                {atual
+                  ? <span className="px-2 py-1 rounded-md bg-zinc-100 text-zinc-900 font-medium">{n} · {nome}</span>
+                  : <button onClick={() => escolher({ tipo: "servico", id: alvo })} className="px-2 py-1 rounded-md hover:bg-zinc-100">{n} · {nome}</button>}
+              </React.Fragment>
+            ))}
           </div>
           {!igualPadrao && <button onClick={restaurar} className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}
         </div>
@@ -704,7 +725,7 @@ function FotosDoCaso({ p, servico, escolhidas, onChange }) {
 }
 
 /** Os três textos de um caso: vêm do site; aqui dá para reescrever (vale em todas as apresentações). */
-function TextosDoCaso({ r, set, pid, s, setServ }) {
+function TextosDoCaso({ r, set, pid, s, setServ, nome }) {
   const p = projects.find((x) => x.id === pid);
   if (!p) return <p className="text-xs text-zinc-400">Marque os casos acima. Os 2 primeiros viram os slides Caso 1 e Caso 2.</p>;
   const editado = r.casosTextos?.[pid] || {};
@@ -720,7 +741,7 @@ function TextosDoCaso({ r, set, pid, s, setServ }) {
         </label>
       ))}
       <p className="text-[11px] text-zinc-400">Até ~190 caracteres por texto.</p>
-      <FotosDoCaso p={p} servico={s.nome} escolhidas={s.fotosCasos?.[pid] || []} onChange={(lista) => setServ("fotosCasos", { ...(s.fotosCasos || {}), [pid]: lista })} />
+      <FotosDoCaso p={p} servico={nome} escolhidas={s.fotosCasos?.[pid] || []} onChange={(lista) => setServ("fotosCasos", { ...(s.fotosCasos || {}), [pid]: lista })} />
     </div>
   );
 }

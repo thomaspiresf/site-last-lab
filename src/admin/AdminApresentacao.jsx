@@ -375,7 +375,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className={rotulo}>Investimento</label>
-          <input className={campo} value={rascunho.investimento || ""} onChange={(e) => mudar({ investimento: e.target.value })} onBlur={gravar} placeholder={dados.oferta.servico.investimento || "R$ ____"} />
+          <input className={campo} value={rascunho.investimento || ""} onChange={(e) => mudar({ investimento: e.target.value })} onBlur={gravar} placeholder={dados.oferta.servico.investimento || (dados.oferta.servico.valorFaixa ? `a partir de ${aPartirDe(dados.oferta.servico.valorFaixa)}` : "R$ ____")} />
         </div>
         <div>
           <label className={rotulo}>Prazo</label>
@@ -393,7 +393,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
       <div>
         <label className={rotulo}>Em destaque no investimento</label>
         <div className="flex gap-1.5">
-          {[["entrada", "Entrada"], ["projeto", "Projeto completo"]].map(([v, t]) => (
+          {[["entrada", "Esta oferta"], ["projeto", dados.ancora?.nome || "A outra opção"]].map(([v, t]) => (
             <button key={v} onClick={() => salvar({ ...rascunho, destaque: v })} className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold border ${(rascunho.destaque || "entrada") === v ? "bg-black text-white border-black" : "border-zinc-200 text-zinc-600 hover:border-zinc-400"}`}>{t}</button>
           ))}
         </div>
@@ -402,11 +402,11 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
       {dados.oferta.area && (
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className={rotulo}>Valor do projeto completo</label>
-            <input className={campo} value={rascunho.investimentoProjeto || ""} onChange={(e) => mudar({ investimentoProjeto: e.target.value })} onBlur={gravar} placeholder={`a partir de ${aPartirDe(dados.oferta.area.principal.valor)}`} />
+            <label className={rotulo}>Valor de {dados.ancora?.nome || "a outra opção"}</label>
+            <input className={campo} value={rascunho.investimentoProjeto || ""} onChange={(e) => mudar({ investimentoProjeto: e.target.value })} onBlur={gravar} placeholder={`a partir de ${aPartirDe(dados.ancora?.valor || "")}`} />
           </div>
           <div>
-            <label className={rotulo}>Pagamento do projeto</label>
+            <label className={rotulo}>Pagamento de {dados.ancora?.nome || "a outra opção"}</label>
             <input className={campo} value={rascunho.parcelamentoProjeto || ""} onChange={(e) => mudar({ parcelamentoProjeto: e.target.value })} onBlur={gravar} placeholder="ou 6x de R$ ___" />
           </div>
         </div>
@@ -574,6 +574,9 @@ export function montarDados(item, ap, urls = {}) {
     faixa: faixa.charAt(0).toUpperCase() + faixa.slice(1),
     faixaTexto: d.faixa || "",
     personaId: d.persona_id || "indefinida",
+    degrau: oferta.degrau || "entrada",
+    // a outra opção do investimento: entrada → principal (acima); principal → premium (acima); premium → principal (abaixo)
+    ancora: oferta.area ? (oferta.degrau === "premium" ? { ...oferta.area.principal, acima: false } : { ...oferta.area[oferta.degrau === "principal" ? "premium" : "principal"], acima: true }) : null,
     destaque: ap.destaque || "entrada",
     investimentoProjeto: ap.investimentoProjeto || "",
     parcelamentoProjeto: ap.parcelamentoProjeto || "",
@@ -805,11 +808,18 @@ function Custo({ d, escala }) {
 /** A escada para este lead: a entrada (o que vendemos agora), o projeto e a continuidade. */
 function Comeco({ d, escala }) {
   const a = d.oferta.area;
-  const cards = [
-    ["01", tx("comeco", "r1"), d.oferta.titulo, d.oferta.servico.promessa, true],
-    ["02", tx("comeco", "r2"), a?.principal.nome || d.oferta.servico.projeto, tx("comeco", "t2"), false],
-    ["03", tx("comeco", "r3"), d.continuidade?.nome || "Plano mensal", tx("comeco", "t3"), false],
-  ];
+  const plano = d.continuidade?.nome || "Plano mensal";
+  const cards = d.degrau === "premium"
+    ? [["01", tx("comeco", "r1"), d.oferta.titulo, d.oferta.servico.promessa, true],
+       ["02", tx("comeco", "r3"), plano, tx("comeco", "t3"), false],
+       ["03", tx("comeco", "r4"), tx("comeco", "n4"), tx("comeco", "t4"), false]]
+    : d.degrau === "principal"
+    ? [["01", tx("comeco", "r1"), d.oferta.titulo, d.oferta.servico.promessa, true],
+       ["02", tx("comeco", "r2p"), a?.premium.nome || "", tx("comeco", "t2p"), false],
+       ["03", tx("comeco", "r3"), plano, tx("comeco", "t3"), false]]
+    : [["01", tx("comeco", "r1"), d.oferta.titulo, d.oferta.servico.promessa, true],
+       ["02", tx("comeco", "r2"), a?.principal.nome || d.oferta.servico.projeto, tx("comeco", "t2"), false],
+       ["03", tx("comeco", "r3"), plano, tx("comeco", "t3"), false]];
   const xs = [81, 675, 1269];
   return (
     <Slide livre escala={escala} d={d}>
@@ -987,17 +997,21 @@ const aPartirDe = (t = "") => (t.match(/R\$\s*[\d.]+/) || [""])[0];
  */
 function Passo({ d, escala }) {
   const s = d.oferta.servico;
-  const a = d.oferta.area;
+  const outraOpcao = d.ancora; // a outra opção (acima ou abaixo na escada)
+  const atualRecomendada = d.destaque !== "projeto"; // "projeto" = a outra opção em destaque
+  const seloRec = d.degrau === "entrada" ? tx("passo", "seloEntrada") : tx("passo", "seloProjetoRec");
+  const seloNaoRec = (acima) => (acima ? tx("passo", "seloProjeto") : tx("passo", "seloEnxuto"));
+  const valorAtual = d.investimento || (s.valorFaixa ? aPartirDe(s.valorFaixa) : "") || "R$ ____";
   const entrada = {
-    tipo: "entrada", selo: d.destaque === "projeto" ? tx("passo", "seloEnxuto") : tx("passo", "seloEntrada"), nome: d.oferta.titulo, texto: s.pitch || s.promessa,
-    valor: d.investimento || "R$ ____", de: d.investimentoDe, pagamento: d.parcelamento, prazo: `${d.cronograma.total} dias úteis`,
+    tipo: d.degrau === "entrada" ? "entrada" : "atual", selo: atualRecomendada ? seloRec : seloNaoRec(!outraOpcao?.acima), nome: d.oferta.titulo, texto: s.pitch || s.promessa,
+    valor: valorAtual, aPartir: !d.investimento && !!s.valorFaixa, de: d.investimentoDe, pagamento: d.parcelamento, prazo: `${d.cronograma.total} dias úteis`,
   };
-  const projeto = a && {
-    tipo: "projeto", selo: d.destaque === "projeto" ? tx("passo", "seloProjetoRec") : tx("passo", "seloProjeto"), nome: a.principal.nome, texto: a.principal.pitch || a.principal.entregas,
-    valor: d.investimentoProjeto || aPartirDe(a.principal.valor) || "R$ ____", aPartir: !d.investimentoProjeto,
-    pagamento: d.parcelamentoProjeto, prazo: a.principal.prazo,
+  const projeto = outraOpcao && {
+    tipo: "projeto", selo: atualRecomendada ? seloNaoRec(outraOpcao.acima) : tx("passo", "seloProjetoRec"), nome: outraOpcao.nome, texto: outraOpcao.pitch || outraOpcao.entregas,
+    valor: d.investimentoProjeto || aPartirDe(outraOpcao.valor) || "R$ ____", aPartir: !d.investimentoProjeto,
+    pagamento: d.parcelamentoProjeto, prazo: outraOpcao.prazo,
   };
-  const [principal, outra] = d.destaque === "projeto" && projeto ? [projeto, entrada] : [entrada, projeto];
+  const [principal, outra] = !atualRecomendada && projeto ? [projeto, entrada] : [entrada, projeto];
   return (
     <Slide livre escala={escala} d={d}>
       {/* "Investimento" pequeno, como chapéu; o nome da oferta é o título */}
@@ -1013,7 +1027,7 @@ function Passo({ d, escala }) {
           </div>
         )}
       </div>
-      {outra && principal.tipo === "entrada" && (
+      {outra && principal.tipo === "entrada" && outraOpcao?.acima && (
         <p className="apr-p" style={{ left: 81, top: 880, width: 820, fontSize: 22, lineHeight: 1.35, color: "#999999" }}>
           {rico(tx("passo", "credito", { projeto: outra.nome.charAt(0).toLowerCase() + outra.nome.slice(1) }))}
         </p>
@@ -1157,7 +1171,7 @@ function Proximos({ d, escala }) {
       <Cabeca t={tx("proximos", "titulo")} sub={rico(tx("proximos", "sub", { inicio: dia(c.inicio), fim: dia(c.fim) }))} />
       <div className="apr-caixa" style={{ left: 90, top: 455, width: (colunas.length - 1) * w, height: 2, background: "#d4d4d8", borderRadius: 0 }} />
       {colunas.map((col, i) => (
-        <div key={i} className={`apr-crono2 ${col.tipo}`} style={{ left: 81 + i * w, width: w - 24 }}>
+        <div key={i} className={`apr-crono2 ${col.tipo} ${colunas.length > 6 ? "densa" : ""}`} style={{ left: 81 + i * w, width: w - 24 }}>
           <p className="data">{col.data}</p>
           <span className="marco" />
           <h3>{col.n && <b>{col.n}</b>}{col.nome}</h3>
