@@ -6,7 +6,7 @@ import { projects } from "../data/projects";
 import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import { FORMATOS } from "./mockups";
-import { Palco, SLIDES, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
+import { NOMES_SLIDES, Palco, SLIDES, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
 
@@ -181,6 +181,7 @@ export default function AdminServicos() {
       {!sel && <VisaoGeral r={r} escolher={escolher} />}
       {sel?.tipo === "servico" && (
         <Servico
+          key={sel.id}
           id={sel.id} r={r} padrao={padrao} set={set} setServ={setServ} escolher={escolher}
           persona={persona || MOMENTO_DO_SERVICO[sel.id] || "loja_sem_vitrine"} setPersona={setPersona}
         />
@@ -410,47 +411,58 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
   const aid = areaDoServico(id);
   const area = r.areas[aid];
   const igualPadrao = JSON.stringify([s, v, casos]) === JSON.stringify([padrao.servicos[id], padrao.visao[id], padrao.casos[id]]);
+  const [atual, setAtual] = useState(0);
+  const [apresentando, setApresentando] = useState(null);
+  const [verRoteiro, setVerRoteiro] = useState(false);
 
   const restaurar = () => {
     set("servicos", id, padrao.servicos[id]);
     set("visao", id, padrao.visao[id]);
     set("casos", id, padrao.casos[id]);
   };
+  const mudarArea = (campoNome, valor) => set("areas", aid, { ...area, [campoNome]: valor });
 
-  return (
-    <div className="grid grid-cols-[420px_1fr] gap-6 items-start">
-      <div className="flex flex-col gap-4">
-        {area && (
-          <div className="bg-white rounded-2xl border border-zinc-200 p-4 flex flex-col gap-2 text-sm">
-            <p className="text-zinc-500 leading-snug"><b className="text-zinc-900 font-semibold">{area.nome}</b> · {area.problema}</p>
-            <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-500">
-              <span className="px-2 py-1 rounded-md bg-zinc-100 text-zinc-900 font-medium">1 · {s.nome}</span>
-              <ChevronRight size={13} className="text-zinc-300" />
-              <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">2 · {area.principal.nome}</button>
-              <ChevronRight size={13} className="text-zinc-300" />
-              <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">3 · {area.premium.nome}</button>
-            </div>
-          </div>
-        )}
-        <Bloco titulo="O serviço (slides de proposta)" acao={!igualPadrao && <button onClick={restaurar} className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}>
-          <Campo label="Nome" valor={s.nome} onChange={(x) => setServ(id, "nome", x)} dica="Título da proposta quando a oferta foi escolhida no admin. Se veio do diagnóstico, o título é o nome que o cliente viu." />
-          <Campo label="Promessa" area valor={s.promessa} onChange={(x) => setServ(id, "promessa", x)} />
-          <Campo label="Frase do fechamento (último slide)" valor={s.fechamento} onChange={(x) => setServ(id, "fechamento", x)} dica="Uma pergunta que convida a fechar. O trecho entre ** fica em negrito." />
-          <Campo label="Texto comercial (slide de investimento)" area valor={s.pitch} onChange={(x) => setServ(id, "pitch", x)} dica="O que o cliente ganha, em 1 ou 2 frases. Aparece ao lado do preço." />
-          <Lista label="O que você recebe" itens={s.entregas} onChange={(x) => setServ(id, "entregas", x)} min={1} />
-          <Campo label="Não inclui" valor={s.naoInclui} onChange={(x) => setServ(id, "naoInclui", x)} />
-          <div className="grid grid-cols-3 gap-2">
-            <Campo label="Investimento" valor={s.investimento} placeholder="R$ ____" onChange={(x) => setServ(id, "investimento", x || null)} />
-            <Campo label="Prazo" valor={s.prazo} placeholder="__ dias úteis" onChange={(x) => setServ(id, "prazo", x || null)} />
-            <Campo label="Ajustes" valor={s.ajustes} onChange={(x) => setServ(id, "ajustes", x)} />
-          </div>
-        </Bloco>
+  // prévia com um lead de exemplo (o rascunho já aplicado no catálogo em uso)
+  const { slides, roteiro, objecoes } = useMemo(() => {
+    aplicarCatalogo(r);
+    const item = leadExemplo(r.servicos[id], persona);
+    const ap = { ...apresentacaoInicial(item), empresa: "Sua Empresa" };
+    const d = montarDados(item, ap);
+    const lista = SLIDES.filter(([, , quando]) => !quando || quando(d)).map(([sid, S]) => Object.assign((props) => <S d={d} {...props} />, { sid }));
+    return { slides: lista, roteiro: montarRoteiro(item, d, montarPreparacao(item, d)), objecoes: montarObjecoes(d) };
+  }, [id, persona, r]);
+  const indice = Math.min(atual, slides.length - 1);
+  const sid = slides[indice]?.sid;
+  const SlideAtual = slides[indice] || (() => null);
 
-        <Bloco titulo="Antes e depois">
-          <Lista label="O que muda depois (3 frases)" itens={s.depois} onChange={(x) => setServ(id, "depois", x)} fixo />
-        </Bloco>
+  const fixo = (t) => <p className="text-xs text-zinc-400 leading-relaxed">{t}</p>;
+  const doLead = (t) => <div className="rounded-xl bg-zinc-50 border border-zinc-200 p-3 text-xs text-zinc-500 leading-relaxed">{t} Isso é editado em cada lead, na apresentação dele.</div>;
 
-        <Bloco titulo="Cronograma (etapas)">
+  const B = {
+    nome: <Campo label="Nome do serviço" valor={s.nome} onChange={(x) => setServ(id, "nome", x)} dica="Título da proposta quando a oferta foi escolhida no admin. Se veio do diagnóstico, o título é o nome que o cliente viu." />,
+    promessa: <Campo label="Promessa (frase curta)" area valor={s.promessa} onChange={(x) => setServ(id, "promessa", x)} />,
+    pitch: <Campo label="Texto comercial" area valor={s.pitch} onChange={(x) => setServ(id, "pitch", x)} dica="O que o cliente ganha, em 1 ou 2 frases. Aparece ao lado do preço." />,
+    preco: (
+      <div className="grid grid-cols-2 gap-2">
+        <Campo label="Investimento" valor={s.investimento} placeholder="R$ ____" onChange={(x) => setServ(id, "investimento", x || null)} />
+        <Campo label="Prazo escrito" valor={s.prazo} placeholder="__ dias úteis" onChange={(x) => setServ(id, "prazo", x || null)} />
+      </div>
+    ),
+    ajustes: <Campo label="Rodadas de ajuste" valor={s.ajustes} onChange={(x) => setServ(id, "ajustes", x)} />,
+    entregas: <Lista label="O que você recebe" itens={s.entregas} onChange={(x) => setServ(id, "entregas", x)} min={1} />,
+    depois: <Lista label="Depois (3 frases)" itens={s.depois} onChange={(x) => setServ(id, "depois", x)} fixo />,
+    fechamento: <Campo label="Frase do fechamento" valor={s.fechamento} onChange={(x) => setServ(id, "fechamento", x)} dica="Uma pergunta que convida a fechar. O trecho entre ** fica em negrito." />,
+    exemplo: (
+      <label className="block">
+        <span className={rotulo}>Ilustração do entregável</span>
+        <select className={campo} value={s.exemplo} onChange={(e) => setServ(id, "exemplo", e.target.value)}>
+          <option value="guia">Páginas do Guia de mensagem (+ slide da sessão)</option>
+          {Object.entries(FORMATOS).map(([k, f]) => <option key={k} value={k}>Ilustração: {f.nome}</option>)}
+          {projects.map((p) => <option key={p.id} value={p.id}>Projeto: {p.title}</option>)}
+        </select>
+      </label>
+    ),
+    etapas: <div className="flex flex-col gap-3">
           <p className="text-xs text-zinc-400 -mt-2">Vira o slide de cronograma, com datas reais a partir do início. Total: <b className="text-black">{s.etapas.reduce((t, e) => t + (Number(e.dias) || 1), 0)} dias úteis</b> (prazo escrito: {s.prazo || "—"}).</p>
           {s.etapas.map((e, i) => {
             const mudarEtapa = (k, v) => setServ(id, "etapas", s.etapas.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
@@ -471,20 +483,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
             );
           })}
           {s.etapas.length < 5 && <button onClick={() => setServ(id, "etapas", [...s.etapas, { nome: "", texto: "", dias: 2, cliente: "", aprovacao: false }])} className="self-start inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><Plus size={13} /> Adicionar etapa</button>}
-        </Bloco>
-
-        <Bloco titulo="Como fica (ilustração do entregável)">
-          <label className="block">
-            <span className={rotulo}>Mostrar</span>
-            <select className={campo} value={s.exemplo} onChange={(e) => setServ(id, "exemplo", e.target.value)}>
-              <option value="guia">Páginas do Guia de mensagem (+ slide da sessão)</option>
-              {Object.entries(FORMATOS).map(([k, f]) => <option key={k} value={k}>Ilustração: {f.nome}</option>)}
-              {projects.map((p) => <option key={p.id} value={p.id}>Projeto: {p.title}</option>)}
-            </select>
-          </label>
-        </Bloco>
-
-        <Bloco titulo="O que eu vi de fora (sugestão)">
+    </div>,
+    visao: <div className="flex flex-col gap-3">
           <Campo label="Título" area valor={v.titulo} onChange={(x) => set("visao", id, { ...v, titulo: x })} />
           {v.observacoes.map((o, i) => (
             <div key={i} className="flex flex-col gap-1.5">
@@ -494,9 +494,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
             </div>
           ))}
           <p className="text-[11px] text-zinc-400">Entra nos leads que ainda não editaram essas observações.</p>
-        </Bloco>
-
-        <Bloco titulo="Casos">
+    </div>,
+    casos: <div>
           <div className="grid grid-cols-2 gap-1.5">
             {projects.map((p) => (
               <label key={p.id} className="flex items-center gap-2 text-sm">
@@ -505,69 +504,134 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
               </label>
             ))}
           </div>
-        </Bloco>
-
-        <Bloco titulo="Vem do diagnóstico como">
-          {ofertas.length
-            ? <ul className="text-sm text-zinc-600 list-disc pl-5">{ofertas.map((o) => <li key={o}>{o}</li>)}</ul>
-            : <p className="text-sm text-zinc-400">Nenhuma oferta do diagnóstico cai aqui.</p>}
-          <p className="text-[11px] text-zinc-400">Para mudar, use a aba Ofertas do diagnóstico.</p>
-        </Bloco>
+    </div>,
+    custo: area && (
+      <div className="flex flex-col gap-1.5">
+        <span className={rotulo}>Frase (da área {area.nome})</span>
+        <textarea rows={3} className={campo} value={area.custo?.frase || ""} onChange={(e) => mudarArea("custo", { ...area.custo, frase: e.target.value })} />
+        <span className={`${rotulo} mt-2`}>Consequências (usadas no roteiro)</span>
+        {(area.custo?.consequencias || []).map((c, i) => (
+          <input key={i} className={`${campo} text-zinc-600`} value={c} onChange={(e) => mudarArea("custo", { ...area.custo, consequencias: area.custo.consequencias.map((x, k) => (k === i ? e.target.value : x)) })} />
+        ))}
+        <p className="text-[11px] text-zinc-400">Vale para todos os serviços da área. Use **assim** para o negrito.</p>
       </div>
+    ),
+    projeto: area && (
+      <div className="flex flex-col gap-2">
+        <Campo label="2 · Projeto (principal da área)" valor={area.principal.nome} onChange={(x) => mudarArea("principal", { ...area.principal, nome: x })} />
+        <Campo label="Texto comercial do projeto" area valor={area.principal.pitch} onChange={(x) => mudarArea("principal", { ...area.principal, pitch: x })} />
+        <Campo label="Valor do projeto" valor={area.principal.valor} onChange={(x) => mudarArea("principal", { ...area.principal, valor: x })} />
+      </div>
+    ),
+    continuidade: area && (
+      <label className="block">
+        <span className={rotulo}>3 · Plano mensal sugerido</span>
+        <select className={campo} value={area.continuidade || ""} onChange={(e) => mudarArea("continuidade", e.target.value)}>
+          {Object.entries(r.continuidade).map(([k, pl]) => <option key={k} value={k}>{pl.nome}</option>)}
+        </select>
+      </label>
+    ),
+  };
 
-      <Previa servicoId={id} persona={persona} setPersona={setPersona} r={r} />
-    </div>
-  );
-}
-
-function Previa({ servicoId, persona, setPersona, r }) {
-  const [verRoteiro, setVerRoteiro] = useState(false);
-  const [apresentando, setApresentando] = useState(null);
-  const { slides, roteiro, objecoes } = useMemo(() => {
-    aplicarCatalogo(r); // garante que os slides já leiam o rascunho
-    const item = leadExemplo(r.servicos[servicoId], persona);
-    const ap = { ...apresentacaoInicial(item), empresa: "Sua Empresa" };
-    const d = montarDados(item, ap);
-    const lista = SLIDES.filter(([, , quando]) => !quando || quando(d)).map(([sid, S]) => Object.assign((props) => <S d={d} {...props} />, { sid }));
-    return { slides: lista, roteiro: montarRoteiro(item, d, montarPreparacao(item, d)), objecoes: montarObjecoes(d) };
-  }, [servicoId, persona, r]);
+  const POR_SLIDE = {
+    capa: [fixo("A capa é igual para todos. O nome da empresa vem de cada lead.")],
+    objetivo: [fixo("Este slide é igual para todos os leads.")],
+    conversa: [fixo("Este slide é igual para todos os leads.")],
+    respostas: [doLead("Momento, nota, radar e barras vêm do diagnóstico; o resumo é ajustado por lead."), fixo("Para testar outro momento nesta prévia, troque o \"Momento\" acima do slide.")],
+    visao: [B.visao, fixo("É a sugestão inicial. Em cada lead você troca pelo que viu de verdade e coloca os prints.")],
+    custo: [B.custo],
+    comeco: [B.promessa, B.projeto, B.continuidade],
+    oferta: [B.nome, B.promessa],
+    antesdepois: [B.depois, fixo("O lado \"Antes\" usa os títulos das observações da Visão externa.")],
+    casos: [B.casos],
+    entrega: [B.promessa, B.entregas, B.exemplo],
+    produto: [B.exemplo],
+    sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
+    passo: [B.preco, B.pitch, B.projeto, doLead("Parcelamento, destaque e a frase da conta")],
+    condicoes: [B.ajustes, doLead("Pagamento e validade")],
+    proximos: [B.etapas, doLead("A data de início")],
+    fim: [B.fechamento, doLead("Validade e data de início")],
+  };
 
   return (
-    <div className="flex flex-col gap-4 min-w-0">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-zinc-500 flex-1">Prévia com um lead de exemplo · {slides.length} slides</p>
-        <button onClick={() => abrirTelaCheia(setApresentando)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><Play size={15} /> Apresentar</button>
-        <label className="flex items-center gap-2 text-sm">
-          <span className="text-zinc-500">Momento</span>
-          <select className="px-2 py-1 rounded-lg border border-zinc-200 text-sm bg-white" value={persona} onChange={(e) => setPersona(e.target.value)}>
-            {Object.entries(MOMENTOS).map(([k, n]) => <option key={k} value={k}>{n}</option>)}
-          </select>
-        </label>
-      </div>
-      {slides.map((S, i) => (
-        <button key={S.sid} onClick={() => abrirTelaCheia(setApresentando, i)} className="block w-full rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 hover:ring-black/30 text-left" title="Apresentar a partir deste slide">
-          <Palco><S /></Palco>
-        </button>
-      ))}
-      {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal="apr-exemplo" onSair={() => setApresentando(null)} />}
-      <button onClick={() => setVerRoteiro((x) => !x)} className="self-start text-sm font-semibold text-zinc-600 hover:text-black">{verRoteiro ? "Esconder" : "Ver"} roteiro e objeções deste serviço</button>
-      {verRoteiro && (
-        <div className="bg-white rounded-2xl border border-zinc-200 p-5 text-sm flex flex-col gap-4">
-          <p className="text-xs text-zinc-400">O roteiro é montado a partir dos textos acima e do lead. Edições de fala ficam em cada lead, na janela do roteiro.</p>
-          {roteiro.map((e) => (
-            <div key={e.id}>
-              <p className="font-bold">{e.titulo} <span className="font-normal text-zinc-400">· {e.tempo}</span></p>
-              <ul className="list-disc pl-5 text-zinc-600 mt-1 flex flex-col gap-1">{e.falas.map((f, i) => <li key={i}>{f}</li>)}</ul>
-            </div>
-          ))}
-          <div>
-            <p className="font-bold">Objeções</p>
-            <ul className="pl-0 mt-1 flex flex-col gap-2">
-              {objecoes.map((o) => <li key={o.id} className="text-zinc-600"><b className="text-black">{o.diz}</b> {o.resposta} <span className="text-zinc-400">{o.seguir}</span></li>)}
-            </ul>
+    <div className="flex flex-col gap-4">
+      {area && (
+        <div className="bg-white rounded-2xl border border-zinc-200 px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+          <p className="text-zinc-500"><b className="text-zinc-900 font-semibold">{area.nome}</b> · {area.problema}</p>
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-zinc-500">
+            <span className="px-2 py-1 rounded-md bg-zinc-100 text-zinc-900 font-medium">1 · {s.nome}</span>
+            <ChevronRight size={13} className="text-zinc-300" />
+            <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">2 · {area.principal.nome}</button>
+            <ChevronRight size={13} className="text-zinc-300" />
+            <button onClick={() => escolher({ tipo: "area", id: aid })} className="px-2 py-1 rounded-md hover:bg-zinc-100">3 · {area.premium.nome}</button>
           </div>
+          {!igualPadrao && <button onClick={restaurar} className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black"><RotateCcw size={13} /> Voltar ao padrão</button>}
         </div>
       )}
+
+      <div className="grid grid-cols-[180px_1fr_380px] gap-5 items-start">
+        <nav className="sticky top-[76px] max-h-[calc(100vh-96px)] overflow-y-auto flex flex-col gap-2.5 pr-1">
+          {slides.map((S, i) => (
+            <button key={S.sid} onClick={() => setAtual(i)} className={`text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white"}`}>
+              <div className="rounded overflow-hidden ring-1 ring-black/5 pointer-events-none"><Palco><S /></Palco></div>
+              <p className={`text-[11px] mt-1 px-0.5 truncate ${i === indice ? "font-semibold text-black" : "text-zinc-500"}`}>{i + 1} · {NOMES_SLIDES[S.sid] || S.sid}</p>
+            </button>
+          ))}
+        </nav>
+
+        <div className="flex flex-col gap-3 min-w-0 sticky top-[76px]">
+          <div className="flex items-center gap-3 text-sm">
+            <span className="text-zinc-500 flex-1">Prévia com um lead de exemplo</span>
+            <label className="flex items-center gap-2">
+              <span className="text-zinc-500">Momento</span>
+              <select className="px-2 py-1 rounded-lg border border-zinc-200 text-sm bg-white" value={persona} onChange={(e) => setPersona(e.target.value)}>
+                {Object.entries(MOMENTOS).map(([k, n]) => <option key={k} value={k}>{n}</option>)}
+              </select>
+            </label>
+          </div>
+          <div className="rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5"><Palco><SlideAtual /></Palco></div>
+          <div className="flex items-center gap-2">
+            <button disabled={indice === 0} onClick={() => setAtual(indice - 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">‹ Anterior</button>
+            <button disabled={indice === slides.length - 1} onClick={() => setAtual(indice + 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">Próximo ›</button>
+            <span className="text-xs text-zinc-400 ml-1">{indice + 1} de {slides.length}</span>
+            <button onClick={() => abrirTelaCheia(setApresentando, indice)} className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
+          </div>
+          <button onClick={() => setVerRoteiro((x) => !x)} className="self-start text-sm font-semibold text-zinc-600 hover:text-black mt-2">{verRoteiro ? "Esconder" : "Ver"} roteiro e objeções deste serviço</button>
+          {verRoteiro && (
+            <div className="bg-white rounded-2xl border border-zinc-200 p-5 text-sm flex flex-col gap-4 max-h-[50vh] overflow-y-auto">
+              {roteiro.map((e) => (
+                <div key={e.id}>
+                  <p className="font-bold">{e.titulo} <span className="font-normal text-zinc-400">· {e.tempo}</span></p>
+                  <ul className="list-disc pl-5 text-zinc-600 mt-1 flex flex-col gap-1">{e.falas.map((f, i) => <li key={i}>{f}</li>)}</ul>
+                </div>
+              ))}
+              <div>
+                <p className="font-bold">Objeções</p>
+                <ul className="mt-1 flex flex-col gap-2">{objecoes.map((o) => <li key={o.id} className="text-zinc-600"><b className="text-black">{o.diz}</b> {o.resposta} <span className="text-zinc-400">{o.seguir}</span></li>)}</ul>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <aside className="sticky top-[76px] max-h-[calc(100vh-96px)] overflow-y-auto bg-white rounded-2xl border border-zinc-200 p-5 flex flex-col gap-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Editando</p>
+            <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>
+          </div>
+          {(POR_SLIDE[sid] || [fixo("Nada para editar neste slide.")]).filter(Boolean).map((el, i) => <React.Fragment key={i}>{el}</React.Fragment>)}
+          <details className="border-t border-zinc-100 pt-3 text-sm">
+            <summary className="cursor-pointer text-xs font-semibold text-zinc-500">Mais deste serviço</summary>
+            <div className="flex flex-col gap-3 mt-3">
+              <Campo label="Não inclui" valor={s.naoInclui} onChange={(x) => setServ(id, "naoInclui", x)} />
+              <div>
+                <span className={rotulo}>Vem do diagnóstico como</span>
+                {ofertas.length ? <ul className="text-sm text-zinc-600 list-disc pl-5">{ofertas.map((o) => <li key={o}>{o}</li>)}</ul> : <p className="text-sm text-zinc-400">Nenhuma oferta do diagnóstico cai aqui.</p>}
+              </div>
+            </div>
+          </details>
+        </aside>
+      </div>
+      {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal="apr-exemplo" onSair={() => setApresentando(null)} />}
     </div>
   );
 }
