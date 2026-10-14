@@ -399,10 +399,12 @@ export const SERVICOS = {
     "promessa": "A marca inteira renovada, da estratégia ao lançamento.",
     "fechamento": "Vamos **reinventar a sua marca** do jeito certo?",
     "entregas": [
-      "Posicionamento completo",
-      "Identidade visual nova",
+      "Imersão com sócios e equipe e diagnóstico da marca atual",
+      "Posicionamento: proposta de valor, público, personalidade e tom de voz",
+      "Nova identidade visual: conceito, logo, cores, tipografia e grafismos",
+      "Manual de marca completo",
       "Aplicações principais: papelaria, redes, apresentação e sinalização",
-      "Plano de lançamento da nova marca"
+      "Plano de lançamento para apresentar a nova marca ao mercado"
     ],
     "naoInclui": "site, fotos e produção de conteúdo",
     "investimento": null,
@@ -889,7 +891,7 @@ export const AREAS = {
     nome: "Percepção de valor", foco: "Como parecer", problema: "O cliente acha caro; a marca parece mais barata que o trabalho.",
     entradas: ["revisao", "kit"],
     principal: { servico: "valor_principal", nome: "Identidade visual", pitch: "Uma identidade visual completa, pensada para o seu negócio, que faz o cliente perceber o valor antes de ver o preço.", entregas: "Conceito, logo e variações, sistema visual (cores, fontes, grafismos, fotos), manual de marca, papelaria e kit para redes", prazo: "4 a 6 semanas", valor: "R$ 4.500 a R$ 9.000" },
-    premium: { servico: "valor_premium", nome: "Rebranding", entregas: "Posicionamento + identidade + aplicações principais + plano de lançamento da nova marca", prazo: "8 a 12 semanas", valor: "R$ 12.000 a R$ 25.000" },
+    premium: { servico: "valor_premium", nome: "Rebranding", entregas: "Imersão e diagnóstico, posicionamento e tom de voz, nova identidade visual, manual, aplicações principais e plano de lançamento", prazo: "8 a 12 semanas", valor: "R$ 12.000 a R$ 25.000" },
     custo: { frase: "O cliente decide pelo preço **antes de conhecer o seu valor.**", consequencias: ["Quem compara pela aparência escolhe o mais barato.", "Você negocia desconto em vez de valor.", "O trabalho bom não aparece na primeira impressão."] },
     continuidade: "design",
     complementos: "Guia de direção de fotos (R$ 500 a R$ 900); embalagem ou etiqueta; sinalização ou fachada (sob orçamento)",
