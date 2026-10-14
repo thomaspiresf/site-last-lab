@@ -377,7 +377,9 @@ export const CASOS_PADRAO = {
 // Supabase (catalogo_servicos); carregarCatalogo() aplica por cima destes objetos, no lugar, para
 // que apresentação, roteiro e guia usem sempre os textos editados.
 
-const GRUPOS = { servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
+import { TEXTOS } from "./textosSlides";
+
+const GRUPOS = { textos: TEXTOS, servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
 const ORIGINAL = JSON.parse(JSON.stringify(GRUPOS));
 
 /** O catálogo padrão do código (para comparar e para "voltar ao padrão"). */
@@ -390,6 +392,8 @@ export const catalogoAtual = () => JSON.parse(JSON.stringify(GRUPOS));
 export function aplicarCatalogo(dados = {}) {
   for (const [grupo, alvo] of Object.entries(GRUPOS)) {
     const final = { ...ORIGINAL[grupo], ...(dados[grupo] || {}) };
+    // textos dos slides: mescla campo a campo (campos novos do código continuam aparecendo)
+    if (grupo === "textos") for (const k of Object.keys(ORIGINAL.textos)) final[k] = { ...ORIGINAL.textos[k], ...((dados.textos || {})[k] || {}) };
     for (const k of Object.keys(alvo)) delete alvo[k];
     Object.assign(alvo, JSON.parse(JSON.stringify(final)));
   }

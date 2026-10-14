@@ -9,6 +9,7 @@ const AREAS_ATUAIS = () => AREAS;
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import { Cena, FORMATOS, Peca } from "./mockups";
 import { dia, montarCronograma, periodo } from "./cronograma";
+import { TEXTOS } from "./textosSlides";
 import { carregarCatalogo } from "./carregarCatalogo";
 import "./apresentacao.css";
 
@@ -396,9 +397,9 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 
   // o que dá para mudar em cada slide
   const POR_SLIDE = {
-    capa: [SEC.empresa, fixo("O título e o desenho são fixos. A empresa aparece no rodapé de todos os slides.")],
+    capa: [SEC.empresa, fixo("A empresa aparece no rodapé de todos os slides.")],
     objetivo: [fixo("Este slide é igual para todos os leads.")],
-    conversa: [fixo("O texto do slide é fixo. O elogio abaixo aparece só no roteiro, na abertura da conversa."), SEC.elogio],
+    conversa: [fixo("O elogio abaixo aparece só no roteiro, na abertura da conversa."), SEC.elogio],
     respostas: [SEC.resumo, fixo("Momento, nota, faixa, ícone, radar e barras vêm do diagnóstico do lead.")],
     visao: [SEC.visao, fixo("Os títulos das observações também viram o lado \"Antes\" do slide Antes & Depois.")],
     custo: [SEC.custo, fixo("O texto padrão vem da área da oferta; aqui você ajusta só para este lead. Use **assim** para o negrito.")],
@@ -412,7 +413,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     passo: [SEC.invest, SEC.conta, doCatalogo("Os textos comerciais das duas opções vêm do serviço e da área.")],
     condicoes: [SEC.pagamento, SEC.validade, fixo("O prazo vem do cronograma do serviço.")],
     proximos: [SEC.inicio, doCatalogo("As etapas, a duração e o que depende do cliente vêm do serviço.")],
-    fim: [SEC.fechamento, SEC.validade, SEC.inicio, fixo("Contatos e o chapéu \"Próximo passo\" são fixos.")],
+    fim: [SEC.fechamento, SEC.validade, SEC.inicio],
   };
 
   return (
@@ -422,6 +423,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
         <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>
       </div>
       {(POR_SLIDE[sid] || [fixo("Nada para editar neste slide.")]).map((el, i) => <React.Fragment key={i}>{el}</React.Fragment>)}
+      <a href={`/admin/servicos?s=${svc}&slide=${sid}`} target="_blank" rel="noreferrer" className="text-xs font-semibold text-zinc-600 hover:text-black underline underline-offset-2">Editar os textos fixos deste slide (títulos, rótulos) em Produtos e serviços</a>
       <p className="text-[11px] text-zinc-400 border-t border-zinc-100 pt-3">Salva sozinho ao sair de cada campo.</p>
     </aside>
   );
@@ -547,9 +549,9 @@ function Slide({ tipo = "", classe = "", escala, d, children, livre }) {
 function Rodape({ d }) {
   return (
     <div className="apr-rodape">
-      <p style={{ left: 83 }}>Desenvolvido<br />para {d.empresa || d.nome}</p>
-      <p style={{ left: 723 }}>Diagnóstico de marca<br />Apresentação</p>
-      <p style={{ left: 1322 }}>Last Lab<br />Thomás Pires</p>
+      <p style={{ left: 83 }}>{rico(tx("rodape", "col1", { empresa: d.empresa || d.nome }))}</p>
+      <p style={{ left: 723 }}>{rico(tx("rodape", "col2"))}</p>
+      <p style={{ left: 1322 }}>{rico(tx("rodape", "col3"))}</p>
       <svg className="simbolo" viewBox="0 0 20 46" aria-hidden="true">
         <rect x="5" y="0" width="4" height="31" /><rect x="14" y="0" width="5" height="31" />
         <polygon points="0,34 5,34 8,45 4,45" /><polygon points="11,34 14,34 18,45 14,45" />
@@ -586,6 +588,17 @@ const Cabeca = ({ t, sub, y = 63, corSub = "#999999" }) => (
   </>
 );
 
+/** Texto fixo editável (Produtos e serviços › textos do slide), com {variáveis} trocadas. */
+const tx = (slide, chave, vars = {}) => String(TEXTOS[slide]?.[chave] ?? "").replace(/\{(\w+)\}/g, (m, v) => (vars[v] ?? m));
+
+/** Texto rico: nova linha = quebra, **negrito**, [[laranja]]. */
+function rico(str = "") {
+  const pedacos = (linha) => linha.split(/(\*\*.+?\*\*|\[\[.+?\]\])/g).map((p, i) =>
+    p.startsWith("**") ? <b key={i}>{p.slice(2, -2)}</b> : p.startsWith("[[") ? <span key={i} style={{ color: "#ef4b3a" }}>{p.slice(2, -2)}</span> : p);
+  const linhas = String(str).split("\n");
+  return linhas.map((l, i) => <React.Fragment key={i}>{pedacos(l)}{i < linhas.length - 1 && <br />}</React.Fragment>);
+}
+
 /** Frase com a parte entre ** em SemiBold. */
 const negrito = (txt = "") => txt.split("**").map((parte, i) => (i % 2 ? <b key={i}>{parte}</b> : parte));
 
@@ -603,7 +616,7 @@ function Capa({ d, escala }) {
   return (
     <Slide livre tipo="escuro" escala={escala} d={d}>
       <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
-      <P x={68} y={324} s={152} lh={1.15} cor="#fff" como="h1">Diagnóstico<br />de marca</P>
+      <P x={68} y={324} s={152} lh={1.15} cor="#fff" como="h1">{rico(tx("capa", "titulo"))}</P>
       <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
         {PECAS_CAPA.map((pts) => <polygon key={pts} points={pts} fill="#ef4b3a" />)}
       </svg>
@@ -617,19 +630,19 @@ const Icone = ({ x, y = 197, t = 30, children }) => (
 
 function Objetivo({ d, escala }) {
   const cols = [
-    [77, "01", "O seu momento", <>Me conta um pouco sobre<br />o negócio, o cliente e<br />onde quer chegar</>],
-    [722, "02", "Visão externa", <>Sua marca e suas respostas<br />vistas de fora.</>],
-    [1350, "03", "Por onde começar", <>Primeiros passos, prazos<br />e investimento</>],
+    [77, "01", tx("objetivo", "t1"), rico(tx("objetivo", "d1"))],
+    [722, "02", tx("objetivo", "t2"), rico(tx("objetivo", "d2"))],
+    [1350, "03", tx("objetivo", "t3"), rico(tx("objetivo", "d3"))],
   ];
   return (
     <Slide livre escala={escala} d={d}>
-      <P x={77} y={63} s={88} como="h2" cor="#000">Nossa conversa</P>
+      <P x={77} y={63} s={88} como="h2" cor="#000">{tx("objetivo", "titulo")}</P>
       <Icone x={82} y={196} t={34}><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" /></Icone>
-      <P x={129} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>Do diagnóstico à ação.</P>
+      <P x={129} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>{rico(tx("objetivo", "meta1"))}</P>
       <Icone x={619} y={197} t={32}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></Icone>
-      <P x={672} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>30 minutos</P>
+      <P x={672} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>{rico(tx("objetivo", "meta2"))}</P>
       <Icone x={943} y={200} t={34}><path d="M20 6 9 17l-5-5" /></Icone>
-      <P x={994} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>Avaliação sem compromisso</P>
+      <P x={994} y={187} s={36} peso={300} cor="#999999" style={{ whiteSpace: "nowrap" }}>{rico(tx("objetivo", "meta3"))}</P>
       {cols.map(([x, n, t, txt]) => (
         <React.Fragment key={n}>
           <P x={x} y={373} s={144} peso={200} cor="#ef4b3a">{n}</P>
@@ -644,8 +657,8 @@ function Objetivo({ d, escala }) {
 function Conversa({ d, escala }) {
   return (
     <Slide livre tipo="laranja" escala={escala} d={d}>
-      <P x={89} y={73} s={56} cor="#d64434" style={{ whiteSpace: "nowrap" }}>01 - O seu momento</P>
-      <P x={82} y={242} s={124} lh={1.38} cor="#fff" style={{ whiteSpace: "nowrap" }}>Antes de mostrar<br />qualquer coisa,<br /><b>quero te ouvir.</b></P>
+      <P x={89} y={73} s={56} cor="#d64434" style={{ whiteSpace: "nowrap" }}>{rico(tx("conversa", "chapeu"))}</P>
+      <P x={82} y={242} s={124} lh={1.38} cor="#fff" style={{ whiteSpace: "nowrap" }}>{rico(tx("conversa", "frase"))}</P>
     </Slide>
   );
 }
@@ -661,9 +674,9 @@ function Respostas({ d, escala }) {
   const pil = d.pilares.slice(0, 5);
   return (
     <Slide livre escala={escala} d={d}>
-      <Cabeca t="Visão interna" sub={d.resumo} corSub="#888888" />
+      <Cabeca t={tx("respostas", "titulo")} sub={d.resumo} corSub="#888888" />
       <div className="apr-caixa" style={{ left: 71, top: 331, width: 557, height: 527, background: "#ef4b3a" }} />
-      <P x={114} y={375} s={22} peso={300} cor="#fff" style={{ whiteSpace: "nowrap" }}>MOMENTO DA SUA MARCA</P>
+      <P x={114} y={375} s={22} peso={300} cor="#fff" style={{ whiteSpace: "nowrap" }}>{tx("respostas", "rotulo")}</P>
       <P direita={592} y={362} s={34} peso={600} cor="#fff" style={{ whiteSpace: "nowrap" }}>{d.nota}<span style={{ fontSize: 28, fontWeight: 400, color: "#faada4" }}>/100</span></P>
       <div className="apr-caixa apr-persona" style={{ left: 109, top: 461, width: 130, height: 129, background: "#d64434", borderRadius: 22 }}
         dangerouslySetInnerHTML={{ __html: ICONES_PERSONA[d.personaId] || ICONES_PERSONA.indefinida || "" }} />
@@ -700,7 +713,7 @@ function Visao({ d, escala }) {
   const xs = [[81, 83], [675, 676], [1269, 1270]];
   return (
     <Slide livre escala={escala} d={d}>
-      <Cabeca t="Visão externa" sub={d.visaoTitulo || <span className="apr-vazio">[A frase que resume o que você viu]</span>} />
+      <Cabeca t={tx("visao", "titulo")} sub={d.visaoTitulo || <span className="apr-vazio">[A frase que resume o que você viu]</span>} />
       {d.observacoes.slice(0, 3).map((o, i) => (
         <React.Fragment key={i}>
           <div className="apr-caixa" style={{ left: xs[i][0], top: 330, width: 566, height: 344, background: "#e7e6e6", overflow: "hidden" }}>
@@ -719,7 +732,7 @@ function Visao({ d, escala }) {
 function Custo({ d, escala }) {
   return (
     <Slide livre tipo="escuro" escala={escala} d={d}>
-      <P x={89} y={73} s={56} cor="#999999" style={{ whiteSpace: "nowrap" }}>O custo de ficar como está</P>
+      <P x={89} y={73} s={56} cor="#999999" style={{ whiteSpace: "nowrap" }}>{rico(tx("custo", "chapeu"))}</P>
       <P x={82} y={311} s={102} lh={1.38} peso={300} cor="#fff" w={1400}>{negrito(d.custo.frase)}</P>
     </Slide>
   );
@@ -729,14 +742,14 @@ function Custo({ d, escala }) {
 function Comeco({ d, escala }) {
   const a = d.oferta.area;
   const cards = [
-    ["01", "INÍCIO", d.oferta.titulo, d.oferta.servico.promessa, true],
-    ["02", "PROJETO", a?.principal.nome || d.oferta.servico.projeto, "Quando a entrada mostra resultado", false],
-    ["03", "CONTINUIDADE", d.continuidade?.nome || "Plano mensal", "Para a marca seguir consistente todo mês", false],
+    ["01", tx("comeco", "r1"), d.oferta.titulo, d.oferta.servico.promessa, true],
+    ["02", tx("comeco", "r2"), a?.principal.nome || d.oferta.servico.projeto, tx("comeco", "t2"), false],
+    ["03", tx("comeco", "r3"), d.continuidade?.nome || "Plano mensal", tx("comeco", "t3"), false],
   ];
   const xs = [81, 675, 1269];
   return (
     <Slide livre escala={escala} d={d}>
-      <Cabeca t="Por onde começar" sub={<>Do diagnóstico à <span style={{ color: "#ef4b3a" }}>ação</span>.</>} />
+      <Cabeca t={tx("comeco", "titulo")} sub={rico(tx("comeco", "sub"))} />
       {cards.map(([n, rot, t, txt, ativo], i) => (
         <div key={n} className="apr-caixa apr-degrau" style={{ left: xs[i], top: 321, width: 565, height: 544, background: ativo ? "#ef4b3a" : "#e7e6e6", "--pn": `${[40, 51, 52][i]}px`, "--pt": `${[37, 48, 52][i]}px`, "--pr": `${[61, 50, 51][i]}px` }}>
           <p className="n" style={{ color: ativo ? "#fff" : "#999999" }}>{n}</p>
@@ -753,8 +766,8 @@ function Comeco({ d, escala }) {
 function OfertaCapa({ d, escala }) {
   return (
     <Slide livre tipo="laranja" escala={escala} d={d}>
-      <P x={97} y={78} s={56} peso={300} cor="#fff">01</P>
-      <P direita={1837} y={78} s={48} peso={300} cor="#fff" style={{ top: 78 + 4 }}>INÍCIO</P>
+      <P x={97} y={78} s={56} peso={300} cor="#fff">{tx("oferta", "numero")}</P>
+      <P direita={1837} y={78} s={48} peso={300} cor="#fff" style={{ top: 78 + 4 }}>{tx("oferta", "rotulo")}</P>
       <div className="apr-p" style={{ left: 94, top: 314 + 0.105 * 124, width: 1100, display: "flex", flexDirection: "column", gap: 58 }}>
         <h2 style={{ fontSize: 124, lineHeight: 1.19, fontWeight: 500, color: "#fff" }}>{d.oferta.titulo}</h2>
         <p style={{ fontSize: 36, lineHeight: 1.22, color: "#fff", width: 470 }}>{d.oferta.servico.promessa}</p>
@@ -768,11 +781,11 @@ function AntesDepois({ d, escala }) {
   const tops = [388, 525, 662];
   return (
     <Slide livre escala={escala} d={d}>
-      <P x={77} y={40} s={88} como="h2" cor="#000">Antes &amp; Depois</P>
+      <P x={77} y={40} s={88} como="h2" cor="#000">{tx("antesdepois", "titulo")}</P>
       <div className="apr-caixa" style={{ left: 81, top: 199, width: 852, height: 718, background: "#e7e6e6" }} />
       <div className="apr-caixa" style={{ left: 977, top: 199, width: 852, height: 718, background: "#262626" }} />
-      <P x={133} y={239} s={36} peso={300} cor="#999999">ANTES</P>
-      <P x={1056} y={239} s={36} peso={300} cor="#999999">DEPOIS</P>
+      <P x={133} y={239} s={36} peso={300} cor="#999999">{tx("antesdepois", "antes")}</P>
+      <P x={1056} y={239} s={36} peso={300} cor="#999999">{tx("antesdepois", "depois")}</P>
       {(hoje.length ? hoje : ["[O que você viu de fora]"]).map((x, i) => (
         <React.Fragment key={i}>
           <span className="apr-bola" style={{ left: 134, top: tops[i] + 8.5 }} />
@@ -819,13 +832,13 @@ function Entrega({ d, escala }) {
   const s = d.oferta.servico;
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t="O que você recebe" sub={s.promessa} />
+      <Titulo t={tx("entrega", "titulo")} sub={s.promessa} />
       <div className="apr-entrega">
         <div className="esq">
           <div className="lista">
             {s.entregas.map((x) => <div key={x} className="apr-check"><i />{x}</div>)}
           </div>
-          <p className="prazo">Entrega em {d.cronograma.total} dias úteis · {d.oferta.servico.ajustes} de ajuste</p>
+          <p className="prazo">{tx("entrega", "prazo", { total: d.cronograma.total, ajustes: d.oferta.servico.ajustes })}</p>
         </div>
         <PreviaEntrega d={d} />
       </div>
@@ -852,7 +865,7 @@ function Produto({ d, escala }) {
     const g = { ...GUIA_VAZIO, marca: d.empresa || d.nome };
     return (
       <Slide escala={escala} d={d}>
-        <Titulo t="O Guia de mensagem" sub="8 páginas para usar na bio, no site, na apresentação e nos posts." />
+        <Titulo t={tx("produto", "tituloGuia")} sub={tx("produto", "subGuia")} />
         <div className="apr-paginas">
           {GUIA_PAGINAS.map((P, i) => (
             <div key={i} className="item">
@@ -867,8 +880,8 @@ function Produto({ d, escala }) {
   if (FORMATOS[ex]) {
     return (
       <Slide escala={escala} d={d}>
-        <Titulo t="Como fica" sub={FORMATOS[ex].sub} />
-        <Cena formato={ex} marca={d.empresa || d.nome} />
+        <Titulo t={tx("produto", "titulo")} sub={FORMATOS[ex].sub} />
+        <Cena formato={ex} marca={d.empresa || d.nome} aviso={tx("produto", "aviso")} />
       </Slide>
     );
   }
@@ -876,7 +889,7 @@ function Produto({ d, escala }) {
   const imgs = p ? imagensDoProjeto(p).slice(0, 5) : [];
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t="Como fica" sub={p ? `Um projeto parecido: ${p.title}${p.expandDetails?.sector ? ` · ${p.expandDetails.sector}` : ""}.` : "Exemplos do portfólio."} />
+      <Titulo t={tx("produto", "titulo")} sub={p ? `Um projeto parecido: ${p.title}${p.expandDetails?.sector ? ` · ${p.expandDetails.sector}` : ""}.` : "Exemplos do portfólio."} />
       <div className="apr-galeria">
         {imgs.map((src, i) => <div key={src} className={`foto g${i}`}><img src={src} alt="" /></div>)}
       </div>
@@ -889,7 +902,7 @@ function Sessao({ d, escala }) {
   const blocos = [["Hoje", "0–15 min"], ["Para quem", "15–40 min"], ["Por que você", "40–65 min"], ["A frase", "65–90 min"], ["O tom", "90–110 min"], ["Fechar", "110–120 min"]];
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t="Como é a sessão" sub="2 horas, online, num quadro que a gente preenche juntos." />
+      <Titulo t={tx("sessao", "titulo")} sub={tx("sessao", "sub")} />
       <div className="apr-sessao">
         <div className="quadro"><img src="/images/kit/workshop-quadro.webp" alt="Quadro do workshop no FigJam" /></div>
         <div className="blocos">
@@ -912,11 +925,11 @@ function Passo({ d, escala }) {
   const s = d.oferta.servico;
   const a = d.oferta.area;
   const entrada = {
-    tipo: "entrada", selo: d.destaque === "projeto" ? "Caminho mais enxuto" : "Recomendado para começar", nome: d.oferta.titulo, texto: s.pitch || s.promessa,
+    tipo: "entrada", selo: d.destaque === "projeto" ? tx("passo", "seloEnxuto") : tx("passo", "seloEntrada"), nome: d.oferta.titulo, texto: s.pitch || s.promessa,
     valor: d.investimento || "R$ ____", de: d.investimentoDe, pagamento: d.parcelamento, prazo: `${d.cronograma.total} dias úteis`,
   };
   const projeto = a && {
-    tipo: "projeto", selo: d.destaque === "projeto" ? "Recomendado para o seu momento" : "Solução completa", nome: a.principal.nome, texto: a.principal.pitch || a.principal.entregas,
+    tipo: "projeto", selo: d.destaque === "projeto" ? tx("passo", "seloProjetoRec") : tx("passo", "seloProjeto"), nome: a.principal.nome, texto: a.principal.pitch || a.principal.entregas,
     valor: d.investimentoProjeto || aPartirDe(a.principal.valor) || "R$ ____", aPartir: !d.investimentoProjeto,
     pagamento: d.parcelamentoProjeto, prazo: a.principal.prazo,
   };
@@ -924,7 +937,7 @@ function Passo({ d, escala }) {
   return (
     <Slide livre escala={escala} d={d}>
       {/* "Investimento" pequeno, como chapéu; o nome da oferta é o título */}
-      <P x={89} y={73} s={56} cor="#999999" style={{ whiteSpace: "nowrap" }}>Investimento</P>
+      <P x={89} y={73} s={56} cor="#999999" style={{ whiteSpace: "nowrap" }}>{tx("passo", "chapeu")}</P>
       {/* esquerda: a opção recomendada, em texto, e a conta */}
       <div className="apr-p" style={{ left: 81, top: 205, width: 860 }}>
         <p style={{ fontSize: 22, fontWeight: 300, letterSpacing: 3, color: "#999999", textTransform: "uppercase" }}>{principal.selo}</p>
@@ -938,13 +951,13 @@ function Passo({ d, escala }) {
       </div>
       {outra && principal.tipo === "entrada" && (
         <p className="apr-p" style={{ left: 81, top: 880, width: 820, fontSize: 22, lineHeight: 1.35, color: "#999999" }}>
-          O valor da entrada vira desconto no {outra.nome.charAt(0).toLowerCase() + outra.nome.slice(1)} se você seguir em até 60 dias.
+          {rico(tx("passo", "credito", { projeto: outra.nome.charAt(0).toLowerCase() + outra.nome.slice(1) }))}
         </p>
       )}
 
       {/* direita: o cartão escuro com o preço recomendado */}
       <div className="apr-caixa apr-preco" style={{ left: 1000, top: 215, width: 839, height: outra ? 455 : 680 }}>
-        <p className="rot">Investimento total</p>
+        <p className="rot">{tx("passo", "total")}</p>
         {principal.de && <p className="de">{principal.de}</p>}
         <p className="valor">{principal.aPartir && <span>a partir de</span>}{principal.valor}</p>
         <div className="linhas">
@@ -979,16 +992,18 @@ const ICONES_COND = {
 
 function Condicoes({ d, escala }) {
   const s = d.oferta.servico;
+  const v0 = { Ajustes: s.ajustes.charAt(0).toUpperCase() + s.ajustes.slice(1), ajustes: s.ajustes, total: d.cronograma.total, pagamento: d.pagamento, validade: d.validade };
+  const v = v0;
   const itens = [
-    ["escopo", "Escopo", "O projeto contempla os itens desta proposta. Demandas fora dele são orçadas à parte."],
-    ["ajustes", "Ajustes", `${s.ajustes.charAt(0).toUpperCase() + s.ajustes.slice(1)} de ajustes incluída, por escrito.`],
-    ["prazo", "Prazo", `${d.cronograma.total} dias úteis, contados do pagamento inicial e do envio dos materiais.`],
-    ["pagamento", "Pagamento", d.pagamento + "."],
-    ["validade", "Validade", `Esta proposta vale por ${d.validade}.`],
+    ["escopo", tx("condicoes", "escopoT"), tx("condicoes", "escopo", v)],
+    ["ajustes", tx("condicoes", "ajustesT"), tx("condicoes", "ajustes", v)],
+    ["prazo", tx("condicoes", "prazoT"), tx("condicoes", "prazo", v)],
+    ["pagamento", tx("condicoes", "pagamentoT"), tx("condicoes", "pagamento", v)],
+    ["validade", tx("condicoes", "validadeT"), tx("condicoes", "validade", v)],
   ];
   return (
     <Slide livre escala={escala} d={d}>
-      <Cabeca t="Condições" sub="Tudo combinado antes de começar." />
+      <Cabeca t={tx("condicoes", "titulo")} sub={tx("condicoes", "sub")} />
       {itens.map(([k, t, p], i) => (
         <div key={k} className="apr-caixa apr-cond" style={{ left: 81 + i * 355.6, top: 330, width: 331, height: 520 }}>
           <span className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONES_COND[k]}</svg></span>
@@ -1003,7 +1018,7 @@ function Condicoes({ d, escala }) {
 function Casos({ d, escala }) {
   return (
     <Slide escala={escala} d={d}>
-      <Titulo t="Casos" sub="Marcas que a Last Lab ajudou a aparecer." />
+      <Titulo t={tx("casos", "titulo")} sub={tx("casos", "sub")} />
       <div className="apr-cards" style={{ gridTemplateColumns: "1fr 1fr", gap: 48 }}>
         {d.casos.map((p) => (
           <div key={p.id}>
@@ -1021,14 +1036,14 @@ function Casos({ d, escala }) {
 function Proximos({ d, escala }) {
   const c = d.cronograma;
   const colunas = [
-    { tipo: "inicio", nome: "Início", data: dia(c.inicio), info: "Contrato e pagamento inicial" },
+    { tipo: "inicio", nome: tx("proximos", "inicio"), data: dia(c.inicio), info: tx("proximos", "inicioInfo") },
     ...c.etapas.map((e, i) => ({ tipo: e.aprovacao ? "aprova" : "etapa", n: i + 1, nome: e.nome, data: periodo(e.ini, e.fim), dias: e.dias, info: e.cliente })),
-    { tipo: "fim", nome: "Entrega", data: dia(c.fim), info: `${c.total} dias úteis` },
+    { tipo: "fim", nome: tx("proximos", "entrega"), data: dia(c.fim), info: `${c.total} dias úteis` },
   ];
   const w = 1758 / colunas.length;
   return (
     <Slide livre escala={escala} d={d}>
-      <Cabeca t="Cronograma" sub={<>Começando em {dia(c.inicio)}, você recebe tudo em <span style={{ color: "#ef4b3a" }}>{dia(c.fim)}</span>.</>} />
+      <Cabeca t={tx("proximos", "titulo")} sub={rico(tx("proximos", "sub", { inicio: dia(c.inicio), fim: dia(c.fim) }))} />
       <div className="apr-caixa" style={{ left: 90, top: 455, width: (colunas.length - 1) * w, height: 2, background: "#d4d4d8", borderRadius: 0 }} />
       {colunas.map((col, i) => (
         <div key={i} className={`apr-crono2 ${col.tipo}`} style={{ left: 81 + i * w, width: w - 24 }}>
@@ -1039,15 +1054,15 @@ function Proximos({ d, escala }) {
           {col.info && <p className="info">{col.tipo === "aprova" || col.tipo === "etapa" ? `Você: ${col.info.charAt(0).toLowerCase() + col.info.slice(1)}` : col.info}</p>}
         </div>
       ))}
-      <p className="apr-p apr-crono2-nota" style={{ left: 81, top: 860 }}><span className="losango" /> Sua aprovação. Cada uma em até 2 dias úteis mantém as datas.</p>
+      <p className="apr-p apr-crono2-nota" style={{ left: 81, top: 860 }}><span className="losango" /> {tx("proximos", "nota")}</p>
     </Slide>
   );
 }
 
 const CONTATOS = [
-  ["site", "lastlab.com.br", <><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></>],
-  ["e-mail", "contato@lastlab.com.br", <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>],
-  ["WhatsApp", "(15) 99129-5541", <><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></>],
+  ["site", "site", <><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /><path d="M2 12h20" /></>],
+  ["e-mail", "email", <><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></>],
+  ["WhatsApp", "whatsapp", <><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></>],
 ];
 
 /** Data limite da proposta: hoje + o número de dias da validade ("7 dias" → hoje + 7). */
@@ -1065,22 +1080,22 @@ function Fim({ d, escala }) {
   return (
     <Slide livre tipo="escuro" escala={escala} d={d}>
       <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
-      <P x={89} y={340} s={30} peso={300} cor="#999999" style={{ letterSpacing: 4, textTransform: "uppercase" }}>Próximo passo</P>
+      <P x={89} y={340} s={30} peso={300} cor="#999999" style={{ letterSpacing: 4, textTransform: "uppercase" }}>{tx("fim", "chapeu")}</P>
       <P x={82} y={400} s={104} lh={1.12} peso={300} cor="#fff" w={1040}>{negrito(frase)}</P>
 
       <div className="apr-caixa apr-fecha" style={{ left: 1230, top: 72, width: 609, height: 840 }}>
-        <p className="rot">Proposta válida até</p>
+        <p className="rot">{tx("fim", "validadeRot")}</p>
         <p className="validade">{dia(validaAte(d.validade))}</p>
-        <p className="sub">{d.validade} a partir de hoje</p>
+        <p className="sub">{tx("fim", "validadeSub", { validade: d.validade })}</p>
         <div className="datas">
-          <div><p className="rot">Início</p><p className="data">{dia(c.inicio)}</p></div>
-          <div><p className="rot">Entrega</p><p className="data laranja">{dia(c.fim)}</p></div>
+          <div><p className="rot">{tx("fim", "inicio")}</p><p className="data">{dia(c.inicio)}</p></div>
+          <div><p className="rot">{tx("fim", "entrega")}</p><p className="data laranja">{dia(c.fim)}</p></div>
         </div>
         <div className="contatos">
           {CONTATOS.map(([rot, txt, ic]) => (
             <div key={rot}>
               <span className="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ic}</svg></span>
-              <div><p className="rot">{rot}</p><p className="txt">{txt}</p></div>
+              <div><p className="rot">{rot}</p><p className="txt">{tx("fim", txt)}</p></div>
             </div>
           ))}
         </div>

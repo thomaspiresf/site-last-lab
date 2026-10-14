@@ -163,7 +163,7 @@ const PECAS = {
 const CENA = { pagina: [1336, 600], redes: [1244, 600], whatsapp: [776, 600], proposta: [960, 520], slides: [1000, 520], marca: [1000, 520] };
 
 /** A cena completa (slide "Como fica"): peça principal + apoio, encaixada em 1664×470. */
-export function Cena({ formato, marca }) {
+export function Cena({ formato, marca, aviso = "Ilustração. A sua versão sai com a sua marca." }) {
   const [Principal, , , apoio] = PECAS[formato] || PECAS.pagina;
   const [w, h] = CENA[formato] || CENA.pagina;
   const k = Math.min(1664 / w, 470 / h);
@@ -175,7 +175,7 @@ export function Cena({ formato, marca }) {
           {apoio.map((A, i) => <A key={i} m={marca} />)}
         </div>
       </div>
-      <p className="mk-aviso">Ilustração. A sua versão sai com a sua marca.</p>
+      <p className="mk-aviso">{aviso}</p>
     </div>
   );
 }

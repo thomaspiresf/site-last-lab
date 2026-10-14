@@ -6,6 +6,7 @@ import { projects } from "../data/projects";
 import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import { FORMATOS } from "./mockups";
+import { ROTULOS_TEXTOS } from "./textosSlides";
 import { NOMES_SLIDES, Palco, SLIDES, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
@@ -431,6 +432,12 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     const lista = SLIDES.filter(([, , quando]) => !quando || quando(d)).map(([sid, S]) => Object.assign((props) => <S d={d} {...props} />, { sid }));
     return { slides: lista, roteiro: montarRoteiro(item, d, montarPreparacao(item, d)), objecoes: montarObjecoes(d) };
   }, [id, persona, r]);
+  // ?slide=<id> (atalho vindo da apresentação de um lead) abre direto naquele slide
+  useEffect(() => {
+    const alvo = new URLSearchParams(window.location.search).get("slide");
+    const i = alvo ? slides.findIndex((x) => x.sid === alvo) : -1;
+    if (i >= 0) setAtual(i);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const indice = Math.min(atual, slides.length - 1);
   const sid = slides[indice]?.sid;
   const SlideAtual = slides[indice] || (() => null);
@@ -619,6 +626,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
             <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>
           </div>
           {(POR_SLIDE[sid] || [fixo("Nada para editar neste slide.")]).filter(Boolean).map((el, i) => <React.Fragment key={i}>{el}</React.Fragment>)}
+          <TextosDoSlide r={r} set={set} padrao={padrao} grupos={sid === "capa" ? ["capa", "rodape"] : [sid]} />
           <details className="border-t border-zinc-100 pt-3 text-sm">
             <summary className="cursor-pointer text-xs font-semibold text-zinc-500">Mais deste serviço</summary>
             <div className="flex flex-col gap-3 mt-3">
@@ -634,6 +642,29 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
       {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal="apr-exemplo" onSair={() => setApresentando(null)} />}
     </div>
   );
+}
+
+/** Textos fixos de um slide (valem para todas as apresentações, de todos os serviços). */
+function TextosDoSlide({ r, set, padrao, grupos }) {
+  return grupos.filter((g) => r.textos[g]).map((g) => {
+    const t = r.textos[g];
+    const igual = JSON.stringify(t) === JSON.stringify(padrao.textos[g]);
+    return (
+      <div key={g} className="flex flex-col gap-2.5 rounded-xl border border-zinc-200 bg-zinc-50/60 p-3.5">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs font-semibold text-zinc-700">{g === "rodape" ? "Rodapé (todos os slides)" : "Textos do slide"} <span className="font-normal text-zinc-400">· valem para todos os serviços</span></p>
+          {!igual && <button onClick={() => set("textos", g, padrao.textos[g])} className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-black"><RotateCcw size={12} /> Padrão</button>}
+        </div>
+        {Object.entries(t).map(([k, val]) => (
+          <label key={k} className="block">
+            <span className={rotulo}>{ROTULOS_TEXTOS[k] || k}</span>
+            <textarea rows={Math.max(1, String(val).split("\n").length)} className={`${campo} resize-y`} value={val} onChange={(e) => set("textos", g, { ...t, [k]: e.target.value })} />
+          </label>
+        ))}
+        <p className="text-[11px] text-zinc-400 leading-snug">Enter quebra a linha · **negrito** · [[laranja]] · {"{palavras entre chaves}"} vêm do lead.</p>
+      </div>
+    );
+  });
 }
 
 // ---------- para qual serviço vai cada oferta do diagnóstico ----------
