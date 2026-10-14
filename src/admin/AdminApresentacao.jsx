@@ -1038,23 +1038,36 @@ export function resumoDoCaso(p) {
   };
 }
 
-/** Um caso por slide: o que era, o que fizemos e o resultado, com um mosaico de imagens. */
+/** Um caso por slide: imagens à esquerda (a grande sem corte, 3 menores embaixo), texto à direita. */
 function Caso({ d, escala, n }) {
   const p = d.casos[n];
+  const [proporcao, setProporcao] = useState(2);
   if (!p) return <Slide livre escala={escala} d={d}><Cabeca t={tx("casos", "titulo")} sub="Escolha os casos no painel." /></Slide>;
   const c = resumoDoCaso(p);
+  const [grande, ...outras] = c.imagens.length ? c.imagens : [p.coverImage];
+  const menores = [...outras, ...(p.topGrid || []), ...(p.expandDetails?.expandImages || [])].filter((x, k, a) => x && x !== grande && a.indexOf(x) === k).slice(0, 3);
+  // a grande ocupa a altura que a proporção dela pede (sem cortar), dentro do espaço
+  const largura = 1080, topo = 100, total = 800, vao = 18;
+  const altGrande = Math.min(total - 200 - vao, Math.max(380, largura / proporcao));
+  const altMenor = total - altGrande - vao;
   const blocos = [[tx("casos", "desafio"), c.desafio], [tx("casos", "fizemos"), c.fizemos], [tx("casos", "resultado"), c.resultado]];
   return (
     <Slide livre escala={escala} d={d}>
-      <P x={83} y={52} s={26} peso={300} cor="#999999" style={{ letterSpacing: 3, textTransform: "uppercase" }}>{tx("casos", "chapeu", { n: n + 1, total: d.casos.length })}</P>
-      <Cabeca t={p.title} sub={c.setor} y={98} />
-      <div className="apr-p apr-caso-txt" style={{ left: 81, top: 330, width: 640 }}>
-        {blocos.map(([rot, txt]) => (
-          <div key={rot}><p className="rot">{rot}</p><p className="txt">{txt}</p></div>
-        ))}
+      <div className="apr-caso-foto" style={{ left: 81, top: topo, width: largura, height: altGrande }}>
+        <img src={grande} alt="" onLoad={(e) => e.currentTarget.naturalWidth && setProporcao(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)} />
       </div>
-      <div className="apr-caso-mosaico" style={{ left: 780, top: 100, width: 1059, height: 800 }}>
-        {c.imagens.map((src, k) => <div key={src} className={`foto f${k}`}><img src={src} alt="" /></div>)}
+      {menores.map((src, k) => (
+        <div key={src} className="apr-caso-foto" style={{ left: 81 + k * ((largura + vao) / 3), top: topo + altGrande + vao, width: (largura - 2 * vao) / 3, height: altMenor }}>
+          <img src={src} alt="" />
+        </div>
+      ))}
+      <div className="apr-p apr-caso-txt" style={{ left: 1225, top: topo - 6, width: 615 }}>
+        <p className="chapeu">{tx("casos", "chapeu", { n: n + 1, total: d.casos.length })}</p>
+        <h2 className="nome">{p.title}</h2>
+        {c.setor && <p className="setor">{c.setor}</p>}
+        {blocos.map(([rot, txt]) => (
+          <div key={rot} className="bloco"><p className="rot">{rot}</p><p className="txt">{txt}</p></div>
+        ))}
       </div>
     </Slide>
   );
