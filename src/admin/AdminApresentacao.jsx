@@ -617,7 +617,7 @@ function Rodape({ d }) {
   return (
     <div className="apr-rodape">
       <p style={{ left: 83 }}>{rico(tx("rodape", "col1", { empresa: d.empresa || d.nome }))}</p>
-      <p style={{ left: 723 }}>{rico(tx("rodape", "col2"))}</p>
+      <p style={{ left: 723 }}>{rico(d.degrau && d.degrau !== "entrada" ? tx("rodape", "col2Projeto", { projeto: d.oferta.titulo }) : tx("rodape", "col2"))}</p>
       <p style={{ left: 1322 }}>{rico(tx("rodape", "col3"))}</p>
       <svg className="simbolo" viewBox="0 0 20 46" aria-hidden="true">
         <rect x="5" y="0" width="4" height="31" /><rect x="14" y="0" width="5" height="31" />
@@ -683,7 +683,10 @@ function Capa({ d, escala }) {
   return (
     <Slide livre tipo="escuro" escala={escala} d={d}>
       <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
-      <P x={68} y={324} s={152} lh={1.15} cor="#fff" como="h1">{rico(tx("capa", "titulo"))}</P>
+      {/* entrada: "Diagnóstico de marca"; principal e premium: o nome do projeto */}
+      <P x={68} y={324} s={d.degrau && d.degrau !== "entrada" && d.oferta.titulo.length > 16 ? 120 : 152} lh={1.15} cor="#fff" como="h1" w={1000}>
+        {rico(d.degrau && d.degrau !== "entrada" ? tx("capa", "tituloProjeto", { projeto: d.oferta.titulo }) : tx("capa", "titulo"))}
+      </P>
       <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
         {PECAS_CAPA.map((pts) => <polygon key={pts} points={pts} fill="#ef4b3a" />)}
       </svg>

@@ -2,8 +2,8 @@
 // Marcações: quebra de linha = nova linha; **negrito**; [[laranja]]; {variável} vem do lead/serviço.
 
 export const TEXTOS = {
-  rodape: { col1: "Desenvolvido\npara {empresa}", col2: "Diagnóstico de marca\nApresentação", col3: "Last Lab\nThomás Pires" },
-  capa: { titulo: "Diagnóstico\nde marca" },
+  rodape: { col1: "Desenvolvido\npara {empresa}", col2: "Diagnóstico de marca\nApresentação", col2Projeto: "Proposta de projeto\n{projeto}", col3: "Last Lab\nThomás Pires" },
+  capa: { titulo: "Diagnóstico\nde marca", tituloProjeto: "{projeto}" },
   objetivo: {
     titulo: "Nossa conversa",
     meta1: "Do diagnóstico à ação.", meta2: "30 minutos", meta3: "Avaliação sem compromisso",
@@ -59,7 +59,8 @@ export const TEXTOS = {
 
 // nomes dos campos no editor
 export const ROTULOS_TEXTOS = {
-  col1: "Rodapé · coluna 1", col2: "Rodapé · coluna 2", col3: "Rodapé · coluna 3",
+  col1: "Rodapé · coluna 1", col2: "Rodapé · coluna 2", col2Projeto: "Rodapé · coluna 2 (principal e premium)", col3: "Rodapé · coluna 3",
+  tituloProjeto: "Título (principal e premium)",
   titulo: "Título", sub: "Subtítulo", chapeu: "Chapéu (texto pequeno no topo)", frase: "Frase", rotulo: "Rótulo",
   meta1: "Linha de cima · 1", meta2: "Linha de cima · 2", meta3: "Linha de cima · 3",
   t1: "Coluna 1 · título", d1: "Coluna 1 · texto", t2: "Item 2 · título/texto", d2: "Coluna 2 · texto", t3: "Item 3 · título/texto", d3: "Coluna 3 · texto",
