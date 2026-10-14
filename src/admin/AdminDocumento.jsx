@@ -135,7 +135,7 @@ export default function AdminDocumento({ docFixo }) {
 
           {/* página em foco */}
           <div className="flex flex-col items-center gap-3 sticky top-[73px]">
-            <div className="w-full max-w-[640px] rounded-lg overflow-hidden shadow-sm ring-1 ring-black/5">
+            <div className="w-full rounded-lg overflow-hidden shadow-sm ring-1 ring-black/5" style={{ maxWidth: "min(640px, calc((100vh - 160px) / 1.4144))" }}>
               {lista[foco] && <Palco key={`${versao}-${foco}`}>{pagina(lista[foco], {}, registrar)}</Palco>}
             </div>
             <div className="flex items-center gap-3 text-sm">
