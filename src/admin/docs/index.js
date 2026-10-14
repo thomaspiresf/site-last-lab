@@ -28,6 +28,10 @@ Object.assign(CAMPANHA, { v2: CAMPANHA_V2, v3: CAMPANHA_V3 });
 Object.assign(COMERCIAL, { v2: COMERCIAL_V2, v3: COMERCIAL_V3 });
 Object.assign(JORNADA, { v2: JORNADA_V2, v3: JORNADA_V3 });
 
+// grafismo da capa de cada material (mesma família dos cartões de serviço)
+const CAPAS = { manual: "revisao", "brand-board": "kit", lancamento: "landing", "guia-editorial": "redes", "plano-campanha": "proposta", "roteiro-comercial": "apresentacao", "mapa-jornada": "whatsapp" };
+[MANUAL, BRAND_BOARD, LANCAMENTO, EDITORIAL, CAMPANHA, COMERCIAL, JORNADA].forEach((d) => { d.capa = `/images/entregaveis/${CAPAS[d.id]}.png`; });
+
 export const DOCUMENTOS = Object.fromEntries([BRAND_BOARD, MANUAL, LANCAMENTO, EDITORIAL, CAMPANHA, COMERCIAL, JORNADA].map((d) => [d.id, d]));
 
 /** Os dados do documento: o vazio + o que já foi salvo + o nome da empresa do lead. */
@@ -36,11 +40,11 @@ export const dadosDoDocumento = (doc, apresentacao = {}) => ({ ...doc.vazio, mar
 /** As versões que o documento tem (v1 sempre). */
 export const versoesDe = (doc) => ["v1", ...(doc.v2 ? ["v2"] : []), ...(doc.v3 ? ["v3"] : [])];
 
-/** A versão em uso: a escolhida, ou a mais nova que existe. */
-export const versaoDe = (doc, g) => {
-  const vs = versoesDe(doc);
-  return vs.includes(g?.versao) ? g.versao : vs.at(-1);
-};
+/** A versão padrão: a V2 (a escolhida como principal), quando existe. */
+export const versaoPadrao = (doc) => (doc.v2 ? "v2" : "v1");
+
+/** A versão em uso: a escolhida para o lead, ou a padrão. */
+export const versaoDe = (doc, g) => (versoesDe(doc).includes(g?.versao) ? g.versao : versaoPadrao(doc));
 
 /** As páginas [Componente, nome] da versão em uso. */
 export const paginasDe = (doc, g, versao = versaoDe(doc, g)) => (doc[versao] && versao !== "v1" ? doc[versao](g) : doc.paginas(g));

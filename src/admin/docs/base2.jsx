@@ -4,7 +4,8 @@ import "./v2.css";
 
 // V2 dos entregáveis: direção de arte editorial (grade suíça). Cabeçalho corrido com o número e o
 // nome da seção, numeração de página, filetes no lugar de cartões, coluna de rótulos à esquerda,
-// títulos grandes em peso leve, blocos de cor e imagem até a borda. As páginas recebem
+// títulos grandes em peso leve, blocos de cor e imagem sempre dentro das margens, e os mockups de
+// Instagram e WhatsApp da V3 (base3). As páginas recebem
 // n (número), total e indice (nomes das páginas) de quem as monta.
 
 export const LOGO_LASTLAB = "/images/logo.png";
@@ -42,10 +43,10 @@ export function Pag2({ g, nome, doc, escala, n, total, indice, fundo = "claro", 
 }
 
 /** Título de página: número da seção, título grande e um texto de abertura. */
-export function Tit({ t, lead, claro }) {
+export function Tit({ t, lead, claro, tamanho }) {
   return (
     <div className="v2-tit">
-      <h2>{t}</h2>
+      <h2 style={tamanho ? { fontSize: tamanho, letterSpacing: -tamanho * 0.035 } : undefined}>{t}</h2>
       {lead && <p className={claro ? "claro" : ""}>{lead}</p>}
     </div>
   );
@@ -69,17 +70,10 @@ export function Foto({ src, vazio = "Imagem", contain, estilo }) {
   return <img crossOrigin="anonymous" src={src} alt="" style={{ width: "100%", height: "100%", objectFit: contain ? "contain" : "cover", display: "block", ...estilo }} />;
 }
 
-/** Capa V2: metadados no topo, nome do cliente grande, barras sangrando na base. */
+/** Capa V2: metadados no topo, o grafismo do material (doc.capa) e o nome do cliente grande na base. */
 export function Capa2(p) {
   const hoje = new Date();
   const mes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"][hoje.getMonth()];
-  const barras = [];
-  let x = 0, w = 120;
-  for (let i = 0; i < 14; i++) {
-    barras.push(<rect key={i} x={x} y={0} width={w} height={300} fill="var(--ac)" />);
-    x += w + 14;
-    w = Math.max(10, Math.round(w * 0.8));
-  }
   return (
     <Pag2 {...p} fundo="escuro" semCabeca classe="v2-capa">
       <div className="meta">
@@ -91,7 +85,7 @@ export function Capa2(p) {
         <p className="tipo">{p.titulo || p.doc.nome}</p>
         <h1>{p.g.marca || p.nome || "Sua Empresa"}</h1>
       </div>
-      <svg className="barras" viewBox={`0 0 ${x} 300`} preserveAspectRatio="none" aria-hidden="true">{barras}</svg>
+      {p.doc.capa && <img className="grafismo" src={p.doc.capa} alt="" crossOrigin="anonymous" />}
       <img className="logo" src={LOGO_LASTLAB} alt="Last Lab" />
     </Pag2>
   );

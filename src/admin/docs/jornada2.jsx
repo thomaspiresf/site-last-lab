@@ -1,5 +1,6 @@
 import React from "react";
-import { Balao, Capa2, Pag2, Rot, Sumario2, Tit, nn, ou2 } from "./base2";
+import { Capa2, Pag2, Rot, Sumario2, Tit, nn, ou2 } from "./base2";
+import { Celular, Whats } from "./base3";
 
 // Mapa da jornada, V2. Mesmos dados da V1. O mapa é uma grade de colunas com a curva de emoção
 // atravessando a página; as etapas viram fichas com três colunas.
@@ -9,8 +10,8 @@ const HUMOR = ["", "Frustrado", "Inseguro", "Neutro", "Satisfeito", "Encantado"]
 function Mapa(p) {
   const e = p.g.etapas;
   const n = Math.max(1, e.length);
-  const W = 794, H = 230;
-  const x = (i) => 64 + ((W - 128) / n) * (i + 0.5);
+  const W = 666, H = 230;
+  const x = (i) => (W / n) * (i + 0.5);
   const y = (h) => 24 + (1 - (Math.min(5, Math.max(1, Number(h) || 3)) - 1) / 4) * (H - 48);
   const pts = e.map((s, i) => [x(i), y(s.humor)]);
   const curva = pts.map(([a, b], i) => {
@@ -34,8 +35,8 @@ function Mapa(p) {
       </div>
       <svg className="v2-sangra" width={W} height={H} style={{ display: "block", background: "#fff" }}>
         <defs><linearGradient id="v2-area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="var(--ac)" stopOpacity="0.22" /><stop offset="1" stopColor="var(--ac)" stopOpacity="0" /></linearGradient></defs>
-        {e.map((_, i) => i > 0 && <line key={i} x1={64 + ((W - 128) / n) * i} x2={64 + ((W - 128) / n) * i} y1="0" y2={H} stroke="#efefec" />)}
-        <line x1="64" x2={W - 64} y1={y(3)} y2={y(3)} stroke="#d5d5d2" strokeDasharray="3 5" />
+        {e.map((_, i) => i > 0 && <line key={i} x1={(W / n) * i} x2={(W / n) * i} y1="0" y2={H} stroke="#efefec" />)}
+        <line x1="0" x2={W} y1={y(3)} y2={y(3)} stroke="#d5d5d2" strokeDasharray="3 5" />
         <path d={area} fill="url(#v2-area)" />
         <path d={curva} fill="none" stroke="var(--ac)" strokeWidth="2.5" />
         {pts.map(([a, b], i) => (
@@ -95,16 +96,17 @@ const Etapas1 = Etapas(1);
 const Etapas2 = Etapas(2);
 
 function Mensagens(p) {
+  const itens = p.g.mensagens.flatMap((m, i) => [{ tipo: "dia", texto: m.momento || "Momento" }, { tipo: "sai", texto: m.texto || "[Mensagem]", hora: ["09:10", "14:32", "17:05", "10:20", "11:45", "16:00"][i % 6] }]);
   return (
     <Pag2 {...p}>
-      <Tit t="Mensagens prontas" lead="O tom da marca em cada momento da jornada." />
-      <div className="v2-sangra" style={{ background: "#e6e3dc", padding: "28px 64px", display: "flex", flexDirection: "column", gap: 22, flex: 1, marginBottom: -36 }}>
-        {p.g.mensagens.map((m, i) => (
-          <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <p className="v2-rot" style={{ color: "var(--cinza)", alignSelf: "flex-end" }}>{m.momento || "Momento"}</p>
-            <Balao lado="sai">{ou2(m.texto, "[Mensagem]")}</Balao>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 34, flex: 1 }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <Tit t={<>Mensagens<br />prontas</>} tamanho={54} lead="O tom da marca em cada momento da jornada." />
+          <div style={{ marginTop: "auto", display: "flex", flexDirection: "column" }}>
+            {p.g.mensagens.map((m, i) => <div key={i} style={{ borderTop: "1px solid var(--filete)", padding: "12px 0", display: "grid", gridTemplateColumns: "40px 1fr" }}><span style={{ fontSize: 12, fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</span><p style={{ fontSize: 14 }}>{m.momento}</p></div>)}
           </div>
-        ))}
+        </div>
+        <Celular largura={300} altura={860}><Whats nome="Cliente" itens={itens} altura={820} /></Celular>
       </div>
     </Pag2>
   );

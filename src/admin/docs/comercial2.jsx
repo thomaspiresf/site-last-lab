@@ -1,5 +1,6 @@
 import React from "react";
-import { Balao, Capa2, Pag2, Rot, Sumario2, Tit, nn, ou2 } from "./base2";
+import { Capa2, Pag2, Rot, Sumario2, Tit, nn, ou2 } from "./base2";
+import { Celular, Whats } from "./base3";
 
 // Roteiro comercial, V2. Mesmos dados da V1. A reunião vira uma agenda com o relógio correndo,
 // o follow-up uma régua de dias, e as mensagens aparecem como conversa.
@@ -17,7 +18,7 @@ function Processo(p) {
         {e.map((x, i) => {
           const ultimo = i === e.length - 1;
           return (
-            <div key={i} style={{ flex: 1, background: ultimo ? "var(--ac)" : ["#0b0b0c", "#232325", "#3a3a3d", "#515155"][i % 4], color: ultimo ? "#0b0b0c" : "#f4f4f1", padding: `22px ${ultimo ? 64 : 22}px 22px ${i ? 30 : 64}px`, display: "flex", flexDirection: "column", justifyContent: "space-between", clipPath: ultimo ? undefined : "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)", marginRight: ultimo ? 0 : -14 }}>
+            <div key={i} style={{ flex: 1, background: ultimo ? "var(--ac)" : ["#0b0b0c", "#232325", "#3a3a3d", "#515155"][i % 4], color: ultimo ? "#0b0b0c" : "#f4f4f1", padding: `22px 22px 22px ${i ? 30 : 22}px`, display: "flex", flexDirection: "column", justifyContent: "space-between", clipPath: ultimo ? undefined : "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)", marginRight: ultimo ? 0 : -14 }}>
               <p style={{ fontSize: 60, fontWeight: 200, lineHeight: 1, color: ultimo ? "#0b0b0c" : "var(--ac)" }}>{nn(i + 1)}</p>
               <div>
                 <p style={{ fontSize: 21, fontWeight: 500, letterSpacing: -0.4, lineHeight: 1.1 }}>{ou2(x.nome, "[Etapa]")}</p>
@@ -85,47 +86,39 @@ function Objecoes(p) {
 
 function Followup(p) {
   const f = p.g.followups;
-  const max = Math.max(1, ...f.map((x) => diaDe(x.quando)));
+  const itens = f.flatMap((x, i) => [{ tipo: "dia", texto: `${x.quando || "Dia"} · ${x.canal || ""}` }, { tipo: "sai", texto: x.texto || (i === f.length - 1 ? "[Despedida que deixa a porta aberta]" : "[Mensagem]"), hora: ["09:12", "10:40", "14:05", "11:20", "16:30", "09:45"][i % 6] }]);
   return (
     <Pag2 {...p}>
-      <Tit t="Follow-up" lead="Insistir com elegância: cada contato leva algo novo." />
-      <div style={{ position: "relative", height: 96, marginTop: 8 }}>
-        <div style={{ position: "absolute", left: 0, right: 0, top: 47, height: 1, background: "var(--tinta)" }} />
-        {f.map((x, i) => {
-          const pos = (diaDe(x.quando) / max) * 100;
-          const cima = i % 2 === 1;
-          const alinha = pos > 95 ? "-100%" : pos < 5 ? "0" : "-50%";
-          return (
-            <React.Fragment key={i}>
-              <span style={{ position: "absolute", left: `${pos}%`, top: 41, width: 13, height: 13, marginLeft: pos > 95 ? -13 : pos < 5 ? 0 : -6.5, borderRadius: 99, background: i === f.length - 1 ? "var(--tinta)" : "var(--ac)" }} />
-              <p style={{ position: "absolute", left: `${pos}%`, top: cima ? 0 : 66, transform: `translateX(${alinha})`, fontSize: 12.5, fontWeight: 500, whiteSpace: "nowrap" }}>{x.quando}</p>
-            </React.Fragment>
-          );
-        })}
-      </div>
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        {f.map((x, i) => (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "176px 1fr", gap: 24, borderTop: "1px solid var(--filete)", padding: "14px 0" }}>
-            <p style={{ fontSize: 14, fontWeight: 500 }}>{ou2(x.quando, "[Quando]")} <span className="v2-rot" style={{ color: "var(--cinza)", marginLeft: 6 }}>{x.canal}</span></p>
-            <p className="v2-txt" style={{ fontSize: 14 }}>{ou2(x.texto, i === f.length - 1 ? "[Despedida que deixa a porta aberta]" : "[Mensagem]")}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 34, flex: 1 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 30 }}>
+          <Tit t="Follow-up" tamanho={54} lead="Insistir com elegância: cada contato leva algo novo." />
+          <div style={{ display: "flex", flexDirection: "column", marginTop: "auto" }}>
+            {f.map((x, i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "110px 1fr", borderTop: "1px solid var(--filete)", padding: "12px 0", alignItems: "baseline" }}>
+                <p style={{ fontSize: 15, fontWeight: 500, color: i === f.length - 1 ? "var(--tinta)" : "var(--ac)" }}>{x.quando}</p>
+                <p className="v2-rot" style={{ color: "var(--cinza)" }}>{x.canal}</p>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+        <Celular largura={300} altura={860}><Whats nome={p.g.marca ? `Cliente · ${p.g.marca}` : "Cliente"} itens={itens} altura={820} /></Celular>
       </div>
     </Pag2>
   );
 }
 
 function Mensagens(p) {
+  const itens = p.g.mensagens.flatMap((m, i) => [{ tipo: "dia", texto: m.nome || "Momento" }, ...(i === 0 ? [{ tipo: "entra", texto: "Oi! Vi o perfil de vocês e queria saber mais.", hora: "09:02" }] : []), { tipo: "sai", texto: m.texto || "[Mensagem]", hora: ["09:03", "15:20", "10:00"][i % 3] }]);
   return (
     <Pag2 {...p}>
-      <Tit t="Mensagens prontas" lead="Para copiar, trocar o nome e enviar." />
-      <div className="v2-sangra" style={{ background: "#e6e3dc", padding: "28px 64px", display: "flex", flexDirection: "column", gap: 22, flex: 1, marginBottom: -36 }}>
-        {p.g.mensagens.map((m, i) => (
-          <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <p className="v2-rot" style={{ color: "var(--cinza)", alignSelf: "flex-end" }}>{m.nome || "Momento"}</p>
-            <Balao lado="sai">{ou2(m.texto, "[Mensagem]")}</Balao>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 34, flex: 1 }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <Tit t={<>Mensagens<br />prontas</>} tamanho={54} lead="Para copiar, trocar o nome e enviar." />
+          <div style={{ marginTop: "auto", display: "flex", flexDirection: "column" }}>
+            {p.g.mensagens.map((m, i) => <div key={i} style={{ borderTop: "1px solid var(--filete)", padding: "12px 0", display: "grid", gridTemplateColumns: "40px 1fr" }}><span style={{ fontSize: 12, fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</span><p style={{ fontSize: 14 }}>{m.nome}</p></div>)}
           </div>
-        ))}
+        </div>
+        <Celular largura={300} altura={860}><Whats nome={p.g.marca || "Sua marca"} itens={itens} altura={820} /></Celular>
       </div>
     </Pag2>
   );

@@ -1,5 +1,6 @@
 import React from "react";
 import { Capa2, Linha, Numerada, Pag2, Rot, Sumario2, Tit, nn, ou2 } from "./base2";
+import { Celular, Email, PostInsta, Whats } from "./base3";
 
 // Plano de lançamento, V2. Mesmos dados da V1; os textos prontos aparecem como as peças reais
 // (post, e-mail e WhatsApp).
@@ -9,11 +10,11 @@ function Mudanca(p) {
     <Pag2 {...p}>
       <Tit t="A mudança" lead="De onde a marca vem, aonde vai e por quê." />
       <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: 300 }}>
-        <div style={{ background: "#e8e8e4", padding: "26px 28px 26px 64px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div style={{ background: "#e8e8e4", padding: "26px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <Rot estilo={{ color: "var(--cinza)" }}>Antes</Rot>
           <p style={{ fontSize: 22, fontWeight: 300, lineHeight: 1.35, color: "#55555b" }}>{ou2(p.g.antes, "[Como a marca era vista]")}</p>
         </div>
-        <div style={{ background: "var(--tinta)", color: "#f4f4f1", padding: "26px 64px 26px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}>
+        <div style={{ background: "var(--tinta)", color: "#f4f4f1", padding: "26px 28px 26px 36px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}>
           <Rot>Depois</Rot>
           <span style={{ position: "absolute", left: -22, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: 99, background: "var(--ac)", color: "var(--tinta)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>→</span>
           <p style={{ fontSize: 22, fontWeight: 300, lineHeight: 1.35 }}>{ou2(p.g.depois, "[Como queremos ser vistos]")}</p>
@@ -90,23 +91,14 @@ function Textos(p) {
   return (
     <Pag2 {...p}>
       <Tit t="Textos prontos" lead="O anúncio em cada canal, pronto para enviar." />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
-        <div style={{ background: "#fff", boxShadow: "0 1px 0 var(--filete)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 14px" }}><span style={{ width: 28, height: 28, borderRadius: 99, background: "var(--tinta)" }} /><b style={{ fontSize: 12.5, fontWeight: 600 }}>{marca.toLowerCase().replace(/\s+/g, "")}</b></div>
-          <div style={{ height: 220, background: "var(--ac)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}><p style={{ fontSize: 26, fontWeight: 300, textAlign: "center", lineHeight: 1.15, letterSpacing: -0.8 }}>{ou2(p.g.frase, "[A frase]")}</p></div>
-          <p style={{ fontSize: 12.5, fontWeight: 300, lineHeight: 1.55, padding: "12px 14px 16px", whiteSpace: "pre-line" }}><b style={{ fontWeight: 600 }}>{marca.toLowerCase().replace(/\s+/g, "")}</b> {ou2(p.g.textoRedes, "[Legenda do post de lançamento]")}</p>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ background: "#fff" }}>
-            <div style={{ borderBottom: "1px solid var(--filete)", padding: "10px 14px", fontSize: 11.5, color: "var(--cinza)", lineHeight: 1.7 }}>
-              <p><b style={{ color: "var(--tinta)", fontWeight: 500 }}>De</b> {marca}</p>
-              <p><b style={{ color: "var(--tinta)", fontWeight: 500 }}>Assunto</b> Temos novidade</p>
-            </div>
-            <p style={{ fontSize: 12.5, fontWeight: 300, lineHeight: 1.6, padding: "14px", whiteSpace: "pre-line" }}>{ou2(p.g.textoEmail, "[E-mail para a base de clientes]")}</p>
-          </div>
-          <div style={{ background: "#e6e3dc", padding: 14, display: "flex", flexDirection: "column" }}>
-            <Rot estilo={{ color: "var(--cinza)", marginBottom: 10 }}>WhatsApp</Rot>
-            <div className="v2-balao sai" style={{ maxWidth: "92%" }}>{ou2(p.g.textoWhats, "[Mensagem curta para clientes e parceiros]")}</div>
+      <div style={{ display: "grid", gridTemplateColumns: "270px 1fr", gap: 26, flex: 1 }}>
+        <Celular largura={270} altura={560}>
+          <PostInsta marca={marca} alturaImg={250} imagem={<div style={{ height: "100%", background: "var(--ac)", display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}><p style={{ fontSize: 22, fontWeight: 300, textAlign: "center", lineHeight: 1.15, letterSpacing: -0.5 }}>{ou2(p.g.frase, "[A frase]")}</p></div>} legenda={ou2(p.g.textoRedes, "[Legenda do post de lançamento]")} />
+        </Celular>
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <Email de={marca} assunto="Temos novidade" corpo={ou2(p.g.textoEmail, "[E-mail para a base de clientes]")} />
+          <div style={{ borderRadius: 18, overflow: "hidden", boxShadow: "var(--sombra)" }}>
+            <Whats nome="Cliente" itens={[{ tipo: "dia", texto: "Hoje" }, { tipo: "sai", texto: p.g.textoWhats || "[Mensagem curta para clientes e parceiros]" }]} />
           </div>
         </div>
       </div>

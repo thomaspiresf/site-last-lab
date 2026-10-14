@@ -7,7 +7,7 @@ import { AREAS, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import { PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES, VAZIO as GUIA_VAZIO } from "./AdminGuia";
 import { VAZIO_MARCA, nomesDoGuiaMarca, paginasDoGuiaMarca } from "./AdminGuiaMarca";
-import { DOCUMENTOS, paginasDe, propsDasPaginas, versoesDe } from "./docs";
+import { DOCUMENTOS, paginasDe, propsDasPaginas, versaoPadrao, versoesDe } from "./docs";
 import "./guia.css";
 
 // Entregáveis (/admin/entregaveis): os documentos finais que o cliente recebe, por área do
@@ -60,7 +60,7 @@ export default function AdminEntregaveis() {
   const [leads, setLeads] = useState([]);
   const [aberto, setAberto] = useState(null); // documento com o modelo aberto
   const [escolhendo, setEscolhendo] = useState(null); // documento esperando a escolha do lead
-  const [versao, setVersao] = useState(null); // versão mostrada no modelo (null = a mais nova)
+  const [versao, setVersao] = useState(null); // versão mostrada no modelo (null = a padrão)
 
   useEffect(() => {
     if (!document.querySelector(`link[href="${FONTE}"]`)) {
@@ -76,7 +76,7 @@ export default function AdminEntregaveis() {
 
   const porArea = useMemo(() => Object.entries(AREAS).map(([aid, a]) => [aid, a, DOCS.filter((d) => d.area === aid)]), [pronto]);
   const nomeServico = (sid) => servicoCompleto(sid)?.nome || sid;
-  const verAberta = versao || (aberto?.doc ? versoesDe(aberto.doc).at(-1) : undefined);
+  const verAberta = versao || (aberto?.doc ? versaoPadrao(aberto.doc) : undefined);
 
   return (
     <AdminLayout>
@@ -99,7 +99,7 @@ export default function AdminEntregaveis() {
                 {docs.map((doc) => doc.lista ? (
                   <article key={doc.id} className="bg-white rounded-2xl border border-zinc-200 p-4 flex gap-4">
                     <button onClick={() => setAberto(doc)} className="shrink-0" title="Ver o modelo">
-                      {(() => { const x = doc.lista(doc.doc ? versoesDe(doc.doc).at(-1) : undefined)[0]; return <Miniatura P={x.P} extra={x.extra} g={doc.vazio()} doc={doc.doc} largura={96} />; })()}
+                      {(() => { const x = doc.lista(doc.doc ? versaoPadrao(doc.doc) : undefined)[0]; return <Miniatura P={x.P} extra={x.extra} g={doc.vazio()} doc={doc.doc} largura={96} />; })()}
                     </button>
                     <div className="flex flex-col gap-2 min-w-0">
                       <p className="text-[15px] font-semibold leading-snug">{doc.nome}</p>

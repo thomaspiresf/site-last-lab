@@ -1,5 +1,6 @@
 import React from "react";
-import { Balao, Capa2, Foto, Linha, Pag2, Rot, Sumario2, Tit, nn, ou2 } from "./base2";
+import { Capa2, Foto, Linha, Pag2, Rot, Sumario2, Tit, nn, ou2 } from "./base2";
+import { Celular, Direct, PerfilInsta, PostInsta } from "./base3";
 
 // Guia editorial, V2. Mesmos dados da V1. Os pilares têm uma cor cada, repetida na semana; a
 // legenda é mostrada num celular com as partes numeradas.
@@ -52,7 +53,7 @@ function Semana(p) {
   return (
     <Pag2 {...p}>
       <Tit t="A semana" lead="Uma frequência que dá para manter. Constância vale mais que volume." />
-      <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderTop: "1px solid var(--tinta)", borderBottom: "1px solid var(--filete)", padding: "0 64px", height: 420 }}>
+      <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderTop: "1px solid var(--tinta)", borderBottom: "1px solid var(--filete)", height: 420 }}>
         {DIAS.map((d, i) => {
           const itens = porDia(d);
           return (
@@ -76,24 +77,16 @@ function Semana(p) {
 }
 
 function Legenda(p) {
-  const marca = (p.g.marca || p.nome || "suamarca").toLowerCase().replace(/\s+/g, "");
   const partes = p.g.estrutura.filter(Boolean);
   const ctas = p.g.ctas.filter(Boolean);
+  const num = (n) => <b style={{ background: "var(--ac)", color: "#0b0b0c", width: 15, height: 15, borderRadius: 99, fontSize: 9, display: "inline-flex", alignItems: "center", justifyContent: "center", marginRight: 5, verticalAlign: "1px" }}>{n}</b>;
   return (
     <Pag2 {...p}>
       <Tit t="A legenda" lead="A anatomia de um post que funciona." />
-      <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 36, alignItems: "start" }}>
-        <div style={{ background: "#0b0b0c", borderRadius: 38, padding: 10 }}>
-          <div style={{ background: "#fff", borderRadius: 30, overflow: "hidden" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "16px 14px 10px" }}><span style={{ width: 24, height: 24, borderRadius: 99, background: "var(--ac)" }} /><b style={{ fontSize: 11.5, fontWeight: 600 }}>{marca}</b></div>
-            <div style={{ height: 250, background: "#ecebe6" }} />
-            <div style={{ padding: "12px 14px 22px", fontSize: 11, lineHeight: 1.5, display: "flex", flexDirection: "column", gap: 6 }}>
-              {[["1", "Uma frase que faz parar de rolar."], ["2", "Uma ideia só, em frases curtas, com um exemplo real."], ["3", ctas[0] || "Me chama no direct."]].map(([n, t]) => (
-                <p key={n} style={{ display: "flex", gap: 8 }}><b style={{ background: "var(--ac)", color: "#0b0b0c", width: 16, height: 16, borderRadius: 99, fontSize: 9.5, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{n}</b><span>{t}</span></p>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 34, alignItems: "start" }}>
+        <Celular largura={280} altura={590}>
+          <PostInsta marca={p.g.marca || p.nome} alturaImg={270} imagem={<div style={{ height: "100%", background: "#ecebe6" }} />} legenda={<>{num(1)}Uma frase que faz parar de rolar.{"\n"}{num(2)}Uma ideia só, em frases curtas, com um exemplo real.{"\n"}{num(3)}{ctas[0] || "Me chama no direct."}</>} />
+        </Celular>
         <div style={{ display: "flex", flexDirection: "column" }}>
           {partes.map((x, i) => {
             const [t, ...r] = x.split(":");
@@ -122,14 +115,17 @@ function Templates(p) {
   const t = p.g.templates;
   return (
     <Pag2 {...p}>
-      <Tit t="Templates" lead="A cara da marca em cada formato." />
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${t.length > 4 ? 3 : 2}, 1fr)`, gap: 18 }}>
-        {t.map((x, i) => (
-          <div key={i}>
-            <div style={{ aspectRatio: "4 / 5", maxHeight: t.length > 4 ? 250 : 330, width: "100%" }}><Foto src={x.img} vazio={x.nome || "Template"} /></div>
-            <p style={{ fontSize: 12.5, marginTop: 8 }}><b style={{ color: "var(--ac)", fontWeight: 600, marginRight: 8 }}>{nn(i + 1)}</b>{ou2(x.nome, "[Formato]")}</p>
-          </div>
-        ))}
+      <Tit t="Templates" lead="A cara da marca em cada formato, e o perfil inteiro conversando." />
+      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 34, alignItems: "start" }}>
+        <Celular largura={280} altura={590}><PerfilInsta marca={p.g.marca || p.nome} imagens={t.map((x) => x.img)} /></Celular>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          {t.slice(0, 4).map((x, i) => (
+            <div key={i}>
+              <div style={{ aspectRatio: "4 / 5" }}><Foto src={x.img} vazio={x.nome || "Template"} /></div>
+              <p style={{ fontSize: 12.5, marginTop: 8 }}><b style={{ color: "var(--ac)", fontWeight: 600, marginRight: 8 }}>{nn(i + 1)}</b>{ou2(x.nome, "[Formato]")}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </Pag2>
   );
@@ -139,14 +135,7 @@ function Respostas(p) {
   return (
     <Pag2 {...p}>
       <Tit t="Respostas prontas" lead="Para responder rápido, sempre no tom da marca." />
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        {p.g.respostas.map((r, i) => (
-          <div key={i} style={{ display: "grid", gridTemplateColumns: "176px 1fr", gap: 24, borderTop: "1px solid var(--filete)", padding: "16px 0" }}>
-            <Rot estilo={{ paddingTop: 4 }}>{nn(i + 1)} · {r.situacao || "Situação"}</Rot>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}><Balao lado="sai">{ou2(r.resposta, "[Resposta]")}</Balao></div>
-          </div>
-        ))}
-      </div>
+      <Direct marca={p.g.marca || p.nome} pares={p.g.respostas.map((r) => [r.situacao || "Situação", r.resposta || "Resposta"])} />
     </Pag2>
   );
 }

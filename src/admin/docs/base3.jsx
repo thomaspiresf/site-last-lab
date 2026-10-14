@@ -174,3 +174,21 @@ export function Direct({ marca, pares }) {
     </div>
   );
 }
+
+/** Perfil do Instagram (cabeçalho e grade 3×3 com as imagens). */
+export function PerfilInsta({ marca, imagens = [] }) {
+  const grade = Array.from({ length: 9 }, (_, i) => imagens[i % Math.max(1, imagens.length)]);
+  return (
+    <>
+      <div style={{ padding: "6px 14px 10px", display: "flex", alignItems: "center", gap: 14 }}>
+        <span style={{ width: 58, height: 58, borderRadius: 99, background: "var(--ac)", boxShadow: "0 0 0 2px #fff, 0 0 0 4px #d6249f", flexShrink: 0 }} />
+        <div style={{ display: "flex", gap: 14, fontSize: 10, textAlign: "center" }}>{[["128", "posts"], ["2.430", "seguidores"], ["310", "seguindo"]].map(([a, b]) => <p key={b}><b style={{ display: "block", fontSize: 12 }}>{a}</b>{b}</p>)}</div>
+      </div>
+      <p style={{ padding: "0 14px", fontSize: 11, fontWeight: 600 }}>{handle(marca)}</p>
+      <p style={{ padding: "2px 14px 10px", fontSize: 10, lineHeight: 1.4, color: "#444" }}>{marca}</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 2 }}>
+        {grade.map((src, i) => <div key={i} style={{ aspectRatio: "4 / 5" }}><Foto src={src} raio={0} vazio="" estilo={{ background: i % 2 ? "#eceae4" : "#e3e1da" }} /></div>)}
+      </div>
+    </>
+  );
+}

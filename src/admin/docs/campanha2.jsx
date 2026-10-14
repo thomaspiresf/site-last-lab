@@ -53,7 +53,7 @@ function Fases(p) {
       <Tit t="As fases" lead="Do aquecimento ao fechamento, cada fase com um foco." />
       <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, f.length)}, 1fr)` }}>
         {f.map((x, i) => (
-          <div key={i} style={{ height: 120, background: ["#0b0b0c", "var(--ac)", "#3a3a3d", "#8a8a90", "#c9c9c5"][i % 5], color: i === 1 || i >= 3 ? "#0b0b0c" : "#f4f4f1", padding: `18px ${i === f.length - 1 ? 64 : 24}px 14px ${i ? 26 : 64}px`, display: "flex", flexDirection: "column", justifyContent: "space-between", clipPath: i < f.length - 1 ? "polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)" : undefined, marginRight: i < f.length - 1 ? -12 : 0 }}>
+          <div key={i} style={{ height: 120, background: ["#0b0b0c", "var(--ac)", "#3a3a3d", "#8a8a90", "#c9c9c5"][i % 5], color: i === 1 || i >= 3 ? "#0b0b0c" : "#f4f4f1", padding: `18px 24px 14px ${i ? 28 : 20}px`, display: "flex", flexDirection: "column", justifyContent: "space-between", clipPath: i < f.length - 1 ? "polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)" : undefined, marginRight: i < f.length - 1 ? -12 : 0 }}>
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.4 }}>{nn(i + 1)}</p>
             <p style={{ fontSize: 20, fontWeight: 500, letterSpacing: -0.4, lineHeight: 1.1 }}>{ou2(x.nome, "[Fase]")}</p>
           </div>

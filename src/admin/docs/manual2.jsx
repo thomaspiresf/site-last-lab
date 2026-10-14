@@ -1,6 +1,7 @@
 import React from "react";
 import { Logo, hexRgb, rgbCmyk, tintaSobre, useFontes } from "./base";
 import { Capa2, Foto, Linha, Marcas2, Pag2, Rot, Sumario2, Tit, acentoDe, nn, ou2 } from "./base2";
+import { PostInsta } from "./base3";
 
 // Manual de identidade e Brand board, V2 (direção de arte editorial). Mesmos dados da V1.
 // O destaque das páginas é a cor de destaque do próprio cliente.
@@ -199,19 +200,22 @@ function Fotografia(p) {
 }
 
 function Aplicacoes(p) {
-  const [prim, ...resto] = p.g.aplicacoes;
+  const [prim, seg, ...resto] = p.g.aplicacoes;
   return (
     <Pag2 {...p}>
       <Tit t="Aplicações" lead="A marca no dia a dia." />
-      <div className="v2-sangra" style={{ height: 380, position: "relative" }}>
-        <Foto src={prim?.img} vazio={prim?.nome || "Aplicação"} />
-        {prim?.img && prim?.nome && <p className="v2-rot" style={{ position: "absolute", left: 64, bottom: 16, background: "var(--papel)", padding: "6px 10px", color: "var(--tinta)" }}>{prim.nome}</p>}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 250px", gap: 18, alignItems: "start" }}>
+        <div>
+          <div style={{ height: 330 }}><Foto src={prim?.img} vazio={prim?.nome || "Aplicação"} /></div>
+          <p style={{ fontSize: 12.5, marginTop: 8 }}><b style={{ color: "var(--ac)", fontWeight: 600, marginRight: 8 }}>01</b>{ou2(prim?.nome, "[Aplicação]")}</p>
+        </div>
+        <div style={{ boxShadow: "var(--sombra)" }}><PostInsta marca={p.g.marca || p.nome} alturaImg={250} imagem={<Foto src={seg?.img} vazio={seg?.nome || "Post"} />} legenda={seg?.nome || "A marca aplicada nas redes."} /></div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, Math.min(3, resto.length))}, 1fr)`, gap: 16 }}>
-        {resto.slice(0, 3).map((a, i) => (
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, Math.min(4, resto.length))}, 1fr)`, gap: 16 }}>
+        {resto.slice(0, 4).map((a, i) => (
           <div key={i}>
-            <div style={{ height: 170 }}><Foto src={a.img} vazio={a.nome || "Aplicação"} /></div>
-            <p style={{ fontSize: 12.5, marginTop: 8 }}><b style={{ color: "var(--ac)", fontWeight: 600, marginRight: 8 }}>{nn(i + 2)}</b>{ou2(a.nome, "[Aplicação]")}</p>
+            <div style={{ height: 160 }}><Foto src={a.img} vazio={a.nome || "Aplicação"} /></div>
+            <p style={{ fontSize: 12.5, marginTop: 8 }}><b style={{ color: "var(--ac)", fontWeight: 600, marginRight: 8 }}>{nn(i + 3)}</b>{ou2(a.nome, "[Aplicação]")}</p>
           </div>
         ))}
       </div>
