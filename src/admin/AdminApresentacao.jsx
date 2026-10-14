@@ -119,18 +119,18 @@ export default function AdminApresentacao() {
         <button onClick={() => abrirTelaCheia(setApresentando)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><Play size={15} /> Apresentar</button>
       </header>
 
-      <div className="grid grid-cols-[200px_1fr_380px] gap-5 p-5 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-[180px_minmax(0,1fr)_380px] gap-5 p-5 items-start">
         {/* miniaturas */}
-        <nav className="sticky top-[73px] max-h-[calc(100vh-93px)] overflow-y-auto flex flex-col gap-2.5 pr-1">
+        <nav className="flex flex-row gap-2 overflow-x-auto pb-1 xl:pb-0 xl:pr-1 xl:flex-col xl:gap-2.5 xl:overflow-x-visible xl:overflow-y-auto xl:sticky xl:top-[76px] xl:max-h-[calc(100vh-96px)]">
           {slides.map((S, i) => (
-            <button key={S.sid} onClick={() => setAtual(i)} className={`text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white/70"}`}>
+            <button key={S.sid} onClick={() => setAtual(i)} className={`shrink-0 w-36 xl:w-auto text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white/70"}`}>
               <div className="rounded overflow-hidden ring-1 ring-black/5 pointer-events-none"><Palco><S /></Palco></div>
               <p className={`text-[11px] mt-1 px-0.5 truncate ${i === indice ? "font-semibold text-black" : "text-zinc-500"}`}>{i + 1} · {NOMES_SLIDES[S.sid] || S.sid}</p>
             </button>
           ))}
         </nav>
         {/* o slide em foco */}
-        <div className="flex flex-col gap-3 min-w-0 sticky top-[73px]">
+        <div className="flex flex-col gap-3 min-w-0 xl:sticky xl:top-[73px]">
           <div className="rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5"><Palco><SlideAtual /></Palco></div>
           <div className="flex items-center gap-2">
             <button disabled={indice === 0} onClick={() => setAtual(indice - 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">‹ Anterior</button>
@@ -416,7 +416,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
   };
 
   return (
-    <aside className="sticky top-[73px] max-h-[calc(100vh-97px)] overflow-y-auto bg-white rounded-2xl ring-1 ring-black/5 p-5 flex flex-col gap-5 text-sm">
+    <aside className="xl:sticky xl:top-[73px] xl:max-h-[calc(100vh-97px)] xl:overflow-y-auto bg-white rounded-2xl ring-1 ring-black/5 p-5 flex flex-col gap-5 text-sm">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Editando</p>
         <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>

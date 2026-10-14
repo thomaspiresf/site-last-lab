@@ -569,17 +569,17 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
         </div>
       )}
 
-      <div className="grid grid-cols-[180px_1fr_380px] gap-5 items-start">
-        <nav className="sticky top-[76px] max-h-[calc(100vh-96px)] overflow-y-auto flex flex-col gap-2.5 pr-1">
+      <div className="grid grid-cols-1 xl:grid-cols-[180px_minmax(0,1fr)_380px] gap-5 p-5 items-start">
+        <nav className="flex flex-row gap-2 overflow-x-auto pb-1 xl:pb-0 xl:pr-1 xl:flex-col xl:gap-2.5 xl:overflow-x-visible xl:overflow-y-auto xl:sticky xl:top-[76px] xl:max-h-[calc(100vh-96px)]">
           {slides.map((S, i) => (
-            <button key={S.sid} onClick={() => setAtual(i)} className={`text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white"}`}>
+            <button key={S.sid} onClick={() => setAtual(i)} className={`shrink-0 w-36 xl:w-auto text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white"}`}>
               <div className="rounded overflow-hidden ring-1 ring-black/5 pointer-events-none"><Palco><S /></Palco></div>
               <p className={`text-[11px] mt-1 px-0.5 truncate ${i === indice ? "font-semibold text-black" : "text-zinc-500"}`}>{i + 1} · {NOMES_SLIDES[S.sid] || S.sid}</p>
             </button>
           ))}
         </nav>
 
-        <div className="flex flex-col gap-3 min-w-0 sticky top-[76px]">
+        <div className="flex flex-col gap-3 min-w-0 xl:sticky xl:top-[76px]">
           <div className="flex items-center gap-3 text-sm">
             <span className="text-zinc-500 flex-1">Prévia com um lead de exemplo</span>
             <label className="flex items-center gap-2">
@@ -613,7 +613,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
           )}
         </div>
 
-        <aside className="sticky top-[76px] max-h-[calc(100vh-96px)] overflow-y-auto bg-white rounded-2xl border border-zinc-200 p-5 flex flex-col gap-4">
+        <aside className="xl:sticky xl:top-[76px] xl:max-h-[calc(100vh-96px)] xl:overflow-y-auto bg-white rounded-2xl border border-zinc-200 p-5 flex flex-col gap-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Editando</p>
             <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>
