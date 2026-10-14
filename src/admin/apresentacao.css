@@ -455,3 +455,4 @@
 .apr-crono2.densa h3 { font-size: 24px; gap: 8px; }
 .apr-crono2.densa .data { font-size: 20px; }
 .apr-crono2.densa .dias, .apr-crono2.densa .info { font-size: 19px; }
+.apr-preco .apr-off { position: absolute; top: 40px; right: 44px; font-size: 22px; font-weight: 600; letter-spacing: 1.5px; color: #fff; background: #ef4b3a; padding: 8px 18px; border-radius: 999px; }

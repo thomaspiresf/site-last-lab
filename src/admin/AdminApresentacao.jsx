@@ -393,6 +393,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
         <div>
           <label className={rotulo}>Valor original (De ~~R$ X~~ por)</label>
           <input className={campo} value={rascunho.investimentoDe || ""} onChange={(e) => mudar({ investimentoDe: e.target.value })} onBlur={gravar} placeholder={dados.oferta.servico.investimentoDe || "Opcional, ex.: R$ 2.000"} />
+          <label className="flex items-center gap-2 text-[11px] text-zinc-500 mt-1.5"><input type="checkbox" checked={dados.mostrarDesconto !== false} onChange={(e) => salvar({ ...rascunho, mostrarDesconto: e.target.checked })} /> Mostrar selo de % OFF (a partir de 10%)</label>
         </div>
         <div>
           <label className={rotulo}>Parcelas</label>
@@ -613,6 +614,7 @@ export function montarDados(item, ap, urls = {}) {
     parcelas: ap.parcelas ?? oferta.servico.parcelas ?? "",
     parcelasProjeto: ap.parcelasProjeto ?? "",
     destaquePreco: ap.destaquePreco || oferta.servico.destaquePreco || "cheio", // "cheio" ou "parcela"
+    mostrarDesconto: ap.mostrarDesconto ?? oferta.servico.mostrarDesconto ?? true,
     pagamento: ap.pagamento || PAGAMENTO_PADRAO,
     validade: ap.validade || VALIDADE_PADRAO,
     casos,
@@ -1086,6 +1088,12 @@ function Passo({ d, escala }) {
       {/* direita: o cartão escuro com o preço recomendado */}
       <div className="apr-caixa apr-preco" style={{ left: 1000, top: 215, width: 839, height: outra ? 455 : 680 }}>
         <p className="rot">{tx("passo", "total")}</p>
+        {(() => {
+          // selo de desconto: calculado do valor original, só a partir de 10% e se não estiver desligado
+          const de = valorNumero(principal.de), por = valorNumero(principal.valor);
+          const pct = de && por && de > por ? Math.round((1 - por / de) * 100) : 0;
+          return d.mostrarDesconto !== false && pct >= 10 ? <span className="apr-off">{pct}% OFF</span> : null;
+        })()}
         {principal.de && <p className="de">De <s>{principal.de}</s> por</p>}
         {d.destaquePreco === "parcela" && principal.parcela
           ? <p className="valor"><span>{principal.aPartir ? "a partir de " : ""}{principal.parcela.n}x de</span>{moeda(principal.parcela.cada)}</p>

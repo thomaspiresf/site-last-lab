@@ -498,7 +498,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     preco: (
       <div className="grid grid-cols-2 gap-2">
         <Campo label="Valor original (padrão, riscado)" valor={s.investimentoDe || ""} placeholder="Opcional" onChange={(x) => setServ(id, "investimentoDe", x || null)} />
-        <span />
+        <label className="flex items-center gap-2 text-xs text-zinc-600 self-end pb-2"><input type="checkbox" checked={s.mostrarDesconto !== false} onChange={(e) => setServ(id, "mostrarDesconto", e.target.checked)} /> Selo de % OFF</label>
         <Campo label="Parcelas (padrão)" valor={s.parcelas ?? ""} placeholder="ex.: 3" onChange={(x) => setServ(id, "parcelas", x === "" ? null : Number(x) || null)} />
 <span />
         {deg
