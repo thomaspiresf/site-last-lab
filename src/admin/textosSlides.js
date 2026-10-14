@@ -17,7 +17,7 @@ export const TEXTOS = {
   custo: { chapeu: "O custo de ficar como está" },
   comeco: {
     titulo: "Por onde começar", sub: "Do diagnóstico à [[ação]].",
-    r1: "INÍCIO", r2: "PROJETO", r3: "CONTINUIDADE",
+    r1: "INÍCIO", r2: "PROJETO", r3: "RECORRÊNCIA",
     t2: "Quando a entrada mostra resultado", t3: "Para a marca seguir consistente todo mês",
   },
   oferta: { numero: "01", rotulo: "INÍCIO" },
