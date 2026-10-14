@@ -25,6 +25,7 @@ import AdminGuia from "./admin/AdminGuia";
 import AdminGuiaMarca from "./admin/AdminGuiaMarca";
 import AdminServicos from "./admin/AdminServicos";
 import AdminEntregaveis from "./admin/AdminEntregaveis";
+import AdminDocumento from "./admin/AdminDocumento";
 import AdminNamingList from "./admin/AdminNamingList";
 import AdminNamingStudy from "./admin/AdminNamingStudy";
 import AdminCalendarEditor from "./admin/AdminCalendarEditor";
@@ -98,6 +99,7 @@ function Shell() {
           <Route path="/admin/diagnosticos/:id/guia-marca" element={<AdminGuiaMarca />} />
           <Route path="/admin/servicos" element={<AdminServicos />} />
           <Route path="/admin/entregaveis" element={<AdminEntregaveis />} />
+          <Route path="/admin/diagnosticos/:id/doc/:docId" element={<AdminDocumento />} />
           <Route path="/admin/naming" element={<AdminNamingList />} />
           <Route path="/admin/naming/:studyId" element={<AdminNamingStudy />} />
           <Route path="/admin/calendarios/:calendarId" element={<AdminCalendarEditor />} />

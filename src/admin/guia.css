@@ -68,6 +68,35 @@
 .gm-caixa { background: #ffffff; border-radius: 18px; padding: 24px 26px; display: flex; flex-direction: column; gap: 10px; }
 .gm-caixa .txt { white-space: pre-line; }
 
+/* entregáveis (docs/*.jsx) */
+.dc-card { background: #ffffff; border-radius: 18px; overflow: hidden; }
+.dc-img-vazia { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px;
+  font-size: 14px; color: #a3a3ab; background: repeating-linear-gradient(135deg, #ececf1 0 12px, #f4f4f7 12px 24px); }
+.dc-logo-texto { font-weight: 700; letter-spacing: -1px; line-height: 1; text-align: center; white-space: nowrap; }
+.dc-protecao { position: relative; padding: 34px; outline: 1.5px dashed #ef4b3a; }
+.dc-protecao i { position: absolute; width: 26px; height: 26px; font-size: 12px; font-style: italic; color: #ef4b3a; display: flex; align-items: center; justify-content: center; background: #ffd8d2; }
+.dc-protecao .tl { top: 4px; left: 4px; } .dc-protecao .tr { top: 4px; right: 4px; } .dc-protecao .bl { bottom: 4px; left: 4px; } .dc-protecao .br { bottom: 4px; right: 4px; }
+.dc-medida { font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #55555d; }
+.dc-x { position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%; background: #ef4b3a; color: #fff; font-size: 20px; font-weight: 600; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.dc-tabela { width: 100%; border-collapse: collapse; font-size: 15px; line-height: 1.4; }
+.dc-tabela th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--laranja); padding: 0 12px 10px 0; border-bottom: 2px solid var(--tinta); }
+.gm-pag.escuro .dc-tabela th { border-bottom-color: #f7f7f9; }
+.dc-tabela td { padding: 14px 12px 14px 0; border-bottom: 1px solid #d9d9df; vertical-align: top; }
+.dc-tabela td.forte { font-weight: 600; }
+.gm-pag.escuro .dc-tabela td { border-bottom-color: #2c2c32; }
+.dc-check { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--tinta); border-radius: 5px; }
+.dc-tempo { display: flex; flex-direction: column; position: relative; }
+.dc-tempo::before { content: ""; position: absolute; left: 21px; top: 22px; bottom: 22px; width: 2px; background: #d9d9df; }
+.dc-tempo-item { display: grid; grid-template-columns: 44px 1fr; gap: 22px; padding-bottom: 30px; position: relative; }
+.dc-tempo-item .ponto { width: 44px; height: 44px; border-radius: 50%; background: var(--laranja); color: #fff; font-weight: 600; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+.dc-tempo-item h3 { font-size: 26px; font-weight: 600; line-height: 1.2; margin: 4px 0 6px; }
+.dc-marcas { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.dc-marcas li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; font-size: 18px; line-height: 1.4; }
+.dc-marcas li span { color: var(--laranja); font-weight: 700; }
+.dc-marcas.nao li span { color: #9a9aa3; }
+.dc-perguntas { padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 16px; line-height: 1.45; color: var(--suave); }
+.dc-mini { font-size: 10.5px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #9a9aa3; margin-bottom: 3px; }
+
 /* PDF: imprime só as páginas, uma por folha A4 */
 .gm-impressao { position: fixed; left: -100000px; top: 0; pointer-events: none; }
 @media print {

@@ -7,6 +7,7 @@ import { AREAS, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import { PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES, VAZIO as GUIA_VAZIO } from "./AdminGuia";
 import { VAZIO_MARCA, nomesDoGuiaMarca, paginasDoGuiaMarca } from "./AdminGuiaMarca";
+import { DOCUMENTOS } from "./docs";
 import "./guia.css";
 
 // Entregáveis (/admin/entregaveis): os documentos finais que o cliente recebe, por área do
@@ -16,7 +17,8 @@ import "./guia.css";
 const FONTE = "https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap";
 const ICONES = { clareza: MessageSquareText, valor: Gem, site: Globe, redes: Smartphone, vendas: Presentation, experiencia: HeartHandshake };
 
-// os documentos prontos (com gerador) e os planejados, por área
+// os documentos por área: os dois guias (editores próprios), os do editor genérico (docs/) e o site,
+// que é entregue no ar
 const DOCS = [
   {
     id: "guia-mensagem", area: "clareza", nome: "Guia de mensagem", rota: "guia", servicos: ["mensagem"],
@@ -24,22 +26,19 @@ const DOCS = [
     paginas: () => GUIA_PAGINAS, nomes: () => GUIA_NOMES, vazio: () => ({ ...GUIA_VAZIO, marca: "Sua Empresa" }),
   },
   {
-    id: "guia-marca", area: "clareza", nome: "Guia da marca", rota: "guia-marca", servicos: ["clareza_principal", "clareza_premium"],
+    id: "guia-marca", area: "clareza", nome: "Guia da marca", rota: "guia-marca", servicos: ["clareza_principal", "clareza_premium", "valor_premium"],
     descricao: "A estratégia completa da marca: essência, público, proposta, personalidade, tom, mensagens e manifesto. No premium, com a arquitetura.",
     paginas: () => paginasDoGuiaMarca(true), nomes: () => nomesDoGuiaMarca(true), vazio: () => ({ ...VAZIO_MARCA, marca: "Sua Empresa", comArquitetura: true }),
   },
-  { id: "brand-board", area: "valor", nome: "Brand board", servicos: ["revisao", "kit"], descricao: "Logo, cores, fontes e aplicações organizados numa página." },
-  { id: "manual", area: "valor", nome: "Manual de identidade", servicos: ["valor_principal", "valor_premium"], descricao: "Conceito, logo e versões, cores, tipografia, grafismos, fotografia e aplicações." },
-  { id: "lancamento", area: "valor", nome: "Plano de lançamento", servicos: ["valor_premium"], descricao: "Como e quando a nova marca chega aos clientes." },
-  { id: "paginas-site", area: "site", nome: "Páginas do site", servicos: ["pagina", "site_principal", "site_premium"], descricao: "As páginas desenhadas, no computador e no celular." },
-  { id: "guia-editorial", area: "redes", nome: "Guia editorial", servicos: ["instagram", "redes_principal"], descricao: "Pilares, calendário e templates para postar com cara de marca." },
-  { id: "plano-campanha", area: "redes", nome: "Plano de campanha", servicos: ["redes_premium"], descricao: "Conceito, fases e peças da campanha." },
-  { id: "roteiro-comercial", area: "vendas", nome: "Roteiro comercial", servicos: ["vendas_premium"], descricao: "O roteiro da reunião, as objeções e os follow-ups." },
-  { id: "mapa-jornada", area: "experiencia", nome: "Mapa da jornada", servicos: ["jornada", "experiencia_principal", "experiencia_premium"], descricao: "As etapas do atendimento, as mensagens de cada uma e o pós-venda." },
+  ...Object.values(DOCUMENTOS).map((d) => ({
+    id: d.id, area: d.area, nome: d.nome, rota: `doc/${d.id}`, servicos: d.servicos, descricao: d.descricao, doc: d,
+    paginas: () => d.paginas(d.vazio).map(([P]) => P), nomes: () => d.paginas(d.vazio).map(([, n]) => n), vazio: () => ({ ...d.vazio, marca: "Sua Empresa" }),
+  })),
+  { id: "paginas-site", area: "site", nome: "O próprio site", externo: true, servicos: ["pagina", "site_principal", "site_premium"], descricao: "Entregue no ar, com o acesso ao painel e um treinamento rápido. Não tem documento." },
 ];
 
 /** Uma página A4 em miniatura, na largura do espaço que ocupa (ou na largura fixa dada). */
-function Miniatura({ P, g, largura }) {
+function Miniatura({ P, g, largura, doc }) {
   const ref = useRef(null);
   const [w, setW] = useState(largura || 0);
   useEffect(() => {
@@ -50,7 +49,7 @@ function Miniatura({ P, g, largura }) {
   }, [largura]);
   return (
     <div ref={ref} className="gm-palco rounded-md overflow-hidden ring-1 ring-black/5 shadow-sm" style={largura ? { width: largura } : undefined}>
-      {w > 0 && <P g={g} nome="Sua Empresa" escala={w / 794} />}
+      {w > 0 && <P g={g} nome="Sua Empresa" doc={doc} escala={w / 794} />}
     </div>
   );
 }
@@ -98,7 +97,7 @@ export default function AdminEntregaveis() {
                 {docs.map((doc) => doc.paginas ? (
                   <article key={doc.id} className="bg-white rounded-2xl border border-zinc-200 p-4 flex gap-4">
                     <button onClick={() => setAberto(doc)} className="shrink-0" title="Ver o modelo">
-                      <Miniatura P={doc.paginas()[0]} g={doc.vazio()} largura={96} />
+                      <Miniatura P={doc.paginas()[0]} g={doc.vazio()} doc={doc.doc} largura={96} />
                     </button>
                     <div className="flex flex-col gap-2 min-w-0">
                       <p className="text-[15px] font-semibold leading-snug">{doc.nome}</p>
@@ -112,7 +111,7 @@ export default function AdminEntregaveis() {
                   </article>
                 ) : (
                   <article key={doc.id} className="rounded-2xl border border-dashed border-zinc-300 p-4 flex flex-col gap-2 text-zinc-500">
-                    <div className="flex items-center justify-between gap-2"><p className="text-[15px] font-semibold text-zinc-700">{doc.nome}</p><span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">Em breve</span></div>
+                    <div className="flex items-center justify-between gap-2"><p className="text-[15px] font-semibold text-zinc-700">{doc.nome}</p><span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">{doc.externo ? "Entregue no ar" : "Em breve"}</span></div>
                     <p className="text-xs leading-snug">{doc.descricao}</p>
                     <div className="flex flex-wrap gap-1">{doc.servicos.map((s) => <span key={s} className="text-[11px] px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500">{nomeServico(s)}</span>)}</div>
                   </article>
@@ -137,7 +136,7 @@ export default function AdminEntregaveis() {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {aberto.paginas().map((P, i) => (
                 <div key={i}>
-                  <Miniatura P={P} g={aberto.vazio()} />
+                  <Miniatura P={P} g={aberto.vazio()} doc={aberto.doc} />
                   <p className="text-xs text-zinc-500 mt-1.5">{i + 1} · {aberto.nomes()[i]}</p>
                 </div>
               ))}

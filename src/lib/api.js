@@ -164,6 +164,14 @@ export async function uploadPostMedia(file) {
   return { type: "image", dataUrl: url };
 }
 
+/** Imagem de um entregável (logo, foto, template). PNG e SVG sobem como estão, para manter a transparência. */
+export async function uploadImagemDoc(file) {
+  const ext = (file.name.split(".").pop() || "").toLowerCase();
+  if (["png", "svg", "webp", "gif"].includes(ext)) return uploadToStorage(file, "entregaveis", ext, file.type);
+  const blob = await compressImageToBlob(file, 2000, 0.9);
+  return uploadToStorage(blob, "entregaveis", "jpg", "image/jpeg");
+}
+
 export async function uploadAvatar(file) {
   const blob = await compressImageToBlob(file, 400, 0.85);
   return uploadToStorage(blob, "avatars", "jpg", "image/jpeg");
