@@ -684,8 +684,9 @@ function Capa({ d, escala }) {
     <Slide livre tipo="escuro" escala={escala} d={d}>
       <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
       {/* entrada: "Diagnóstico de marca"; principal e premium: o nome do projeto */}
-      <P x={68} y={324} s={d.degrau && d.degrau !== "entrada" && d.oferta.titulo.length > 16 ? 120 : 152} lh={1.15} cor="#fff" como="h1" w={1000}>
-        {rico(d.degrau && d.degrau !== "entrada" ? tx("capa", "tituloProjeto", { projeto: d.oferta.titulo }) : tx("capa", "titulo"))}
+      {/* o serviço pode ter o título da capa com a quebra escolhida à mão (tituloCapa); senão, quebra equilibrada */}
+      <P x={68} y={324} s={d.degrau && d.degrau !== "entrada" && d.oferta.titulo.length > 16 ? 120 : 152} lh={1.15} cor="#fff" como="h1" w={1000} style={{ textWrap: "balance" }}>
+        {rico(d.degrau && d.degrau !== "entrada" ? (d.oferta.servico.tituloCapa || tx("capa", "tituloProjeto", { projeto: d.oferta.titulo })) : tx("capa", "titulo"))}
       </P>
       <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
         {PECAS_CAPA.map((pts) => <polygon key={pts} points={pts} fill="#ef4b3a" />)}

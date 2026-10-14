@@ -589,7 +589,14 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
   };
 
   const POR_SLIDE = {
-    capa: [fixo(deg ? "Nos serviços de projeto (principal e premium), a capa mostra o nome do serviço. O nome da empresa do lead vai no rodapé." : "Nas entradas, a capa é igual para todas. O nome da empresa do lead vai no rodapé.")],
+    capa: [fixo(deg ? "Nos serviços de projeto (principal e premium), a capa mostra o nome do serviço. O nome da empresa do lead vai no rodapé." : "Nas entradas, a capa é igual para todas. O nome da empresa do lead vai no rodapé."),
+      deg && (
+        <label key="tc" className="block">
+          <span className={rotulo}>Título da capa deste serviço</span>
+          <textarea rows={3} className={`${campo} resize-y`} value={s.tituloCapa || ""} placeholder={nomeDoServico(r, id)} onChange={(e) => setServ(id, "tituloCapa", e.target.value)} />
+          <span className="block text-[11px] text-zinc-400 mt-1">Use Enter para escolher onde a linha quebra. Vazio: o nome do serviço, com quebra automática.</span>
+        </label>
+      )],
     objetivo: [fixo("Este slide é igual para todos os leads.")],
     conversa: [fixo("Este slide é igual para todos os leads.")],
     respostas: [doLead("Momento, nota, radar e barras vêm do diagnóstico; o resumo é ajustado por lead."), fixo("Para testar outro momento nesta prévia, troque o \"Momento\" acima do slide.")],
