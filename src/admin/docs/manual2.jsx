@@ -37,7 +37,7 @@ function LogoPag(p) {
   return (
     <Pag2 {...p}>
       <Tit t="Logo" lead="A assinatura principal e as versões para cada espaço." />
-      <div className="v2-sangra" style={{ background: "#fff", height: 430, display: "flex", alignItems: "center", justifyContent: "center", padding: 80 }}>
+      <div className="v2-sangra v4-bloco" style={{ background: "#fff", height: 430, display: "flex", alignItems: "center", justifyContent: "center", padding: 80 }}>
         <Logo g={p.g} nome={p.nome} altura={180} />
       </div>
       <Linha r="Versões">
@@ -61,7 +61,7 @@ function UsoLogo(p) {
       <Tit t="Uso do logo" lead="Espaço em volta, tamanho mínimo e os fundos certos." />
       <Linha r="Área de proteção">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 190px", gap: 24, alignItems: "center" }}>
-          <div style={{ background: "#fff", height: 210, display: "flex", alignItems: "center", justifyContent: "center", backgroundImage: "linear-gradient(#ececea 1px, transparent 1px), linear-gradient(90deg, #ececea 1px, transparent 1px)", backgroundSize: "20px 20px" }}>
+          <div className="v4-bloco" style={{ background: "#fff", height: 210, display: "flex", alignItems: "center", justifyContent: "center", backgroundImage: "linear-gradient(#ececea 1px, transparent 1px), linear-gradient(90deg, #ececea 1px, transparent 1px)", backgroundSize: "20px 20px" }}>
             <div className="dc-protecao" style={{ background: "#fff" }}><Logo g={p.g} nome={p.nome} altura={64} />{["tl", "tr", "bl", "br"].map((c) => <i key={c} className={c}>x</i>)}</div>
           </div>
           <p className="v2-txt" style={{ fontSize: 13.5 }}>{ou2(p.g.protecao, "[Regra da área de proteção]")}</p>
@@ -73,7 +73,7 @@ function UsoLogo(p) {
           <div><Logo g={p.g} nome={p.nome} altura={28} /><p style={{ fontSize: 22, fontWeight: 300, marginTop: 12 }}>{ou2(p.g.minDigital, "[px]")} <span className="v2-rot" style={{ color: "var(--cinza)" }}>digital</span></p></div>
         </div>
       </Linha>
-      <div className="v2-sangra" style={{ marginTop: "auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", height: 230 }}>
+      <div className="v2-sangra v4-faixa" style={{ marginTop: "auto", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", height: 230 }}>
         {[["#ffffff", false, "Fundo claro"], ["#0b0b0c", true, "Fundo escuro"], [ac, tintaSobre(ac) === "#ffffff", "Cor da marca"]].map(([bg, neg, r]) => (
           <div key={r} style={{ background: bg, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", padding: 28 }}>
             <Logo g={p.g} nome={p.nome} negativo={neg} altura={48} />
@@ -89,10 +89,10 @@ function NaoFazer(p) {
   return (
     <Pag2 {...p}>
       <Tit t="O que não fazer" lead="Os erros mais comuns. Se ficar em dúvida, use a versão original." />
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: "1px solid var(--tinta)" }}>
+      <div className="v4-grade" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: "1px solid var(--tinta)" }}>
         {ERROS.map(([nomeErro, estilo, fundo], i) => (
           <div key={nomeErro} style={{ borderBottom: "1px solid var(--filete)", borderRight: i % 2 === 0 ? "1px solid var(--filete)" : 0, padding: i % 2 === 0 ? "18px 18px 18px 0" : "18px 0 18px 18px" }}>
-            <div style={{ height: 150, background: fundo || "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
+            <div className="v4-bloco" style={{ height: 150, background: fundo || "#fff", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
               <div style={estilo}><Logo g={p.g} nome={p.nome} altura={54} /></div>
               <span style={{ position: "absolute", inset: 0, background: "linear-gradient(to top right, transparent calc(50% - 1px), var(--ac) 50%, transparent calc(50% + 1px))" }} />
             </div>
@@ -109,7 +109,7 @@ function Cores(p) {
   return (
     <Pag2 {...p}>
       <Tit t="Cores" lead="A paleta, com os códigos para tela e impressão." />
-      <div className="v2-sangra" style={{ display: "flex", height: 360 }}>
+      <div className="v2-sangra v4-faixa" style={{ display: "flex", height: 360 }}>
         {cores.map((c, i) => (
           <div key={i} style={{ flex: i === 0 ? 2.2 : 1, background: hexRgb(c.hex) ? c.hex : "#ddd", color: tintaSobre(c.hex), padding: "20px 18px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxShadow: "inset 0 0 0 0.5px rgba(0,0,0,0.06)" }}>
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.6, opacity: 0.7 }}>{nn(i + 1)}</p>
@@ -171,10 +171,10 @@ function Grafismos(p) {
   return (
     <Pag2 {...p}>
       <Tit t="Grafismos" lead="Os elementos que dão ritmo e reconhecimento à marca." />
-      <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gridTemplateRows: "260px 260px", gap: 2 }}>
+      <div className="v2-sangra v4-faixa" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gridTemplateRows: "260px 260px", gap: 2 }}>
         <div style={{ gridRow: "span 2" }}><Foto src={a} vazio="Grafismo 01" /></div>
         <Foto src={b} vazio="Grafismo 02" />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}><Foto src={c} vazio="03" /><Foto src={d} vazio="04" /></div>
+        <div className="v4-faixa" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}><Foto src={c} vazio="03" /><Foto src={d} vazio="04" /></div>
       </div>
       <Linha r="Como usar"><p className="v2-txt">{ou2(p.g.grafismosTxt, "[Como e onde usar os grafismos]")}</p></Linha>
     </Pag2>
@@ -186,7 +186,7 @@ function Fotografia(p) {
   return (
     <Pag2 {...p}>
       <Tit t="Fotografia" lead="O olhar da marca nas imagens." />
-      <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gridTemplateRows: "230px 230px", gap: 2 }}>
+      <div className="v2-sangra v4-faixa" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gridTemplateRows: "230px 230px", gap: 2 }}>
         <div style={{ gridRow: "span 2" }}><Foto src={a} vazio="Referência 01" /></div>
         <div style={{ gridColumn: "span 2" }}><Foto src={b} vazio="Referência 02" /></div>
         <Foto src={c} vazio="03" /><Foto src={d} vazio="04" />
@@ -251,7 +251,7 @@ function Board(p) {
         <h2 style={{ fontSize: 56, fontWeight: 300, letterSpacing: -2, lineHeight: 1 }}>Brand board</h2>
         <p className="v2-rot">{p.g.marca || p.nome}</p>
       </div>
-      <div className="v2-sangra" style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gridTemplateRows: "290px 140px 130px 1fr", gap: 2, background: "var(--filete)", padding: 0 }}>
+      <div className="v2-sangra v4-faixa" style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gridTemplateRows: "290px 140px 130px 1fr", gap: 2, background: "var(--filete)", padding: 0 }}>
         <div style={{ ...cel, gridColumn: "span 4", display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>{rot("Logo")}<Logo g={p.g} nome={p.nome} altura={130} /></div>
         <div style={{ ...cel, gridColumn: "span 2", background: "#0b0b0c", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>{rot("Negativo", true)}<Logo g={p.g} nome={p.nome} negativo altura={64} /></div>
         {cores.slice(0, 6).map((c, i) => (

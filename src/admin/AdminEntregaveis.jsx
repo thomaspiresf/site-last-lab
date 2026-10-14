@@ -32,7 +32,7 @@ const DOCS = [
   },
   ...Object.values(DOCUMENTOS).map((d) => ({
     id: d.id, area: d.area, nome: d.nome, rota: `doc/${d.id}`, servicos: d.servicos, descricao: d.descricao, doc: d,
-    lista: (v) => propsDasPaginas(paginasDe(d, d.vazio, v)), vazio: () => ({ ...d.vazio, marca: "Sua Empresa" }),
+    lista: (v) => propsDasPaginas(paginasDe(d, d.vazio, v), v), vazio: () => ({ ...d.vazio, marca: "Sua Empresa" }),
   })),
   { id: "paginas-site", area: "site", nome: "O próprio site", externo: true, servicos: ["pagina", "site_principal", "site_premium"], descricao: "Entregue no ar, com o acesso ao painel e um treinamento rápido. Não tem documento." },
 ];

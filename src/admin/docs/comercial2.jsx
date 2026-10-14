@@ -14,7 +14,7 @@ function Processo(p) {
   return (
     <Pag2 {...p}>
       <Tit t="O processo" lead="Poucas etapas, um objetivo em cada. Toda etapa termina com o próximo passo marcado." />
-      <div className="v2-sangra" style={{ display: "flex", height: 330 }}>
+      <div className="v2-sangra v4-setas" style={{ display: "flex", height: 330 }}>
         {e.map((x, i) => {
           const ultimo = i === e.length - 1;
           return (

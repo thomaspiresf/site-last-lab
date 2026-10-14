@@ -29,10 +29,10 @@ function Pilares(p) {
   return (
     <Pag2 {...p}>
       <Tit t="Pilares" lead="Todo post nasce de um deles. O peso mostra quanto do mês cada um ocupa." />
-      <div className="v2-sangra" style={{ display: "flex", height: 64 }}>
+      <div className="v2-sangra v4-faixa" style={{ display: "flex", height: 64 }}>
         {pil.map((x, i) => <div key={i} style={{ flex: Number(x.peso) || 0, background: COR_PILAR[i % 5], color: i === 1 ? "#fff" : "#0b0b0c", padding: "0 12px", display: "flex", alignItems: "center", fontSize: 12, fontWeight: 600 }}>{Math.round(((Number(x.peso) || 0) / total) * 100)}%</div>)}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: "1px solid var(--tinta)" }}>
+      <div className="v4-cartoes" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", borderTop: "1px solid var(--tinta)" }}>
         {pil.map((x, i) => (
           <div key={i} style={{ padding: i % 2 ? "20px 0 22px 22px" : "20px 22px 22px 0", borderRight: i % 2 ? 0 : "1px solid var(--filete)", borderBottom: "1px solid var(--filete)", display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span style={{ width: 10, height: 10, borderRadius: 99, background: COR_PILAR[i % 5] }} /><Rot estilo={{ color: "var(--cinza)" }}>{nn(i + 1)}</Rot></div>
@@ -53,7 +53,7 @@ function Semana(p) {
   return (
     <Pag2 {...p}>
       <Tit t="A semana" lead="Uma frequência que dá para manter. Constância vale mais que volume." />
-      <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderTop: "1px solid var(--tinta)", borderBottom: "1px solid var(--filete)", height: 420 }}>
+      <div className="v2-sangra v4-semana" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderTop: "1px solid var(--tinta)", borderBottom: "1px solid var(--filete)", height: 420 }}>
         {DIAS.map((d, i) => {
           const itens = porDia(d);
           return (

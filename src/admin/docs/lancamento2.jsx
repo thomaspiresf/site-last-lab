@@ -9,7 +9,7 @@ function Mudanca(p) {
   return (
     <Pag2 {...p}>
       <Tit t="A mudança" lead="De onde a marca vem, aonde vai e por quê." />
-      <div className="v2-sangra" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: 300 }}>
+      <div className="v2-sangra v4-faixa" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: 300 }}>
         <div style={{ background: "#e8e8e4", padding: "26px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <Rot estilo={{ color: "var(--cinza)" }}>Antes</Rot>
           <p style={{ fontSize: 22, fontWeight: 300, lineHeight: 1.35, color: "#55555b" }}>{ou2(p.g.antes, "[Como a marca era vista]")}</p>
@@ -44,7 +44,7 @@ function Fases(p) {
   return (
     <Pag2 {...p}>
       <Tit t="As fases" lead="Primeiro a equipe conhece a marca. Depois, o mercado." />
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, f.length)}, 1fr)`, gap: 3 }}>
+      <div className="v4-faixa" style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, f.length)}, 1fr)`, gap: 3 }}>
         {f.map((x, i) => <div key={i} style={{ height: 8, background: i === f.length - 2 ? "var(--ac)" : i < f.length - 2 ? "var(--tinta)" : "#c9c9c5" }} />)}
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>

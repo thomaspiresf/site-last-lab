@@ -51,7 +51,7 @@ export default function AdminDocumento() {
     }
   };
 
-  const lista = useMemo(() => (g ? propsDasPaginas(paginasDe(doc, g)) : []), [g, doc]);
+  const lista = useMemo(() => (g ? propsDasPaginas(paginasDe(doc, g), versaoDe(doc, g)) : []), [g, doc]);
   const paginas = useMemo(() => lista.map(({ P, extra }) => (props) => <P g={g} nome={item?.nome} doc={doc} {...extra} {...props} />), [lista, g, item, doc]);
 
   if (!doc) return <div className="p-10 text-sm text-zinc-500">Documento não encontrado.</div>;

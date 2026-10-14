@@ -22,11 +22,11 @@ export function acentoDe(hex) {
 }
 
 /** A página V2. `fundo`: "claro" | "escuro" | "acento". `sangra`: sem margens (o conteúdo se posiciona). */
-export function Pag2({ g, nome, doc, escala, n, total, indice, fundo = "claro", classe = "", children, semCabeca, estilo }) {
+export function Pag2({ g, nome, doc, escala, n, total, indice, versao, fundo = "claro", classe = "", children, semCabeca, estilo }) {
   const acento = doc.acento ? doc.acento(g) : "#ef4b3a";
   const secao = indice?.[n - 1];
   return (
-    <section className={`v2-pag v2-${fundo} ${classe}`} style={{ "--ac": acento, ...(escala ? { zoom: escala } : {}), ...estilo }}>
+    <section className={`v2-pag v2-${fundo} ${versao === "v4" ? "v4" : ""} ${classe}`} style={{ "--ac": acento, ...(escala ? { zoom: escala } : {}), ...estilo }}>
       {!semCabeca && (
         <header className="v2-cabeca">
           <p><b>{nn(n || 1)}</b>{secao}</p>
@@ -67,7 +67,7 @@ export const Rot = ({ children, estilo }) => <p className="v2-rot" style={estilo
 /** Imagem até a borda do bloco, ou um bloco neutro com o nome do que vai ali. */
 export function Foto({ src, vazio = "Imagem", contain, estilo }) {
   if (!src) return <div className="v2-foto-vazia" style={estilo}><span>{vazio}</span></div>;
-  return <img crossOrigin="anonymous" src={src} alt="" style={{ width: "100%", height: "100%", objectFit: contain ? "contain" : "cover", display: "block", ...estilo }} />;
+  return <img className="v2-img" crossOrigin="anonymous" src={src} alt="" style={{ width: "100%", height: "100%", objectFit: contain ? "contain" : "cover", display: "block", ...estilo }} />;
 }
 
 /** Capa V2: metadados no topo, o grafismo do material (doc.capa) e o nome do cliente grande na base. */
@@ -81,10 +81,17 @@ export function Capa2(p) {
         <div><Rot>Para</Rot><p>{p.g.marca || p.nome}</p></div>
         <div><Rot>Data</Rot><p>{mes[0].toUpperCase() + mes.slice(1)} {hoje.getFullYear()}</p></div>
       </div>
-      <div className="nome">
-        <p className="tipo">{p.titulo || p.doc.nome}</p>
-        <h1>{p.g.marca || p.nome || "Sua Empresa"}</h1>
-      </div>
+      {p.versao === "v4" ? (
+        <div className="nome">
+          <p className="tipo">{p.g.marca || p.nome || "Sua Empresa"}</p>
+          <h1>{p.titulo || p.doc.nome}</h1>
+        </div>
+      ) : (
+        <div className="nome">
+          <p className="tipo">{p.titulo || p.doc.nome}</p>
+          <h1>{p.g.marca || p.nome || "Sua Empresa"}</h1>
+        </div>
+      )}
       {p.doc.capa && <img className="grafismo" src={p.doc.capa} alt="" crossOrigin="anonymous" />}
       <img className="logo" src={LOGO_LASTLAB} alt="Last Lab" />
     </Pag2>

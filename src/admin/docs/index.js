@@ -37,20 +37,24 @@ export const DOCUMENTOS = Object.fromEntries([BRAND_BOARD, MANUAL, LANCAMENTO, E
 /** Os dados do documento: o vazio + o que já foi salvo + o nome da empresa do lead. */
 export const dadosDoDocumento = (doc, apresentacao = {}) => ({ ...doc.vazio, marca: apresentacao.empresa || "", ...(apresentacao[doc.chave] || {}) });
 
-/** As versões que o documento tem (v1 sempre). */
-export const versoesDe = (doc) => ["v1", ...(doc.v2 ? ["v2"] : []), ...(doc.v3 ? ["v3"] : [])];
+/** As versões que o documento tem (v1 sempre). A V4 é a V2 refinada: mesmas páginas, com cantos
+ * arredondados, mais respiro, sem sombra e o nome do material em destaque na capa. */
+export const versoesDe = (doc) => ["v1", ...(doc.v2 ? ["v2"] : []), ...(doc.v3 ? ["v3"] : []), ...(doc.v2 ? ["v4"] : [])];
 
-/** A versão padrão: a V2 (a escolhida como principal), quando existe. */
-export const versaoPadrao = (doc) => (doc.v2 ? "v2" : "v1");
+/** A versão padrão: a V4 (a escolhida como principal), quando existe. */
+export const versaoPadrao = (doc) => (doc.v2 ? "v4" : "v1");
 
 /** A versão em uso: a escolhida para o lead, ou a padrão. */
 export const versaoDe = (doc, g) => (versoesDe(doc).includes(g?.versao) ? g.versao : versaoPadrao(doc));
 
 /** As páginas [Componente, nome] da versão em uso. */
-export const paginasDe = (doc, g, versao = versaoDe(doc, g)) => (doc[versao] && versao !== "v1" ? doc[versao](g) : doc.paginas(g));
+export const paginasDe = (doc, g, versao = versaoDe(doc, g)) => {
+  const v = versao === "v4" ? "v2" : versao;
+  return doc[v] && v !== "v1" ? doc[v](g) : doc.paginas(g);
+};
 
 /** Props extras de cada página: número, total e índice (a V2 usa no cabeçalho e no sumário). */
-export const propsDasPaginas = (lista) => {
+export const propsDasPaginas = (lista, versao) => {
   const indice = lista.map(([, n]) => n);
-  return lista.map(([P, nome], i) => ({ P, nome, extra: { n: i + 1, total: lista.length, indice } }));
+  return lista.map(([P, nome], i) => ({ P, nome, extra: { n: i + 1, total: lista.length, indice, versao } }));
 };

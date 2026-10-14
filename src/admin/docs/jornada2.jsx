@@ -33,7 +33,7 @@ function Mapa(p) {
           </div>
         ))}
       </div>
-      <svg className="v2-sangra" width={W} height={H} style={{ display: "block", background: "#fff" }}>
+      <svg className="v2-sangra v4-bloco" width={W} height={H} style={{ display: "block", background: "#fff" }}>
         <defs><linearGradient id="v2-area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="var(--ac)" stopOpacity="0.22" /><stop offset="1" stopColor="var(--ac)" stopOpacity="0" /></linearGradient></defs>
         {e.map((_, i) => i > 0 && <line key={i} x1={(W / n) * i} x2={(W / n) * i} y1="0" y2={H} stroke="#efefec" />)}
         <line x1="0" x2={W} y1={y(3)} y2={y(3)} stroke="#d5d5d2" strokeDasharray="3 5" />
