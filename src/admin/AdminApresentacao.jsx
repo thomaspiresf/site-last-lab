@@ -910,7 +910,7 @@ function Entrega({ d, escala }) {
 }
 
 /** Todas as imagens de um projeto do portfólio (capa, banner, grades), sem repetir. */
-function imagensDoProjeto(p) {
+export function imagensDoProjeto(p) {
   const achadas = [];
   const andar = (v) => {
     if (typeof v === "string" && /^\/images\/.+\.(png|jpe?g|webp|avif)$/i.test(v)) achadas.push(v);
@@ -1097,6 +1097,7 @@ export function resumoDoCaso(p) {
     resultado: editado.resultado || frase(ps[ps.length - 1]),
     setor: [p.expandDetails?.sector, p.expandDetails?.year].filter(Boolean).join(" · "),
     imagens: [p.bannerImage || p.coverImage, ...(p.topGrid || []), ...(p.expandDetails?.expandImages || [])].filter(Boolean).filter((x, k, a) => a.indexOf(x) === k).slice(0, 3),
+    escolhidas: editado.imagens?.length ? editado.imagens : null, // fotos escolhidas em Produtos e serviços (1ª = grande)
   };
 }
 
@@ -1106,8 +1107,10 @@ function Caso({ d, escala, n }) {
   const [proporcao, setProporcao] = useState(2);
   if (!p) return <Slide livre escala={escala} d={d}><Cabeca t={tx("casos", "titulo")} sub="Escolha os casos no painel." /></Slide>;
   const c = resumoDoCaso(p);
-  const [grande, ...outras] = c.imagens.length ? c.imagens : [p.coverImage];
-  const menores = [...outras, ...(p.topGrid || []), ...(p.expandDetails?.expandImages || [])].filter((x, k, a) => x && x !== grande && a.indexOf(x) === k).slice(0, 3);
+  const [grande, ...outras] = c.escolhidas || (c.imagens.length ? c.imagens : [p.coverImage]);
+  const menores = c.escolhidas
+    ? outras.slice(0, 3)
+    : [...outras, ...(p.topGrid || []), ...(p.expandDetails?.expandImages || [])].filter((x, k, a) => x && x !== grande && a.indexOf(x) === k).slice(0, 3);
   // a grande ocupa a altura que a proporção dela pede (sem cortar), dentro do espaço
   // área útil 81–1839 (1758 px), 60 px entre as colunas: 40% texto (679), 60% imagens (1019)
   const largura = 1019, topo = 100, total = 800, vao = 18;

@@ -7,7 +7,7 @@ import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao
 import { carregarCatalogo } from "./carregarCatalogo";
 import { FORMATOS } from "./mockups";
 import { ROTULOS_TEXTOS } from "./textosSlides";
-import { NOMES_SLIDES, NavSlides, Palco, SLIDES, inicioVisivel, ordenarSlides, resumoDoCaso, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
+import { NOMES_SLIDES, NavSlides, Palco, SLIDES, imagensDoProjeto, inicioVisivel, ordenarSlides, resumoDoCaso, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
 
@@ -644,6 +644,33 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
   );
 }
 
+/** Escolha das fotos do caso entre as do projeto no site: clique na ordem (1ª = grande, até 4). */
+function FotosDoCaso({ p, escolhidas, onChange }) {
+  const todas = imagensDoProjeto(p);
+  const alternar = (src) => onChange(escolhidas.includes(src) ? escolhidas.filter((x) => x !== src) : escolhidas.length < 4 ? [...escolhidas, src] : escolhidas);
+  return (
+    <div className="flex flex-col gap-2 border-t border-zinc-200 pt-3">
+      <div className="flex items-center justify-between gap-2">
+        <span className={rotulo}>Fotos do slide</span>
+        {escolhidas.length > 0 && <button onClick={() => onChange([])} className="text-[11px] font-semibold text-zinc-500 hover:text-black">Automático</button>}
+      </div>
+      <p className="text-[11px] text-zinc-400 -mt-1">Clique na ordem: a 1ª é a grande, as próximas 3 vão embaixo. {escolhidas.length ? `${escolhidas.length} de 4.` : "Nenhuma escolhida: o slide escolhe sozinho."}</p>
+      <div className="grid grid-cols-3 gap-1.5">
+        {todas.map((src) => {
+          const n = escolhidas.indexOf(src);
+          return (
+            <button key={src} onClick={() => alternar(src)} title={src.split("/").pop()}
+              className={`relative aspect-[4/3] rounded-md overflow-hidden ring-2 transition ${n >= 0 ? "ring-[#ef4b3a]" : "ring-transparent hover:ring-zinc-300"} ${n < 0 && escolhidas.length >= 4 ? "opacity-40" : ""}`}>
+              <img src={src} alt="" loading="lazy" className="w-full h-full object-cover" />
+              {n >= 0 && <span className="absolute top-1 left-1 w-5 h-5 rounded-full bg-[#ef4b3a] text-white text-[11px] font-bold flex items-center justify-center">{n + 1}</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /** Os três textos de um caso: vêm do site; aqui dá para reescrever (vale em todas as apresentações). */
 function TextosDoCaso({ r, set, pid }) {
   const p = projects.find((x) => x.id === pid);
@@ -660,7 +687,8 @@ function TextosDoCaso({ r, set, pid }) {
           <textarea rows={3} className={`${campo} resize-y`} value={editado[k] || ""} placeholder={doSite[k]} onChange={(e) => mudar(k, e.target.value)} />
         </label>
       ))}
-      <p className="text-[11px] text-zinc-400">As imagens vêm da página do projeto no site. Até ~190 caracteres por texto.</p>
+      <p className="text-[11px] text-zinc-400">Até ~190 caracteres por texto.</p>
+      <FotosDoCaso p={p} escolhidas={editado.imagens || []} onChange={(lista) => mudar("imagens", lista)} />
     </div>
   );
 }
