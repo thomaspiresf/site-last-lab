@@ -516,6 +516,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
         <span className={rotulo}>Ilustração do entregável</span>
         <select className={campo} value={s.exemplo} onChange={(e) => setServ(id, "exemplo", e.target.value)}>
           <option value="guia">Páginas do Guia de mensagem (+ slide da sessão)</option>
+          <option value="guiaMarca">Páginas do Guia da marca</option>
+          <option value="guiaMarcaArq">Páginas do Guia da marca, com arquitetura</option>
           {Object.entries(FORMATOS).map(([k, f]) => <option key={k} value={k}>Ilustração: {f.nome}</option>)}
           {projects.map((p) => <option key={p.id} value={p.id}>Projeto: {p.title}</option>)}
         </select>

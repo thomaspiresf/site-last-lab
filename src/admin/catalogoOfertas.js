@@ -173,7 +173,7 @@ export const SERVICOS = {
         "aprovacao": false
       },
       {
-        "nome": "Plataforma de marca",
+        "nome": "Guia da marca",
         "texto": "Propósito, proposta de valor e personalidade",
         "dias": 5,
         "cliente": "Aprovar a plataforma",
@@ -194,7 +194,7 @@ export const SERVICOS = {
         "aprovacao": false
       }
     ],
-    "exemplo": "slides",
+    "exemplo": "guiaMarca",
     "depois": [
       "Uma marca com um lugar claro no mercado",
       "Todo mundo da equipe falando a mesma língua",
@@ -205,7 +205,7 @@ export const SERVICOS = {
     "entregas": [
       "2 sessões de imersão com você e a equipe",
       "Análise de 5 concorrentes e do seu público",
-      "Plataforma de marca: propósito, proposta de valor, público e personalidade",
+      "Guia da marca: propósito, proposta de valor, público e personalidade",
       "Guia de tom de voz completo e manifesto",
       "Textos do site e da apresentação"
     ],
@@ -231,7 +231,7 @@ export const SERVICOS = {
         "aprovacao": false
       },
       {
-        "nome": "Plataforma de marca",
+        "nome": "Guia da marca",
         "texto": "Propósito, proposta de valor e personalidade",
         "dias": 6,
         "cliente": "Aprovar a plataforma",
@@ -259,7 +259,7 @@ export const SERVICOS = {
         "aprovacao": false
       }
     ],
-    "exemplo": "slides",
+    "exemplo": "guiaMarcaArq",
     "depois": [
       "Uma marca organizada do topo às linhas de serviço",
       "Nomes e mensagens que fazem sentido juntos",
@@ -269,7 +269,7 @@ export const SERVICOS = {
     "fechamento": "Vamos organizar a sua marca **para crescer sem se perder?**",
     "entregas": [
       "Imersão com sócios e equipe, análise de concorrentes e entrevistas com clientes",
-      "Plataforma de marca: propósito, proposta de valor, público e personalidade",
+      "Guia da marca: propósito, proposta de valor, público e personalidade",
       "Guia de tom de voz completo e manifesto",
       "Arquitetura das linhas de serviço ou submarcas, com naming quando precisar",
       "Textos do site e da apresentação",

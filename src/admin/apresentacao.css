@@ -456,3 +456,7 @@
 .apr-crono2.densa .data { font-size: 20px; }
 .apr-crono2.densa .dias, .apr-crono2.densa .info { font-size: 19px; }
 .apr-preco .apr-off { position: absolute; top: 40px; right: 44px; font-size: 22px; font-weight: 600; letter-spacing: 1.5px; color: #fff; background: #ef4b3a; padding: 8px 18px; border-radius: 999px; }
+.apr-paginas.duas { gap: 22px 24px; align-content: center; justify-content: start; grid-auto-columns: 178px; }
+.apr-paginas.duas .mini { width: 178px; height: 252px; }
+.apr-paginas.duas .mini > .gm-pag { transform: scale(.2242); }
+.apr-paginas.duas p { font-size: 17px; margin-top: 8px; }

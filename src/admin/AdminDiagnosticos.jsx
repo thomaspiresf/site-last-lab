@@ -401,6 +401,9 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
       <Link to={`/admin/diagnosticos/${item.id}/guia`} className="-mt-2 self-start text-xs font-semibold text-zinc-500 hover:text-black">
         Guia de mensagem (entregável do Workshop de mensagem) →
       </Link>
+      <Link to={`/admin/diagnosticos/${item.id}/guia-marca`} className="-mt-2 self-start text-xs font-semibold text-zinc-500 hover:text-black">
+        Guia da marca (entregável do Posicionamento de marca) →
+      </Link>
 
       <div className="grid md:grid-cols-2 gap-4 items-start">
         <div className="rounded-2xl bg-zinc-900 text-white p-5">

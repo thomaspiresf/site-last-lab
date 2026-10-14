@@ -8,6 +8,7 @@ import { AREAS, CASOS_PADRAO, CASOS_TEXTOS, ESTRUTURA, CONTINUIDADE, CUSTO_PADRA
 const AREAS_ATUAIS = () => AREAS;
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import { Cena, FORMATOS, Peca } from "./mockups";
+import { VAZIO_MARCA, paginasDoGuiaMarca, nomesDoGuiaMarca } from "./AdminGuiaMarca";
 import { dia, montarCronograma, periodo } from "./cronograma";
 import { TEXTOS } from "./textosSlides";
 import { carregarCatalogo } from "./carregarCatalogo";
@@ -918,6 +919,16 @@ function PreviaEntrega({ d }) {
       </div>
     );
   }
+  if (ex === "guiaMarca" || ex === "guiaMarcaArq") {
+    const g = { ...VAZIO_MARCA, marca: d.empresa || d.nome };
+    const [P1, P2] = paginasDoGuiaMarca(false);
+    return (
+      <div className="apr-previa guia">
+        <div className="pag p1"><P1 g={g} nome={d.nome} /></div>
+        <div className="pag p2"><P2 g={g} nome={d.nome} /></div>
+      </div>
+    );
+  }
   if (FORMATOS[ex]) return <Peca formato={ex} marca={d.empresa || d.nome} largura={720} altura={500} />;
   const p = projects.find((x) => x.id === ex);
   const imgs = [p?.coverImage, ...(p?.topGrid || [])].filter(Boolean).slice(0, 3);
@@ -972,6 +983,24 @@ function Produto({ d, escala }) {
             <div key={i} className="item">
               <div className="mini"><P g={g} nome={d.nome} /></div>
               <p>{i + 1} · {GUIA_NOMES[i]}</p>
+            </div>
+          ))}
+        </div>
+      </Slide>
+    );
+  }
+  if (ex === "guiaMarca" || ex === "guiaMarcaArq") {
+    const g = { ...VAZIO_MARCA, marca: d.empresa || d.nome, comArquitetura: ex === "guiaMarcaArq" };
+    const pags = paginasDoGuiaMarca(g.comArquitetura);
+    const nomes = nomesDoGuiaMarca(g.comArquitetura);
+    return (
+      <Slide escala={escala} d={d}>
+        <Titulo t={tx("produto", "tituloGuiaMarca")} sub={tx("produto", "subGuiaMarca", { paginas: pags.length })} />
+        <div className="apr-paginas duas" style={{ gridTemplateColumns: `repeat(${Math.ceil(pags.length / 2)}, 178px)` }}>
+          {pags.map((P, i) => (
+            <div key={i} className="item">
+              <div className="mini"><P g={g} nome={d.nome} /></div>
+              <p>{i + 1} · {nomes[i]}</p>
             </div>
           ))}
         </div>
