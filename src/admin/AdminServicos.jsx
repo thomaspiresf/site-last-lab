@@ -497,6 +497,16 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     pitch: <Campo label="Texto comercial" area valor={campoDe("pitch")} onChange={(x) => mudarCampo("pitch", x)} dica="O que o cliente ganha, em 1 ou 2 frases. Aparece ao lado do preço." />,
     preco: (
       <div className="grid grid-cols-2 gap-2">
+        <Campo label="Valor original (padrão, riscado)" valor={s.investimentoDe || ""} placeholder="Opcional" onChange={(x) => setServ(id, "investimentoDe", x || null)} />
+        <span />
+        <Campo label="Parcelas (padrão)" valor={s.parcelas ?? ""} placeholder="ex.: 3" onChange={(x) => setServ(id, "parcelas", x === "" ? null : Number(x) || null)} />
+        <label className="block">
+          <span className={rotulo}>Destaque do preço (padrão)</span>
+          <select className={campo} value={s.destaquePreco || "cheio"} onChange={(e) => setServ(id, "destaquePreco", e.target.value)}>
+            <option value="cheio">Valor cheio</option>
+            <option value="parcela">Parcela</option>
+          </select>
+        </label>
         {deg
           ? <Campo label="Faixa de valor (escada)" valor={area[deg].valor} onChange={(x) => mudarArea(deg, { ...area[deg], valor: x })} />
           : <Campo label="Investimento" valor={s.investimento} placeholder="R$ ____" onChange={(x) => setServ(id, "investimento", x || null)} />}

@@ -386,7 +386,8 @@
 /* investimento com âncora */
 .apr-preco { background: #0a0a0a; color: #fff; padding: 44px 48px; display: flex; flex-direction: column; box-sizing: border-box; }
 .apr-preco .rot { font-size: 20px; font-weight: 300; letter-spacing: 3px; text-transform: uppercase; color: #999999; }
-.apr-preco .de { font-size: 30px; font-weight: 300; color: #8a8a92; text-decoration: line-through; margin-top: 18px; }
+.apr-preco .de { font-size: 30px; font-weight: 300; color: #8a8a92; margin-top: 18px; }
+.apr-preco .de s { text-decoration-color: #ef4b3a; text-decoration-thickness: 2px; }
 .apr-preco .valor { font-size: 120px; font-weight: 600; line-height: 1; letter-spacing: -3px; margin-top: 18px; }
 .apr-preco .valor span { display: block; font-size: 26px; font-weight: 300; letter-spacing: 0; color: #c9c9d1; margin-bottom: 10px; }
 .apr-preco .linhas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: auto; }

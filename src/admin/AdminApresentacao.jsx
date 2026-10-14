@@ -382,12 +382,25 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
           <input className={campo} value={rascunho.prazo || ""} onChange={(e) => mudar({ prazo: e.target.value })} onBlur={gravar} placeholder={dados.oferta.servico.prazo || "__ dias úteis"} />
         </div>
         <div>
-          <label className={rotulo}>Valor cheio (riscado)</label>
-          <input className={campo} value={rascunho.investimentoDe || ""} onChange={(e) => mudar({ investimentoDe: e.target.value })} onBlur={gravar} placeholder="Opcional" />
+          <label className={rotulo}>Valor original (De ~~R$ X~~ por)</label>
+          <input className={campo} value={rascunho.investimentoDe || ""} onChange={(e) => mudar({ investimentoDe: e.target.value })} onBlur={gravar} placeholder={dados.oferta.servico.investimentoDe || "Opcional, ex.: R$ 2.000"} />
         </div>
         <div>
-          <label className={rotulo}>Parcelamento</label>
-          <input className={campo} value={rascunho.parcelamento || ""} onChange={(e) => mudar({ parcelamento: e.target.value })} onBlur={gravar} placeholder="ou 3x de R$ ___" />
+          <label className={rotulo}>Parcelas</label>
+          <input type="number" min="1" max="24" className={campo} value={rascunho.parcelas ?? ""} onChange={(e) => mudar({ parcelas: e.target.value === "" ? undefined : Number(e.target.value) })} onBlur={gravar} placeholder={dados.oferta.servico.parcelas ? `${dados.oferta.servico.parcelas} (padrão)` : "ex.: 3"} />
+          <p className="text-[11px] text-zinc-400 mt-1">{parcela(dados.investimento, dados.parcelas)?.texto ? `= ${parcela(dados.investimento, dados.parcelas).texto}` : "A parcela é calculada sozinha."}</p>
+        </div>
+        <div className="col-span-2">
+          <label className={rotulo}>Destaque do preço</label>
+          <div className="flex gap-1.5">
+            {[["cheio", "Valor cheio"], ["parcela", "Parcela"]].map(([v, t]) => (
+              <button key={v} onClick={() => salvar({ ...rascunho, destaquePreco: v })} className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold border ${dados.destaquePreco === v ? "bg-black text-white border-black" : "border-zinc-200 text-zinc-600 hover:border-zinc-400"}`}>{t}</button>
+            ))}
+          </div>
+        </div>
+        <div className="col-span-2">
+          <label className={rotulo}>Texto do parcelamento (opcional)</label>
+          <input className={campo} value={rascunho.parcelamento || ""} onChange={(e) => mudar({ parcelamento: e.target.value })} onBlur={gravar} placeholder="Vazio: calculado pelas parcelas" />
         </div>
       </div>
       <div>
@@ -404,6 +417,10 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
           <div>
             <label className={rotulo}>Valor de {dados.ancora?.nome || "a outra opção"}</label>
             <input className={campo} value={rascunho.investimentoProjeto || ""} onChange={(e) => mudar({ investimentoProjeto: e.target.value })} onBlur={gravar} placeholder={`a partir de ${aPartirDe(dados.ancora?.valor || "")}`} />
+          </div>
+          <div>
+            <label className={rotulo}>Parcelas de {dados.ancora?.nome || "a outra opção"}</label>
+            <input type="number" min="1" max="24" className={campo} value={rascunho.parcelasProjeto ?? ""} onChange={(e) => mudar({ parcelasProjeto: e.target.value === "" ? undefined : Number(e.target.value) })} onBlur={gravar} placeholder="ex.: 6" />
           </div>
           <div>
             <label className={rotulo}>Pagamento de {dados.ancora?.nome || "a outra opção"}</label>
@@ -590,8 +607,11 @@ export function montarDados(item, ap, urls = {}) {
     oferta,
     investimento: ap.investimento || oferta.servico.investimento || "",
     prazo: ap.prazo || oferta.servico.prazo || "",
-    investimentoDe: ap.investimentoDe || "",
+    investimentoDe: ap.investimentoDe || oferta.servico.investimentoDe || "",
     parcelamento: ap.parcelamento || "",
+    parcelas: ap.parcelas ?? oferta.servico.parcelas ?? "",
+    parcelasProjeto: ap.parcelasProjeto ?? "",
+    destaquePreco: ap.destaquePreco || oferta.servico.destaquePreco || "cheio", // "cheio" ou "parcela"
     pagamento: ap.pagamento || PAGAMENTO_PADRAO,
     validade: ap.validade || VALIDADE_PADRAO,
     casos,
@@ -991,6 +1011,22 @@ function Sessao({ d, escala }) {
   );
 }
 
+/** "R$ 1.500,50" → 1500.5 (null se não houver número). */
+export const valorNumero = (t = "") => {
+  const m = String(t).match(/(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d{1,2}))?/);
+  return m ? Number(m[1].replace(/\./g, "")) + (m[2] ? Number(m[2].padEnd(2, "0")) / 100 : 0) : null;
+};
+/** 500 → "R$ 500"; 333.33 → "R$ 333,33". */
+export const moeda = (n) => "R$ " + n.toLocaleString("pt-BR", { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
+/** Parcela calculada: { n, valor, texto: "3x de R$ 500" } ou null. */
+export const parcela = (total, n) => {
+  const v = valorNumero(total);
+  const k = Number(n) || 0;
+  if (!v || k < 2) return null;
+  const cada = Math.round((v / k) * 100) / 100;
+  return { n: k, cada, texto: `${k}x de ${moeda(cada)}` };
+};
+
 /** Menor valor de uma faixa ("R$ 4.500 a R$ 9.000" → "R$ 4.500"). */
 const aPartirDe = (t = "") => (t.match(/R\$\s*[\d.]+/) || [""])[0];
 
@@ -1015,6 +1051,15 @@ function Passo({ d, escala }) {
     valor: d.investimentoProjeto || aPartirDe(outraOpcao.valor) || "R$ ____", aPartir: !d.investimentoProjeto,
     pagamento: d.parcelamentoProjeto, prazo: outraOpcao.prazo,
   };
+  // parcelas calculadas: "ou 3x de R$ 500" (o texto escrito à mão no painel tem prioridade)
+  const pAtual = parcela(entrada.valor, d.parcelas);
+  if (!entrada.pagamento && pAtual) entrada.pagamento = `ou ${pAtual.texto}`;
+  entrada.parcela = pAtual;
+  if (projeto) {
+    const pProj = parcela(projeto.valor, d.parcelasProjeto);
+    if (!projeto.pagamento && pProj) projeto.pagamento = `ou ${pProj.texto}`;
+    projeto.parcela = pProj;
+  }
   const [principal, outra] = !atualRecomendada && projeto ? [projeto, entrada] : [entrada, projeto];
   return (
     <Slide livre escala={escala} d={d}>
@@ -1040,10 +1085,14 @@ function Passo({ d, escala }) {
       {/* direita: o cartão escuro com o preço recomendado */}
       <div className="apr-caixa apr-preco" style={{ left: 1000, top: 215, width: 839, height: outra ? 455 : 680 }}>
         <p className="rot">{tx("passo", "total")}</p>
-        {principal.de && <p className="de">{principal.de}</p>}
-        <p className="valor">{principal.aPartir && <span>a partir de</span>}{principal.valor}</p>
+        {principal.de && <p className="de">De <s>{principal.de}</s> por</p>}
+        {d.destaquePreco === "parcela" && principal.parcela
+          ? <p className="valor"><span>{principal.aPartir ? "a partir de " : ""}{principal.parcela.n}x de</span>{moeda(principal.parcela.cada)}</p>
+          : <p className="valor">{principal.aPartir && <span>a partir de</span>}{principal.valor}</p>}
         <div className="linhas">
-          {principal.pagamento && <p className="pilula">{principal.pagamento}</p>}
+          {d.destaquePreco === "parcela" && principal.parcela
+            ? <p className="pilula">ou {principal.valor} à vista</p>
+            : principal.pagamento && <p className="pilula">{principal.pagamento}</p>}
           <p className="pilula">Entrega em {principal.prazo}</p>
         </div>
         <p className="validade">Proposta válida por {d.validade} · {d.pagamento}</p>
