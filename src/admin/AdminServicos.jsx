@@ -500,13 +500,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
         <Campo label="Valor original (padrão, riscado)" valor={s.investimentoDe || ""} placeholder="Opcional" onChange={(x) => setServ(id, "investimentoDe", x || null)} />
         <span />
         <Campo label="Parcelas (padrão)" valor={s.parcelas ?? ""} placeholder="ex.: 3" onChange={(x) => setServ(id, "parcelas", x === "" ? null : Number(x) || null)} />
-        <label className="block">
-          <span className={rotulo}>Destaque do preço (padrão)</span>
-          <select className={campo} value={s.destaquePreco || "cheio"} onChange={(e) => setServ(id, "destaquePreco", e.target.value)}>
-            <option value="cheio">Valor cheio</option>
-            <option value="parcela">Parcela</option>
-          </select>
-        </label>
+<span />
         {deg
           ? <Campo label="Faixa de valor (escada)" valor={area[deg].valor} onChange={(x) => mudarArea(deg, { ...area[deg], valor: x })} />
           : <Campo label="Investimento" valor={s.investimento} placeholder="R$ ____" onChange={(x) => setServ(id, "investimento", x || null)} />}
@@ -620,7 +614,18 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     entrega: [B.promessa, B.entregas, B.exemplo],
     produto: [B.exemplo],
     sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
-    passo: [B.preco, B.pitch, B.projeto, doLead("Parcelamento, destaque e a frase da conta")],
+    passo: [
+      <div key="hier" className="rounded-xl border border-zinc-200 p-3 flex flex-col gap-2">
+        <span className={rotulo}>Hierarquia do preço</span>
+        <div className="flex gap-1.5">
+          {[["cheio", "Valor cheio maior"], ["parcela", "Parcela maior"]].map(([v, t2]) => (
+            <button key={v} onClick={() => setServ(id, "destaquePreco", v)} className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold border ${(s.destaquePreco || "cheio") === v ? "bg-black text-white border-black" : "border-zinc-200 text-zinc-600 hover:border-zinc-400"}`}>{t2}</button>
+          ))}
+        </div>
+        {(s.destaquePreco === "parcela") && !s.parcelas && <p className="text-[11px] text-[#ef4b3a]">Preencha "Parcelas (padrão)" abaixo para a parcela aparecer em destaque.</p>}
+        <p className="text-[11px] text-zinc-400">Padrão deste serviço. Em cada lead dá para trocar.</p>
+      </div>,
+      B.preco, B.pitch, B.projeto, doLead("Parcelamento, destaque e a frase da conta")],
     condicoes: [B.ajustes, doLead("Pagamento e validade")],
     proximos: [B.etapas, doLead("A data de início")],
     fim: [B.fechamento, doLead("Validade e data de início")],

@@ -372,6 +372,15 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 
     </>,
     invest: <>
+        <div className="rounded-xl border border-zinc-200 p-3">
+          <label className={rotulo}>Hierarquia do preço</label>
+          <div className="flex gap-1.5">
+            {[["cheio", "Valor cheio maior"], ["parcela", "Parcela maior"]].map(([v, t]) => (
+              <button key={v} onClick={() => salvar({ ...rascunho, destaquePreco: v })} className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold border ${dados.destaquePreco === v ? "bg-black text-white border-black" : "border-zinc-200 text-zinc-600 hover:border-zinc-400"}`}>{t}</button>
+            ))}
+          </div>
+        </div>
+        {dados.destaquePreco === "parcela" && !parcela(dados.investimento, dados.parcelas) && <p className="text-[11px] text-[#ef4b3a] -mt-3">Preencha o investimento e as parcelas para a parcela aparecer em destaque.</p>}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className={rotulo}>Investimento</label>
@@ -389,14 +398,6 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
           <label className={rotulo}>Parcelas</label>
           <input type="number" min="1" max="24" className={campo} value={rascunho.parcelas ?? ""} onChange={(e) => mudar({ parcelas: e.target.value === "" ? undefined : Number(e.target.value) })} onBlur={gravar} placeholder={dados.oferta.servico.parcelas ? `${dados.oferta.servico.parcelas} (padrão)` : "ex.: 3"} />
           <p className="text-[11px] text-zinc-400 mt-1">{parcela(dados.investimento, dados.parcelas)?.texto ? `= ${parcela(dados.investimento, dados.parcelas).texto}` : "A parcela é calculada sozinha."}</p>
-        </div>
-        <div className="col-span-2">
-          <label className={rotulo}>Destaque do preço</label>
-          <div className="flex gap-1.5">
-            {[["cheio", "Valor cheio"], ["parcela", "Parcela"]].map(([v, t]) => (
-              <button key={v} onClick={() => salvar({ ...rascunho, destaquePreco: v })} className={`flex-1 px-3 py-2 rounded-lg text-sm font-semibold border ${dados.destaquePreco === v ? "bg-black text-white border-black" : "border-zinc-200 text-zinc-600 hover:border-zinc-400"}`}>{t}</button>
-            ))}
-          </div>
         </div>
         <div className="col-span-2">
           <label className={rotulo}>Texto do parcelamento (opcional)</label>
