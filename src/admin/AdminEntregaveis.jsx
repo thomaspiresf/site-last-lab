@@ -5,10 +5,7 @@ import AdminLayout from "./AdminLayout";
 import { listDiagnosticos } from "../lib/api";
 import { AREAS, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
-import { PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES, VAZIO as GUIA_VAZIO } from "./AdminGuia";
-import { VAZIO_MARCA, nomesDoGuiaMarca, paginasDoGuiaMarca } from "./AdminGuiaMarca";
 import { DOCUMENTOS, paginasDe, propsDasPaginas, versaoPadrao, versoesDe } from "./docs";
-import { DOC_GUIA, DOC_GUIA_MARCA, GUIA_MARCA_V4, GUIA_V4 } from "./docs/guias4";
 import "./guia.css";
 
 // Entregáveis (/admin/entregaveis): os documentos finais que o cliente recebe, por área do
@@ -20,22 +17,13 @@ const ICONES = { clareza: MessageSquareText, valor: Gem, site: Globe, redes: Sma
 
 // os documentos por área: os dois guias (editores próprios), os do editor genérico (docs/) e o site,
 // que é entregue no ar
+// dados de exemplo do modelo (o guia da marca mostra também a página de arquitetura)
+const modeloDe = (d) => ({ ...d.vazio, marca: "Sua Empresa", ...(d.id === "guia-marca" ? { comArquitetura: true } : {}) });
+
 const DOCS = [
-  {
-    id: "guia-mensagem", area: "clareza", nome: "Guia de mensagem", rota: "guia", servicos: ["mensagem"],
-    descricao: "A frase, o público, o diferencial e o tom: a comunicação resolvida em 8 páginas.",
-    versoes: ["v1", "v4"], doc: DOC_GUIA,
-    lista: (v) => (v === "v1" ? GUIA_PAGINAS.map((P, i) => ({ P, nome: GUIA_NOMES[i], extra: {} })) : propsDasPaginas(GUIA_V4(), "v4")), vazio: () => ({ ...GUIA_VAZIO, marca: "Sua Empresa" }),
-  },
-  {
-    id: "guia-marca", area: "clareza", nome: "Guia da marca", rota: "guia-marca", servicos: ["clareza_principal", "clareza_premium", "valor_premium"],
-    descricao: "A estratégia completa da marca: essência, público, proposta, personalidade, tom, mensagens e manifesto. No premium, com a arquitetura.",
-    versoes: ["v1", "v4"], doc: DOC_GUIA_MARCA,
-    lista: (v) => (v === "v1" ? paginasDoGuiaMarca(true).map((P, i) => ({ P, nome: nomesDoGuiaMarca(true)[i], extra: {} })) : propsDasPaginas(GUIA_MARCA_V4({ comArquitetura: true }), "v4")), vazio: () => ({ ...VAZIO_MARCA, marca: "Sua Empresa", comArquitetura: true }),
-  },
   ...Object.values(DOCUMENTOS).map((d) => ({
     id: d.id, area: d.area, nome: d.nome, rota: `doc/${d.id}`, servicos: d.servicos, descricao: d.descricao, doc: d,
-    lista: (v) => propsDasPaginas(paginasDe(d, d.vazio, v), v), vazio: () => ({ ...d.vazio, marca: "Sua Empresa" }),
+    lista: (v) => propsDasPaginas(paginasDe(d, modeloDe(d), v), v), vazio: () => modeloDe(d),
   })),
   { id: "paginas-site", area: "site", nome: "O próprio site", externo: true, servicos: ["pagina", "site_principal", "site_premium"], descricao: "Entregue no ar, com o acesso ao painel e um treinamento rápido. Não tem documento." },
 ];
@@ -79,7 +67,7 @@ export default function AdminEntregaveis() {
 
   const porArea = useMemo(() => Object.entries(AREAS).map(([aid, a]) => [aid, a, DOCS.filter((d) => d.area === aid)]), [pronto]);
   const nomeServico = (sid) => servicoCompleto(sid)?.nome || sid;
-  const verAberta = versao || (aberto?.versoes ? "v4" : aberto?.doc ? versaoPadrao(aberto.doc) : undefined);
+  const verAberta = versao || (aberto?.doc ? versaoPadrao(aberto.doc) : undefined);
 
   return (
     <AdminLayout>
@@ -102,7 +90,7 @@ export default function AdminEntregaveis() {
                 {docs.map((doc) => doc.lista ? (
                   <article key={doc.id} className="bg-white rounded-2xl border border-zinc-200 p-4 flex gap-4">
                     <button onClick={() => setAberto(doc)} className="shrink-0" title="Ver o modelo">
-                      {(() => { const x = doc.lista(doc.versoes ? "v4" : doc.doc ? versaoPadrao(doc.doc) : undefined)[0]; return <Miniatura P={x.P} extra={x.extra} g={doc.vazio()} doc={doc.doc} largura={96} />; })()}
+                      {(() => { const x = doc.lista(versaoPadrao(doc.doc))[0]; return <Miniatura P={x.P} extra={x.extra} g={doc.vazio()} doc={doc.doc} largura={96} />; })()}
                     </button>
                     <div className="flex flex-col gap-2 min-w-0">
                       <p className="text-[15px] font-semibold leading-snug">{doc.nome}</p>
@@ -134,9 +122,9 @@ export default function AdminEntregaveis() {
             <div className="flex items-center justify-between gap-3 mb-4">
               <div><p className="text-lg font-bold">{aberto.nome}</p><p className="text-xs text-zinc-500">Modelo · {aberto.lista(verAberta).length} {aberto.lista(verAberta).length === 1 ? "página" : "páginas"}</p></div>
               <div className="flex gap-2 items-center">
-                {(aberto.versoes || aberto.doc?.v2) && (
+                {aberto.doc && versoesDe(aberto.doc).length > 1 && (
                   <div className="flex rounded-full bg-white p-0.5 text-xs font-semibold">
-                    {(aberto.versoes || versoesDe(aberto.doc)).map((v) => <button key={v} onClick={() => setVersao(v)} className={`px-3 py-1.5 rounded-full ${verAberta === v ? "bg-black text-white" : "text-zinc-500 hover:text-black"}`}>{v.toUpperCase()}</button>)}
+                    {versoesDe(aberto.doc).map((v) => <button key={v} onClick={() => setVersao(v)} className={`px-3 py-1.5 rounded-full ${verAberta === v ? "bg-black text-white" : "text-zinc-500 hover:text-black"}`}>{v.toUpperCase()}</button>)}
                   </div>
                 )}
                 <button onClick={() => { setEscolhendo(aberto); setAberto(null); }} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-black text-white text-xs font-semibold"><FilePen size={13} /> Preencher para um lead</button>

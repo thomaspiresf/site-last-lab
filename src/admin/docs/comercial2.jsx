@@ -19,10 +19,10 @@ function Processo(p) {
           const ultimo = i === e.length - 1;
           return (
             <div key={i} style={{ flex: 1, background: ultimo ? "var(--ac)" : ["#0b0b0c", "#232325", "#3a3a3d", "#515155"][i % 4], color: ultimo ? "#0b0b0c" : "#f4f4f1", padding: `22px 22px 22px ${i ? 30 : 22}px`, display: "flex", flexDirection: "column", justifyContent: "space-between", clipPath: ultimo ? undefined : "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)", marginRight: ultimo ? 0 : -14 }}>
-              <p style={{ fontSize: 60, fontWeight: 200, lineHeight: 1, color: ultimo ? "#0b0b0c" : "var(--ac)" }}>{nn(i + 1)}</p>
+              <p style={{ fontSize: "calc(60px * var(--esc, 1))", fontWeight: 200, lineHeight: 1, color: ultimo ? "#0b0b0c" : "var(--ac)" }}>{nn(i + 1)}</p>
               <div>
-                <p style={{ fontSize: 21, fontWeight: 500, letterSpacing: -0.4, lineHeight: 1.1 }}>{ou2(x.nome, "[Etapa]")}</p>
-                <p style={{ fontSize: 12.5, fontWeight: 300, lineHeight: 1.5, marginTop: 10, opacity: 0.8 }}>{ou2(x.meta, "[Objetivo da etapa]")}</p>
+                <p style={{ fontSize: "calc(21px * var(--esc, 1))", fontWeight: 500, letterSpacing: -0.4, lineHeight: 1.1 }}>{ou2(x.nome, "[Etapa]")}</p>
+                <p style={{ fontSize: "calc(12.5px * var(--esc, 1))", fontWeight: 300, lineHeight: 1.5, marginTop: 10, opacity: 0.8 }}>{ou2(x.meta, "[Objetivo da etapa]")}</p>
               </div>
             </div>
           );
@@ -45,13 +45,13 @@ function Reuniao(parte) {
           {lista.map(([b, i, ini]) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "176px 1fr", gap: 24, borderTop: "1px solid var(--filete)", padding: "20px 0" }}>
               <div>
-                <p style={{ fontSize: 28, fontWeight: 300, letterSpacing: -1, fontVariantNumeric: "tabular-nums" }}>{relogio(ini)}</p>
+                <p style={{ fontSize: "calc(28px * var(--esc, 1))", fontWeight: 300, letterSpacing: -1, fontVariantNumeric: "tabular-nums" }}>{relogio(ini)}</p>
                 <p className="v2-rot" style={{ color: "var(--cinza)", marginTop: 6 }}>{b.tempo || "—"}</p>
               </div>
               <div>
-                <p style={{ fontSize: 26, fontWeight: 400, letterSpacing: -0.6 }}><span style={{ color: "var(--ac)", fontSize: 13, fontWeight: 600, marginRight: 12, verticalAlign: "middle" }}>{nn(i + 1)}</span>{ou2(b.etapa, "[Etapa]")}</p>
+                <p style={{ fontSize: "calc(26px * var(--esc, 1))", fontWeight: 400, letterSpacing: -0.6 }}><span style={{ color: "var(--ac)", fontSize: "calc(13px * var(--esc, 1))", fontWeight: 600, marginRight: 12, verticalAlign: "middle" }}>{nn(i + 1)}</span>{ou2(b.etapa, "[Etapa]")}</p>
                 <ul style={{ listStyle: "none", padding: 0, marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
-                  {(b.perguntas || "").split("\n").filter(Boolean).map((q, j) => <li key={j} style={{ fontSize: 15, fontWeight: 300, lineHeight: 1.45, paddingLeft: 16, borderLeft: "2px solid var(--ac)" }}>{q}</li>)}
+                  {(b.perguntas || "").split("\n").filter(Boolean).map((q, j) => <li key={j} style={{ fontSize: "calc(15px * var(--esc, 1))", fontWeight: 300, lineHeight: 1.45, paddingLeft: 16, borderLeft: "2px solid var(--ac)" }}>{q}</li>)}
                   {!b.perguntas && <li className="v2-vazio">[Perguntas]</li>}
                 </ul>
               </div>
@@ -72,10 +72,10 @@ function Objecoes(p) {
       <div style={{ display: "flex", flexDirection: "column" }}>
         {p.g.objecoes.map((o, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "250px 1fr", gap: 24, borderTop: "1px solid var(--filete)", padding: "20px 0" }}>
-            <p style={{ fontSize: 26, fontWeight: 300, letterSpacing: -0.8, lineHeight: 1.15 }}>“{ou2(o.objecao, "[Objeção]")}”</p>
+            <p style={{ fontSize: "calc(26px * var(--esc, 1))", fontWeight: 300, letterSpacing: -0.8, lineHeight: 1.15 }}>“{ou2(o.objecao, "[Objeção]")}”</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <p className="v2-txt" style={{ fontSize: 14.5 }}>{ou2(o.resposta, "[Como responder]")}</p>
-              <p style={{ fontSize: 14.5, fontWeight: 500, color: "var(--ac)" }}>→ {ou2(o.pergunta, "[Pergunta para seguir]")}</p>
+              <p className="v2-txt" style={{ fontSize: "calc(14.5px * var(--esc, 1))" }}>{ou2(o.resposta, "[Como responder]")}</p>
+              <p style={{ fontSize: "calc(14.5px * var(--esc, 1))", fontWeight: 500, color: "var(--ac)" }}>→ {ou2(o.pergunta, "[Pergunta para seguir]")}</p>
             </div>
           </div>
         ))}
@@ -95,7 +95,7 @@ function Followup(p) {
           <div style={{ display: "flex", flexDirection: "column", marginTop: "auto" }}>
             {f.map((x, i) => (
               <div key={i} style={{ display: "grid", gridTemplateColumns: "110px 1fr", borderTop: "1px solid var(--filete)", padding: "12px 0", alignItems: "baseline" }}>
-                <p style={{ fontSize: 15, fontWeight: 500, color: i === f.length - 1 ? "var(--tinta)" : "var(--ac)" }}>{x.quando}</p>
+                <p style={{ fontSize: "calc(15px * var(--esc, 1))", fontWeight: 500, color: i === f.length - 1 ? "var(--tinta)" : "var(--ac)" }}>{x.quando}</p>
                 <p className="v2-rot" style={{ color: "var(--cinza)" }}>{x.canal}</p>
               </div>
             ))}
@@ -113,9 +113,9 @@ function Mensagens(p) {
     <Pag2 {...p}>
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 34, flex: 1 }}>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <Tit t={<>Mensagens<br />prontas</>} tamanho={54} lead="Para copiar, trocar o nome e enviar." />
+          <Tit t={"Mensagens\nprontas"} tamanho={54} lead="Para copiar, trocar o nome e enviar." />
           <div style={{ marginTop: "auto", display: "flex", flexDirection: "column" }}>
-            {p.g.mensagens.map((m, i) => <div key={i} style={{ borderTop: "1px solid var(--filete)", padding: "12px 0", display: "grid", gridTemplateColumns: "40px 1fr" }}><span style={{ fontSize: 12, fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</span><p style={{ fontSize: 14 }}>{m.nome}</p></div>)}
+            {p.g.mensagens.map((m, i) => <div key={i} style={{ borderTop: "1px solid var(--filete)", padding: "12px 0", display: "grid", gridTemplateColumns: "40px 1fr" }}><span style={{ fontSize: "calc(12px * var(--esc, 1))", fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</span><p style={{ fontSize: "calc(14px * var(--esc, 1))" }}>{m.nome}</p></div>)}
           </div>
         </div>
         <Celular largura={300} altura={860}><Whats nome={p.g.marca || "Sua marca"} itens={itens} altura={820} /></Celular>

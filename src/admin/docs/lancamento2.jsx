@@ -12,16 +12,16 @@ function Mudanca(p) {
       <div className="v2-sangra v4-faixa" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", height: 300 }}>
         <div style={{ background: "#e8e8e4", padding: "26px 28px", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           <Rot estilo={{ color: "var(--cinza)" }}>Antes</Rot>
-          <p style={{ fontSize: 22, fontWeight: 300, lineHeight: 1.35, color: "#55555b" }}>{ou2(p.g.antes, "[Como a marca era vista]")}</p>
+          <p style={{ fontSize: "calc(22px * var(--esc, 1))", fontWeight: 300, lineHeight: 1.35, color: "#55555b" }}>{ou2(p.g.antes, "[Como a marca era vista]")}</p>
         </div>
         <div style={{ background: "var(--tinta)", color: "#f4f4f1", padding: "26px 28px 26px 36px", display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative" }}>
           <Rot>Depois</Rot>
-          <span style={{ position: "absolute", left: -22, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: 99, background: "var(--ac)", color: "var(--tinta)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>→</span>
-          <p style={{ fontSize: 22, fontWeight: 300, lineHeight: 1.35 }}>{ou2(p.g.depois, "[Como queremos ser vistos]")}</p>
+          <span style={{ position: "absolute", left: -22, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: 99, background: "var(--ac)", color: "var(--tinta)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "calc(20px * var(--esc, 1))" }}>→</span>
+          <p style={{ fontSize: "calc(22px * var(--esc, 1))", fontWeight: 300, lineHeight: 1.35 }}>{ou2(p.g.depois, "[Como queremos ser vistos]")}</p>
         </div>
       </div>
-      <Linha r="Por que mudamos"><p className="v2-grande" style={{ fontSize: 24 }}>{ou2(p.g.motivo, "[O motivo da mudança: a história que todo mundo vai contar]")}</p></Linha>
-      <Linha r="Lançamento"><p style={{ fontSize: 56, fontWeight: 600, letterSpacing: -2, lineHeight: 1 }}>{ou2(p.g.data, "[Data]")}</p></Linha>
+      <Linha r="Por que mudamos"><p className="v2-grande" style={{ fontSize: "calc(24px * var(--esc, 1))" }}>{ou2(p.g.motivo, "[O motivo da mudança: a história que todo mundo vai contar]")}</p></Linha>
+      <Linha r="Lançamento"><p style={{ fontSize: "calc(56px * var(--esc, 1))", fontWeight: 600, letterSpacing: -2, lineHeight: 1 }}>{ou2(p.g.data, "[Data]")}</p></Linha>
     </Pag2>
   );
 }
@@ -30,10 +30,10 @@ function Mensagem(p) {
   return (
     <Pag2 {...p} fundo="acento">
       <Rot estilo={{ marginTop: 40 }}>A mensagem do lançamento</Rot>
-      <p style={{ fontSize: 60, fontWeight: 300, lineHeight: 1.04, letterSpacing: -2.4 }}>{ou2(p.g.frase, "[A frase que resume a nova marca]")}</p>
+      <p style={{ fontSize: "calc(60px * var(--esc, 1))", fontWeight: 300, lineHeight: 1.04, letterSpacing: -2.4 }}>{ou2(p.g.frase, "[A frase que resume a nova marca]")}</p>
       <div style={{ marginTop: "auto", display: "grid", gridTemplateColumns: "176px 1fr", gap: 24, borderTop: "1px solid var(--tinta)", paddingTop: 16 }}>
         <Rot>O anúncio</Rot>
-        <p style={{ fontSize: 17, fontWeight: 300, lineHeight: 1.6, whiteSpace: "pre-line" }}>{ou2(p.g.anuncio, "[O que mudou, por que, e o que continua igual]")}</p>
+        <p style={{ fontSize: "calc(17px * var(--esc, 1))", fontWeight: 300, lineHeight: 1.6, whiteSpace: "pre-line" }}>{ou2(p.g.anuncio, "[O que mudou, por que, e o que continua igual]")}</p>
       </div>
     </Pag2>
   );
@@ -50,8 +50,8 @@ function Fases(p) {
       <div style={{ display: "flex", flexDirection: "column" }}>
         {f.map((x, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "176px 1fr", gap: 24, borderTop: "1px solid var(--filete)", padding: "22px 0" }}>
-            <div><p style={{ fontSize: 13, fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</p><p style={{ fontSize: 13, color: "var(--cinza)", marginTop: 6 }}>{ou2(x.quando, "[Quando]")}</p></div>
-            <div><p style={{ fontSize: 30, fontWeight: 400, letterSpacing: -0.8, lineHeight: 1.1 }}>{ou2(x.nome, "[Fase]")}</p><p className="v2-txt" style={{ marginTop: 8, color: "var(--cinza)" }}>{ou2(x.texto, "[O que acontece]")}</p></div>
+            <div><p style={{ fontSize: "calc(13px * var(--esc, 1))", fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</p><p style={{ fontSize: "calc(13px * var(--esc, 1))", color: "var(--cinza)", marginTop: 6 }}>{ou2(x.quando, "[Quando]")}</p></div>
+            <div><p style={{ fontSize: "calc(30px * var(--esc, 1))", fontWeight: 400, letterSpacing: -0.8, lineHeight: 1.1 }}>{ou2(x.nome, "[Fase]")}</p><p className="v2-txt" style={{ marginTop: 8, color: "var(--cinza)" }}>{ou2(x.texto, "[O que acontece]")}</p></div>
           </div>
         ))}
       </div>
@@ -76,7 +76,7 @@ function Checklist(p) {
             <React.Fragment key={nome}>
               <tr className="grupo"><td colSpan={3}>{nome}</td></tr>
               {itens.map((x, i) => (
-                <tr key={i}><td><span style={{ display: "inline-block", width: 14, height: 14, border: "1.5px solid var(--tinta)", borderRadius: 3, marginTop: 2 }} /></td><td className="forte" style={{ fontSize: 14.5 }}>{ou2(x.item, "[Item]")}</td><td>{ou2(x.quem, "—")}</td></tr>
+                <tr key={i}><td><span style={{ display: "inline-block", width: 14, height: 14, border: "1.5px solid var(--tinta)", borderRadius: 3, marginTop: 2 }} /></td><td className="forte" style={{ fontSize: "calc(14.5px * var(--esc, 1))" }}>{ou2(x.item, "[Item]")}</td><td>{ou2(x.quem, "—")}</td></tr>
               ))}
             </React.Fragment>
           ))}
@@ -93,7 +93,7 @@ function Textos(p) {
       <Tit t="Textos prontos" lead="O anúncio em cada canal, pronto para enviar." />
       <div style={{ display: "grid", gridTemplateColumns: "270px 1fr", gap: 26, flex: 1 }}>
         <Celular largura={270} altura={560}>
-          <PostInsta marca={marca} alturaImg={250} imagem={<div style={{ height: "100%", background: "var(--ac)", display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}><p style={{ fontSize: 22, fontWeight: 300, textAlign: "center", lineHeight: 1.15, letterSpacing: -0.5 }}>{ou2(p.g.frase, "[A frase]")}</p></div>} legenda={ou2(p.g.textoRedes, "[Legenda do post de lançamento]")} />
+          <PostInsta marca={marca} alturaImg={250} imagem={<div style={{ height: "100%", background: "var(--ac)", display: "flex", alignItems: "center", justifyContent: "center", padding: 22 }}><p style={{ fontSize: "calc(22px * var(--esc, 1))", fontWeight: 300, textAlign: "center", lineHeight: 1.15, letterSpacing: -0.5 }}>{ou2(p.g.frase, "[A frase]")}</p></div>} legenda={ou2(p.g.textoRedes, "[Legenda do post de lançamento]")} />
         </Celular>
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <Email de={marca} assunto="Temos novidade" corpo={ou2(p.g.textoEmail, "[E-mail para a base de clientes]")} />
@@ -113,7 +113,7 @@ function Medir(p) {
       <Numerada itens={p.g.medir.filter(Boolean).length ? p.g.medir.filter(Boolean) : ["[O que acompanhar]"]} tamanho={24} />
       <div style={{ marginTop: "auto", borderTop: "1px solid #f4f4f1", paddingTop: 16, display: "grid", gridTemplateColumns: "176px 1fr", gap: 24 }}>
         <Rot>Revisão em 30 dias</Rot>
-        <p style={{ fontSize: 22, fontWeight: 300, lineHeight: 1.35 }}>A gente se encontra para ver os números, ouvir o que os clientes disseram e ajustar o que for preciso.</p>
+        <p style={{ fontSize: "calc(22px * var(--esc, 1))", fontWeight: 300, lineHeight: 1.35 }}>A gente se encontra para ver os números, ouvir o que os clientes disseram e ajustar o que for preciso.</p>
       </div>
     </Pag2>
   );

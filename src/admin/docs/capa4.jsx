@@ -14,7 +14,7 @@ export const GRAFISMO = {
 };
 export const grafismoDe = (id) => (GRAFISMO[id] ? `/images/entregaveis/grafismo-${GRAFISMO[id]}.png` : null);
 
-export function CapaGrafismo({ titulo, marca, imagem, n = 1, total = 1, escala, classe = "" }) {
+export function CapaGrafismo({ titulo, marca, imagem, n = 1, total = 1, escala, classe = "", tamanho }) {
   const hoje = new Date();
   const cliente = marca || "Sua Empresa";
   return (
@@ -25,7 +25,7 @@ export function CapaGrafismo({ titulo, marca, imagem, n = 1, total = 1, escala, 
         <div><p className="r">Data</p><p>{MESES[hoje.getMonth()]} {hoje.getFullYear()}</p></div>
       </div>
       {imagem && <img className="c4-graf" src={imagem} alt="" crossOrigin="anonymous" />}
-      <div className="c4-tit"><h1>{titulo}</h1><p>{cliente}</p></div>
+      <div className="c4-tit"><h1 style={tamanho ? { fontSize: tamanho } : undefined}>{titulo}</h1><p>{cliente}</p></div>
       <img className="c4-logo" src="/images/logo.png" alt="Last Lab" />
       <p className="c4-pag">{nn(n)} / {nn(total)}</p>
     </section>

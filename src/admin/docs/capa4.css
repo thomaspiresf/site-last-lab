@@ -8,7 +8,7 @@
 .capa4 .c4-meta p:not(.r) { font-size: 11.5px; font-weight: 400; margin-top: 5px; color: #e9e9e9; }
 .capa4 .c4-graf { position: absolute; left: 64px; top: 318px; width: 666px; height: 300px; object-fit: contain; object-position: left center; display: block; }
 .capa4 .c4-tit { position: absolute; left: 64px; right: 64px; top: 835px; transform: translateY(-50%); }
-.capa4 .c4-tit h1 { font-size: 86px; font-weight: 300; line-height: 1.12; letter-spacing: -0.5px; color: #ffffff; }
+.capa4 .c4-tit h1 { white-space: pre-line; font-size: 86px; font-weight: 300; line-height: 1.12; letter-spacing: -0.5px; color: #ffffff; }
 .capa4 .c4-tit p { font-size: 42px; font-weight: 300; line-height: 1.2; letter-spacing: -0.3px; color: #85858a; margin-top: 4px; }
 .capa4 .c4-logo { position: absolute; left: 64px; bottom: 48px; width: 92px; height: 24px; object-fit: contain; object-position: left center; filter: invert(1); }
 .capa4 .c4-pag { position: absolute; right: 64px; bottom: 54px; font-size: 8.5px; letter-spacing: 1.5px; color: #77777c; font-variant-numeric: tabular-nums; }

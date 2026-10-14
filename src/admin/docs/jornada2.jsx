@@ -28,8 +28,8 @@ function Mapa(p) {
       <div style={{ ...grade, marginTop: 30, borderTop: "1px solid var(--tinta)" }}>
         {e.map((s, i) => (
           <div key={i} style={{ padding: "12px 8px 14px 0", borderLeft: i ? "1px solid var(--filete)" : 0, paddingLeft: i ? 10 : 0 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</p>
-            <p style={{ fontSize: 15.5, fontWeight: 500, lineHeight: 1.15, marginTop: 6, letterSpacing: -0.2 }}>{ou2(s.nome, "[Etapa]")}</p>
+            <p style={{ fontSize: "calc(11px * var(--esc, 1))", fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</p>
+            <p style={{ fontSize: "calc(15.5px * var(--esc, 1))", fontWeight: 500, lineHeight: 1.15, marginTop: 6, letterSpacing: -0.2 }}>{ou2(s.nome, "[Etapa]")}</p>
           </div>
         ))}
       </div>
@@ -49,8 +49,8 @@ function Mapa(p) {
       {[["Pontos de contato", "contato"], ["Momento da verdade", "momento"], ["O que melhorar", "melhoria"]].map(([r, k], j) => (
         <div key={k} style={{ ...grade, borderTop: j ? "1px solid var(--filete)" : "1px solid var(--tinta)" }}>
           {e.map((s, i) => (
-            <div key={i} style={{ padding: "12px 8px 14px 0", borderLeft: i ? "1px solid var(--filete)" : 0, paddingLeft: i ? 10 : 0, fontSize: 11.5, fontWeight: k === "melhoria" ? 500 : 300, lineHeight: 1.45 }}>
-              {i === 0 && <p className="v2-rot" style={{ fontSize: 9, letterSpacing: 1.2, marginBottom: 6, color: k === "melhoria" ? "var(--ac)" : "var(--cinza)" }}>{r}</p>}
+            <div key={i} style={{ padding: "12px 8px 14px 0", borderLeft: i ? "1px solid var(--filete)" : 0, paddingLeft: i ? 10 : 0, fontSize: "calc(11.5px * var(--esc, 1))", fontWeight: k === "melhoria" ? 500 : 300, lineHeight: 1.45 }}>
+              {i === 0 && <p className="v2-rot" style={{ fontSize: "calc(9px * var(--esc, 1))", letterSpacing: 1.2, marginBottom: 6, color: k === "melhoria" ? "var(--ac)" : "var(--cinza)" }}>{r}</p>}
               {i !== 0 && <p style={{ height: 17 }} />}
               <p>{ou2(s[k], "—")}</p>
             </div>
@@ -73,15 +73,15 @@ function Etapas(parte) {
           {lista.map(([s, i]) => (
             <div key={i} style={{ borderTop: "1px solid var(--tinta)", padding: "16px 0 22px", display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-                <span style={{ fontSize: 44, fontWeight: 200, color: "var(--ac)", lineHeight: 1 }}>{nn(i + 1)}</span>
-                <p style={{ fontSize: 28, fontWeight: 400, letterSpacing: -0.8 }}>{ou2(s.nome, "[Etapa]")}</p>
-                <p style={{ marginLeft: "auto", fontSize: 12, color: "var(--cinza)" }}>{s.contato}</p>
+                <span style={{ fontSize: "calc(44px * var(--esc, 1))", fontWeight: 200, color: "var(--ac)", lineHeight: 1 }}>{nn(i + 1)}</span>
+                <p style={{ fontSize: "calc(28px * var(--esc, 1))", fontWeight: 400, letterSpacing: -0.8 }}>{ou2(s.nome, "[Etapa]")}</p>
+                <p style={{ marginLeft: "auto", fontSize: "calc(12px * var(--esc, 1))", color: "var(--cinza)" }}>{s.contato}</p>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 0 }}>
                 {[["O que pensa e sente", s.sente], ["Momento da verdade", s.momento], ["O que melhorar", s.melhoria]].map(([r, v], j) => (
                   <div key={r} style={{ borderLeft: j ? "1px solid var(--filete)" : 0, padding: j ? "0 0 0 14px" : "0 14px 0 0" }}>
                     <Rot estilo={{ color: j === 2 ? "var(--ac)" : "var(--cinza)", marginBottom: 8 }}>{r}</Rot>
-                    <p style={{ fontSize: 13.5, fontWeight: j === 2 ? 500 : 300, lineHeight: 1.5 }}>{ou2(v, "—")}</p>
+                    <p style={{ fontSize: "calc(13.5px * var(--esc, 1))", fontWeight: j === 2 ? 500 : 300, lineHeight: 1.5 }}>{ou2(v, "—")}</p>
                   </div>
                 ))}
               </div>
@@ -101,9 +101,9 @@ function Mensagens(p) {
     <Pag2 {...p}>
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) 300px", gap: 34, flex: 1 }}>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <Tit t={<>Mensagens<br />prontas</>} tamanho={54} lead="O tom da marca em cada momento da jornada." />
+          <Tit t={"Mensagens\nprontas"} tamanho={54} lead="O tom da marca em cada momento da jornada." />
           <div style={{ marginTop: "auto", display: "flex", flexDirection: "column" }}>
-            {p.g.mensagens.map((m, i) => <div key={i} style={{ borderTop: "1px solid var(--filete)", padding: "12px 0", display: "grid", gridTemplateColumns: "40px 1fr" }}><span style={{ fontSize: 12, fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</span><p style={{ fontSize: 14 }}>{m.momento}</p></div>)}
+            {p.g.mensagens.map((m, i) => <div key={i} style={{ borderTop: "1px solid var(--filete)", padding: "12px 0", display: "grid", gridTemplateColumns: "40px 1fr" }}><span style={{ fontSize: "calc(12px * var(--esc, 1))", fontWeight: 600, color: "var(--ac)" }}>{nn(i + 1)}</span><p style={{ fontSize: "calc(14px * var(--esc, 1))" }}>{m.momento}</p></div>)}
           </div>
         </div>
         <Celular largura={300} altura={860}><Whats nome="Cliente" itens={itens} altura={820} /></Celular>
@@ -120,9 +120,9 @@ function PosVenda(p) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", borderTop: "1px solid #f4f4f1", marginTop: "auto" }}>
         {itens.map(([r, v, ph], i) => (
           <div key={r} style={{ padding: "18px 16px 0 0", paddingLeft: i ? 16 : 0, borderLeft: i ? "1px solid #2c2c2e" : 0, display: "flex", flexDirection: "column", gap: 14, minHeight: 420 }}>
-            <p style={{ fontSize: 72, fontWeight: 200, color: "var(--ac)", lineHeight: 1 }}>{nn(i + 1)}</p>
-            <p style={{ fontSize: 26, fontWeight: 400, letterSpacing: -0.6 }}>{r}</p>
-            <p className="v2-txt" style={{ fontSize: 14, color: "#c9c9c5" }}>{ou2(v, ph)}</p>
+            <p style={{ fontSize: "calc(72px * var(--esc, 1))", fontWeight: 200, color: "var(--ac)", lineHeight: 1 }}>{nn(i + 1)}</p>
+            <p style={{ fontSize: "calc(26px * var(--esc, 1))", fontWeight: 400, letterSpacing: -0.6 }}>{r}</p>
+            <p className="v2-txt" style={{ fontSize: "calc(14px * var(--esc, 1))", color: "#c9c9c5" }}>{ou2(v, ph)}</p>
           </div>
         ))}
       </div>

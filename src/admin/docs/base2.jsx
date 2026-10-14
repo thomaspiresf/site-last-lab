@@ -2,6 +2,7 @@ import React from "react";
 import { hexRgb } from "./base";
 import "./v2.css";
 import { CapaGrafismo, grafismoDe } from "./capa4";
+import { useEstilo, useTexto } from "./ctx";
 
 // V2 dos entregáveis: direção de arte editorial (grade suíça). Cabeçalho corrido com o número e o
 // nome da seção, numeração de página, filetes no lugar de cartões, coluna de rótulos à esquerda,
@@ -24,10 +25,12 @@ export function acentoDe(hex) {
 
 /** A página V2. `fundo`: "claro" | "escuro" | "acento". `sangra`: sem margens (o conteúdo se posiciona). */
 export function Pag2({ g, nome, doc, escala, n, total, indice, versao, fundo = "claro", classe = "", children, semCabeca, estilo }) {
-  const acento = doc.acento ? doc.acento(g) : "#ef4b3a";
+  const ajuste = useEstilo();
+  const acento = ajuste.acento || (doc.acento ? doc.acento(g) : "#ef4b3a");
   const secao = indice?.[n - 1];
+  const f = ajuste.fundo || fundo;
   return (
-    <section className={`v2-pag v2-${fundo} ${versao === "v4" ? "v4" : ""} ${classe}`} style={{ "--ac": acento, ...(escala ? { zoom: escala } : {}), ...estilo }}>
+    <section className={`v2-pag v2-${f} ${versao === "v4" ? "v4" : ""} ${classe}`} style={{ "--ac": acento, "--esc": (ajuste.texto || 100) / 100, ...(ajuste.titulo ? { "--tit": `${ajuste.titulo}px` } : {}), ...(escala ? { zoom: escala } : {}), ...estilo }}>
       {!semCabeca && (
         <header className="v2-cabeca">
           <p><b>{nn(n || 1)}</b>{secao}</p>
@@ -45,25 +48,31 @@ export function Pag2({ g, nome, doc, escala, n, total, indice, versao, fundo = "
 
 /** Título de página: número da seção, título grande e um texto de abertura. */
 export function Tit({ t, lead, claro, tamanho }) {
+  const titulo = useTexto(t);
+  const abertura = useTexto(lead);
   return (
     <div className="v2-tit">
-      <h2 style={tamanho ? { fontSize: tamanho, letterSpacing: -tamanho * 0.035 } : undefined}>{t}</h2>
-      {lead && <p className={claro ? "claro" : ""}>{lead}</p>}
+      <h2 style={tamanho ? { fontSize: `var(--tit, ${tamanho}px)`, letterSpacing: -tamanho * 0.035 } : undefined}>{titulo}</h2>
+      {abertura && <p className={claro ? "claro" : ""}>{abertura}</p>}
     </div>
   );
 }
 
 /** Linha da grade: rótulo à esquerda, conteúdo à direita, com filete em cima. */
 export function Linha({ r, children, estilo, semFilete }) {
+  const rotulo = useTexto(r);
   return (
     <div className={`v2-linha ${semFilete ? "sem" : ""}`} style={estilo}>
-      <p className="v2-rot">{r}</p>
+      <p className="v2-rot">{rotulo}</p>
       <div>{children}</div>
     </div>
   );
 }
 
-export const Rot = ({ children, estilo }) => <p className="v2-rot" style={estilo}>{children}</p>;
+export function Rot({ children, estilo }) {
+  const t = useTexto(children);
+  return <p className="v2-rot" style={estilo}>{t}</p>;
+}
 
 /** Imagem até a borda do bloco, ou um bloco neutro com o nome do que vai ali. */
 export function Foto({ src, vazio = "Imagem", contain, estilo }) {
@@ -71,9 +80,15 @@ export function Foto({ src, vazio = "Imagem", contain, estilo }) {
   return <img className="v2-img" crossOrigin="anonymous" src={src} alt="" style={{ width: "100%", height: "100%", objectFit: contain ? "contain" : "cover", display: "block", ...estilo }} />;
 }
 
+function CapaV4(p) {
+  const titulo = useTexto(p.titulo || p.doc.nome);
+  const ajuste = useEstilo();
+  return <CapaGrafismo titulo={titulo} marca={p.g.marca || p.nome} imagem={grafismoDe(p.doc.id)} n={p.n} total={p.total} escala={p.escala} tamanho={ajuste.titulo} />;
+}
+
 /** Capa V2: metadados no topo, o grafismo do material (doc.capa) e o nome do cliente grande na base. */
 export function Capa2(p) {
-  if (p.versao === "v4") return <CapaGrafismo titulo={p.titulo || p.doc.nome} marca={p.g.marca || p.nome} imagem={grafismoDe(p.doc.id)} n={p.n} total={p.total} escala={p.escala} />;
+  if (p.versao === "v4") return <CapaV4 {...p} />;
   const hoje = new Date();
   const mes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"][hoje.getMonth()];
   return (
@@ -120,7 +135,7 @@ export function Numerada({ itens, tamanho = 26 }) {
   return (
     <div className="v2-numerada">
       {itens.map((x, i) => (
-        <div key={i}><span className="n">{nn(i + 1)}</span><p style={{ fontSize: tamanho }}>{x}</p></div>
+        <div key={i}><span className="n">{nn(i + 1)}</span><p style={{ fontSize: `calc(${tamanho}px * var(--esc, 1))` }}>{x}</p></div>
       ))}
     </div>
   );
