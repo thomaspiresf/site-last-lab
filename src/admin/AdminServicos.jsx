@@ -589,7 +589,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
   };
 
   const POR_SLIDE = {
-    capa: [fixo("A capa é igual para todos. O nome da empresa vem de cada lead.")],
+    capa: [fixo(deg ? "Nos serviços de projeto (principal e premium), a capa mostra o nome do serviço. O nome da empresa do lead vai no rodapé." : "Nas entradas, a capa é igual para todas. O nome da empresa do lead vai no rodapé.")],
     objetivo: [fixo("Este slide é igual para todos os leads.")],
     conversa: [fixo("Este slide é igual para todos os leads.")],
     respostas: [doLead("Momento, nota, radar e barras vêm do diagnóstico; o resumo é ajustado por lead."), fixo("Para testar outro momento nesta prévia, troque o \"Momento\" acima do slide.")],
@@ -679,7 +679,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
             <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>
           </div>
           {(POR_SLIDE[sid] || [fixo("Nada para editar neste slide.")]).filter(Boolean).map((el, i) => <React.Fragment key={i}>{el}</React.Fragment>)}
-          <TextosDoSlide r={r} set={set} padrao={padrao} grupos={sid === "capa" ? ["capa", "rodape"] : sid === "casos2" ? ["casos"] : [sid]} />
+          <TextosDoSlide r={r} set={set} padrao={padrao} grupos={sid === "capa" ? ["capa", "rodape"] : sid === "casos2" ? ["casos"] : [sid]} ocultar={deg ? ["titulo:capa", "col2"] : ["tituloProjeto", "col2Projeto"]} projeto={deg ? nomeDoServico(r, id) : ""} />
           <details className="border-t border-zinc-100 pt-3 text-sm">
             <summary className="cursor-pointer text-xs font-semibold text-zinc-500">Mais deste serviço</summary>
             <div className="flex flex-col gap-3 mt-3">
@@ -747,7 +747,7 @@ function TextosDoCaso({ r, set, pid, s, setServ, nome }) {
 }
 
 /** Textos fixos de um slide (valem para todas as apresentações, de todos os serviços). */
-function TextosDoSlide({ r, set, padrao, grupos }) {
+function TextosDoSlide({ r, set, padrao, grupos, ocultar = [], projeto }) {
   return grupos.filter((g) => r.textos[g]).map((g) => {
     const t = r.textos[g];
     const igual = JSON.stringify(t) === JSON.stringify(padrao.textos[g]);
@@ -757,13 +757,13 @@ function TextosDoSlide({ r, set, padrao, grupos }) {
           <p className="text-xs font-semibold text-zinc-700">{g === "rodape" ? "Rodapé (todos os slides)" : "Textos do slide"} <span className="font-normal text-zinc-400">· valem para todos os serviços</span></p>
           {!igual && <button onClick={() => set("textos", g, padrao.textos[g])} className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-black"><RotateCcw size={12} /> Padrão</button>}
         </div>
-        {Object.entries(t).map(([k, val]) => (
+        {Object.entries(t).filter(([k]) => !ocultar.includes(k) && !ocultar.includes(`${k}:${g}`)).map(([k, val]) => (
           <label key={k} className="block">
             <span className={rotulo}>{ROTULOS_TEXTOS[k] || k}</span>
             <textarea rows={Math.max(1, String(val).split("\n").length)} className={`${campo} resize-y`} value={val} onChange={(e) => set("textos", g, { ...t, [k]: e.target.value })} />
           </label>
         ))}
-        <p className="text-[11px] text-zinc-400 leading-snug">Enter quebra a linha · **negrito** · [[laranja]] · {"{palavras entre chaves}"} vêm do lead.</p>
+        <p className="text-[11px] text-zinc-400 leading-snug">Enter quebra a linha · **negrito** · [[laranja]] · {"{palavras entre chaves}"} são preenchidas sozinhas{projeto ? ` ({projeto} = ${projeto})` : ""}.</p>
       </div>
     );
   });
