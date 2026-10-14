@@ -1,0 +1,115 @@
+/* Entregáveis V3: editorial contemporâneo. A4 794×1123, margens de 80, serifa grande contra sans fina. */
+
+.v3-pag {
+  --ac: #ef4b3a; --tinta: #121212; --papel: #f6f5f1; --cinza: #7a7a7f; --linha: rgba(18, 18, 18, 0.12);
+  --sombra: 0 1px 1px rgba(0, 0, 0, 0.04), 0 28px 50px -30px rgba(0, 0, 0, 0.28);
+  width: 794px; height: 1123px; overflow: hidden; position: relative; box-sizing: border-box;
+  font-family: "Poppins", Arial, sans-serif; color: var(--tinta); background: var(--papel);
+  padding: 112px 80px 88px; display: flex; flex-direction: column; gap: 40px;
+  -webkit-font-smoothing: antialiased;
+}
+.v3-pag * { box-sizing: border-box; margin: 0; font-family: inherit; }
+.v3-pag.v3-branco { background: #ffffff; }
+.v3-pag.v3-escuro { background: var(--tinta); color: #f3f2ee; --cinza: #8f8f94; --linha: rgba(255, 255, 255, 0.14); }
+.v3-pag.v3-acento { background: var(--ac); color: var(--tinta); --cinza: rgba(18, 18, 18, 0.62); --linha: rgba(18, 18, 18, 0.22); }
+
+.v3-serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; letter-spacing: -0.02em; line-height: 0.95; }
+.v3-serif em, .v3-pag .v3-serif em { font-family: "Instrument Serif", Georgia, serif !important; font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+
+/* cabeçalho discreto */
+.v3-cabeca { position: absolute; top: 44px; left: 80px; right: 80px; display: grid; grid-template-columns: 1fr auto 1fr;
+  font-size: 9px; font-weight: 500; letter-spacing: 2.2px; text-transform: uppercase; color: var(--cinza); }
+.v3-cabeca span:nth-child(2) { text-align: center; }
+.v3-cabeca span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* textos */
+.v3-cab { display: flex; flex-direction: column; gap: 18px; }
+.v3-cab h2 { margin-top: 4px; }
+.v3-rot { font-size: 9.5px; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: var(--cinza); }
+.v3-lead { font-size: 15px; font-weight: 300; line-height: 1.6; color: var(--cinza); max-width: 400px; }
+.v3-p { font-size: 14px; font-weight: 300; line-height: 1.65; white-space: pre-line; }
+.v3-vazio { color: #bcbab3; }
+.v3-escuro .v3-vazio { color: #55555a; }
+.v3-acento .v3-vazio { color: rgba(18, 18, 18, 0.4); }
+
+.v3-card { background: #ffffff; border-radius: 22px; box-shadow: var(--sombra); }
+.v3-escuro .v3-card { background: #1d1d1f; box-shadow: none; }
+.v3-foto-vazia { background: linear-gradient(160deg, #eceae4, #e2e0d9); display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #aeaca5; text-align: center; padding: 10px; }
+.v3-escuro .v3-foto-vazia { background: linear-gradient(160deg, #222224, #1a1a1c); color: #4d4d52; }
+
+/* capa */
+.v3-capa { padding: 56px 80px 80px; justify-content: space-between; }
+.v3-capa .topo { display: flex; justify-content: space-between; align-items: center; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #8f8f94; }
+.v3-capa .topo img { width: 92px; height: 24px; object-fit: contain; object-position: left; filter: invert(1); }
+.v3-capa .meio { margin-top: 210px; display: flex; flex-direction: column; gap: 12px; }
+.v3-capa .cliente { font-size: 22px; font-weight: 300; letter-spacing: -0.3px; }
+.v3-capa h1 { font-size: 136px; line-height: 0.86; letter-spacing: -0.035em; margin-top: auto; }
+.v3-capa h1 em { color: var(--ac); }
+.v3-capa .ponto { position: absolute; right: 80px; top: 300px; width: 120px; height: 120px; border-radius: 50%; background: var(--ac); }
+
+/* iPhone */
+.v3-cel { background: #111; border-radius: 48px; padding: 10px; box-shadow: 0 2px 0 #2a2a2a inset, 0 40px 60px -30px rgba(0, 0, 0, 0.45); flex-shrink: 0; }
+.v3-cel .tela { width: 100%; height: 100%; background: #fff; border-radius: 38px; overflow: hidden; display: flex; flex-direction: column; color: #111; }
+.v3-cel .status { display: flex; justify-content: space-between; align-items: center; padding: 12px 22px 6px; font-size: 11px; font-weight: 600; }
+.v3-cel .status span:last-child { font-size: 7px; letter-spacing: 1px; }
+.v3-cel .ilha { width: 76px; height: 20px; background: #111; border-radius: 20px; }
+
+/* Instagram */
+.v3-insta { display: flex; flex-direction: column; background: #fff; color: #111; font-size: 11px; }
+.v3-insta .cab { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
+.v3-insta .avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--ac); box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #d6249f; }
+.v3-insta .cab b { font-weight: 600; font-size: 11.5px; }
+.v3-insta .mais { margin-left: auto; font-weight: 700; }
+.v3-insta .acoes { display: flex; justify-content: space-between; padding: 9px 12px 4px; }
+.v3-insta .acoes span { display: flex; gap: 12px; }
+.v3-insta .curt { padding: 0 12px; font-weight: 600; }
+.v3-insta .leg { padding: 4px 12px 12px; line-height: 1.45; white-space: pre-line; }
+.v3-insta .leg b { font-weight: 600; }
+
+/* WhatsApp */
+.v3-whats { display: flex; flex-direction: column; background: #efeae2; color: #111; font-size: 11.5px; border-radius: inherit; overflow: hidden; }
+.v3-whats .cab { display: flex; align-items: center; gap: 8px; background: #f6f6f6; padding: 10px 12px; border-bottom: 1px solid #e3e3e3; }
+.v3-whats .cab .seta { font-size: 22px; color: #007aff; line-height: 1; }
+.v3-whats .cab .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--ac); }
+.v3-whats .cab b { display: block; font-size: 12px; font-weight: 600; }
+.v3-whats .cab small { font-size: 9.5px; color: #8a8a8a; }
+.v3-whats .corpo { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 6px;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.035) 1px, transparent 1px); background-size: 14px 14px; }
+.v3-whats .dia { align-self: center; background: #fff; border-radius: 8px; padding: 3px 10px; font-size: 9.5px; font-weight: 500; color: #555; margin: 6px 0; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06); }
+.v3-whats .bal { max-width: 82%; padding: 6px 9px 4px; border-radius: 9px; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08); line-height: 1.42; display: flex; flex-direction: column; }
+.v3-whats .bal .t { white-space: pre-line; }
+.v3-whats .bal small { align-self: flex-end; font-size: 8.5px; color: #8a8a8a; margin-top: 2px; }
+.v3-whats .bal small em { font-style: normal; color: #53bdeb; }
+.v3-whats .bal.entra { background: #fff; align-self: flex-start; border-top-left-radius: 2px; }
+.v3-whats .bal.sai { background: #d9fdd3; align-self: flex-end; border-top-right-radius: 2px; }
+
+/* e-mail */
+.v3-email { background: #fff; border-radius: 16px; box-shadow: var(--sombra); overflow: hidden; color: #111; }
+.v3-email .barra { display: flex; gap: 6px; padding: 12px 14px; background: #f3f3f3; }
+.v3-email .barra i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+.v3-email .barra i:nth-child(2) { background: #febc2e; }
+.v3-email .barra i:nth-child(3) { background: #28c840; }
+.v3-email .campos { padding: 10px 18px; border-bottom: 1px solid #eee; font-size: 11px; line-height: 1.9; }
+.v3-email .campos span { display: inline-block; width: 58px; color: #999; }
+.v3-email .campos b { font-weight: 600; }
+.v3-email .corpo { padding: 16px 18px 20px; font-size: 11.5px; font-weight: 300; line-height: 1.65; white-space: pre-line; }
+
+/* direct */
+.v3-direct { background: #fff; border-radius: 22px; box-shadow: var(--sombra); overflow: hidden; color: #111; }
+.v3-direct .cab { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid #efefef; font-size: 12px; }
+.v3-direct .cab .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--ac); }
+.v3-direct .corpo { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.v3-direct .bal { max-width: 76%; padding: 9px 14px; border-radius: 20px; font-size: 12px; line-height: 1.45; white-space: pre-line; }
+.v3-direct .bal.entra { background: #efefef; align-self: flex-start; }
+.v3-direct .bal.sai { background: #3797f0; color: #fff; align-self: flex-end; margin-bottom: 8px; }
+
+/* listas */
+.v3-lista { display: flex; flex-direction: column; }
+.v3-lista > div { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--linha); }
+.v3-lista .n { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-size: 26px; color: var(--ac); line-height: 1; }
+.v3-acento .v3-lista .n { color: var(--tinta); }
+.v3-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: rgba(18, 18, 18, 0.06); }
+.v3-escuro .v3-chip { background: rgba(255, 255, 255, 0.1); }
+
+.v3-pag .v3-noite .v3-vazio { color: #6a6a6f; }

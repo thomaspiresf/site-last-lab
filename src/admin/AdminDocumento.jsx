@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown, ImagePlus, Plus, Trash2, X } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, uploadImagemDoc } from "../lib/api";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
-import { DOCUMENTOS, dadosDoDocumento, paginasDe, propsDasPaginas, versaoDe } from "./docs";
+import { DOCUMENTOS, dadosDoDocumento, paginasDe, propsDasPaginas, versaoDe, versoesDe } from "./docs";
 import { Palco } from "./docs/base";
 import "./guia.css";
 
@@ -73,7 +73,7 @@ export default function AdminDocumento() {
           {erro && <span className="text-xs text-red-600">{erro}</span>}
           {doc.v2 && (
             <div className="flex rounded-full bg-zinc-100 p-0.5 text-xs font-semibold" title="Versão do layout">
-              {[["v1", "V1"], ["v2", "V2"]].map(([v, r]) => (
+              {versoesDe(doc).map((v) => [v, v.toUpperCase()]).map(([v, r]) => (
                 <button key={v} onClick={() => { const n = { ...g, versao: v }; setG(n); salvar(n); }} className={`px-3 py-1.5 rounded-full ${versao === v ? "bg-white shadow-sm text-black" : "text-zinc-500 hover:text-black"}`}>{r}</button>
               ))}
             </div>
