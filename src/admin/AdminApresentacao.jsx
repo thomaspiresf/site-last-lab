@@ -115,7 +115,7 @@ export default function AdminApresentacao() {
         <button disabled={gerando} onClick={async () => {
           setGerando(true);
           try {
-            await exportarPdf([...impressao.current.children], { largura: 1920, altura: 1080, nome: nomeArquivo("Last Lab", "Diagnostico", dados.empresa || item.nome) });
+            await exportarPdf([...impressao.current.children], { largura: 1920, altura: 1080, nitidez: 2, nome: nomeArquivo("Last Lab", "Diagnostico", dados.empresa || item.nome) });
           } catch (e) {
             setErro(`Não gerou o PDF: ${e.message || e}`);
           } finally {
@@ -601,7 +601,8 @@ export function montarDados(item, ap, urls = {}) {
 
 function Slide({ tipo = "", classe = "", escala, d, children, livre }) {
   return (
-    <section className={`apr-slide ${livre ? "livre" : ""} ${tipo} ${classe}`} style={escala ? { transform: `scale(${escala})` } : undefined}>
+    // zoom (e não transform: scale) para o navegador redesenhar fotos e textos no tamanho final, sem serrilhar
+    <section className={`apr-slide ${livre ? "livre" : ""} ${tipo} ${classe}`} style={escala ? { zoom: escala } : undefined}>
       {children}
       <Rodape d={d} />
     </section>
