@@ -90,10 +90,7 @@ export default function AdminDocumento({ docFixo }) {
   if (!sessao) return <Navigate to="/admin/login" replace />;
   if (!g) return <div className="p-10 text-sm text-zinc-400">{erro || "Carregando..."}</div>;
 
-  const ctx = (nome, registrar) => ({ textos: g.textos?.[nome] || {}, estilo: g.estilo?.[nome] || {}, registrar });
-  const pagina = ({ P, extra, nome }, props = {}, registrar) => (
-    <PaginaCtx.Provider value={ctx(nome, registrar)}><P g={g} nome={item?.nome} doc={doc} {...extra} {...props} /></PaginaCtx.Provider>
-  );
+  const pagina = (x, props = {}, registrar) => <PaginaComAjustes x={x} g={g} nomeLead={item?.nome} doc={doc} registrar={registrar} {...props} />;
   const ir = (i) => setAtual(Math.max(0, Math.min(lista.length - 1, i)));
 
   return (
@@ -154,6 +151,13 @@ export default function AdminDocumento({ docFixo }) {
       <div ref={impressao} className="gm-impressao" aria-hidden="true">{lista.map((x, i) => <React.Fragment key={i}>{pagina(x)}</React.Fragment>)}</div>
     </div>
   );
+}
+
+/** A página com os ajustes dela (textos e visual). Recebe `escala` do Palco e repassa à página. */
+function PaginaComAjustes({ x, g, nomeLead, doc, registrar, ...props }) {
+  const { P, extra, nome } = x;
+  const valor = { textos: g.textos?.[nome] || {}, estilo: g.estilo?.[nome] || {}, registrar };
+  return <PaginaCtx.Provider value={valor}><P g={g} nome={nomeLead} doc={doc} {...extra} {...props} /></PaginaCtx.Provider>;
 }
 
 // ---------- painel da página ----------
