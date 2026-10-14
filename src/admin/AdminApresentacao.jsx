@@ -1038,7 +1038,7 @@ export function resumoDoCaso(p) {
   };
 }
 
-/** Um caso por slide: imagens à esquerda (a grande sem corte, 3 menores embaixo), texto à direita. */
+/** Um caso por slide: texto à esquerda, imagens à direita (a grande sem corte, 3 menores embaixo). */
 function Caso({ d, escala, n }) {
   const p = d.casos[n];
   const [proporcao, setProporcao] = useState(2);
@@ -1053,15 +1053,15 @@ function Caso({ d, escala, n }) {
   const blocos = [[tx("casos", "desafio"), c.desafio], [tx("casos", "fizemos"), c.fizemos], [tx("casos", "resultado"), c.resultado]];
   return (
     <Slide livre escala={escala} d={d}>
-      <div className="apr-caso-foto" style={{ left: 81, top: topo, width: largura, height: altGrande }}>
+      <div className="apr-caso-foto" style={{ left: 1839 - largura, top: topo, width: largura, height: altGrande }}>
         <img src={grande} alt="" onLoad={(e) => e.currentTarget.naturalWidth && setProporcao(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)} />
       </div>
       {menores.map((src, k) => (
-        <div key={src} className="apr-caso-foto" style={{ left: 81 + k * ((largura + vao) / 3), top: topo + altGrande + vao, width: (largura - 2 * vao) / 3, height: altMenor }}>
+        <div key={src} className="apr-caso-foto" style={{ left: 1839 - largura + k * ((largura + vao) / 3), top: topo + altGrande + vao, width: (largura - 2 * vao) / 3, height: altMenor }}>
           <img src={src} alt="" />
         </div>
       ))}
-      <div className="apr-p apr-caso-txt" style={{ left: 1225, top: topo - 6, width: 615 }}>
+      <div className="apr-p apr-caso-txt" style={{ left: 81, top: topo - 6, width: 615 }}>
         <p className="chapeu">{tx("casos", "chapeu", { n: n + 1, total: d.casos.length })}</p>
         <h2 className="nome">{p.title}</h2>
         {c.setor && <p className="setor">{c.setor}</p>}
