@@ -4,6 +4,8 @@ import { ArrowLeft, FileDown } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico } from "../lib/api";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import "./guia.css";
+import { propsDasPaginas } from "./docs";
+import { DOC_GUIA_MARCA, GUIA_MARCA_V4 } from "./docs/guias4";
 import { CapaGrafismo, grafismoDe } from "./docs/capa4";
 
 // Guia da marca (/admin/diagnosticos/:id/guia-marca): o entregável do Posicionamento de marca
@@ -71,7 +73,12 @@ export default function AdminGuiaMarca() {
     }
   };
 
-  const paginas = useMemo(() => (g ? paginasDoGuiaMarca(g.comArquitetura).map((P) => (props) => <P g={g} nome={item?.nome} {...props} />) : []), [g, item]);
+  // V4 (padrão) com a direção de arte dos outros entregáveis; V1 é o visual original
+  const paginas = useMemo(() => {
+    if (!g) return [];
+    if ((g.versao || "v4") === "v4") return propsDasPaginas(GUIA_MARCA_V4(g), "v4").map(({ P, extra }) => (props) => <P g={g} nome={item?.nome} doc={DOC_GUIA_MARCA} {...extra} {...props} />);
+    return paginasDoGuiaMarca(g.comArquitetura).map((P) => (props) => <P g={g} nome={item?.nome} {...props} />);
+  }, [g, item]);
 
   if (sessao === undefined) return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Carregando...</div>;
   if (!sessao) return <Navigate to="/admin/login" replace />;
@@ -87,6 +94,11 @@ export default function AdminGuiaMarca() {
             <p className="text-xs text-zinc-500">Entregável do Posicionamento de marca · salva ao sair de cada campo</p>
           </div>
           {erro && <span className="text-xs text-red-600">{erro}</span>}
+          <div className="flex rounded-full bg-zinc-100 p-0.5 text-xs font-semibold" title="Versão do layout">
+            {["v1", "v4"].map((v) => (
+              <button key={v} onClick={() => { const n = { ...g, versao: v }; setG(n); salvar(n); }} className={`px-3 py-1.5 rounded-full ${(g.versao || "v4") === v ? "bg-white shadow-sm text-black" : "text-zinc-500 hover:text-black"}`}>{v.toUpperCase()}</button>
+            ))}
+          </div>
           <button disabled={gerando} onClick={async () => {
             setGerando(true);
             try {
