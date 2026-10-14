@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft, FileDown, ImagePlus, Plus, Trash2, X } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, uploadImagemDoc } from "../lib/api";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
-import { DOCUMENTOS, dadosDoDocumento } from "./docs";
+import { DOCUMENTOS, dadosDoDocumento, paginasDe, propsDasPaginas, versaoDe } from "./docs";
 import { Palco } from "./docs/base";
 import "./guia.css";
 
@@ -51,14 +51,16 @@ export default function AdminDocumento() {
     }
   };
 
-  const paginas = useMemo(() => (g ? doc.paginas(g).map(([P]) => (props) => <P g={g} nome={item?.nome} doc={doc} {...props} />) : []), [g, item, doc]);
+  const lista = useMemo(() => (g ? propsDasPaginas(paginasDe(doc, g)) : []), [g, doc]);
+  const paginas = useMemo(() => lista.map(({ P, extra }) => (props) => <P g={g} nome={item?.nome} doc={doc} {...extra} {...props} />), [lista, g, item, doc]);
 
   if (!doc) return <div className="p-10 text-sm text-zinc-500">Documento não encontrado.</div>;
   if (sessao === undefined) return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Carregando...</div>;
   if (!sessao) return <Navigate to="/admin/login" replace />;
   if (!g) return <div className="p-10 text-sm text-zinc-400">{erro || "Carregando..."}</div>;
 
-  const nomes = doc.paginas(g).map(([, n]) => n);
+  const nomes = lista.map((x) => x.nome);
+  const versao = versaoDe(doc, g);
   return (
     <div className="min-h-screen bg-zinc-100">
       <div className="gm-tela">
@@ -69,6 +71,13 @@ export default function AdminDocumento() {
             <p className="text-xs text-zinc-500">{nomes.length} {nomes.length === 1 ? "página" : "páginas"} · salva ao sair de cada campo</p>
           </div>
           {erro && <span className="text-xs text-red-600">{erro}</span>}
+          {doc.v2 && (
+            <div className="flex rounded-full bg-zinc-100 p-0.5 text-xs font-semibold" title="Versão do layout">
+              {[["v1", "V1"], ["v2", "V2"]].map(([v, r]) => (
+                <button key={v} onClick={() => { const n = { ...g, versao: v }; setG(n); salvar(n); }} className={`px-3 py-1.5 rounded-full ${versao === v ? "bg-white shadow-sm text-black" : "text-zinc-500 hover:text-black"}`}>{r}</button>
+              ))}
+            </div>
+          )}
           <button disabled={gerando} onClick={async () => {
             setGerando(true);
             try {

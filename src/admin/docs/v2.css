@@ -1,0 +1,95 @@
+/* Entregáveis V2: direção de arte editorial. A4 em 794×1123, margens de 64, grade de rótulo (176) + conteúdo. */
+
+.v2-pag {
+  --ac: #ef4b3a; --tinta: #0b0b0c; --papel: #f5f5f2; --cinza: #6b6b72; --filete: #d5d5d2; --branco: #ffffff;
+  width: 794px; height: 1123px; overflow: hidden; position: relative; box-sizing: border-box;
+  font-family: "Poppins", Arial, sans-serif; color: var(--tinta); background: var(--papel);
+  padding: 112px 64px 96px; display: flex; flex-direction: column; gap: 36px;
+  -webkit-font-smoothing: antialiased;
+}
+.v2-pag * { box-sizing: border-box; margin: 0; }
+.v2-pag.v2-escuro { background: var(--tinta); color: #f4f4f1; --filete: #2c2c2e; --cinza: #9d9da3; }
+.v2-pag.v2-acento { background: var(--ac); color: var(--tinta); --filete: rgba(11, 11, 12, 0.25); --cinza: rgba(11, 11, 12, 0.68); }
+
+/* cabeçalho e pé corridos */
+.v2-cabeca, .v2-pe { position: absolute; left: 64px; right: 64px; display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 10.5px; font-weight: 500; letter-spacing: 1.6px; text-transform: uppercase; color: var(--cinza); }
+.v2-cabeca { top: 44px; padding-bottom: 12px; border-bottom: 1px solid var(--filete); }
+.v2-cabeca b { color: var(--ac); font-weight: 600; margin-right: 14px; }
+.v2-acento .v2-cabeca b { color: var(--tinta); }
+.v2-pe { bottom: 38px; }
+.v2-pe p:last-child { font-variant-numeric: tabular-nums; }
+
+/* títulos */
+.v2-tit { display: flex; flex-direction: column; gap: 18px; }
+.v2-tit h2 { font-size: 76px; font-weight: 300; line-height: 0.98; letter-spacing: -3px; }
+.v2-tit p { font-size: 17px; font-weight: 300; line-height: 1.5; color: var(--cinza); max-width: 470px; }
+.v2-rot { font-size: 10.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ac); }
+.v2-acento .v2-rot { color: var(--tinta); }
+.v2-vazio { color: #b3b3b0; }
+.v2-escuro .v2-vazio { color: #5d5d62; }
+.v2-acento .v2-vazio { color: rgba(11, 11, 12, 0.45); }
+
+/* grade rótulo + conteúdo */
+.v2-linha { display: grid; grid-template-columns: 176px 1fr; gap: 0 24px; border-top: 1px solid var(--filete); padding-top: 16px; }
+.v2-linha.sem { border-top: 0; padding-top: 0; }
+.v2-linha > .v2-rot { padding-top: 5px; }
+.v2-txt { font-size: 15.5px; font-weight: 300; line-height: 1.6; white-space: pre-line; }
+.v2-grande { font-size: 30px; font-weight: 300; line-height: 1.28; letter-spacing: -0.6px; white-space: pre-line; }
+.v2-forte { font-weight: 500; }
+
+/* imagem vazia */
+.v2-foto-vazia { width: 100%; height: 100%; background: #e8e8e4; display: flex; align-items: flex-end; padding: 14px 16px;
+  font-size: 10.5px; font-weight: 500; letter-spacing: 1.6px; text-transform: uppercase; color: #a5a5a1; }
+.v2-escuro .v2-foto-vazia { background: #1c1c1e; color: #5d5d62; }
+
+/* capa */
+.v2-capa { padding-top: 56px; justify-content: space-between; }
+.v2-capa .meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-bottom: 1px solid #2c2c2e; padding-bottom: 18px; }
+.v2-capa .meta p:not(.v2-rot) { font-size: 13px; font-weight: 400; margin-top: 6px; color: #d9d9d6; }
+.v2-capa .nome { margin-top: auto; margin-bottom: 64px; position: relative; }
+.v2-capa .tipo { font-size: 22px; font-weight: 300; color: #9d9da3; margin-bottom: 18px; }
+.v2-capa h1 { font-size: 104px; font-weight: 600; line-height: 0.92; letter-spacing: -5px; overflow-wrap: anywhere; }
+.v2-capa .barras { position: absolute; left: 0; top: 190px; width: 794px; height: 300px; display: block; }
+.v2-capa .logo { position: absolute; left: 64px; bottom: 40px; width: 104px; height: 26px; object-fit: contain; object-position: left; filter: invert(1); }
+.v2-capa .v2-pe { justify-content: flex-end; }
+.v2-capa .v2-pe p:first-child { display: none; }
+
+/* sumário */
+.v2-sumario { display: flex; flex-direction: column; margin-top: 8px; }
+.v2-sumario div { display: grid; grid-template-columns: 176px 1fr auto; gap: 24px; align-items: baseline; border-top: 1px solid var(--filete); padding: 13px 0; }
+.v2-sumario div:last-child { border-bottom: 1px solid var(--filete); }
+.v2-sumario .n { font-size: 13px; font-weight: 600; color: var(--ac); letter-spacing: 1px; }
+.v2-sumario .t { font-size: 24px; font-weight: 300; letter-spacing: -0.8px; }
+.v2-sumario .p { font-size: 13px; color: var(--cinza); font-variant-numeric: tabular-nums; }
+
+/* listas numeradas */
+.v2-numerada { display: flex; flex-direction: column; }
+.v2-numerada div { display: grid; grid-template-columns: 176px 1fr; gap: 24px; border-top: 1px solid var(--filete); padding: 18px 0; align-items: baseline; }
+.v2-numerada .n { font-size: 13px; font-weight: 600; color: var(--ac); }
+.v2-acento .v2-numerada .n { color: var(--tinta); }
+.v2-numerada p { font-weight: 300; line-height: 1.3; letter-spacing: -0.4px; }
+
+/* tabela */
+.v2-tabela { width: 100%; border-collapse: collapse; font-size: 13.5px; line-height: 1.45; }
+.v2-tabela th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--cinza); padding: 0 14px 10px 0; border-bottom: 1px solid var(--tinta); }
+.v2-escuro .v2-tabela th { border-bottom-color: #f4f4f1; }
+.v2-tabela td { padding: 14px 14px 14px 0; border-bottom: 1px solid var(--filete); vertical-align: top; font-weight: 300; }
+.v2-tabela td.forte { font-weight: 500; }
+.v2-tabela tr.grupo td { padding-top: 26px; border-bottom-color: var(--tinta); font-size: 10px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ac); }
+
+/* sangrias: blocos que vão até a borda */
+.v2-sangra { margin-left: -64px; margin-right: -64px; }
+
+/* balões de conversa */
+.v2-balao { max-width: 78%; padding: 12px 16px; border-radius: 18px; font-size: 13.5px; font-weight: 300; line-height: 1.5; white-space: pre-line; }
+.v2-balao.entra { background: #ffffff; border-bottom-left-radius: 4px; align-self: flex-start; }
+.v2-balao.sai { background: var(--tinta); color: #f4f4f1; border-bottom-right-radius: 4px; align-self: flex-end; }
+.v2-escuro .v2-balao.entra { background: #1f1f21; color: #f4f4f1; }
+.v2-escuro .v2-balao.sai { background: var(--ac); color: var(--tinta); }
+
+/* marcadores */
+.v2-marcas { list-style: none; padding: 0; display: flex; flex-direction: column; }
+.v2-marcas li { display: grid; grid-template-columns: 28px 1fr; border-top: 1px solid var(--filete); padding: 12px 0; font-size: 15px; font-weight: 300; line-height: 1.45; }
+.v2-marcas li > span:first-child { color: var(--ac); font-weight: 600; }
+.v2-marcas.nao li > span:first-child { color: var(--cinza); }

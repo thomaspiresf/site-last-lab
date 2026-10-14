@@ -7,7 +7,7 @@ import { AREAS, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import { PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES, VAZIO as GUIA_VAZIO } from "./AdminGuia";
 import { VAZIO_MARCA, nomesDoGuiaMarca, paginasDoGuiaMarca } from "./AdminGuiaMarca";
-import { DOCUMENTOS } from "./docs";
+import { DOCUMENTOS, paginasDe, propsDasPaginas } from "./docs";
 import "./guia.css";
 
 // Entregáveis (/admin/entregaveis): os documentos finais que o cliente recebe, por área do
@@ -23,22 +23,22 @@ const DOCS = [
   {
     id: "guia-mensagem", area: "clareza", nome: "Guia de mensagem", rota: "guia", servicos: ["mensagem"],
     descricao: "A frase, o público, o diferencial e o tom: a comunicação resolvida em 8 páginas.",
-    paginas: () => GUIA_PAGINAS, nomes: () => GUIA_NOMES, vazio: () => ({ ...GUIA_VAZIO, marca: "Sua Empresa" }),
+    lista: () => GUIA_PAGINAS.map((P, i) => ({ P, nome: GUIA_NOMES[i], extra: {} })), vazio: () => ({ ...GUIA_VAZIO, marca: "Sua Empresa" }),
   },
   {
     id: "guia-marca", area: "clareza", nome: "Guia da marca", rota: "guia-marca", servicos: ["clareza_principal", "clareza_premium", "valor_premium"],
     descricao: "A estratégia completa da marca: essência, público, proposta, personalidade, tom, mensagens e manifesto. No premium, com a arquitetura.",
-    paginas: () => paginasDoGuiaMarca(true), nomes: () => nomesDoGuiaMarca(true), vazio: () => ({ ...VAZIO_MARCA, marca: "Sua Empresa", comArquitetura: true }),
+    lista: () => paginasDoGuiaMarca(true).map((P, i) => ({ P, nome: nomesDoGuiaMarca(true)[i], extra: {} })), vazio: () => ({ ...VAZIO_MARCA, marca: "Sua Empresa", comArquitetura: true }),
   },
   ...Object.values(DOCUMENTOS).map((d) => ({
     id: d.id, area: d.area, nome: d.nome, rota: `doc/${d.id}`, servicos: d.servicos, descricao: d.descricao, doc: d,
-    paginas: () => d.paginas(d.vazio).map(([P]) => P), nomes: () => d.paginas(d.vazio).map(([, n]) => n), vazio: () => ({ ...d.vazio, marca: "Sua Empresa" }),
+    lista: (v) => propsDasPaginas(paginasDe(d, d.vazio, v)), vazio: () => ({ ...d.vazio, marca: "Sua Empresa" }),
   })),
   { id: "paginas-site", area: "site", nome: "O próprio site", externo: true, servicos: ["pagina", "site_principal", "site_premium"], descricao: "Entregue no ar, com o acesso ao painel e um treinamento rápido. Não tem documento." },
 ];
 
 /** Uma página A4 em miniatura, na largura do espaço que ocupa (ou na largura fixa dada). */
-function Miniatura({ P, g, largura, doc }) {
+function Miniatura({ P, g, largura, doc, extra }) {
   const ref = useRef(null);
   const [w, setW] = useState(largura || 0);
   useEffect(() => {
@@ -49,7 +49,7 @@ function Miniatura({ P, g, largura, doc }) {
   }, [largura]);
   return (
     <div ref={ref} className="gm-palco rounded-md overflow-hidden ring-1 ring-black/5 shadow-sm" style={largura ? { width: largura } : undefined}>
-      {w > 0 && <P g={g} nome="Sua Empresa" doc={doc} escala={w / 794} />}
+      {w > 0 && <P g={g} nome="Sua Empresa" doc={doc} {...extra} escala={w / 794} />}
     </div>
   );
 }
@@ -60,6 +60,7 @@ export default function AdminEntregaveis() {
   const [leads, setLeads] = useState([]);
   const [aberto, setAberto] = useState(null); // documento com o modelo aberto
   const [escolhendo, setEscolhendo] = useState(null); // documento esperando a escolha do lead
+  const [versao, setVersao] = useState("v2"); // versão mostrada no modelo
 
   useEffect(() => {
     if (!document.querySelector(`link[href="${FONTE}"]`)) {
@@ -94,10 +95,10 @@ export default function AdminEntregaveis() {
                 <span className="text-sm text-zinc-400">· {a.foco}</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                {docs.map((doc) => doc.paginas ? (
+                {docs.map((doc) => doc.lista ? (
                   <article key={doc.id} className="bg-white rounded-2xl border border-zinc-200 p-4 flex gap-4">
                     <button onClick={() => setAberto(doc)} className="shrink-0" title="Ver o modelo">
-                      <Miniatura P={doc.paginas()[0]} g={doc.vazio()} doc={doc.doc} largura={96} />
+                      {(() => { const x = doc.lista("v2")[0]; return <Miniatura P={x.P} extra={x.extra} g={doc.vazio()} doc={doc.doc} largura={96} />; })()}
                     </button>
                     <div className="flex flex-col gap-2 min-w-0">
                       <p className="text-[15px] font-semibold leading-snug">{doc.nome}</p>
@@ -127,17 +128,22 @@ export default function AdminEntregaveis() {
         <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center overflow-y-auto p-6" onClick={() => setAberto(null)}>
           <div className="bg-zinc-100 rounded-2xl p-5 w-full max-w-6xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between gap-3 mb-4">
-              <div><p className="text-lg font-bold">{aberto.nome}</p><p className="text-xs text-zinc-500">Modelo · {aberto.paginas().length} páginas</p></div>
-              <div className="flex gap-2">
+              <div><p className="text-lg font-bold">{aberto.nome}</p><p className="text-xs text-zinc-500">Modelo · {aberto.lista(versao).length} {aberto.lista(versao).length === 1 ? "página" : "páginas"}</p></div>
+              <div className="flex gap-2 items-center">
+                {aberto.doc?.v2 && (
+                  <div className="flex rounded-full bg-white p-0.5 text-xs font-semibold">
+                    {[["v1", "V1"], ["v2", "V2"]].map(([v, r]) => <button key={v} onClick={() => setVersao(v)} className={`px-3 py-1.5 rounded-full ${versao === v ? "bg-black text-white" : "text-zinc-500 hover:text-black"}`}>{r}</button>)}
+                  </div>
+                )}
                 <button onClick={() => { setEscolhendo(aberto); setAberto(null); }} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-black text-white text-xs font-semibold"><FilePen size={13} /> Preencher para um lead</button>
                 <button onClick={() => setAberto(null)} className="p-1.5 rounded-full hover:bg-zinc-200" title="Fechar"><X size={18} /></button>
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {aberto.paginas().map((P, i) => (
-                <div key={i}>
-                  <Miniatura P={P} g={aberto.vazio()} doc={aberto.doc} />
-                  <p className="text-xs text-zinc-500 mt-1.5">{i + 1} · {aberto.nomes()[i]}</p>
+              {aberto.lista(versao).map(({ P, nome, extra }, i) => (
+                <div key={`${versao}-${i}`}>
+                  <Miniatura P={P} extra={extra} g={aberto.vazio()} doc={aberto.doc} />
+                  <p className="text-xs text-zinc-500 mt-1.5">{i + 1} · {nome}</p>
                 </div>
               ))}
             </div>
