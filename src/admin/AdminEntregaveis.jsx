@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, FilePen, Gem, Globe, HeartHandshake, MessageSquareText, Presentation, Smartphone, X } from "lucide-react";
 import AdminLayout from "./AdminLayout";
@@ -38,11 +38,19 @@ const DOCS = [
   { id: "mapa-jornada", area: "experiencia", nome: "Mapa da jornada", servicos: ["jornada", "experiencia_principal", "experiencia_premium"], descricao: "As etapas do atendimento, as mensagens de cada uma e o pós-venda." },
 ];
 
-/** Uma página A4 em miniatura. */
+/** Uma página A4 em miniatura, na largura do espaço que ocupa (ou na largura fixa dada). */
 function Miniatura({ P, g, largura }) {
+  const ref = useRef(null);
+  const [w, setW] = useState(largura || 0);
+  useEffect(() => {
+    if (largura || !ref.current) return;
+    const ro = new ResizeObserver(([e]) => setW(e.contentRect.width));
+    ro.observe(ref.current);
+    return () => ro.disconnect();
+  }, [largura]);
   return (
-    <div className="gm-palco rounded-md overflow-hidden ring-1 ring-black/5 shadow-sm" style={{ width: largura }}>
-      <P g={g} nome="Sua Empresa" escala={largura / 794} />
+    <div ref={ref} className="gm-palco rounded-md overflow-hidden ring-1 ring-black/5 shadow-sm" style={largura ? { width: largura } : undefined}>
+      {w > 0 && <P g={g} nome="Sua Empresa" escala={w / 794} />}
     </div>
   );
 }
@@ -96,9 +104,9 @@ export default function AdminEntregaveis() {
                       <p className="text-[15px] font-semibold leading-snug">{doc.nome}</p>
                       <p className="text-xs text-zinc-500 leading-snug">{doc.descricao}</p>
                       <div className="flex flex-wrap gap-1">{doc.servicos.map((s) => <span key={s} className="text-[11px] px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600">{nomeServico(s)}</span>)}</div>
-                      <div className="flex gap-2 mt-auto pt-1">
-                        <button onClick={() => setAberto(doc)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-zinc-300 text-xs font-semibold hover:border-black"><Eye size={13} /> Ver modelo</button>
-                        <button onClick={() => setEscolhendo(doc)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-black text-white text-xs font-semibold hover:bg-zinc-800"><FilePen size={13} /> Preencher para um lead</button>
+                      <div className="flex flex-wrap gap-2 mt-auto pt-1">
+                        <button onClick={() => setAberto(doc)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-zinc-300 text-xs font-semibold whitespace-nowrap hover:border-black"><Eye size={13} /> Ver modelo</button>
+                        <button onClick={() => setEscolhendo(doc)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-black text-white text-xs font-semibold whitespace-nowrap hover:bg-zinc-800"><FilePen size={13} /> Preencher para um lead</button>
                       </div>
                     </div>
                   </article>
@@ -126,10 +134,10 @@ export default function AdminEntregaveis() {
                 <button onClick={() => setAberto(null)} className="p-1.5 rounded-full hover:bg-zinc-200" title="Fechar"><X size={18} /></button>
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               {aberto.paginas().map((P, i) => (
                 <div key={i}>
-                  <Miniatura P={P} g={aberto.vazio()} largura={250} />
+                  <Miniatura P={P} g={aberto.vazio()} />
                   <p className="text-xs text-zinc-500 mt-1.5">{i + 1} · {aberto.nomes()[i]}</p>
                 </div>
               ))}
