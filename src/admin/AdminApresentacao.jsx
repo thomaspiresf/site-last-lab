@@ -4,7 +4,7 @@ import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText } from "lucide-reac
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
 import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
-import { AREAS, CASOS_PADRAO, CONTINUIDADE, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
+import { AREAS, CASOS_PADRAO, CASOS_TEXTOS, CONTINUIDADE, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 const AREAS_ATUAIS = () => AREAS;
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import { Cena, FORMATOS, Peca } from "./mockups";
@@ -406,7 +406,8 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     comeco: [doCatalogo("Os três cartões vêm da escada da área desta oferta.", aid ? `a=${aid}` : `s=${svc}`)],
     oferta: [doCatalogo("O nome é a oferta escolhida no diagnóstico; a frase é a promessa do serviço.")],
     antesdepois: [fixo("O lado \"Antes\" usa os títulos das observações da Visão externa."), <button key="b" onClick={() => irPara("visao")} className="self-start text-xs font-semibold underline underline-offset-2">Editar as observações</button>, doCatalogo("O lado \"Depois\" vem do serviço.")],
-    casos: [SEC.casos],
+    casos: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
+    casos2: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
     entrega: [doCatalogo("A lista do que o cliente recebe e a ilustração vêm do serviço.")],
     produto: [doCatalogo("A ilustração do entregável vem do serviço (campo \"Como fica\").")],
     sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
@@ -431,7 +432,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 
 export const NOMES_SLIDES = {
   capa: "Capa", objetivo: "Nossa conversa", conversa: "O seu momento", respostas: "Visão interna", visao: "Visão externa",
-  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", casos: "Casos",
+  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", casos: "Caso 1", casos2: "Caso 2",
   entrega: "O que você recebe", produto: "Como fica", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
   proximos: "Cronograma", fim: "Fechamento",
 };
@@ -1015,22 +1016,51 @@ function Condicoes({ d, escala }) {
   );
 }
 
-function Casos({ d, escala }) {
+/** Frase curta de um parágrafo: a primeira frase (ou a que fala do desafio), até ~190 caracteres. */
+function frase(texto = "", palavra) {
+  const frases = String(texto).match(/[^.!?]+[.!?]+/g) || [String(texto)];
+  const achada = palavra && frases.find((f) => f.toLowerCase().includes(palavra));
+  let f = (achada || frases[0] || "").trim();
+  if (f.length > 190) f = f.slice(0, 187).replace(/\s+\S*$/, "") + "…";
+  return f;
+}
+
+/** O resumo de um caso, a partir dos textos do site (projects.js). */
+export function resumoDoCaso(p) {
+  const ps = p.expandDetails?.paragraphs?.length ? p.expandDetails.paragraphs : [p.description || p.subtitle || ""];
+  const editado = CASOS_TEXTOS[p.id] || {};
+  return {
+    desafio: editado.desafio || frase(p.description || ps[0], "desafio"),
+    fizemos: editado.fizemos || frase(ps[1] || ps[0]),
+    resultado: editado.resultado || frase(ps[ps.length - 1]),
+    setor: [p.expandDetails?.sector, p.expandDetails?.year].filter(Boolean).join(" · "),
+    imagens: [p.bannerImage || p.coverImage, ...(p.topGrid || []), ...(p.expandDetails?.expandImages || [])].filter(Boolean).filter((x, k, a) => a.indexOf(x) === k).slice(0, 3),
+  };
+}
+
+/** Um caso por slide: o que era, o que fizemos e o resultado, com um mosaico de imagens. */
+function Caso({ d, escala, n }) {
+  const p = d.casos[n];
+  if (!p) return <Slide livre escala={escala} d={d}><Cabeca t={tx("casos", "titulo")} sub="Escolha os casos no painel." /></Slide>;
+  const c = resumoDoCaso(p);
+  const blocos = [[tx("casos", "desafio"), c.desafio], [tx("casos", "fizemos"), c.fizemos], [tx("casos", "resultado"), c.resultado]];
   return (
-    <Slide escala={escala} d={d}>
-      <Titulo t={tx("casos", "titulo")} sub={tx("casos", "sub")} />
-      <div className="apr-cards" style={{ gridTemplateColumns: "1fr 1fr", gap: 48 }}>
-        {d.casos.map((p) => (
-          <div key={p.id}>
-            <div className="img"><img src={p.coverImage} alt="" /></div>
-            <h3>{p.title}</h3>
-            <p>{p.subtitle}</p>
-          </div>
+    <Slide livre escala={escala} d={d}>
+      <P x={83} y={52} s={26} peso={300} cor="#999999" style={{ letterSpacing: 3, textTransform: "uppercase" }}>{tx("casos", "chapeu", { n: n + 1, total: d.casos.length })}</P>
+      <Cabeca t={p.title} sub={c.setor} y={98} />
+      <div className="apr-p apr-caso-txt" style={{ left: 81, top: 330, width: 640 }}>
+        {blocos.map(([rot, txt]) => (
+          <div key={rot}><p className="rot">{rot}</p><p className="txt">{txt}</p></div>
         ))}
+      </div>
+      <div className="apr-caso-mosaico" style={{ left: 780, top: 100, width: 1059, height: 800 }}>
+        {c.imagens.map((src, k) => <div key={src} className={`foto f${k}`}><img src={src} alt="" /></div>)}
       </div>
     </Slide>
   );
 }
+const Casos = (props) => <Caso {...props} n={0} />;
+const Casos2 = (props) => <Caso {...props} n={1} />;
 
 /** Cronograma com datas reais: uma linha fina, um ponto por etapa, datas em cima e o que acontece embaixo. */
 function Proximos({ d, escala }) {
@@ -1107,5 +1137,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["casos", Casos], ["entrega", Entrega], ["produto", Produto], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

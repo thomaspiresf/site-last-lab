@@ -439,3 +439,12 @@
 .apr-fecha .ic { width: 60px; height: 60px; border-radius: 50%; border: 1.5px solid #3a3a40; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .apr-fecha .ic svg { width: 26px; height: 26px; }
 .apr-fecha .contatos .txt { font-size: 26px; color: #fff; margin-top: 2px; white-space: nowrap; }
+
+/* casos: um por slide */
+.apr-caso-txt { display: flex; flex-direction: column; gap: 30px; }
+.apr-caso-txt .rot { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; color: #ef4b3a; }
+.apr-caso-txt .txt { font-size: 25px; line-height: 1.42; color: #3f3f46; margin-top: 10px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.apr-caso-mosaico { position: absolute; display: grid; grid-template-columns: 1.45fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px; }
+.apr-caso-mosaico .foto { border-radius: 28px; overflow: hidden; background: #e4e4e7; min-height: 0; }
+.apr-caso-mosaico .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.apr-caso-mosaico .f0 { grid-row: span 2; }

@@ -89,7 +89,7 @@ export function montarRoteiro(item, dados, prep) {
       ],
     },
     {
-      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["comeco", "oferta", "antesdepois", "casos"], dica: "A hora da autoridade. Fale do resultado, não do serviço.",
+      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["comeco", "oferta", "antesdepois", "casos", "casos2"], dica: "A hora da autoridade. Fale do resultado, não do serviço.",
       falas: [
         `"Independente de trabalharmos juntos, te falo o que eu faria se fosse você: começaria pelo ponto que mais pesa."`,
         `"Hoje é isto que a gente viu. Depois, é isto que muda." Leia o "depois" olhando para o cliente.`,

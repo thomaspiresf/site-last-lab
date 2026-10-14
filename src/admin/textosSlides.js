@@ -22,7 +22,7 @@ export const TEXTOS = {
   },
   oferta: { numero: "01", rotulo: "INÍCIO" },
   antesdepois: { titulo: "Antes & Depois", antes: "ANTES", depois: "DEPOIS" },
-  casos: { titulo: "Casos", sub: "Marcas que a Last Lab ajudou a aparecer." },
+  casos: { titulo: "Casos", chapeu: "Caso {n} de {total}", desafio: "O desafio", fizemos: "O que fizemos", resultado: "Resultado" },
   entrega: { titulo: "O que você recebe", prazo: "Entrega em {total} dias úteis · {ajustes} de ajuste" },
   produto: {
     titulo: "Como fica", aviso: "Ilustração. A sua versão sai com a sua marca.",
@@ -62,7 +62,7 @@ export const ROTULOS_TEXTOS = {
   meta1: "Linha de cima · 1", meta2: "Linha de cima · 2", meta3: "Linha de cima · 3",
   t1: "Coluna 1 · título", d1: "Coluna 1 · texto", t2: "Item 2 · título/texto", d2: "Coluna 2 · texto", t3: "Item 3 · título/texto", d3: "Coluna 3 · texto",
   r1: "Cartão 1 · rótulo", r2: "Cartão 2 · rótulo", r3: "Cartão 3 · rótulo",
-  numero: "Número", antes: "Rótulo do lado Antes", depois: "Rótulo do lado Depois", prazo: "Prazo",
+  numero: "Número", desafio: "Rótulo · desafio", fizemos: "Rótulo · o que fizemos", resultado: "Rótulo · resultado", antes: "Rótulo do lado Antes", depois: "Rótulo do lado Depois", prazo: "Prazo",
   aviso: "Aviso da ilustração", tituloGuia: "Título (workshop)", subGuia: "Subtítulo (workshop)",
   total: "Rótulo do preço", seloEntrada: "Selo da entrada (recomendada)", seloEnxuto: "Selo da entrada (quando o projeto é o destaque)",
   seloProjeto: "Selo do projeto (âncora)", seloProjetoRec: "Selo do projeto (recomendado)", credito: "Crédito da entrada",

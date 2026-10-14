@@ -379,7 +379,10 @@ export const CASOS_PADRAO = {
 
 import { TEXTOS } from "./textosSlides";
 
-const GRUPOS = { textos: TEXTOS, servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
+// textos dos casos reescritos à mão (por id do projeto): { desafio, fizemos, resultado }; vazio = extraído do site
+export const CASOS_TEXTOS = {};
+
+const GRUPOS = { textos: TEXTOS, casosTextos: CASOS_TEXTOS, servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
 const ORIGINAL = JSON.parse(JSON.stringify(GRUPOS));
 
 /** O catálogo padrão do código (para comparar e para "voltar ao padrão"). */

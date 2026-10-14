@@ -7,7 +7,7 @@ import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao
 import { carregarCatalogo } from "./carregarCatalogo";
 import { FORMATOS } from "./mockups";
 import { ROTULOS_TEXTOS } from "./textosSlides";
-import { NOMES_SLIDES, Palco, SLIDES, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
+import { NOMES_SLIDES, Palco, SLIDES, resumoDoCaso, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
 
@@ -550,7 +550,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     comeco: [B.promessa, B.projeto, B.continuidade],
     oferta: [B.nome, B.promessa],
     antesdepois: [B.depois, fixo("O lado \"Antes\" usa os títulos das observações da Visão externa.")],
-    casos: [B.casos],
+    casos: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[0]} />],
+    casos2: [B.casos, <TextosDoCaso key="t" r={r} set={set} pid={casos[1]} />],
     entrega: [B.promessa, B.entregas, B.exemplo],
     produto: [B.exemplo],
     sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
@@ -626,7 +627,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
             <p className="text-base font-bold">{NOMES_SLIDES[sid] || sid}</p>
           </div>
           {(POR_SLIDE[sid] || [fixo("Nada para editar neste slide.")]).filter(Boolean).map((el, i) => <React.Fragment key={i}>{el}</React.Fragment>)}
-          <TextosDoSlide r={r} set={set} padrao={padrao} grupos={sid === "capa" ? ["capa", "rodape"] : [sid]} />
+          <TextosDoSlide r={r} set={set} padrao={padrao} grupos={sid === "capa" ? ["capa", "rodape"] : sid === "casos2" ? ["casos"] : [sid]} />
           <details className="border-t border-zinc-100 pt-3 text-sm">
             <summary className="cursor-pointer text-xs font-semibold text-zinc-500">Mais deste serviço</summary>
             <div className="flex flex-col gap-3 mt-3">
@@ -640,6 +641,27 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
         </aside>
       </div>
       {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal="apr-exemplo" onSair={() => setApresentando(null)} />}
+    </div>
+  );
+}
+
+/** Os três textos de um caso: vêm do site; aqui dá para reescrever (vale em todas as apresentações). */
+function TextosDoCaso({ r, set, pid }) {
+  const p = projects.find((x) => x.id === pid);
+  if (!p) return <p className="text-xs text-zinc-400">Marque os casos acima. Os 2 primeiros viram os slides Caso 1 e Caso 2.</p>;
+  const editado = r.casosTextos?.[pid] || {};
+  const doSite = resumoDoCaso({ ...p, id: "__site__" });
+  const mudar = (k, v) => set("casosTextos", pid, { ...editado, [k]: v });
+  return (
+    <div className="flex flex-col gap-2.5 rounded-xl border border-zinc-200 bg-zinc-50/60 p-3.5">
+      <p className="text-xs font-semibold text-zinc-700">Textos do caso {p.title} <span className="font-normal text-zinc-400">· vazio = o texto do site</span></p>
+      {[["desafio", "O desafio"], ["fizemos", "O que fizemos"], ["resultado", "Resultado"]].map(([k, rot]) => (
+        <label key={k} className="block">
+          <span className={rotulo}>{rot}</span>
+          <textarea rows={3} className={`${campo} resize-y`} value={editado[k] || ""} placeholder={doSite[k]} onChange={(e) => mudar(k, e.target.value)} />
+        </label>
+      ))}
+      <p className="text-[11px] text-zinc-400">As imagens vêm da página do projeto no site. Até ~190 caracteres por texto.</p>
     </div>
   );
 }
