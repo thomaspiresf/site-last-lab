@@ -1,6 +1,7 @@
 import React from "react";
 import { hexRgb } from "./base";
 import "./v2.css";
+import { CapaGrafismo, grafismoDe } from "./capa4";
 
 // V2 dos entregáveis: direção de arte editorial (grade suíça). Cabeçalho corrido com o número e o
 // nome da seção, numeração de página, filetes no lugar de cartões, coluna de rótulos à esquerda,
@@ -72,6 +73,7 @@ export function Foto({ src, vazio = "Imagem", contain, estilo }) {
 
 /** Capa V2: metadados no topo, o grafismo do material (doc.capa) e o nome do cliente grande na base. */
 export function Capa2(p) {
+  if (p.versao === "v4") return <CapaGrafismo titulo={p.titulo || p.doc.nome} marca={p.g.marca || p.nome} imagem={grafismoDe(p.doc.id)} n={p.n} total={p.total} escala={p.escala} />;
   const hoje = new Date();
   const mes = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"][hoje.getMonth()];
   return (

@@ -4,13 +4,13 @@ import { ArrowLeft, FileDown } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico } from "../lib/api";
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import "./guia.css";
+import { CapaGrafismo, grafismoDe } from "./docs/capa4";
 
 // Guia da marca (/admin/diagnosticos/:id/guia-marca): o entregável do Posicionamento de marca
 // (e do Posicionamento e arquitetura, com a página de arquitetura). Mesmo visual do Guia de
 // mensagem, em versão completa. Salvo em diagnosticos.apresentacao.guiaMarca.
 
 const FONTE = "https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap";
-const LOGO = "/images/logo.png";
 const REGUAS = [
   ["proxima", "Próxima", "Formal"],
   ["leve", "Leve", "Séria"],
@@ -243,21 +243,7 @@ function Pag({ tipo = "", classe = "", escala, g, nome, children }) {
 }
 
 export function CapaMarca(p) {
-  const barras = [];
-  let x = 0, w = 150, s = 52;
-  for (let i = 0; i < 12; i++) {
-    barras.push(<polygon key={i} points={`${x},0 ${x + w},${s} ${x + w},${420 - s} ${x},420`} fill="#ef4b3a" />);
-    x += w + 26;
-    w = Math.max(22, Math.round(w * 0.82));
-    s = Math.max(0, Math.round(s * 0.78));
-  }
-  return (
-    <Pag {...p} tipo="escuro" classe="gm-capa">
-      <img className="logo" src={LOGO} alt="Last Lab" />
-      <svg viewBox={`0 0 ${x} 420`} preserveAspectRatio="none" aria-hidden="true">{barras}</svg>
-      <div><h1>Guia da marca</h1><p className="marca">{p.g.marca || p.nome}</p></div>
-    </Pag>
-  );
+  return <CapaGrafismo classe="gm-pag" titulo="Guia da marca" marca={p.g.marca || p.nome} imagem={grafismoDe("guia-marca")} n={1} total={p.g.comArquitetura ? 11 : 10} escala={p.escala} />;
 }
 
 export function Essencia(p) {
