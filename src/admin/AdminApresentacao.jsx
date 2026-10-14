@@ -1047,7 +1047,8 @@ function Caso({ d, escala, n }) {
   const [grande, ...outras] = c.imagens.length ? c.imagens : [p.coverImage];
   const menores = [...outras, ...(p.topGrid || []), ...(p.expandDetails?.expandImages || [])].filter((x, k, a) => x && x !== grande && a.indexOf(x) === k).slice(0, 3);
   // a grande ocupa a altura que a proporção dela pede (sem cortar), dentro do espaço
-  const largura = 1080, topo = 100, total = 800, vao = 18;
+  // área útil 81–1839 (1758 px), 60 px entre as colunas: 40% texto (679), 60% imagens (1019)
+  const largura = 1019, topo = 100, total = 800, vao = 18;
   const altGrande = Math.min(total - 200 - vao, Math.max(380, largura / proporcao));
   const altMenor = total - altGrande - vao;
   const blocos = [[tx("casos", "desafio"), c.desafio], [tx("casos", "fizemos"), c.fizemos], [tx("casos", "resultado"), c.resultado]];
@@ -1061,7 +1062,7 @@ function Caso({ d, escala, n }) {
           <img src={src} alt="" />
         </div>
       ))}
-      <div className="apr-p apr-caso-txt" style={{ left: 81, top: topo - 6, width: 615 }}>
+      <div className="apr-p apr-caso-txt" style={{ left: 81, top: topo - 6, width: 679 }}>
         <p className="chapeu">{tx("casos", "chapeu", { n: n + 1, total: d.casos.length })}</p>
         <h2 className="nome">{p.title}</h2>
         {c.setor && <p className="setor">{c.setor}</p>}
