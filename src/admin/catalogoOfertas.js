@@ -379,10 +379,13 @@ export const CASOS_PADRAO = {
 
 import { TEXTOS } from "./textosSlides";
 
+// ordem e slides ocultos padrão das apresentações (ids de SLIDES); vazio = a ordem do código
+export const ESTRUTURA = { ordem: [], ocultos: [] };
+
 // textos dos casos reescritos à mão (por id do projeto): { desafio, fizemos, resultado }; vazio = extraído do site
 export const CASOS_TEXTOS = {};
 
-const GRUPOS = { textos: TEXTOS, casosTextos: CASOS_TEXTOS, servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
+const GRUPOS = { estrutura: ESTRUTURA, textos: TEXTOS, casosTextos: CASOS_TEXTOS, servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
 const ORIGINAL = JSON.parse(JSON.stringify(GRUPOS));
 
 /** O catálogo padrão do código (para comparar e para "voltar ao padrão"). */

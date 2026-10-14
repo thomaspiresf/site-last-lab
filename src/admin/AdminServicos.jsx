@@ -7,7 +7,7 @@ import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao
 import { carregarCatalogo } from "./carregarCatalogo";
 import { FORMATOS } from "./mockups";
 import { ROTULOS_TEXTOS } from "./textosSlides";
-import { NOMES_SLIDES, Palco, SLIDES, resumoDoCaso, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
+import { NOMES_SLIDES, NavSlides, Palco, SLIDES, inicioVisivel, ordenarSlides, resumoDoCaso, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
 
@@ -429,9 +429,11 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
     const item = leadExemplo(r.servicos[id], persona);
     const ap = { ...apresentacaoInicial(item), empresa: "Sua Empresa" };
     const d = montarDados(item, ap);
-    const lista = SLIDES.filter(([, , quando]) => !quando || quando(d)).map(([sid, S]) => Object.assign((props) => <S d={d} {...props} />, { sid }));
+    const lista = ordenarSlides(SLIDES.filter(([, , quando]) => !quando || quando(d)).map(([sid, S]) => Object.assign((props) => <S d={d} {...props} />, { sid })), r.estrutura?.ordem || []);
     return { slides: lista, roteiro: montarRoteiro(item, d, montarPreparacao(item, d)), objecoes: montarObjecoes(d) };
   }, [id, persona, r]);
+  const ocultos = r.estrutura?.ocultos || [];
+  const visiveis = slides.filter((S) => !ocultos.includes(S.sid));
   // ?slide=<id> (atalho vindo da apresentação de um lead) abre direto naquele slide
   useEffect(() => {
     const alvo = new URLSearchParams(window.location.search).get("slide");
@@ -578,14 +580,11 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-[180px_minmax(0,1fr)_380px] gap-5 p-5 items-start">
-        <nav className="flex flex-row gap-2 overflow-x-auto pb-1 xl:pb-0 xl:pr-1 xl:flex-col xl:gap-2.5 xl:overflow-x-visible xl:overflow-y-auto xl:sticky xl:top-[76px] xl:max-h-[calc(100vh-96px)]">
-          {slides.map((S, i) => (
-            <button key={S.sid} onClick={() => setAtual(i)} className={`shrink-0 w-36 xl:w-auto text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white"}`}>
-              <div className="rounded overflow-hidden ring-1 ring-black/5 pointer-events-none"><Palco><S /></Palco></div>
-              <p className={`text-[11px] mt-1 px-0.5 truncate ${i === indice ? "font-semibold text-black" : "text-zinc-500"}`}>{i + 1} · {NOMES_SLIDES[S.sid] || S.sid}</p>
-            </button>
-          ))}
-        </nav>
+        <NavSlides itens={slides} ocultos={ocultos} indice={indice} onSelect={setAtual}
+          onReordenar={(nova) => set("estrutura", "ordem", nova)}
+          onAlternar={(sid) => set("estrutura", "ocultos", ocultos.includes(sid) ? ocultos.filter((x) => x !== sid) : [...ocultos, sid])}
+          rodape={(r.estrutura?.ordem?.length || ocultos.length) ? <button onClick={() => { set("estrutura", "ordem", []); set("estrutura", "ocultos", []); }} className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-black"><RotateCcw size={12} /> Voltar à ordem padrão</button> : null}
+          dica="Padrão de todas as apresentações; salve para aplicar" />
 
         <div className="flex flex-col gap-3 min-w-0 xl:sticky xl:top-[76px]">
           <div className="flex items-center gap-3 text-sm">
@@ -601,8 +600,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
           <div className="flex items-center gap-2">
             <button disabled={indice === 0} onClick={() => setAtual(indice - 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">‹ Anterior</button>
             <button disabled={indice === slides.length - 1} onClick={() => setAtual(indice + 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">Próximo ›</button>
-            <span className="text-xs text-zinc-400 ml-1">{indice + 1} de {slides.length}</span>
-            <button onClick={() => abrirTelaCheia(setApresentando, indice)} className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
+            <span className="text-xs text-zinc-400 ml-1">{indice + 1} de {slides.length}{ocultos.includes(sid) && <b className="ml-2 text-zinc-500">· oculto</b>}</span>
+            <button onClick={() => abrirTelaCheia(setApresentando, inicioVisivel(slides, visiveis, indice))} className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
           </div>
           <button onClick={() => setVerRoteiro((x) => !x)} className="self-start text-sm font-semibold text-zinc-600 hover:text-black mt-2">{verRoteiro ? "Esconder" : "Ver"} roteiro e objeções deste serviço</button>
           {verRoteiro && (
@@ -640,7 +639,7 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
           </details>
         </aside>
       </div>
-      {apresentando !== null && <TelaCheia slides={slides} inicio={apresentando} canal="apr-exemplo" onSair={() => setApresentando(null)} />}
+      {apresentando !== null && <TelaCheia slides={visiveis} inicio={apresentando} canal="apr-exemplo" onSair={() => setApresentando(null)} />}
     </div>
   );
 }

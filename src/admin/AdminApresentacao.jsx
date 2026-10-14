@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText } from "lucide-react";
+import { ArrowLeft, Play, FileDown, ImagePlus, X, ScrollText, Eye, EyeOff, GripVertical, RotateCcw } from "lucide-react";
 import { getAdminSession, getDiagnostico, updateDiagnostico, enviarImagemApresentacao, getDiagnosticoArquivoUrl } from "../lib/api";
 import { projects } from "../data/projects";
 import { Capa as GuiaCapa, Frase as GuiaFrase, VAZIO as GUIA_VAZIO, PAGINAS as GUIA_PAGINAS, PAGINAS_NOMES as GUIA_NOMES } from "./AdminGuia";
-import { AREAS, CASOS_PADRAO, CASOS_TEXTOS, CONTINUIDADE, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
+import { AREAS, CASOS_PADRAO, CASOS_TEXTOS, ESTRUTURA, CONTINUIDADE, CUSTO_PADRAO, MOMENTOS, VISAO_PADRAO, ofertaDoLead } from "./catalogoOfertas";
 const AREAS_ATUAIS = () => AREAS;
 import { exportarPdf, nomeArquivo } from "./exportarPdf";
 import { Cena, FORMATOS, Peca } from "./mockups";
@@ -86,10 +86,15 @@ export default function AdminApresentacao() {
   }, [id]);
 
   const dados = useMemo(() => (item && ap ? montarDados(item, ap, urls) : null), [item, ap, urls]);
-  const slides = useMemo(() => (dados ? SLIDES.filter(([, , quando]) => !quando || quando(dados)).map(([sid, S]) => Object.assign((props) => <S d={dados} {...props} />, { sid })) : []), [dados]);
+  // ordem e ocultos: os do lead, ou o padrão de Produtos e serviços
+  const ordem = ap?.ordem?.length ? ap.ordem : ESTRUTURA.ordem;
+  const ocultos = ap?.ocultos ?? ESTRUTURA.ocultos;
+  const todos = useMemo(() => (dados ? ordenarSlides(SLIDES.filter(([, , quando]) => !quando || quando(dados)).map(([sid, S]) => Object.assign((props) => <S d={dados} {...props} />, { sid })), ordem) : []), [dados, ordem]);
+  const slides = useMemo(() => todos.filter((S) => !ocultos.includes(S.sid)), [todos, ocultos]); // os que entram na apresentação e no PDF
 
-  const indice = Math.min(atual, Math.max(0, slides.length - 1));
-  const SlideAtual = slides[indice] || (() => null);
+  const indice = Math.min(atual, Math.max(0, todos.length - 1));
+  const SlideAtual = todos[indice] || (() => null);
+  const personalizado = !!(ap?.ordem?.length || ap?.ocultos);
 
   if (sessao === undefined) return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Carregando...</div>;
   if (!sessao) return <Navigate to="/admin/login" replace />;
@@ -121,27 +126,24 @@ export default function AdminApresentacao() {
       </header>
 
       <div className="grid grid-cols-1 xl:grid-cols-[180px_minmax(0,1fr)_380px] gap-5 p-5 items-start">
-        {/* miniaturas */}
-        <nav className="flex flex-row gap-2 overflow-x-auto pb-1 xl:pb-0 xl:pr-1 xl:flex-col xl:gap-2.5 xl:overflow-x-visible xl:overflow-y-auto xl:sticky xl:top-[76px] xl:max-h-[calc(100vh-96px)]">
-          {slides.map((S, i) => (
-            <button key={S.sid} onClick={() => setAtual(i)} className={`shrink-0 w-36 xl:w-auto text-left rounded-lg p-1.5 transition ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white/70"}`}>
-              <div className="rounded overflow-hidden ring-1 ring-black/5 pointer-events-none"><Palco><S /></Palco></div>
-              <p className={`text-[11px] mt-1 px-0.5 truncate ${i === indice ? "font-semibold text-black" : "text-zinc-500"}`}>{i + 1} · {NOMES_SLIDES[S.sid] || S.sid}</p>
-            </button>
-          ))}
-        </nav>
+        {/* miniaturas: arraste para reordenar, olho para ocultar */}
+        <NavSlides itens={todos} ocultos={ocultos} indice={indice} onSelect={setAtual}
+          onReordenar={(nova) => salvar({ ...ap, ordem: nova })}
+          onAlternar={(sid) => salvar({ ...ap, ocultos: ocultos.includes(sid) ? ocultos.filter((x) => x !== sid) : [...ocultos, sid] })}
+          rodape={personalizado && <button onClick={() => { const { ordem: _o, ocultos: _x, ...resto } = ap; salvar(resto); }} className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-black"><RotateCcw size={12} /> Voltar à ordem padrão</button>}
+          dica="Só neste lead." />
         {/* o slide em foco */}
         <div className="flex flex-col gap-3 min-w-0 xl:sticky xl:top-[73px]">
           <div className="rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5"><Palco><SlideAtual /></Palco></div>
           <div className="flex items-center gap-2">
             <button disabled={indice === 0} onClick={() => setAtual(indice - 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">‹ Anterior</button>
-            <button disabled={indice === slides.length - 1} onClick={() => setAtual(indice + 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">Próximo ›</button>
-            <span className="text-xs text-zinc-400 ml-1">{indice + 1} de {slides.length}</span>
-            <button onClick={() => abrirTelaCheia(setApresentando, indice)} className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
+            <button disabled={indice === todos.length - 1} onClick={() => setAtual(indice + 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">Próximo ›</button>
+            <span className="text-xs text-zinc-400 ml-1">{indice + 1} de {todos.length}{ocultos.includes(todos[indice]?.sid) && <b className="ml-2 text-zinc-500">· oculto</b>}</span>
+            <button onClick={() => abrirTelaCheia(setApresentando, inicioVisivel(todos, slides, indice))} className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
           </div>
         </div>
         {/* os campos deste slide */}
-        <Painel item={item} ap={ap} salvar={salvar} urls={urls} dados={dados} sid={slides[indice]?.sid} irPara={(sidAlvo) => setAtual(Math.max(0, slides.findIndex((x) => x.sid === sidAlvo)))} />
+        <Painel item={item} ap={ap} salvar={salvar} urls={urls} dados={dados} sid={todos[indice]?.sid} irPara={(sidAlvo) => setAtual(Math.max(0, todos.findIndex((x) => x.sid === sidAlvo)))} />
       </div>
 
       </div>
@@ -152,6 +154,66 @@ export default function AdminApresentacao() {
         {slides.map((S, i) => <S key={i} />)}
       </div>
     </div>
+  );
+}
+
+/** Põe os slides na ordem salva (ids); os que não estão na lista seguem a ordem do código, no fim. */
+export function ordenarSlides(lista, ordem = []) {
+  const pos = (S, i) => { const k = ordem.indexOf(S.sid); return k < 0 ? 1000 + i : k; };
+  return lista.map((S, i) => [S, pos(S, i)]).sort((a, b) => a[1] - b[1]).map(([S]) => S);
+}
+
+/** Índice na lista visível do slide em foco (ou do próximo visível, se ele estiver oculto). */
+export function inicioVisivel(todos, visiveis, indice) {
+  for (let i = indice; i < todos.length; i++) {
+    const k = visiveis.findIndex((S) => S.sid === todos[i].sid);
+    if (k >= 0) return k;
+  }
+  return 0;
+}
+
+/** Miniaturas dos slides: clique para focar, arraste para reordenar, olho para ocultar. */
+export function NavSlides({ itens, ocultos, indice, onSelect, onReordenar, onAlternar, rodape, dica }) {
+  const [arrastando, setArrastando] = useState(null);
+  const [sobre, setSobre] = useState(null);
+  const soltar = (i) => {
+    if (arrastando === null || arrastando === i) { setArrastando(null); setSobre(null); return; }
+    const ids = itens.map((S) => S.sid);
+    const selecionado = ids[indice];
+    const [movido] = ids.splice(arrastando, 1);
+    ids.splice(i, 0, movido);
+    onReordenar(ids);
+    onSelect(ids.indexOf(selecionado));
+    setArrastando(null);
+    setSobre(null);
+  };
+  return (
+    <nav className="flex flex-row gap-2 overflow-x-auto pb-1 xl:pb-0 xl:pr-1 xl:flex-col xl:gap-2 xl:overflow-x-visible xl:overflow-y-auto xl:sticky xl:top-[76px] xl:max-h-[calc(100vh-96px)]">
+      <p className="hidden xl:block text-[11px] text-zinc-400 leading-snug px-1">Arraste para mudar a ordem. O olho oculta o slide{dica ? ` (${dica.toLowerCase().replace(/\.$/, "")})` : ""}.</p>
+      {itens.map((S, i) => {
+        const oculto = ocultos.includes(S.sid);
+        return (
+          <div key={S.sid} draggable
+            onDragStart={(e) => { setArrastando(i); e.dataTransfer.effectAllowed = "move"; }}
+            onDragOver={(e) => { e.preventDefault(); setSobre(i); }}
+            onDragLeave={() => setSobre((x) => (x === i ? null : x))}
+            onDrop={(e) => { e.preventDefault(); soltar(i); }}
+            onDragEnd={() => { setArrastando(null); setSobre(null); }}
+            className={`group relative shrink-0 w-36 xl:w-auto rounded-lg p-1.5 transition cursor-grab active:cursor-grabbing ${i === indice ? "bg-white ring-2 ring-black" : "hover:bg-white/70"} ${arrastando === i ? "opacity-40" : ""} ${sobre === i && arrastando !== i ? "ring-2 ring-[#ef4b3a]" : ""}`}>
+            <button onClick={() => onSelect(i)} className="block w-full text-left">
+              <div className={`rounded overflow-hidden ring-1 ring-black/5 pointer-events-none ${oculto ? "opacity-30 grayscale" : ""}`}><Palco><S /></Palco></div>
+              <p className={`text-[11px] mt-1 px-0.5 pr-6 truncate ${i === indice ? "font-semibold text-black" : "text-zinc-500"} ${oculto ? "line-through" : ""}`}>{i + 1} · {NOMES_SLIDES[S.sid] || S.sid}</p>
+            </button>
+            <GripVertical size={14} className="absolute left-2 top-2.5 text-white drop-shadow opacity-0 group-hover:opacity-100 pointer-events-none" />
+            <button onClick={() => onAlternar(S.sid)} title={oculto ? "Mostrar este slide" : "Ocultar este slide"}
+              className={`absolute right-2 bottom-1.5 p-0.5 rounded ${oculto ? "text-[#ef4b3a]" : "text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-black"}`}>
+              {oculto ? <EyeOff size={14} /> : <Eye size={14} />}
+            </button>
+          </div>
+        );
+      })}
+      {rodape && <div className="px-1 shrink-0 self-center xl:self-start">{rodape}</div>}
+    </nav>
   );
 }
 
