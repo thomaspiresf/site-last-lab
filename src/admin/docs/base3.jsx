@@ -1,26 +1,20 @@
 import React from "react";
 import "./v3.css";
 
-// V3 dos entregáveis: editorial contemporâneo. Contraste tipográfico (Instrument Serif grande, com
-// itálico, contra Poppins fina), margens generosas de 80, nada sangrando a não ser capas, cartões
-// arredondados com sombra macia e mockups realistas (Instagram, WhatsApp, e-mail). As páginas
-// recebem n, total e indice de quem as monta.
-
-const SERIFA = "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap";
-if (typeof document !== "undefined" && !document.querySelector(`link[href="${SERIFA}"]`)) {
-  const l = document.createElement("link");
-  l.rel = "stylesheet";
-  l.crossOrigin = "anonymous";
-  l.href = SERIFA;
-  document.head.appendChild(l);
-}
+// V3 dos entregáveis: editorial contemporâneo, só em Poppins. O contraste vem do peso (títulos
+// enormes em ExtraLight com a palavra de destaque em SemiBold), do tamanho e das margens generosas
+// de 80; nada sangra a não ser a capa; cartões arredondados com sombra macia e mockups realistas
+// (Instagram, WhatsApp, e-mail). As páginas recebem n, total e indice de quem as monta.
 
 export const LOGO_LASTLAB = "/images/logo.png";
 export const nn = (n) => String(n).padStart(2, "0");
 export const ou3 = (v, reserva) => (v ? v : <span className="v3-vazio">{reserva}</span>);
 
-/** "Manual de *identidade*" → texto com o trecho entre asteriscos em itálico. */
-export function serif(texto) {
+/** "Manual de *identidade*" → texto com o trecho entre asteriscos em destaque (SemiBold). */
+export function realce(texto) {
+  const t = String(texto || "");
+  // título inteiro em destaque (uma palavra só) fica leve: o contraste vem do tamanho
+  if (/^\*[^*]+\*$/.test(t)) return t.slice(1, -1);
   return String(texto || "").split("*").map((t, i) => (i % 2 ? <em key={i}>{t}</em> : <React.Fragment key={i}>{t}</React.Fragment>));
 }
 
@@ -37,12 +31,12 @@ export function Pag3({ g, nome, doc, escala, n, fundo = "papel", classe = "", ch
   );
 }
 
-/** Título: chapéu com o número da página, título em serifa (com *itálico*) e um texto curto. */
+/** Título: chapéu com o número da página, título grande em ExtraLight (com *destaque* em SemiBold) e um texto curto. */
 export function Cab({ p, t, lead, tamanho = 92, estilo }) {
   return (
     <div className="v3-cab" style={estilo}>
       <p className="v3-rot">{nn(p.n || 1)} — {p.indice?.[(p.n || 1) - 1]}</p>
-      <h2 className="v3-serif" style={{ fontSize: tamanho }}>{serif(t)}</h2>
+      <h2 className="v3-display" style={{ fontSize: Math.round(tamanho * 0.8) }}>{realce(t)}</h2>
       {lead && <p className="v3-lead">{lead}</p>}
     </div>
   );
@@ -61,7 +55,7 @@ export const handle = (marca) => (marca || "suamarca").normalize("NFD").replace(
 
 // ---------- capa e índice ----------
 
-/** Capa V3: escura, título em serifa enorme com itálico, cliente e data discretos. */
+/** Capa V3: escura, título enorme com a palavra de destaque na cor, cliente e data discretos. */
 export function Capa3(p) {
   const hoje = new Date();
   const mes = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][hoje.getMonth()];
@@ -75,26 +69,26 @@ export function Capa3(p) {
         <p className="v3-rot" style={{ color: "var(--ac)" }}>Preparado para</p>
         <p className="cliente">{p.g.marca || p.nome || "Sua Empresa"}</p>
       </div>
-      <h1 className="v3-serif">{serif(p.titulo || p.doc.nome)}</h1>
+      <h1 className="v3-display">{realce(p.titulo || p.doc.nome)}</h1>
       <span className="ponto" />
     </Pag3>
   );
 }
 
-/** Índice: "Índice" em serifa à esquerda, a lista à direita. */
+/** Índice: "Índice" grande à esquerda, a lista à direita. */
 export function Indice3(p) {
   const itens = (p.indice || []).map((nome, i) => [nome, i + 1]).filter(([, i]) => i > 2);
   return (
     <Pag3 {...p}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.25fr", gap: 40, flex: 1 }}>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <h2 className="v3-serif" style={{ fontSize: 120, lineHeight: 0.9 }}>Ín<em>dice</em></h2>
+          <h2 className="v3-display" style={{ fontSize: 84, lineHeight: 0.9 }}>Índice</h2>
           <p className="v3-p" style={{ color: "var(--cinza)", maxWidth: 230 }}>{p.doc.descricao}</p>
         </div>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
           {itens.map(([nome, i]) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "54px 1fr", alignItems: "baseline", padding: "11px 0", borderBottom: "1px solid var(--linha)" }}>
-              <span className="v3-serif" style={{ fontSize: 22, fontStyle: "italic", color: "var(--ac)" }}>{nn(i)}</span>
+              <span className="v3-display" style={{ fontSize: 15, color: "var(--ac)" }}>{nn(i)}</span>
               <span style={{ fontSize: 19, fontWeight: 300, letterSpacing: -0.3 }}>{nome}</span>
             </div>
           ))}

@@ -1,7 +1,7 @@
 import React from "react";
 import { Logo, hexRgb, rgbCmyk, tintaSobre, useFontes } from "./base";
 import { acentoDe } from "./base2";
-import { Cab, Capa3, Foto, Indice3, Pag3, PostInsta, Rot, nn, ou3, serif } from "./base3";
+import { Cab, Capa3, Foto, Indice3, Pag3, PostInsta, Rot, nn, ou3, realce } from "./base3";
 
 // Manual de identidade e Brand board, V3. Mesmos dados das outras versões; destaque na cor do cliente.
 
@@ -20,10 +20,10 @@ function Conceito(p) {
   return (
     <Pag3 {...p} fundo="escuro">
       <Rot>{nn(p.n)} — Conceito</Rot>
-      <p className="v3-serif" style={{ fontSize: 50, lineHeight: 1.06, maxWidth: 600, whiteSpace: "pre-line" }}>{ou3(p.g.conceito, "O que a identidade quer transmitir, e por quê.")}</p>
+      <p className="v3-display" style={{ fontSize: 35, lineHeight: 1.06, maxWidth: 600, whiteSpace: "pre-line" }}>{ou3(p.g.conceito, "O que a identidade quer transmitir, e por quê.")}</p>
       <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 0 }}>
         {lista.map((w, i) => (
-          <p key={i} className="v3-serif" style={{ fontSize: 112, fontStyle: "italic", lineHeight: 0.98, color: i === 0 ? "var(--ac)" : undefined }}>{ou3(w, `palavra ${i + 1}`)}</p>
+          <p key={i} className="v3-display" style={{ fontSize: 78, lineHeight: 0.98, color: i === 0 ? "var(--ac)" : undefined }}>{ou3(w, `palavra ${i + 1}`)}</p>
         ))}
       </div>
     </Pag3>
@@ -41,7 +41,7 @@ function LogoPag(p) {
         {p.g.versoes.map((v, i) => (
           <div key={i}>
             <div className="v3-card" style={{ height: 150, padding: 22 }}><Foto src={v.img} contain raio={0} vazio={v.nome || "Versão"} /></div>
-            <p style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "baseline" }}><span className="v3-serif" style={{ fontStyle: "italic", fontSize: 18, color: "var(--ac)" }}>{nn(i + 1)}</span><span style={{ fontSize: 12.5 }}>{ou3(v.nome, "Versão")}</span></p>
+            <p style={{ marginTop: 12, display: "flex", gap: 8, alignItems: "baseline" }}><span className="v3-display" style={{ fontSize: 13, color: "var(--ac)" }}>{nn(i + 1)}</span><span style={{ fontSize: 12.5 }}>{ou3(v.nome, "Versão")}</span></p>
           </div>
         ))}
       </div>
@@ -63,7 +63,7 @@ function UsoLogo(p) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}>
         {[[p.g.minImpresso, "Impresso", 40], [p.g.minDigital, "Digital", 26]].map(([v, r, a]) => (
           <div key={r} style={{ borderTop: "1px solid var(--linha)", paddingTop: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-            <div><Rot>Mínimo · {r}</Rot><p className="v3-serif" style={{ fontSize: 58, marginTop: 10 }}>{ou3(v, "—")}</p></div>
+            <div><Rot>Mínimo · {r}</Rot><p className="v3-display" style={{ fontSize: 41, marginTop: 10 }}>{ou3(v, "—")}</p></div>
             <Logo g={p.g} nome={p.nome} altura={a} />
           </div>
         ))}
@@ -88,7 +88,7 @@ function NaoFazer(p) {
               <div style={estilo}><Logo g={p.g} nome={p.nome} altura={46} /></div>
               <span style={{ position: "absolute", top: 12, right: 12, width: 24, height: 24, borderRadius: 99, background: "#121212", color: "#fff", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center" }}>×</span>
             </div>
-            <p style={{ marginTop: 10, fontSize: 12.5 }}><span className="v3-serif" style={{ fontStyle: "italic", fontSize: 17, color: "var(--ac)", marginRight: 8 }}>{nn(i + 1)}</span>{nomeErro}</p>
+            <p style={{ marginTop: 10, fontSize: 12.5 }}><span className="v3-display" style={{ fontSize: 12, color: "var(--ac)", marginRight: 8 }}>{nn(i + 1)}</span>{nomeErro}</p>
           </div>
         ))}
       </div>
@@ -112,14 +112,14 @@ function Cores(p) {
       <div style={{ display: "grid", gridTemplateColumns: "1.25fr 1fr", gap: 14, flex: 1 }}>
         {prim && (
           <div style={{ background: hexRgb(prim.hex) ? prim.hex : "#ddd", color: tintaSobre(prim.hex), borderRadius: 26, padding: 26, display: "flex", flexDirection: "column", justifyContent: "space-between", boxShadow: "var(--sombra)" }}>
-            <p className="v3-serif" style={{ fontSize: 64 }}>{serif(`*${prim.nome || "Principal"}*`)}</p>
+            <p className="v3-display" style={{ fontSize: 45 }}>{realce(`*${prim.nome || "Principal"}*`)}</p>
             <div><p style={{ fontSize: 12.5, fontWeight: 300, marginBottom: 14, maxWidth: 220 }}>{prim.uso}</p><Codigos c={prim} /></div>
           </div>
         )}
         <div style={{ display: "grid", gridTemplateRows: `repeat(${Math.max(1, resto.length)}, 1fr)`, gap: 14 }}>
           {resto.map((c, i) => (
             <div key={i} style={{ background: hexRgb(c.hex) ? c.hex : "#ddd", color: tintaSobre(c.hex), borderRadius: 22, padding: "18px 20px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", boxShadow: "var(--sombra), inset 0 0 0 1px rgba(0,0,0,0.05)" }}>
-              <div><p className="v3-serif" style={{ fontSize: 32, fontStyle: "italic" }}>{c.nome || `Cor ${i + 2}`}</p><p style={{ fontSize: 11, fontWeight: 300, marginTop: 4, opacity: 0.85 }}>{c.uso}</p></div>
+              <div><p className="v3-display" style={{ fontSize: 22 }}>{c.nome || `Cor ${i + 2}`}</p><p style={{ fontSize: 11, fontWeight: 300, marginTop: 4, opacity: 0.85 }}>{c.uso}</p></div>
               <Codigos c={c} />
             </div>
           ))}
@@ -155,7 +155,7 @@ function Tipografia(p) {
       <div style={{ display: "flex", flexDirection: "column", marginTop: "auto" }}>
         {[["48", ft, 44, 600, "A marca em uma frase"], ["22", ft, 22, 400, "Um subtítulo que explica em uma linha"], ["14", fx, 14, 400, "Texto corrido para documentos, site e legendas, com linhas curtas e respiro."]].map(([pt, f, s, w, t]) => (
           <div key={pt} style={{ display: "grid", gridTemplateColumns: "64px 1fr", alignItems: "baseline", borderTop: "1px solid var(--linha)", padding: "16px 0" }}>
-            <span className="v3-serif" style={{ fontStyle: "italic", fontSize: 20, color: "var(--ac)" }}>{pt}</span>
+            <span className="v3-display" style={{ fontSize: 14, color: "var(--ac)" }}>{pt}</span>
             <p style={{ fontFamily: f, fontSize: s, fontWeight: w, lineHeight: 1.15, letterSpacing: s > 30 ? -1.2 : 0 }}>{t}</p>
           </div>
         ))}
@@ -194,8 +194,8 @@ function Fotografia(p) {
         <Foto src={c} vazio="03" raio={22} /><Foto src={d} vazio="04" raio={22} />
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}>
-        <div><p className="v3-serif" style={{ fontSize: 34, marginBottom: 8 }}><em>Usamos</em></p>{lista(p.g.fotoFaz, false, "Ex.: luz natural")}</div>
-        <div><p className="v3-serif" style={{ fontSize: 34, marginBottom: 8 }}><em>Evitamos</em></p>{lista(p.g.fotoEvita, true, "Ex.: banco de imagem")}</div>
+        <div><p className="v3-display" style={{ fontSize: 24, marginBottom: 8 }}><em>Usamos</em></p>{lista(p.g.fotoFaz, false, "Ex.: luz natural")}</div>
+        <div><p className="v3-display" style={{ fontSize: 24, marginBottom: 8 }}><em>Evitamos</em></p>{lista(p.g.fotoEvita, true, "Ex.: banco de imagem")}</div>
       </div>
     </Pag3>
   );
@@ -209,7 +209,7 @@ function Aplicacoes(p) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 250px", gap: 18, alignItems: "start" }}>
         <div>
           <div style={{ height: 330 }}><Foto src={prim?.img} vazio={prim?.nome || "Aplicação"} raio={24} /></div>
-          <p style={{ fontSize: 12.5, marginTop: 10 }}><span className="v3-serif" style={{ fontStyle: "italic", fontSize: 17, color: "var(--ac)", marginRight: 8 }}>01</span>{prim?.nome}</p>
+          <p style={{ fontSize: 12.5, marginTop: 10 }}><span className="v3-display" style={{ fontSize: 12, color: "var(--ac)", marginRight: 8 }}>01</span>{prim?.nome}</p>
         </div>
         <PostInsta marca={p.g.marca || p.nome} alturaImg={250} imagem={<Foto src={seg?.img} vazio={seg?.nome || "Post"} raio={0} />} legenda={seg?.nome || "A marca aplicada nas redes."} />
       </div>
@@ -217,7 +217,7 @@ function Aplicacoes(p) {
         {resto.slice(0, 4).map((a, i) => (
           <div key={i}>
             <div style={{ height: 150 }}><Foto src={a.img} vazio={a.nome || "Aplicação"} raio={18} /></div>
-            <p style={{ fontSize: 12, marginTop: 8 }}><span className="v3-serif" style={{ fontStyle: "italic", fontSize: 16, color: "var(--ac)", marginRight: 6 }}>{nn(i + 3)}</span>{a.nome}</p>
+            <p style={{ fontSize: 12, marginTop: 8 }}><span className="v3-display" style={{ fontSize: 12, color: "var(--ac)", marginRight: 6 }}>{nn(i + 3)}</span>{a.nome}</p>
           </div>
         ))}
       </div>
@@ -249,7 +249,7 @@ function Board(p) {
   return (
     <Pag3 {...p} estilo={{ gap: 14, paddingTop: 96 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 14 }}>
-        <h2 className="v3-serif" style={{ fontSize: 76 }}>Brand <em>board</em></h2>
+        <h2 className="v3-display" style={{ fontSize: 53 }}>Brand <em>board</em></h2>
         <p className="v3-rot">{p.g.marca || p.nome}</p>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 14, height: 280 }}>
@@ -259,7 +259,7 @@ function Board(p) {
       <div style={{ display: "flex", gap: 10, height: 150 }}>
         {cores.map((c, i) => (
           <div key={i} style={{ flex: i === 0 ? 1.8 : 1, background: hexRgb(c.hex) ? c.hex : "#ddd", color: tintaSobre(c.hex), borderRadius: 20, padding: "14px 14px", display: "flex", flexDirection: "column", justifyContent: "space-between", boxShadow: "var(--sombra)" }}>
-            <p className="v3-serif" style={{ fontSize: i === 0 ? 30 : 20, fontStyle: "italic" }}>{c.nome}</p>
+            <p className="v3-display" style={{ fontSize: i === 0 ? 30 : 20 }}>{c.nome}</p>
             <p style={{ fontSize: 9.5, letterSpacing: 0.8, opacity: 0.85 }}>{(c.hex || "").toUpperCase()}</p>
           </div>
         ))}

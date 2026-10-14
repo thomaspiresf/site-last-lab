@@ -13,9 +13,9 @@ function Objetivo(p) {
   return (
     <Pag3 {...p}>
       <Rot>{nn(p.n)} — Para que postar</Rot>
-      <p className="v3-serif" style={{ fontSize: 72, lineHeight: 1, whiteSpace: "pre-line", marginTop: 30 }}>{ou3(p.g.objetivo, "O que as redes precisam fazer pela marca.")}</p>
+      <p className="v3-display" style={{ fontSize: 50, lineHeight: 1, whiteSpace: "pre-line", marginTop: 30 }}>{ou3(p.g.objetivo, "O que as redes precisam fazer pela marca.")}</p>
       <div className="v3-card" style={{ marginTop: "auto", padding: "26px 28px", display: "grid", gridTemplateColumns: "150px 1fr", gap: 24 }}>
-        <p className="v3-serif" style={{ fontSize: 34 }}><em>Para quem</em></p>
+        <p className="v3-display" style={{ fontSize: 24 }}><em>Para quem</em></p>
         <p className="v3-p" style={{ fontSize: 15 }}>{ou3(p.g.publico, "Quem a gente quer alcançar, o que procura e o que trava.")}</p>
       </div>
     </Pag3>
@@ -36,7 +36,7 @@ function Pilares(p) {
           <div key={i} className="v3-card" style={{ padding: "22px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <span style={{ width: 12, height: 12, borderRadius: 99, background: COR_PILAR[i % 5], marginTop: 8 }} />
-              <p className="v3-serif" style={{ fontSize: 78, fontStyle: "italic", lineHeight: 0.85 }}>{Math.round(((Number(x.peso) || 0) / total) * 100)}<span style={{ fontSize: 34 }}>%</span></p>
+              <p className="v3-display" style={{ fontSize: 55, lineHeight: 0.85 }}>{Math.round(((Number(x.peso) || 0) / total) * 100)}<span style={{ fontSize: 34 }}>%</span></p>
             </div>
             <p style={{ fontSize: 22, fontWeight: 500, letterSpacing: -0.5, marginTop: "auto" }}>{ou3(x.nome, "Pilar")}</p>
             <p style={{ fontSize: 12, fontWeight: 400, color: "var(--cinza)" }}>{ou3(x.objetivo, "Objetivo")}</p>
@@ -60,7 +60,7 @@ function Semana(p) {
           const itens = porDia(d);
           return (
             <div key={d} style={{ borderRadius: 18, background: itens.length ? "#fff" : "transparent", border: itens.length ? 0 : "1px dashed var(--linha)", boxShadow: itens.length ? "var(--sombra)" : undefined, padding: "14px 8px", display: "flex", flexDirection: "column", gap: 8 }}>
-              <p className="v3-serif" style={{ fontSize: 24, fontStyle: "italic", textAlign: "center", marginBottom: 6, color: itens.length ? "var(--tinta)" : "var(--cinza)" }}>{d}</p>
+              <p className="v3-display" style={{ fontSize: 17, textAlign: "center", marginBottom: 6, color: itens.length ? "var(--tinta)" : "var(--cinza)" }}>{d}</p>
               {itens.map((x, j) => (
                 <div key={j} style={{ background: corDoPilar(p.g.pilares, x.pilar), color: ["#121212"].includes(corDoPilar(p.g.pilares, x.pilar)) ? "#fff" : "#121212", borderRadius: 12, padding: "10px 8px" }}>
                   <p style={{ fontSize: 11.5, fontWeight: 600, lineHeight: 1.15 }}>{ou3(x.formato, "Formato")}</p>
@@ -94,7 +94,7 @@ function Legenda(p) {
             const [t, ...r] = x.split(":");
             return (
               <div key={i} style={{ padding: "16px 0", borderBottom: "1px solid var(--linha)" }}>
-                <p className="v3-serif" style={{ fontSize: 40 }}><em style={{ color: "var(--ac)", marginRight: 10 }}>{i + 1}</em>{t}</p>
+                <p className="v3-display" style={{ fontSize: 28 }}><em style={{ color: "var(--ac)", marginRight: 10 }}>{i + 1}</em>{t}</p>
                 {r.length > 0 && <p className="v3-p" style={{ color: "var(--cinza)", marginTop: 4 }}>{r.join(":").trim()}</p>}
               </div>
             );
@@ -136,7 +136,7 @@ function Templates(p) {
           {t.slice(0, 4).map((x, i) => (
             <div key={i}>
               <div style={{ aspectRatio: "4 / 5" }}><Foto src={x.img} vazio={x.nome || "Template"} raio={16} /></div>
-              <p style={{ fontSize: 11.5, marginTop: 8 }}><span className="v3-serif" style={{ fontStyle: "italic", fontSize: 16, color: "var(--ac)", marginRight: 6 }}>{nn(i + 1)}</span>{x.nome}</p>
+              <p style={{ fontSize: 11.5, marginTop: 8 }}><span className="v3-display" style={{ fontSize: 12, color: "var(--ac)", marginRight: 6 }}>{nn(i + 1)}</span>{x.nome}</p>
             </div>
           ))}
         </div>
@@ -163,7 +163,7 @@ function Metricas(p) {
         {m.map((x, i) => (
           <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 220px", gap: 24, alignItems: "end", padding: "22px 0", borderTop: "1px solid var(--linha)" }}>
             <div><p style={{ fontSize: 20, fontWeight: 400 }}>{ou3(x.nome, "Métrica")}</p><p style={{ fontSize: 12, fontWeight: 300, color: "var(--cinza)", marginTop: 4 }}>{x.porque}</p></div>
-            <p className="v3-serif" style={{ fontSize: 72, fontStyle: "italic", textAlign: "right", color: x.meta ? "var(--ac)" : undefined }}>{ou3(x.meta, "—")}</p>
+            <p className="v3-display" style={{ fontSize: 50, textAlign: "right", color: x.meta ? "var(--ac)" : undefined }}>{ou3(x.meta, "—")}</p>
           </div>
         ))}
       </div>

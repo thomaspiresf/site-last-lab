@@ -25,14 +25,14 @@ function Mapa(p) {
           {pts.map(([a, b], i) => (
             <g key={i}>
               <circle cx={a} cy={b} r="7" fill="#fff" stroke={Number(e[i].humor) <= 2 ? "#121212" : "var(--ac)"} strokeWidth="3" />
-              <text x={a} y={b - 16} textAnchor="middle" fontSize="15" fontStyle="italic" fill="#121212" fontFamily="Instrument Serif">{HUMOR[Number(e[i].humor) || 3]}</text>
+              <text x={a} y={b - 16} textAnchor="middle" fontSize="10.5" fontWeight="500" fill="#121212" fontFamily="Poppins">{HUMOR[Number(e[i].humor) || 3]}</text>
             </g>
           ))}
         </svg>
         <div style={{ display: "grid", gridTemplateColumns: `repeat(${n}, 1fr)`, borderTop: "1px solid var(--linha)" }}>
           {e.map((s, i) => (
             <div key={i} style={{ padding: "14px 10px 16px", borderLeft: i ? "1px solid var(--linha)" : 0, textAlign: "center" }}>
-              <p className="v3-serif" style={{ fontSize: 26, fontStyle: "italic", color: "var(--ac)", lineHeight: 1 }}>{i + 1}</p>
+              <p className="v3-display" style={{ fontSize: 18, color: "var(--ac)", lineHeight: 1 }}>{i + 1}</p>
               <p style={{ fontSize: 12, fontWeight: 500, marginTop: 6, lineHeight: 1.2 }}>{ou3(s.nome, "Etapa")}</p>
             </div>
           ))}
@@ -61,7 +61,7 @@ function Etapas(parte) {
           {lista.map(([s, i]) => (
             <div key={i} className="v3-card" style={{ padding: "18px 22px 20px" }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 14 }}>
-                <span className="v3-serif" style={{ fontSize: 50, fontStyle: "italic", color: "var(--ac)", lineHeight: 0.9 }}>{i + 1}</span>
+                <span className="v3-display" style={{ fontSize: 35, color: "var(--ac)", lineHeight: 0.9 }}>{i + 1}</span>
                 <p style={{ fontSize: 22, fontWeight: 500, letterSpacing: -0.5 }}>{ou3(s.nome, "Etapa")}</p>
                 <p style={{ marginLeft: "auto", fontSize: 10.5, color: "var(--cinza)" }}>{HUMOR[Number(s.humor) || 3]}</p>
               </div>
@@ -91,7 +91,7 @@ function Mensagens(p) {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <Cab p={p} t="Mensagens *prontas*" lead="O tom da marca em cada momento da jornada." tamanho={84} />
           <div style={{ marginTop: "auto" }}>
-            {p.g.mensagens.map((m, i) => <p key={i} style={{ padding: "12px 0", borderBottom: "1px solid var(--linha)", fontSize: 13 }}><span className="v3-serif" style={{ fontStyle: "italic", fontSize: 20, color: "var(--ac)", marginRight: 10 }}>{nn(i + 1)}</span>{m.momento}</p>)}
+            {p.g.mensagens.map((m, i) => <p key={i} style={{ padding: "12px 0", borderBottom: "1px solid var(--linha)", fontSize: 13 }}><span className="v3-display" style={{ fontSize: 14, color: "var(--ac)", marginRight: 10 }}>{nn(i + 1)}</span>{m.momento}</p>)}
           </div>
         </div>
         <Celular largura={300} altura={860}><Whats nome="Cliente" itens={itens} altura={820} /></Celular>
@@ -114,7 +114,7 @@ function PosVenda(p) {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginTop: "auto" }}>
         {itens.map(([r, v, ph], i) => (
           <div key={r} className="v3-card" style={{ padding: "22px 20px", minHeight: 280, display: "flex", flexDirection: "column", gap: 10 }}>
-            <p className="v3-serif" style={{ fontSize: 60, fontStyle: "italic", color: "var(--ac)", lineHeight: 0.9 }}>{nn(i + 1)}</p>
+            <p className="v3-display" style={{ fontSize: 42, color: "var(--ac)", lineHeight: 0.9 }}>{nn(i + 1)}</p>
             <p style={{ fontSize: 20, fontWeight: 500 }}>{r}</p>
             <p className="v3-p" style={{ fontSize: 12.5, color: "#c9c8c3" }}>{ou3(v, ph)}</p>
           </div>

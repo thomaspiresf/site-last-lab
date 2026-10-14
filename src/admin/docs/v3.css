@@ -1,4 +1,4 @@
-/* Entregáveis V3: editorial contemporâneo. A4 794×1123, margens de 80, serifa grande contra sans fina. */
+/* Entregáveis V3: editorial contemporâneo, só Poppins. A4 794×1123, margens de 80, contraste de peso e tamanho. */
 
 .v3-pag {
   --ac: #ef4b3a; --tinta: #121212; --papel: #f6f5f1; --cinza: #7a7a7f; --linha: rgba(18, 18, 18, 0.12);
@@ -13,8 +13,8 @@
 .v3-pag.v3-escuro { background: var(--tinta); color: #f3f2ee; --cinza: #8f8f94; --linha: rgba(255, 255, 255, 0.14); }
 .v3-pag.v3-acento { background: var(--ac); color: var(--tinta); --cinza: rgba(18, 18, 18, 0.62); --linha: rgba(18, 18, 18, 0.22); }
 
-.v3-serif { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; letter-spacing: -0.02em; line-height: 0.95; }
-.v3-serif em, .v3-pag .v3-serif em { font-family: "Instrument Serif", Georgia, serif !important; font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+.v3-display { font-family: "Poppins", Arial, sans-serif; font-weight: 200; letter-spacing: -0.05em; line-height: 1; font-style: normal; }
+.v3-display em { font-style: normal; font-weight: 600; letter-spacing: -0.055em; }
 
 /* cabeçalho discreto */
 .v3-cabeca { position: absolute; top: 44px; left: 80px; right: 80px; display: grid; grid-template-columns: 1fr auto 1fr;
@@ -44,7 +44,7 @@
 .v3-capa .topo img { width: 92px; height: 24px; object-fit: contain; object-position: left; filter: invert(1); }
 .v3-capa .meio { margin-top: 210px; display: flex; flex-direction: column; gap: 12px; }
 .v3-capa .cliente { font-size: 22px; font-weight: 300; letter-spacing: -0.3px; }
-.v3-capa h1 { font-size: 136px; line-height: 0.86; letter-spacing: -0.035em; margin-top: auto; }
+.v3-capa h1 { font-size: 96px; line-height: 0.95; letter-spacing: -0.06em; margin-top: auto; }
 .v3-capa h1 em { color: var(--ac); }
 .v3-capa .ponto { position: absolute; right: 80px; top: 300px; width: 120px; height: 120px; border-radius: 50%; background: var(--ac); }
 
@@ -107,7 +107,7 @@
 /* listas */
 .v3-lista { display: flex; flex-direction: column; }
 .v3-lista > div { display: grid; grid-template-columns: 64px 1fr; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--linha); }
-.v3-lista .n { font-family: "Instrument Serif", Georgia, serif; font-style: italic; font-size: 26px; color: var(--ac); line-height: 1; }
+.v3-lista .n { font-weight: 200; font-size: 22px; letter-spacing: -0.04em; color: var(--ac); line-height: 1; }
 .v3-acento .v3-lista .n { color: var(--tinta); }
 .v3-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 500; padding: 5px 11px; border-radius: 999px; background: rgba(18, 18, 18, 0.06); }
 .v3-escuro .v3-chip { background: rgba(255, 255, 255, 0.1); }

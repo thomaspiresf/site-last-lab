@@ -17,7 +17,7 @@ function Processo(p) {
           const ultimo = i === e.length - 1;
           return (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "130px 1fr", gap: 20, alignItems: "center", padding: "14px 0", borderBottom: "1px solid var(--linha)" }}>
-              <p className="v3-serif" style={{ fontSize: 110, fontStyle: "italic", lineHeight: 0.8, color: ultimo ? "var(--ac)" : "var(--tinta)", opacity: ultimo ? 1 : 0.14 + i * 0.22 }}>{i + 1}</p>
+              <p className="v3-display" style={{ fontSize: 77, lineHeight: 0.8, color: ultimo ? "var(--ac)" : "var(--tinta)", opacity: ultimo ? 1 : 0.14 + i * 0.22 }}>{i + 1}</p>
               <div>
                 <p style={{ fontSize: 24, fontWeight: 500, letterSpacing: -0.6 }}>{ou3(x.nome, "Etapa")}</p>
                 <p className="v3-p" style={{ color: "var(--cinza)", marginTop: 4 }}>{ou3(x.meta, "Objetivo da etapa")}</p>
@@ -43,7 +43,7 @@ function Reuniao(parte) {
           {lista.map(([b, i, ini]) => (
             <div key={i} className="v3-card" style={{ padding: "20px 24px", display: "grid", gridTemplateColumns: "120px 1fr", gap: 20 }}>
               <div>
-                <p className="v3-serif" style={{ fontSize: 44, fontStyle: "italic", color: "var(--ac)", lineHeight: 1 }}>{relogio(ini)}</p>
+                <p className="v3-display" style={{ fontSize: 31, color: "var(--ac)", lineHeight: 1 }}>{relogio(ini)}</p>
                 <p className="v3-rot" style={{ marginTop: 6 }}>{b.tempo || "—"}</p>
               </div>
               <div>
@@ -70,7 +70,7 @@ function Objecoes(p) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         {p.g.objecoes.map((o, i) => (
           <div key={i} className="v3-card" style={{ padding: "22px 22px", display: "flex", flexDirection: "column", gap: 12, minHeight: 230 }}>
-            <p className="v3-serif" style={{ fontSize: 36, lineHeight: 1 }}><em>“{ou3(o.objecao, "Objeção")}”</em></p>
+            <p className="v3-display" style={{ fontSize: 25, lineHeight: 1 }}><em>“{ou3(o.objecao, "Objeção")}”</em></p>
             <p className="v3-p" style={{ fontSize: 12.5 }}>{ou3(o.resposta, "Como responder.")}</p>
             <p style={{ marginTop: "auto", alignSelf: "flex-start", fontSize: 11.5, fontWeight: 500, background: "var(--ac)", color: "#121212", padding: "7px 12px", borderRadius: 14, lineHeight: 1.35 }}>{ou3(o.pergunta, "Pergunta para seguir")}</p>
           </div>
@@ -91,7 +91,7 @@ function Followup(p) {
           <div style={{ display: "flex", flexDirection: "column", marginTop: "auto" }}>
             {f.map((x, i) => (
               <div key={i} style={{ display: "grid", gridTemplateColumns: "120px 1fr", padding: "10px 0", borderBottom: "1px solid var(--linha)", alignItems: "baseline" }}>
-                <p className="v3-serif" style={{ fontSize: 24, fontStyle: "italic", color: i === f.length - 1 ? "var(--tinta)" : "var(--ac)" }}>{x.quando}</p>
+                <p className="v3-display" style={{ fontSize: 17, color: i === f.length - 1 ? "var(--tinta)" : "var(--ac)" }}>{x.quando}</p>
                 <p style={{ fontSize: 12, color: "var(--cinza)" }}>{x.canal}</p>
               </div>
             ))}
@@ -113,7 +113,7 @@ function Mensagens(p) {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <Cab p={p} t="Mensagens *prontas*" lead="Para copiar, trocar o nome e enviar." tamanho={84} />
           <div style={{ marginTop: "auto", display: "flex", flexDirection: "column" }}>
-            {p.g.mensagens.map((m, i) => <p key={i} style={{ padding: "12px 0", borderBottom: "1px solid var(--linha)", fontSize: 13 }}><span className="v3-serif" style={{ fontStyle: "italic", fontSize: 20, color: "var(--ac)", marginRight: 10 }}>{nn(i + 1)}</span>{m.nome}</p>)}
+            {p.g.mensagens.map((m, i) => <p key={i} style={{ padding: "12px 0", borderBottom: "1px solid var(--linha)", fontSize: 13 }}><span className="v3-display" style={{ fontSize: 14, color: "var(--ac)", marginRight: 10 }}>{nn(i + 1)}</span>{m.nome}</p>)}
           </div>
         </div>
         <Celular largura={300} altura={860}><Whats nome={p.g.marca || "Sua marca"} itens={itens} altura={820} /></Celular>
