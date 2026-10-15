@@ -926,7 +926,11 @@ export async function criarApresentacaoManual({ nome, empresa, email, whatsapp, 
 /** Mensagem de prospecção para o WhatsApp, escrita pelo Claude a partir do diagnóstico e do produto escolhido. */
 export async function gerarMensagemProspeccao(id, produto, instrucao) {
   const { data, error } = await supabase.functions.invoke("gerar-prospeccao", { body: { id, produto, instrucao } });
-  if (error) throw error;
+  if (error) {
+    // a mensagem de verdade vem no corpo da resposta (o supabase-js só diz "non-2xx")
+    const corpo = await error.context?.json?.().catch(() => null);
+    throw new Error(corpo?.error || error.message);
+  }
   if (data?.error) throw new Error(data.error);
   return data.texto;
 }

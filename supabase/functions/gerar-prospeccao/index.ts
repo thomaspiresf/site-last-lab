@@ -95,7 +95,13 @@ Responda só com o texto da mensagem, pronto para enviar.`;
     headers: { "content-type": "application/json", "x-api-key": ANTHROPIC_API_KEY || "", "anthropic-version": "2023-06-01" },
     body: JSON.stringify({ model: "claude-sonnet-5-5", max_tokens: 1200, messages: [{ role: "user", content: prompt }] }),
   });
-  if (!res.ok) throw new Error(`Anthropic API error (${res.status}): ${await res.text()}`);
+  if (!res.ok) {
+    const corpo = await res.text();
+    if (/credit balance is too low/i.test(corpo)) throw new Error("A conta da Anthropic (Claude) está sem créditos. Recarregue em console.anthropic.com → Billing e tente de novo.");
+    if (res.status === 529 || res.status === 503) throw new Error("O Claude está sobrecarregado agora. Tente de novo em alguns segundos.");
+    if (res.status === 401) throw new Error("A chave da Anthropic (ANTHROPIC_API_KEY) no Supabase não é válida.");
+    throw new Error(`Erro da Anthropic (${res.status}): ${corpo.slice(0, 300)}`);
+  }
   const data = await res.json();
   return (data.content || []).filter((c: { type: string }) => c.type === "text").map((c: { text: string }) => c.text).join("").trim();
 }
