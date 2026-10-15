@@ -33,7 +33,7 @@ export const TEXTOS = {
     tituloMaterial: "O {material}", subMaterial: "{paginas} páginas feitas para a {empresa} usar no dia a dia.", subMaterialUnico: "A marca da {empresa} organizada numa página, pronta para usar.",
     tituloMateriais: "Os materiais", subMateriais: "Tudo o que fica com a {empresa} no fim do projeto.",
   },
-  paginas: { titulo: "{material}, página a página", sub: "{paginas} páginas pensadas para a {empresa}, do começo ao fim." },
+  paginas: { titulo: "{material}", sub: "{paginas} páginas" },
   sessao: { titulo: "Como é a sessão", sub: "2 horas, online, num quadro que a gente preenche juntos." },
   passo: {
     chapeu: "Investimento", total: "Investimento total",

@@ -985,7 +985,10 @@ function paginasDoMaterial(k) {
     if (!m) return null;
     return (
       <Slide escala={escala} d={d}>
-        <Titulo t={tx("paginas", "titulo", { material: m.doc.nome })} sub={tx("paginas", "sub", { paginas: m.lista.length, empresa: d.empresa || "sua marca" })} />
+        <div className="vt-cab-pp">
+          <p className="t">{tx("paginas", "titulo", { material: m.doc.nome })}</p>
+          <p className="s">{tx("paginas", "sub", { paginas: m.lista.length, empresa: d.empresa || "sua marca" })}</p>
+        </div>
         <TodasAsPaginas m={m} />
       </Slide>
     );
