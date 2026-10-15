@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
+import BotaoExcluir from "./components/BotaoExcluir";
 import { AREAS, ESTRUTURA, SERVICOS, degrauDoServico, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import {
@@ -110,7 +111,7 @@ export default function AdminDiagnosticos() {
   };
 
   const excluir = async (item) => {
-    if (!confirm(`Excluir o diagnóstico de ${item.nome}? A apresentação e os entregáveis dele também são apagados. Não dá para desfazer.`)) return;
+    // a confirmação é feita no próprio botão (BotaoExcluir)
     try {
       await deleteDiagnostico(item.id);
       setItens((prev) => prev.filter((x) => x.id !== item.id));
@@ -429,10 +430,7 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
               <option key={s.id} value={s.id}>{s.nome}</option>
             ))}
           </select>
-          <button type="button" onClick={onExcluir} title="Excluir diagnóstico"
-            className="p-2 rounded-xl text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors">
-            <Trash2 size={18} />
-          </button>
+          <BotaoExcluir onExcluir={onExcluir} titulo="Excluir diagnóstico" aviso="Excluir este lead, a apresentação e os entregáveis? Não dá para desfazer." />
         </div>
       </div>
 
@@ -627,10 +625,7 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
             </div>
           ))}
         </div>
-        <button type="button" onClick={onExcluir}
-          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-700">
-          <Trash2 size={14} /> Excluir diagnóstico
-        </button>
+        <div className="mt-5"><BotaoExcluir onExcluir={onExcluir} titulo="Excluir diagnóstico" aviso="Excluir este lead, a apresentação e os entregáveis? Não dá para desfazer." /></div>
       </details>
     </div>
   );

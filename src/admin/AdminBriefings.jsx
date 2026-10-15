@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { listBrandBriefs, deleteBrandBrief } from "../lib/api";
+import BotaoExcluir from "./components/BotaoExcluir";
 
 const BUSINESS_STAGE_LABEL = {
   tem_empresa: "Já tem uma empresa",
@@ -114,7 +115,6 @@ function BriefingCard({ briefing, onDeleted }) {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Excluir o briefing de ${briefing.name}?`)) return;
     setDeleting(true);
     try {
       await deleteBrandBrief(briefing.id);
@@ -162,15 +162,7 @@ function BriefingCard({ briefing, onDeleted }) {
           >
             <Download size={18} />
           </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            title="Excluir briefing"
-            className="text-zinc-400 hover:text-red-600 transition-colors disabled:opacity-40"
-          >
-            <Trash2 size={18} />
-          </button>
+          <BotaoExcluir onExcluir={handleDelete} titulo="Excluir briefing" aviso={`Excluir o briefing de ${briefing.name}? Não dá para desfazer.`} />
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
@@ -202,15 +194,7 @@ function BriefingCard({ briefing, onDeleted }) {
             </div>
           ))}
 
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-700 transition-colors disabled:opacity-40"
-          >
-            <Trash2 size={14} />
-            {deleting ? "Excluindo..." : "Excluir briefing"}
-          </button>
+          <BotaoExcluir onExcluir={handleDelete} titulo="Excluir briefing" aviso={`Excluir o briefing de ${briefing.name}? Não dá para desfazer.`} />
         </div>
       )}
     </div>
