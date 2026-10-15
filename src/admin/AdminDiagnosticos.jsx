@@ -22,11 +22,12 @@ import {
   Presentation,
   Plus,
   X,
+  Sparkles,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
 import BotaoExcluir from "./components/BotaoExcluir";
-import { AREAS, ESTRUTURA, SERVICOS, degrauDoServico, servicoCompleto } from "./catalogoOfertas";
+import { AREAS, ESTRUTURA, SERVICOS, areaDoServico, degrauDoServico, ofertaDoLead, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import {
   listDiagnosticos,
@@ -40,6 +41,8 @@ import {
   salvarOfertaEscolhida,
   getCatalogoOfertas,
   criarApresentacaoManual,
+  gerarMensagemProspeccao,
+  getDiagnostico,
 } from "../lib/api";
 
 // Leads do diagnóstico de marca (lastlab.com.br/diagnostico). A sugestão de oferta e o
@@ -344,6 +347,88 @@ function NovaApresentacao({ onFechar }) {
   );
 }
 
+const GRUPO_DEGRAU = { entrada: "Entrada", principal: "Projeto (degrau 2)", premium: "Premium (degrau 3)" };
+
+/**
+ * Mensagem de prospecção: escolhe o produto, o Claude escreve a mensagem a partir do diagnóstico
+ * (e do que foi visto de fora), você edita e abre no WhatsApp do lead. O último texto fica salvo
+ * em apresentacao.prospeccao.
+ */
+function BlocoProspeccao({ item }) {
+  const salvo = item.apresentacao?.prospeccao || {};
+  const [servico, setServico] = useState(salvo.servico || ofertaDoLead(item).servicoId);
+  const [texto, setTexto] = useState(salvo.texto || "");
+  const [instrucao, setInstrucao] = useState("");
+  const [gerando, setGerando] = useState(false);
+  const [erro, setErro] = useState("");
+  const [copiado, setCopiado] = useState(false);
+  const [pronto, setPronto] = useState(false);
+  useEffect(() => { carregarCatalogo().then(() => setPronto(true)).catch(() => setPronto(true)); }, []);
+
+  const opcoes = Object.keys(SERVICOS).map((k) => ({ id: k, s: servicoCompleto(k), grupo: GRUPO_DEGRAU[degrauDoServico(k)] || "Entrada" }));
+  const guardar = async (patch) => {
+    try {
+      const atual = await getDiagnostico(item.id);
+      await updateDiagnostico(item.id, { apresentacao: { ...(atual.apresentacao || {}), prospeccao: { servico, texto, ...patch } } });
+    } catch { /* o texto continua na tela */ }
+  };
+  const gerar = async () => {
+    const s = servicoCompleto(servico);
+    setGerando(true);
+    setErro("");
+    try {
+      const novo = await gerarMensagemProspeccao(item.id, { nome: s.nome, promessa: s.promessa, pitch: s.pitch, entregas: s.entregas, prazo: s.prazo, problema: AREAS[areaDoServico(servico)]?.problema }, instrucao.trim());
+      setTexto(novo);
+      guardar({ texto: novo });
+    } catch (e) {
+      setErro(e.message || "Não consegui gerar a mensagem.");
+    } finally {
+      setGerando(false);
+    }
+  };
+  const campo = "w-full px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm outline-none focus:border-black";
+  return (
+    <Bloco titulo="Mensagem de prospecção">
+      <p className="text-sm text-zinc-500 -mt-1 mb-3">Escolha o produto e gere uma mensagem explicando por que ele melhora os resultados deste cliente. Edite à vontade e envie pelo WhatsApp.</p>
+      <div className="grid sm:grid-cols-[1fr_auto] gap-2">
+        <select className={campo} value={servico} onChange={(e) => setServico(e.target.value)} disabled={!pronto}>
+          {Object.values(GRUPO_DEGRAU).map((g) => (
+            <optgroup key={g} label={g}>
+              {opcoes.filter((o) => o.grupo === g).map((o) => <option key={o.id} value={o.id}>{o.s.nome}</option>)}
+            </optgroup>
+          ))}
+        </select>
+        <button type="button" onClick={gerar} disabled={gerando}
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-black text-white text-sm font-semibold hover:bg-zinc-800 disabled:opacity-50">
+          <Sparkles size={15} /> {gerando ? "Escrevendo..." : texto ? "Gerar de novo" : "Gerar mensagem"}
+        </button>
+      </div>
+      <input className={`${campo} mt-2`} value={instrucao} onChange={(e) => setInstrucao(e.target.value)}
+        placeholder="Opcional: um pedido para a mensagem (ex.: mais curta, citar o Instagram, mais informal)" />
+      {erro && <p className="text-sm text-red-600 mt-2">{erro}</p>}
+      {texto && (
+        <>
+          <textarea className={`${campo} mt-3 leading-relaxed`} rows={10} value={texto}
+            onChange={(e) => setTexto(e.target.value)} onBlur={() => guardar({})} />
+          <div className="flex flex-wrap gap-2 mt-2 items-center">
+            {item.whatsapp
+              ? <a href={`${linkWhats(item.whatsapp)}?text=${encodeURIComponent(texto)}`} target="_blank" rel="noopener" onClick={() => guardar({ enviadoEm: new Date().toISOString() })}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#25D366] text-white text-sm font-semibold hover:brightness-95">
+                  <MessageCircle size={15} /> Abrir no WhatsApp
+                </a>
+              : <span className="text-xs text-zinc-400">Sem WhatsApp neste lead.</span>}
+            <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(texto); setCopiado(true); setTimeout(() => setCopiado(false), 1600); } catch { /* sem permissão */ } }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black">
+              {copiado ? <Check size={15} /> : <Copy size={15} />} {copiado ? "Copiado" : "Copiar"}
+            </button>
+            <span className="text-xs text-zinc-400 ml-auto">{texto.length} caracteres{salvo.enviadoEm ? ` · aberto no WhatsApp em ${new Date(salvo.enviadoEm).toLocaleDateString("pt-BR")}` : ""}</span>
+          </div>
+        </>
+      )}
+    </Bloco>
+  );
+}
+
 function Bloco({ titulo, acao, children, className = "" }) {
   return (
     <div className={`bg-white rounded-2xl border border-zinc-200/80 p-5 ${className}`}>
@@ -508,6 +593,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
       <Link to={`/admin/diagnosticos/${item.id}/guia-marca`} className="-mt-2 self-start text-xs font-semibold text-zinc-500 hover:text-black">
         Guia da marca (entregável do Posicionamento de marca) →
       </Link>
+
+      <BlocoProspeccao item={item} />
 
       <div className="grid md:grid-cols-2 gap-4 items-start">
         <div className="rounded-2xl bg-zinc-900 text-white p-5">

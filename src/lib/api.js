@@ -923,6 +923,14 @@ export async function criarApresentacaoManual({ nome, empresa, email, whatsapp, 
   return id;
 }
 
+/** Mensagem de prospecção para o WhatsApp, escrita pelo Claude a partir do diagnóstico e do produto escolhido. */
+export async function gerarMensagemProspeccao(id, produto, instrucao) {
+  const { data, error } = await supabase.functions.invoke("gerar-prospeccao", { body: { id, produto, instrucao } });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return data.texto;
+}
+
 export async function deleteDiagnostico(id) {
   const { error } = await supabase.from("diagnosticos").delete().eq("id", id);
   if (error) throw error;
