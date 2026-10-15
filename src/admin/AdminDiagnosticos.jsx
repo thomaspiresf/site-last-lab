@@ -217,7 +217,7 @@ export default function AdminDiagnosticos() {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <p className="font-bold text-black truncate">{x.nome}</p>
+                    <p className="font-bold text-black truncate">{x.nome}{x.apresentacao?.empresa && <span className="font-normal text-zinc-500"> · {x.apresentacao.empresa}</span>}</p>
                     <StatusPill status={x.status} />
                   </div>
                   <p className="text-sm font-semibold mt-1" style={{ color: LARANJA }}>
@@ -417,7 +417,7 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
         <div className="min-w-0">
           <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight">{item.nome}</h2>
           <p className="text-sm text-zinc-500 mt-1">
-            {[perfil.cargo, perfil.segmento, formatDate(item.createdAt)].filter(Boolean).join(" · ")}
+            {[item.apresentacao?.empresa, perfil.cargo, perfil.segmento, formatDate(item.createdAt)].filter(Boolean).join(" · ")}
           </p>
         </div>
         <div className="flex items-center gap-2">

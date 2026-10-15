@@ -859,7 +859,8 @@ function mapDiagnostico(row) {
     ofertaEscolhida: row.oferta_escolhida,
     personaAvaliacao: row.persona_avaliacao,
     personaSugerida: row.persona_sugerida,
-    apresentacao: row.apresentacao || {},
+    // a empresa respondida no diagnóstico preenche a da apresentação (e dos entregáveis) até ser trocada
+    apresentacao: { ...(row.apresentacao || {}), empresa: row.apresentacao?.empresa || row.dados?.empresa || "" },
   };
 }
 

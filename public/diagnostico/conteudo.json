@@ -17,6 +17,11 @@
       "comentario": "Veja, {nome}: conforme você responde, seu resultado já vai sendo preenchido automaticamente."
     },
     {
+      "id": "empresa",
+      "pergunta": "E qual é o nome da sua empresa?",
+      "tipo": "texto"
+    },
+    {
       "id": "cargo",
       "pergunta": "Qual é a sua posição na empresa?",
       "tipo": "escolha",
