@@ -726,3 +726,37 @@
 @keyframes caso-entra { from { opacity: 0; scale: .82; } to { opacity: 1; scale: 1; } }
 @keyframes caso-pop { from { opacity: 0; scale: .55; translate: 0 40px; } to { opacity: 1; scale: 1; translate: 0 0; } }
 @keyframes caso-zoom { from { scale: 1.35; } to { scale: 1; } }
+
+/* ---------- visão externa: a cada clique, um achado ampliado ---------- */
+.vx-zoom { display: none; }
+.apr-show.animado.em-passos .vx-zoom { display: grid; visibility: hidden; position: absolute; left: 81px; top: 300px; width: 1758px; height: 620px; z-index: 5;
+  grid-template-columns: 1100px 1fr; gap: 64px; align-items: center; background: var(--claro); transform-origin: var(--ox) 200px; }
+.vx-zoom .foto { height: 620px; border-radius: 38px; overflow: hidden; background: #e7e6e6; display: flex; align-items: center; justify-content: center; }
+.vx-zoom .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vx-zoom .txt { display: flex; flex-direction: column; gap: 22px; padding-right: 20px; }
+.vx-zoom .n { font-size: 30px; font-weight: 600; color: #ef4b3a; letter-spacing: 2px; }
+.vx-zoom .n span { color: #c4c4c8; font-weight: 300; }
+.vx-zoom .t { font-size: 56px; line-height: 1.15; color: #0a0a0a; letter-spacing: -1px; }
+.vx-zoom .x { font-size: 32px; line-height: 1.35; color: #77777f; }
+.apr-show.animado.em-passos.passo-1 .vx-zoom.vx-0 { visibility: visible; animation: vx-abre .8s cubic-bezier(.16, 1, .3, 1) both; }
+.apr-show.animado.em-passos.passo-1 .vx-zoom.vx-0 .txt > * { animation: apr-sobe .6s cubic-bezier(.2, .7, .2, 1) both; }
+.apr-show.animado.em-passos.passo-2 .vx-zoom.vx-1 { visibility: visible; animation: vx-abre .8s cubic-bezier(.16, 1, .3, 1) both; }
+.apr-show.animado.em-passos.passo-2 .vx-zoom.vx-1 .txt > * { animation: apr-sobe .6s cubic-bezier(.2, .7, .2, 1) both; }
+.apr-show.animado.em-passos.passo-3 .vx-zoom.vx-2 { visibility: visible; animation: vx-abre .8s cubic-bezier(.16, 1, .3, 1) both; }
+.apr-show.animado.em-passos.passo-3 .vx-zoom.vx-2 .txt > * { animation: apr-sobe .6s cubic-bezier(.2, .7, .2, 1) both; }
+.apr-show.animado.em-passos .vx-zoom .txt > *:nth-child(2) { animation-delay: .25s !important; }
+.apr-show.animado.em-passos .vx-zoom .txt > *:nth-child(3) { animation-delay: .38s !important; }
+.apr-show.animado.em-passos .vx-zoom .txt > *:nth-child(1) { animation-delay: .15s !important; }
+@keyframes vx-abre { from { opacity: 0; scale: .45; } to { opacity: 1; scale: 1; } }
+
+/* ---------- investimento: o cartão de preço entra deslizando ---------- */
+.apr-show.animado .apr-slide > .apr-preco { animation: preco-entra 1s cubic-bezier(.16, 1, .3, 1) .35s both !important; }
+@keyframes preco-entra { from { opacity: 0; translate: 140px 0; scale: .96; } to { opacity: 1; translate: 0 0; scale: 1; } }
+
+/* ---------- cronograma: a linha se desenha e cada etapa entra quando ela chega ---------- */
+.apr-show.animado .apr-slide > .crono-linha { transform-origin: left center; animation: crono-linha 1.6s cubic-bezier(.45, 0, .2, 1) .5s both !important; }
+.apr-show.animado .apr-slide > .apr-crono2 { animation: apr-sobe .6s cubic-bezier(.2, .7, .2, 1) both !important; animation-delay: calc(.5s + 1.6s * var(--f, 0) - .15s) !important; }
+.apr-show.animado .apr-crono2 .marco { animation: crono-marco .5s cubic-bezier(.34, 1.56, .64, 1) both; animation-delay: calc(.5s + 1.6s * var(--f, 0)); }
+.apr-show.animado .apr-slide > .apr-crono2-nota { animation: apr-surge .6s ease 2.3s both !important; }
+@keyframes crono-linha { from { scale: 0 1; } to { scale: 1 1; } }
+@keyframes crono-marco { from { opacity: 0; scale: 0; } to { opacity: 1; scale: 1; } }

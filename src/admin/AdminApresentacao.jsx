@@ -91,7 +91,14 @@ export default function AdminApresentacao() {
   // ordem e ocultos: os do lead, ou o padrão de Produtos e serviços
   const ordem = ap?.ordem?.length ? ap.ordem : ESTRUTURA.ordem;
   const ocultos = ap?.ocultos ?? ESTRUTURA.ocultos;
-  const todos = useMemo(() => (dados ? ordenarSlides(SLIDES.filter(([, , quando]) => !quando || quando(dados)).map(([sid, S]) => Object.assign((props) => <S d={dados} {...props} />, { sid })), ordem) : []), [dados, ordem]);
+  // cada slide é um componente estável (um por sid) que lê os dados atuais de uma referência: quando os
+  // dados recarregam (foco na janela, links das imagens), o slide atualiza sem ser remontado, e a
+  // animação de entrada não recomeça no meio da apresentação
+  const dadosRef = useRef(dados);
+  dadosRef.current = dados;
+  const fabrica = useRef({});
+  const slideEstavel = (sid, S) => fabrica.current[sid] || (fabrica.current[sid] = Object.assign((props) => <S d={dadosRef.current} {...props} />, { sid, passos: () => PASSOS_DO_SLIDE[sid]?.(dadosRef.current) }));
+  const todos = useMemo(() => (dados ? ordenarSlides(SLIDES.filter(([, , quando]) => !quando || quando(dados)).map(([sid, S]) => slideEstavel(sid, S)), ordem) : []), [dados, ordem]); // eslint-disable-line react-hooks/exhaustive-deps
   const slides = useMemo(() => todos.filter((S) => !ocultos.includes(S.sid)), [todos, ocultos]); // os que entram na apresentação e no PDF
 
   const indice = Math.min(atual, Math.max(0, todos.length - 1));
@@ -324,8 +331,12 @@ function medirFlip(raiz) {
   return itens;
 }
 
-// slides que se revelam em etapas, a cada clique (só na apresentação animada)
+// slides que se revelam em etapas, a cada clique (só na apresentação animada). Visão externa: os três
+// achados juntos e, a cada clique, um deles ampliado
 const PASSOS = { antesdepois: 2 };
+export const PASSOS_DO_SLIDE = { visao: (d) => 1 + Math.min(3, d?.observacoes?.length || 0) };
+
+const nPassos = (S) => S?.passos?.() || PASSOS[S?.sid] || 1;
 
 export function TelaCheia({ slides, inicio, canal, onSair }) {
   const [i, setI] = useState(inicio);
@@ -341,14 +352,14 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
   // antes de trocar de slide: se é "Por onde começar" → "A oferta", mede o card e os textos dele
   const ir = useCallback((direcao) => {
     // dentro de um slide com etapas, o clique revela a próxima antes de trocar de slide
-    const total = animado ? PASSOS[slides[iRef.current]?.sid] || 1 : 1;
+    const total = animado ? nPassos(slides[iRef.current]) : 1;
     if (direcao === 1 && passoRef.current < total - 1) { setPasso((p) => p + 1); return; }
     const x = iRef.current;
     const y = Math.max(0, Math.min(slides.length - 1, x + direcao));
     if (y === x) return;
     flip.current = animado && direcao === 1 && slides[x]?.sid === "comeco" && slides[y]?.sid === "oferta" ? medirFlip(raiz.current) : null;
     // indo para trás, o slide já aparece completo
-    setPasso(direcao === -1 && animado ? (PASSOS[slides[y]?.sid] || 1) - 1 : 0);
+    setPasso(direcao === -1 && animado ? nPassos(slides[y]) - 1 : 0);
     iRef.current = y;
     setI(y);
   }, [slides, animado]);
@@ -425,7 +436,7 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     });
   }, [i]);
   return (
-    <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""} ${animado && PASSOS[S?.sid] ? `em-passos passo-${passo}` : ""}`} onClick={() => ir(1)}>
+    <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""} ${animado && nPassos(S) > 1 ? `em-passos passo-${passo}` : ""}`} onClick={() => ir(1)}>
       {/* key: a cada slide o palco é montado de novo, e a animação de entrada roda outra vez */}
       <div className="apr-camadas">
         {saindo !== null && slides[saindo] && (() => { const A = slides[saindo]; return <div className="apr-saindo" key={`s-${saindo}`}><Palco><A /></Palco></div>; })()}
@@ -986,6 +997,17 @@ function Visao({ d, escala }) {
           </div>
         </React.Fragment>
       ))}
+      {/* na apresentação animada, cada clique amplia um achado (sai do lugar do card e cresce) */}
+      {d.observacoes.slice(0, 3).map((o, i) => (
+        <div key={`z${i}`} className={`vx-zoom vx-${i}`} style={{ "--ox": `${xs[i][0] + 283 - 81}px` }}>
+          <div className="foto">{o.url ? <img src={o.url} alt="" /> : <span className="apr-vazio">[Print {i + 1}]</span>}</div>
+          <div className="txt">
+            <p className="n">{String(i + 1).padStart(2, "0")} <span>/ {String(Math.min(3, d.observacoes.length)).padStart(2, "0")}</span></p>
+            <p className="t">{ou(o.titulo, `[Observação ${i + 1}]`)}</p>
+            <p className="x">{ou(o.texto, "[Uma frase explicando]")}</p>
+          </div>
+        </div>
+      ))}
     </Slide>
   );
 }
@@ -1467,9 +1489,9 @@ function Proximos({ d, escala }) {
   return (
     <Slide livre escala={escala} d={d}>
       <Cabeca t={tx("proximos", "titulo")} sub={rico(tx("proximos", "sub", { inicio: dia(c.inicio), fim: dia(c.fim) }))} />
-      <div className="apr-caixa" style={{ left: 90, top: 455, width: (colunas.length - 1) * w, height: 2, background: "#d4d4d8", borderRadius: 0 }} />
+      <div className="apr-caixa crono-linha" style={{ left: 90, top: 455, width: (colunas.length - 1) * w, height: 2, background: "#d4d4d8", borderRadius: 0 }} />
       {colunas.map((col, i) => (
-        <div key={i} className={`apr-crono2 ${col.tipo} ${colunas.length > 6 ? "densa" : ""}`} style={{ left: 81 + i * w, width: w - 24 }}>
+        <div key={i} className={`apr-crono2 ${col.tipo} ${colunas.length > 6 ? "densa" : ""}`} style={{ left: 81 + i * w, width: w - 24, "--f": colunas.length > 1 ? i / (colunas.length - 1) : 0 }}>
           <p className="data">{col.data}</p>
           <span className="marco" />
           <h3>{col.n && <b>{col.n}</b>}{col.nome}</h3>
