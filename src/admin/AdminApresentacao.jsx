@@ -12,7 +12,7 @@ import { VAZIO_MARCA, paginasDoGuiaMarca, nomesDoGuiaMarca } from "./AdminGuiaMa
 import { dia, montarCronograma, periodo } from "./cronograma";
 import { TEXTOS } from "./textosSlides";
 import { carregarCatalogo } from "./carregarCatalogo";
-import { PalcoMateriais, VitrineMateriais, materiaisDoServico } from "./vitrineMateriais";
+import { PalcoMateriais, TodasAsPaginas, VitrineMateriais, materiaisDoServico } from "./vitrineMateriais";
 import "./apresentacao.css";
 
 // ícones das personas (os mesmos do diagnóstico, copiados de diagnostico-lastlab/src/assets/personas)
@@ -161,8 +161,15 @@ export default function AdminApresentacao() {
 
 /** Põe os slides na ordem salva (ids); os que não estão na lista seguem a ordem do código, no fim. */
 export function ordenarSlides(lista, ordem = []) {
-  const pos = (S, i) => { const k = ordem.indexOf(S.sid); return k < 0 ? 1000 + i : k; };
-  return lista.map((S, i) => [S, pos(S, i)]).sort((a, b) => a[1] - b[1]).map(([S]) => S);
+  // um slide que não está na ordem salva (um tipo novo, por exemplo) entra logo depois do slide
+  // que vem antes dele na lista padrão
+  let base = -1;
+  const pos = lista.map((S, i) => {
+    const k = ordem.indexOf(S.sid);
+    if (k >= 0) { base = k; return k; }
+    return base + 0.001 * (i + 1);
+  });
+  return lista.map((S, i) => [S, pos[i]]).sort((a, b) => a[1] - b[1]).map(([S]) => S);
 }
 
 /** Índice na lista visível do slide em foco (ou do próximo visível, se ele estiver oculto). */
@@ -516,7 +523,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 export const NOMES_SLIDES = {
   capa: "Capa", objetivo: "Nossa conversa", conversa: "O seu momento", respostas: "Visão interna", visao: "Visão externa",
   custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", casos: "Caso 1", casos2: "Caso 2",
-  entrega: "O que você recebe", produto: "Como fica", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
+  entrega: "O que você recebe", produto: "Como fica", paginas: "Página a página", paginas2: "Página a página (2º material)", paginas3: "Página a página (3º material)", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
   proximos: "Cronograma", fim: "Fechamento",
 };
 
@@ -947,9 +954,9 @@ function Entrega({ d, escala }) {
   const s = d.oferta.servico;
   const comMateriais = d.materiais.length > 0;
   return (
-    <Slide escala={escala} d={d}>
+    <Slide escala={escala} d={d} classe={comMateriais ? "vt-slide-entrega" : ""}>
       <Titulo t={tx("entrega", "titulo")} sub={s.promessa} />
-      <div className={`vt-entrega ${comMateriais ? "" : "mockup"}`}>
+      <div className={`vt-entrega ${comMateriais ? "so-lista" : "mockup"}`}>
         <div className="esq">
           <ul className={`vt-itens ${s.entregas.length > 4 ? "muitos" : ""}`}>
             {s.entregas.map((x) => (
@@ -964,10 +971,25 @@ function Entrega({ d, escala }) {
             <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>{s.ajustes} de ajuste</span>
           </div>
         </div>
-        {comMateriais ? <PalcoMateriais materiais={d.materiais} empresa={d.empresa} /> : <PreviaEntrega d={d} />}
+        {!comMateriais && <PreviaEntrega d={d} />}
       </div>
+      {comMateriais && <PalcoMateriais materiais={d.materiais} empresa={d.empresa} />}
     </Slide>
   );
+}
+
+/** Todas as páginas de um material (um slide por material): mostra a riqueza do que é entregue. */
+function paginasDoMaterial(k) {
+  return function PaginaAPagina({ d, escala }) {
+    const m = d.materiais[k];
+    if (!m) return null;
+    return (
+      <Slide escala={escala} d={d}>
+        <Titulo t={tx("paginas", "titulo", { material: m.doc.nome })} sub={tx("paginas", "sub", { paginas: m.lista.length, empresa: d.empresa || "sua marca" })} />
+        <TodasAsPaginas m={m} />
+      </Slide>
+    );
+  };
 }
 
 /** Todas as imagens de um projeto do portfólio (capa, banner, grades), sem repetir. */
@@ -1347,5 +1369,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

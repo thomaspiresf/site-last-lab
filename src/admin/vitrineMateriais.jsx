@@ -90,10 +90,16 @@ export function PalcoMateriais({ materiais, empresa }) {
   return (
     <div className={`vt-palco ${um ? "um" : "varios"}`}>
       {um ? (
-        <Pilha m={um} largura={um.unica ? 360 : 330} />
+        <Pilha m={um} largura={um.unica ? 500 : 470} />
       ) : (
         <div className="vt-fila">
-          {fila.map((m) => <MiniPagina key={m.doc.id} m={m} x={m.capa} largura={fila.length === 2 ? 300 : 236} classe="sombra" />)}
+          {fila.map((m) => (
+            <div key={m.doc.id} className="item">
+              <MiniPagina m={m} x={m.capa} largura={fila.length === 2 ? 360 : 258} classe="sombra" />
+              <p className="nome">{m.doc.nome}</p>
+              <p className="pags">{paginas(m.lista.length)}</p>
+            </div>
+          ))}
         </div>
       )}
       <div className="vt-selo">
@@ -154,6 +160,31 @@ export function VitrineMateriais({ materiais }) {
               {!m.unica && <div className="lado">{m.destaques.slice(0, 2).map((x, i) => <MiniPagina key={i} m={m} x={x} largura={lado} classe="sombra" />)}</div>}
             </div>
             <figcaption><b>{m.doc.nome}</b><span>{paginas(m.lista.length)}</span></figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Slide "Página a página": todas as páginas do material, no maior tamanho que couber. */
+export function TodasAsPaginas({ m }) {
+  const W = 1754, H = 660, GAP = 18, VGAP = 28, LEG = 32;
+  const n = m.lista.length;
+  let melhor = { c: n, larg: 0 };
+  for (let c = 1; c <= n; c++) {
+    const r = Math.ceil(n / c);
+    const larg = Math.min((W - (c - 1) * GAP) / c, ((H - r * LEG - (r - 1) * VGAP) / r) / 1.4144);
+    if (larg > melhor.larg) melhor = { c, larg };
+  }
+  const larg = Math.floor(melhor.larg);
+  return (
+    <div className="vt-vitrine">
+      <div className="vt-todas" style={{ gridTemplateColumns: `repeat(${melhor.c}, ${larg}px)`, gap: `${VGAP}px ${GAP}px` }}>
+        {m.lista.map((x, i) => (
+          <figure key={i}>
+            <MiniPagina m={m} x={x} largura={larg} classe="sombra" />
+            <figcaption><b>{nn(i + 1)}</b>{x.nome}</figcaption>
           </figure>
         ))}
       </div>

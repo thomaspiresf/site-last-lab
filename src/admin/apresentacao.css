@@ -522,3 +522,22 @@
 .vt-blocos figcaption { margin-top: 20px; font-size: 24px; display: flex; align-items: baseline; gap: 14px; }
 .vt-blocos figcaption b { font-weight: 600; color: var(--laranja); }
 .vt-blocos figcaption span { color: var(--suave); }
+
+/* o que você recebe com material: metade informação, metade palco (da altura do slide) */
+.vt-slide-entrega .apr-titulo { max-width: 860px; }
+.vt-entrega.so-lista { grid-template-columns: 820px; }
+.vt-slide-entrega .vt-palco { position: absolute; top: 40px; right: 40px; width: 880px; height: 900px; display: block; padding: 0; }
+.vt-slide-entrega .vt-palco::after { bottom: 60px; }
+.vt-slide-entrega .vt-pilha, .vt-slide-entrega .vt-fila { position: absolute; left: 50%; transform: translateX(-50%); margin: 0; }
+.vt-slide-entrega .vt-pilha { top: 158px; }
+.vt-slide-entrega .vt-fila { top: 50%; transform: translate(-50%, -42%); }
+.vt-fila .item { display: flex; flex-direction: column; }
+.vt-fila .nome { font-size: 24px; font-weight: 600; margin-top: 22px; letter-spacing: -0.3px; }
+.vt-fila .pags { font-size: 20px; color: var(--suave); margin-top: 2px; }
+.vt-slide-entrega .vt-selo { top: 40px; left: 40px; right: auto; bottom: auto; }
+
+/* página a página */
+.vt-todas { display: grid; justify-content: center; align-content: start; width: 100%; }
+.vt-todas figure { margin: 0; }
+.vt-todas figcaption { margin-top: 8px; font-size: 17px; color: var(--suave); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vt-todas figcaption b { color: var(--laranja); font-weight: 600; margin-right: 8px; }
