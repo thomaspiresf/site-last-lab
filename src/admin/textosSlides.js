@@ -30,6 +30,8 @@ export const TEXTOS = {
     titulo: "Como fica", aviso: "Ilustração. A sua versão sai com a sua marca.",
     tituloGuia: "O Guia de mensagem", subGuia: "8 páginas para usar na bio, no site, na apresentação e nos posts.",
     tituloGuiaMarca: "O Guia da marca", subGuiaMarca: "A estratégia da marca em {paginas} páginas, para guiar tudo o que vem depois.",
+    tituloMaterial: "O {material}", subMaterial: "{paginas} páginas feitas para a {empresa} usar no dia a dia.", subMaterialUnico: "A marca da {empresa} organizada numa página, pronta para usar.",
+    tituloMateriais: "Os materiais", subMateriais: "Tudo o que fica com a {empresa} no fim do projeto.",
   },
   sessao: { titulo: "Como é a sessão", sub: "2 horas, online, num quadro que a gente preenche juntos." },
   passo: {
@@ -69,6 +71,7 @@ export const ROTULOS_TEXTOS = {
   r2p: "Cartão 2 · rótulo (principal)", t2p: "Cartão 2 · texto (principal)", r4: "Cartão 3 · rótulo (premium)", n4: "Cartão 3 · título (premium)", t4: "Cartão 3 · texto (premium)",
   numero: "Número", desafio: "Rótulo · desafio", fizemos: "Rótulo · o que fizemos", resultado: "Rótulo · resultado", antes: "Rótulo do lado Antes", depois: "Rótulo do lado Depois", prazo: "Prazo",
   aviso: "Aviso da ilustração", tituloGuia: "Título (workshop)", subGuia: "Subtítulo (workshop)", tituloGuiaMarca: "Título (Guia da marca)", subGuiaMarca: "Subtítulo (Guia da marca)",
+  tituloMaterial: "Título (um material)", subMaterial: "Subtítulo (um material)", subMaterialUnico: "Subtítulo (material de uma página)", tituloMateriais: "Título (vários materiais)", subMateriais: "Subtítulo (vários materiais)",
   total: "Rótulo do preço", seloEntrada: "Selo da entrada (recomendada)", seloEnxuto: "Selo da entrada (quando o projeto é o destaque)",
   seloProjeto: "Selo do projeto (âncora)", seloProjetoRec: "Selo do projeto (recomendado)", credito: "Crédito da entrada",
   escopoT: "Escopo · título", escopo: "Escopo · texto", ajustesT: "Ajustes · título", ajustes: "Ajustes · texto",

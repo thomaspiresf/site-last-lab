@@ -12,6 +12,7 @@ import { VAZIO_MARCA, paginasDoGuiaMarca, nomesDoGuiaMarca } from "./AdminGuiaMa
 import { dia, montarCronograma, periodo } from "./cronograma";
 import { TEXTOS } from "./textosSlides";
 import { carregarCatalogo } from "./carregarCatalogo";
+import { LequeMateriais, VitrineMateriais, materiaisDoServico } from "./vitrineMateriais";
 import "./apresentacao.css";
 
 // ícones das personas (os mesmos do diagnóstico, copiados de diagnostico-lastlab/src/assets/personas)
@@ -585,6 +586,8 @@ export function montarDados(item, ap, urls = {}) {
   return {
     nome: item.nome,
     empresa: ap.empresa || "",
+    // os entregáveis do serviço, com as páginas de verdade (dados e ajustes do editor de entregáveis)
+    materiais: materiaisDoServico(oferta.servicoId, ap),
     elogio: ap.elogio || "",
     momento: MOMENTOS[d.persona_id] || d.persona || "",
     frase: d.devolutiva?.persona_frase || "",
@@ -952,7 +955,7 @@ function Entrega({ d, escala }) {
           </div>
           <p className="prazo">{tx("entrega", "prazo", { total: d.cronograma.total, ajustes: d.oferta.servico.ajustes })}</p>
         </div>
-        <PreviaEntrega d={d} />
+        {d.materiais.length ? <LequeMateriais materiais={d.materiais} /> : <PreviaEntrega d={d} />}
       </div>
     </Slide>
   );
@@ -970,9 +973,21 @@ export function imagensDoProjeto(p) {
   return [...new Set(achadas)];
 }
 
-/** "Mostrar o produto": as páginas do Guia (workshop) ou uma galeria do projeto de exemplo. */
+/** "Mostrar o produto": os entregáveis de verdade (vitrine), ou o mockup do formato / galeria do projeto de exemplo. */
 function Produto({ d, escala }) {
   const ex = d.oferta.servico.exemplo;
+  if (d.materiais.length) {
+    const um = d.materiais.length === 1 ? d.materiais[0] : null;
+    return (
+      <Slide escala={escala} d={d}>
+        <Titulo
+          t={um ? tx("produto", "tituloMaterial", { material: um.doc.nome }) : tx("produto", "tituloMateriais")}
+          sub={um ? tx("produto", um.unica ? "subMaterialUnico" : "subMaterial", { paginas: um.lista.length, empresa: d.empresa || "sua marca" }) : tx("produto", "subMateriais", { empresa: d.empresa || "sua marca" })}
+        />
+        <VitrineMateriais materiais={d.materiais} />
+      </Slide>
+    );
+  }
   if (ex === "guia") {
     const g = { ...GUIA_VAZIO, marca: d.empresa || d.nome };
     return (
