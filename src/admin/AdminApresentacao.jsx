@@ -341,6 +341,7 @@ const nPassos = (S) => S?.passos?.() || PASSOS[S?.sid] || 1;
 export function TelaCheia({ slides, inicio, canal, onSair }) {
   const [i, setI] = useState(inicio);
   const [passo, setPasso] = useState(0);
+  const [voltou, setVoltou] = useState(false); // voltou uma etapa (para animar a volta aos cards)
   const passoRef = useRef(0);
   passoRef.current = passo;
   const raiz = useRef(null);
@@ -353,8 +354,8 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
   const ir = useCallback((direcao) => {
     // dentro de um slide com etapas, o clique revela a próxima antes de trocar de slide
     const total = animado ? nPassos(slides[iRef.current]) : 1;
-    if (direcao === 1 && passoRef.current < total - 1) { setPasso((p) => p + 1); return; }
-    if (direcao === -1 && passoRef.current > 0) { setPasso((p) => p - 1); return; }
+    if (direcao === 1 && passoRef.current < total - 1) { setVoltou(false); setPasso((p) => p + 1); return; }
+    if (direcao === -1 && passoRef.current > 0) { setVoltou(true); setPasso((p) => p - 1); return; }
     const x = iRef.current;
     const y = Math.max(0, Math.min(slides.length - 1, x + direcao));
     if (y === x) return;
@@ -362,6 +363,7 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     // indo para trás, o slide já aparece completo
     setPasso(direcao === -1 && animado ? nPassos(slides[y]) - 1 : 0);
     iRef.current = y;
+    setVoltou(false);
     setI(y);
   }, [slides, animado]);
   // o roteiro (outra janela) acompanha o slide atual
@@ -437,7 +439,7 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     });
   }, [i]);
   return (
-    <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""} ${animado && nPassos(S) > 1 ? `em-passos passo-${passo}` : ""}`} onClick={() => ir(1)}>
+    <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""} ${animado && nPassos(S) > 1 ? `em-passos passo-${passo} ${voltou ? "voltou" : ""}` : ""}`} onClick={() => ir(1)}>
       {/* key: a cada slide o palco é montado de novo, e a animação de entrada roda outra vez */}
       <div className="apr-camadas">
         {saindo !== null && slides[saindo] && (() => { const A = slides[saindo]; return <div className="apr-saindo" key={`s-${saindo}`}><Palco><A /></Palco></div>; })()}
