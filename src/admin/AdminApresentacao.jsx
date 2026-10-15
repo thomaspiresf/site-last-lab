@@ -227,6 +227,29 @@ export function NavSlides({ itens, ocultos, indice, onSelect, onReordenar, onAlt
   );
 }
 
+// quando a apresentação está rodando animada, os números contam de 0 até o valor
+const AnimadoCtx = React.createContext(false);
+
+/** Número que, na apresentação animada, rola de 0 até o valor. */
+function Contador({ valor, atraso = 400, duracao = 1300 }) {
+  const animado = React.useContext(AnimadoCtx);
+  const alvo = Number(valor);
+  const [n, setN] = useState(animado && Number.isFinite(alvo) ? 0 : valor);
+  useEffect(() => {
+    if (!animado || !Number.isFinite(alvo)) { setN(valor); return undefined; }
+    let raf;
+    const t0 = performance.now() + atraso;
+    const passo = (t) => {
+      const k = Math.min(1, Math.max(0, (t - t0) / duracao));
+      setN(Math.round(alvo * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) raf = requestAnimationFrame(passo);
+    };
+    raf = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(raf);
+  }, [animado, alvo, valor, atraso, duracao]);
+  return <>{n}</>;
+}
+
 // apresentar animado (padrão) ou estático: a escolha fica guardada neste navegador
 const CHAVE_MODO = "apr-modo";
 export const modoAnimado = () => { try { return localStorage.getItem(CHAVE_MODO) !== "estatico"; } catch { return true; } };
@@ -293,15 +316,19 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
   }, [slides.length, onSair]);
   const S = slides[i];
   const [animado, setAnimado] = useState(modoAnimado);
+  // "Por onde começar" → "A oferta": o card em destaque se expande e vira o slide seguinte
+  const anterior = useRef(i);
+  const expande = anterior.current === i - 1 && slides[i - 1]?.sid === "comeco" && S?.sid === "oferta";
+  useEffect(() => { anterior.current = i; }, [i]);
   useEffect(() => {
     const t = (e) => { if (e.key === "a" || e.key === "A") setAnimado((x) => !x); };
     window.addEventListener("keydown", t);
     return () => window.removeEventListener("keydown", t);
   }, []);
   return (
-    <div className={`apr-show ${animado ? "animado" : ""}`} onClick={() => setI((x) => Math.min(slides.length - 1, x + 1))}>
+    <div className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""}`} onClick={() => setI((x) => Math.min(slides.length - 1, x + 1))}>
       {/* key: a cada slide o palco é montado de novo, e a animação de entrada roda outra vez */}
-      <Palco key={i}><S /></Palco>
+      <AnimadoCtx.Provider value={animado}><Palco key={`${i}-${animado}`}><S /></Palco></AnimadoCtx.Provider>
       <span className="apr-show-dica">{i + 1} / {slides.length} · setas para navegar · A {animado ? "desliga" : "liga"} a animação · Esc para sair</span>
     </div>
   );
@@ -807,7 +834,7 @@ function Respostas({ d, escala }) {
       <Cabeca t={tx("respostas", "titulo")} sub={d.resumo} corSub="#888888" />
       <div className="apr-caixa" style={{ left: 71, top: 331, width: 557, height: 527, background: "#ef4b3a" }} />
       <P x={114} y={375} s={22} peso={300} cor="#fff" style={{ whiteSpace: "nowrap" }}>{tx("respostas", "rotulo")}</P>
-      <P direita={592} y={362} s={34} peso={600} cor="#fff" style={{ whiteSpace: "nowrap" }}>{d.nota}<span style={{ fontSize: 28, fontWeight: 400, color: "#faada4" }}>/100</span></P>
+      <P direita={592} y={362} s={34} peso={600} cor="#fff" style={{ whiteSpace: "nowrap" }}><Contador valor={d.nota} atraso={700} /><span style={{ fontSize: 28, fontWeight: 400, color: "#faada4" }}>/100</span></P>
       <div className="apr-caixa apr-persona" style={{ left: 109, top: 461, width: 130, height: 129, background: "#d64434", borderRadius: 22 }}
         dangerouslySetInnerHTML={{ __html: ICONES_PERSONA[d.personaId] || ICONES_PERSONA.indefinida || "" }} />
       <div className="apr-p" style={{ left: 266, top: 459, width: 340, height: 131, display: "flex", alignItems: "center" }}>
@@ -818,19 +845,21 @@ function Respostas({ d, escala }) {
       <div className="apr-caixa" style={{ left: 662, top: 331, width: 1178, height: 525, background: "#ebebeb" }} />
       <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
         {/* o radar do diagnóstico: quatro anéis, eixos, a área das notas e os pontos (o mais fraco em laranja) */}
-        {[0.25, 0.5, 0.75, 1].map((f) => <polygon key={f} points={[0, 1, 2, 3, 4].map((i) => ponto(i, f)).join(" ")} fill="none" stroke="#c9c9c9" strokeWidth="2" />)}
-        {[0, 1, 2, 3, 4].map((i) => { const [x, y] = ponto(i, 1).split(","); return <line key={i} x1={RADAR.cx} y1={RADAR.cy} x2={x} y2={y} stroke="#c9c9c9" strokeWidth="2" />; })}
-        {pil.length === 5 && <polygon points={pil.map((p, i) => ponto(i, (p.nota || 0) / 100)).join(" ")} fill="#262626" fillOpacity="0.12" stroke="#262626" strokeWidth="3" strokeLinejoin="round" />}
-        {pil.length === 5 && pil.map((p, i) => { const [x, y] = ponto(i, (p.nota || 0) / 100).split(","); return <circle key={p.nome} cx={x} cy={y} r="8" fill={p.fraco ? "#ef4b3a" : "#262626"} />; })}
+        <g className="apr-radar-grade">
+          {[0.25, 0.5, 0.75, 1].map((f) => <polygon key={f} points={[0, 1, 2, 3, 4].map((i) => ponto(i, f)).join(" ")} fill="none" stroke="#c9c9c9" strokeWidth="2" />)}
+          {[0, 1, 2, 3, 4].map((i) => { const [x, y] = ponto(i, 1).split(","); return <line key={i} x1={RADAR.cx} y1={RADAR.cy} x2={x} y2={y} stroke="#c9c9c9" strokeWidth="2" />; })}
+        </g>
+        {pil.length === 5 && <polygon className="apr-radar-area" points={pil.map((p, i) => ponto(i, (p.nota || 0) / 100)).join(" ")} fill="#262626" fillOpacity="0.12" stroke="#262626" strokeWidth="3" strokeLinejoin="round" />}
+        {pil.length === 5 && pil.map((p, i) => { const [x, y] = ponto(i, (p.nota || 0) / 100).split(","); return <circle key={p.nome} className="apr-radar-ponto" cx={x} cy={y} r="8" fill={p.fraco ? "#ef4b3a" : "#262626"} style={{ "--dx": `${(RADAR.cx - x).toFixed(1)}px`, "--dy": `${(RADAR.cy - y).toFixed(1)}px` }} />; })}
       </svg>
       {pil.map((p, i) => {
         const y = 364 + i * 92.75;
         return (
           <React.Fragment key={p.nome}>
             <P x={1172} y={y + 5} s={28} cor="#434343" style={{ whiteSpace: "nowrap" }}>{p.nome}</P>
-            <P direita={1792} y={y} s={32} cor={p.fraco ? "#ef4b3a" : "#434343"}>{p.nota}</P>
+            <P direita={1792} y={y} s={32} cor={p.fraco ? "#ef4b3a" : "#434343"}><Contador valor={p.nota} atraso={1500 + i * 120} /></P>
             <div className="apr-caixa" style={{ left: 1170, top: y + 54.5, width: 620, height: 12, background: "#d1cfcf", borderRadius: 6 }}>
-              <div style={{ width: `${Math.min(100, p.nota || 0)}%`, height: "100%", borderRadius: 6, background: p.fraco ? "#ef4b3a" : "#262626" }} />
+              <div className="apr-barra-cheia" style={{ width: `${Math.min(100, p.nota || 0)}%`, height: "100%", borderRadius: 6, background: p.fraco ? "#ef4b3a" : "#262626", "--i": i }} />
             </div>
           </React.Fragment>
         );
@@ -888,7 +917,7 @@ function Comeco({ d, escala }) {
     <Slide livre escala={escala} d={d}>
       <Cabeca t={tx("comeco", "titulo")} sub={rico(tx("comeco", "sub"))} />
       {cards.map(([n, rot, t, txt, ativo], i) => (
-        <div key={n} className="apr-caixa apr-degrau" style={{ left: xs[i], top: 321, width: 565, height: 544, background: ativo ? "#ef4b3a" : "#e7e6e6", "--pn": `${[40, 51, 52][i]}px`, "--pt": `${[37, 48, 52][i]}px`, "--pr": `${[61, 50, 51][i]}px` }}>
+        <div key={n} className={`apr-caixa apr-degrau ${ativo ? "ativo" : ""}`} style={{ left: xs[i], top: 321, width: 565, height: 544, background: ativo ? "#ef4b3a" : "#e7e6e6", "--pn": `${[40, 51, 52][i]}px`, "--pt": `${[37, 48, 52][i]}px`, "--pr": `${[61, 50, 51][i]}px` }}>
           <p className="n" style={{ color: ativo ? "#fff" : "#999999" }}>{n}</p>
           <p className="rot" style={{ color: ativo ? "#fff" : "#999999" }}>{rot}</p>
           <p className="t" style={{ color: ativo ? "#fff" : "#a5a5a5" }}>{t}</p>
