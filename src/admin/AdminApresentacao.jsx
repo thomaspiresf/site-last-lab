@@ -961,7 +961,7 @@ function Entrega({ d, escala }) {
           <ul className={`vt-itens ${s.entregas.length > 4 ? "muitos" : ""}`}>
             {s.entregas.map((x) => (
               <li key={x}>
-                <span className="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+                <span className="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" /><path d="M7.5 12.3l3 3 6-6.3" /></svg></span>
                 <span>{x}</span>
               </li>
             ))}

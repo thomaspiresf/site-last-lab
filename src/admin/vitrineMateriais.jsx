@@ -103,10 +103,10 @@ export function PalcoMateriais({ materiais, empresa }) {
         </div>
       )}
       <div className="vt-selo">
-        <p className="num">{um ? total : materiais.length}</p>
+        <p className="num">{String(um ? total : materiais.length).padStart(2, "0")}</p>
         <div>
-          <p className="t">{um ? (total === 1 ? "página" : "páginas") : `materiais · ${paginas(total)}`}</p>
-          <p className="s">{um ? "feito com a sua marca" : `com a marca ${empresa ? `da ${empresa}` : "da sua empresa"}`}</p>
+          <p className="t">{um ? (total === 1 ? "Página" : "Páginas") : "Materiais"}</p>
+          <p className="s">{um ? "com a sua marca" : `${paginas(total)} com a sua marca`}</p>
         </div>
       </div>
     </div>
@@ -169,7 +169,7 @@ export function VitrineMateriais({ materiais }) {
 
 /** Slide "Página a página": todas as páginas do material, no maior tamanho que couber. */
 export function TodasAsPaginas({ m }) {
-  const W = 1800, H = 830, GAP = 22, VGAP = 22, LEG = 26;
+  const W = 1800, H = 850, GAP = 24, VGAP = 22, LEG = 26;
   const n = m.lista.length;
   let melhor = { c: n, larg: 0 };
   for (let c = 1; c <= n; c++) {

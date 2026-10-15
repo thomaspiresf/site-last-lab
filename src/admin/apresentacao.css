@@ -464,7 +464,7 @@
 /* entregáveis de verdade nos slides (vitrineMateriais.jsx). O conteúdo se alinha à margem do título
    (x 83) e vai até a direita (x 1837), descendo até perto do rodapé. */
 .vt-pag { overflow: hidden; border-radius: 6px; background: #fff; flex-shrink: 0; }
-.vt-pag.sombra { box-shadow: 0 40px 70px -34px rgb(0 0 0 / .5), 0 2px 6px rgb(0 0 0 / .06); }
+.vt-pag.sombra { box-shadow: 0 24px 48px -30px rgb(0 0 0 / .22), 0 0 0 1px rgb(0 0 0 / .05); }
 
 /* o que você recebe */
 .vt-entrega { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 860px; gap: 72px; margin: -20px -45px -60px -45px; }
@@ -475,8 +475,8 @@
 .vt-itens.muitos { gap: 18px; }
 .vt-itens.muitos li { font-size: 27px; grid-template-columns: 40px 1fr; gap: 20px; }
 .vt-itens.muitos .ok { width: 40px; height: 40px; }
-.vt-itens .ok { width: 46px; height: 46px; border-radius: 50%; background: var(--laranja); display: flex; align-items: center; justify-content: center; margin-top: -2px; }
-.vt-itens .ok svg { width: 26px; height: 26px; fill: none; stroke: #fff; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.vt-itens .ok { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; margin-top: 0; }
+.vt-itens .ok svg { width: 42px; height: 42px; fill: none; stroke: var(--laranja); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 .vt-prazos { display: flex; gap: 14px; flex-wrap: wrap; }
 .vt-prazos span { display: inline-flex; align-items: center; gap: 12px; font-size: 24px; padding: 14px 24px 14px 18px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 1.5px #e3e3e6; }
 .vt-prazos svg { width: 28px; height: 28px; fill: none; stroke: var(--laranja); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -484,16 +484,17 @@
 /* o palco: o material como foto de produto */
 .vt-palco { position: relative; border-radius: 32px; overflow: hidden; display: flex; align-items: center; justify-content: center;
   background: radial-gradient(120% 90% at 50% 30%, #ffffff 0%, #ecebe7 55%, #dfddd6 100%); }
-.vt-palco::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: 70px; height: 40px; border-radius: 50%; background: rgb(0 0 0 / .18); filter: blur(28px); }
+.vt-palco::after { content: ""; position: absolute; left: 12%; right: 12%; bottom: 70px; height: 40px; border-radius: 50%; background: rgb(0 0 0 / .08); filter: blur(30px); }
 .vt-palco.um { justify-content: flex-start; padding-left: 64px; }
 .vt-pilha { position: relative; z-index: 1; margin-top: -30px; }
-.vt-pilha .folha { position: absolute; border-radius: 6px; box-shadow: 0 0 0 1px rgb(0 0 0 / .06), 0 20px 40px -24px rgb(0 0 0 / .4); }
+.vt-pilha .folha { position: absolute; border-radius: 6px; box-shadow: 0 0 0 1px rgb(0 0 0 / .06), 0 14px 30px -24px rgb(0 0 0 / .2); }
 .vt-fila { position: relative; z-index: 1; display: flex; gap: 26px; align-items: flex-start; margin-top: -90px; }
 .vt-palco.um .vt-selo { left: auto; right: 36px; }
-.vt-selo { position: absolute; left: 36px; bottom: 36px; z-index: 6; display: flex; align-items: center; gap: 18px; background: #fff; border-radius: 22px; padding: 18px 28px 18px 24px; box-shadow: 0 20px 40px -24px rgb(0 0 0 / .35); }
-.vt-selo .num { font-size: 64px; font-weight: 200; line-height: 1; color: var(--laranja); letter-spacing: -2px; }
-.vt-selo .t { font-size: 24px; font-weight: 600; line-height: 1.2; }
-.vt-selo .s { font-size: 20px; color: var(--suave); margin-top: 2px; }
+.vt-selo { position: absolute; left: 36px; bottom: 36px; z-index: 6; display: flex; align-items: center; gap: 20px; }
+.vt-selo .num { font-size: 76px; font-weight: 200; line-height: 1; color: var(--tinta); letter-spacing: -3px; font-variant-numeric: tabular-nums; }
+.vt-selo .t { font-size: 15px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--laranja); }
+.vt-selo .s { font-size: 19px; color: var(--suave); margin-top: 4px; }
+.vt-selo > div { border-left: 1.5px solid #cfcfd3; padding-left: 20px; }
 
 /* como fica: as páginas grandes */
 .vt-vitrine { flex: 1; min-height: 0; margin: -20px -45px -60px -45px; display: flex; align-items: flex-start; }
@@ -534,7 +535,7 @@
 .vt-fila .item { display: flex; flex-direction: column; }
 .vt-fila .nome { font-size: 24px; font-weight: 600; margin-top: 22px; letter-spacing: -0.3px; }
 .vt-fila .pags { font-size: 20px; color: var(--suave); margin-top: 2px; }
-.vt-slide-entrega .vt-selo { top: 40px; left: 40px; right: auto; bottom: auto; }
+.vt-slide-entrega .vt-selo { top: 48px; left: 52px; right: auto; bottom: auto; }
 
 /* página a página */
 .vt-todas { display: grid; justify-content: center; align-content: start; width: 100%; }
@@ -546,12 +547,14 @@
 .vt-cab-pp .s { font-size: 26px; color: #999; }
 
 /* página a página: fundo escuro e as páginas ocupando o slide, para brilharem */
-.vt-slide-pp { padding: 70px 60px 150px; gap: 26px; }
-.vt-slide-pp .vt-cab-pp { margin: 0 0 0 23px; }
+.vt-slide-pp { padding: 128px 60px 96px; gap: 0; }
+.vt-slide-pp .vt-cab-pp { position: absolute; top: 46px; left: 60px; margin: 0; }
 .vt-slide-pp .vt-cab-pp .t { font-size: 22px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--tinta); }
 .vt-slide-pp .vt-cab-pp .s { font-size: 22px; color: #9a9aa0; }
 .vt-slide-pp .vt-vitrine { margin: 0; align-items: center; }
 .vt-slide-pp .vt-todas { align-content: center; }
-.vt-slide-pp .vt-pag.sombra { box-shadow: 0 30px 50px -26px rgb(0 0 0 / .45), 0 0 0 1px rgb(0 0 0 / .05); }
+.vt-slide-pp .vt-pag.sombra { box-shadow: 0 20px 40px -28px rgb(0 0 0 / .2), 0 0 0 1px rgb(0 0 0 / .05); }
 .vt-slide-pp .vt-todas figcaption { color: #8a8a90; font-size: 15px; margin-top: 7px; }
 .vt-slide-pp .apr-rodape { color: #c4c4c8; }
+.vt-slide-pp .apr-rodape p { top: 1026px; font-size: 15px; line-height: 18px; }
+.vt-slide-pp .apr-rodape .simbolo { top: 1022px; height: 36px; width: 16px; }
