@@ -291,8 +291,30 @@ export function Palco({ children }) {
   );
 }
 
+/** Posições dos elementos [data-flip] de um slide, em unidades do slide (1920×1080), e do card. */
+function medirFlip(raiz) {
+  const slide = raiz?.querySelector(".apr-slide");
+  if (!slide) return null;
+  const base = slide.getBoundingClientRect();
+  const z = base.width / 1920;
+  const caixa = (el) => { const r = el.getBoundingClientRect(); return { x: (r.left - base.left) / z, y: (r.top - base.top) / z, w: r.width / z, h: r.height / z }; };
+  const itens = {};
+  slide.querySelectorAll("[data-flip]").forEach((el) => { itens[el.dataset.flip] = { ...caixa(el), fonte: parseFloat(el.dataset.fonte) || parseFloat(getComputedStyle(el).fontSize) }; });
+  return itens;
+}
+
 export function TelaCheia({ slides, inicio, canal, onSair }) {
   const [i, setI] = useState(inicio);
+  const raiz = useRef(null);
+  const flip = useRef(null); // medidas do slide que está saindo, para a transição com elementos compartilhados
+  const S = slides[i];
+  const [animado, setAnimado] = useState(modoAnimado);
+  // antes de trocar de slide: se é "Por onde começar" → "A oferta", mede o card e os textos dele
+  const ir = useCallback((passo) => setI((x) => {
+    const y = Math.max(0, Math.min(slides.length - 1, x + passo));
+    flip.current = animado && passo === 1 && slides[x]?.sid === "comeco" && slides[y]?.sid === "oferta" ? medirFlip(raiz.current) : null;
+    return y;
+  }), [slides, animado]);
   // o roteiro (outra janela) acompanha o slide atual
   useEffect(() => {
     const bc = "BroadcastChannel" in window ? new BroadcastChannel(canal) : null;
@@ -301,9 +323,10 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
   }, [i, canal, slides]);
   useEffect(() => {
     const tecla = (e) => {
-      if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) setI((x) => Math.min(slides.length - 1, x + 1));
-      else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) setI((x) => Math.max(0, x - 1));
+      if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) ir(1);
+      else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) ir(-1);
       else if (e.key === "Escape") onSair();
+      else if (e.key === "a" || e.key === "A") setAnimado((x) => !x);
     };
     const saiu = () => !document.fullscreenElement && onSair();
     window.addEventListener("keydown", tecla);
@@ -311,22 +334,35 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     return () => {
       window.removeEventListener("keydown", tecla);
       document.removeEventListener("fullscreenchange", saiu);
-      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     };
-  }, [slides.length, onSair]);
-  const S = slides[i];
-  const [animado, setAnimado] = useState(modoAnimado);
-  // "Por onde começar" → "A oferta": o card em destaque se expande e vira o slide seguinte
-  const anterior = useRef(i);
-  const expande = anterior.current === i - 1 && slides[i - 1]?.sid === "comeco" && S?.sid === "oferta";
-  useEffect(() => { anterior.current = i; }, [i]);
-  useEffect(() => {
-    const t = (e) => { if (e.key === "a" || e.key === "A") setAnimado((x) => !x); };
-    window.addEventListener("keydown", t);
-    return () => window.removeEventListener("keydown", t);
-  }, []);
+  }, [ir, onSair]);
+  useEffect(() => () => { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); }, []);
+  // o slide novo já está na tela (sem pintar): cada elemento sai de onde estava no card e vai ao lugar
+  // dele; o fundo laranja cresce do retângulo do card até o slide inteiro
+  const expande = !!flip.current;
+  useLayoutEffect(() => {
+    const antes = flip.current;
+    if (!antes) return;
+    flip.current = null;
+    const depois = medirFlip(raiz.current);
+    const slide = raiz.current?.querySelector(".apr-slide");
+    if (!depois || !slide) return;
+    const tempo = { duration: 1000, easing: "cubic-bezier(.65, 0, .2, 1)", fill: "backwards" };
+    const c = antes.card;
+    if (c) slide.animate([{ clipPath: `inset(${c.y}px ${1920 - c.x - c.w}px ${1080 - c.y - c.h}px ${c.x}px round 38px)` }, { clipPath: "inset(0px 0px 0px 0px round 0px)" }], tempo);
+    slide.querySelectorAll("[data-flip]").forEach((el) => {
+      const k = el.dataset.flip, a = antes[k], b = depois[k];
+      if (!a || !b || k === "card") return;
+      const esc = a.fonte / b.fonte;
+      // texto alinhado à direita (o rótulo): a âncora é a borda direita
+      const direita = getComputedStyle(el).textAlign === "right";
+      const dx = direita ? (a.x + a.w) - (b.x + b.w) : a.x - b.x;
+      el.style.transformOrigin = direita ? "top right" : "top left";
+      el.animate([{ transform: `translate(${dx}px, ${a.y - b.y}px) scale(${esc})` }, { transform: "none" }], tempo);
+    });
+  }, [i]);
   return (
-    <div className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""}`} onClick={() => setI((x) => Math.min(slides.length - 1, x + 1))}>
+    <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""}`} onClick={() => ir(1)}>
       {/* key: a cada slide o palco é montado de novo, e a animação de entrada roda outra vez */}
       <AnimadoCtx.Provider value={animado}><Palco key={`${i}-${animado}`}><S /></Palco></AnimadoCtx.Provider>
       <span className="apr-show-dica">{i + 1} / {slides.length} · setas para navegar · A {animado ? "desliga" : "liga"} a animação · Esc para sair</span>
@@ -726,8 +762,8 @@ const ou = (texto, reserva) => (texto ? texto : <span className="apr-vazio">{res
  * Texto posicionado como no layout desenhado (Google Slides, 1920×1080). `y` é o topo da linha do
  * PDF (que usa altura de linha 1,4); com outra altura de linha, a primeira linha fica no mesmo lugar.
  */
-const P = ({ x, y, s, lh = 1.4, w, peso = 400, cor, direita, como: Tag = "p", style, children, className }) => (
-  <Tag className={`apr-p ${className || ""}`} style={{
+const P = ({ x, y, s, lh = 1.4, w, peso = 400, cor, direita, como: Tag = "p", style, children, className, flip }) => (
+  <Tag data-flip={flip} data-fonte={flip ? s : undefined} className={`apr-p ${className || ""}`} style={{
     ...(direita !== undefined ? { right: 1920 - direita, textAlign: "right" } : { left: x }),
     top: y + ((1.4 - lh) / 2) * s, fontSize: s, lineHeight: lh, fontWeight: peso, color: cor, width: w, ...style,
   }}>{children}</Tag>
@@ -917,11 +953,11 @@ function Comeco({ d, escala }) {
     <Slide livre escala={escala} d={d}>
       <Cabeca t={tx("comeco", "titulo")} sub={rico(tx("comeco", "sub"))} />
       {cards.map(([n, rot, t, txt, ativo], i) => (
-        <div key={n} className={`apr-caixa apr-degrau ${ativo ? "ativo" : ""}`} style={{ left: xs[i], top: 321, width: 565, height: 544, background: ativo ? "#ef4b3a" : "#e7e6e6", "--pn": `${[40, 51, 52][i]}px`, "--pt": `${[37, 48, 52][i]}px`, "--pr": `${[61, 50, 51][i]}px` }}>
-          <p className="n" style={{ color: ativo ? "#fff" : "#999999" }}>{n}</p>
-          <p className="rot" style={{ color: ativo ? "#fff" : "#999999" }}>{rot}</p>
-          <p className="t" style={{ color: ativo ? "#fff" : "#a5a5a5" }}>{t}</p>
-          <p className="txt" style={{ color: ativo ? "#fff" : "#a5a5a5" }}>{txt}</p>
+        <div key={n} data-flip={ativo ? "card" : undefined} className={`apr-caixa apr-degrau ${ativo ? "ativo" : ""}`} style={{ left: xs[i], top: 321, width: 565, height: 544, background: ativo ? "#ef4b3a" : "#e7e6e6", "--pn": `${[40, 51, 52][i]}px`, "--pt": `${[37, 48, 52][i]}px`, "--pr": `${[61, 50, 51][i]}px` }}>
+          <p data-flip={ativo ? "n" : undefined} data-fonte="48" className="n" style={{ color: ativo ? "#fff" : "#999999" }}>{n}</p>
+          <p data-flip={ativo ? "rot" : undefined} data-fonte="40" className="rot" style={{ color: ativo ? "#fff" : "#999999" }}>{rot}</p>
+          <p data-flip={ativo ? "t" : undefined} data-fonte="56" className="t" style={{ color: ativo ? "#fff" : "#a5a5a5" }}>{t}</p>
+          <p data-flip={ativo ? "txt" : undefined} data-fonte="28" className="txt" style={{ color: ativo ? "#fff" : "#a5a5a5" }}>{txt}</p>
         </div>
       ))}
     </Slide>
@@ -932,11 +968,11 @@ function Comeco({ d, escala }) {
 function OfertaCapa({ d, escala }) {
   return (
     <Slide livre tipo="laranja" escala={escala} d={d}>
-      <P x={97} y={78} s={56} peso={300} cor="#fff">{tx("oferta", "numero")}</P>
-      <P direita={1837} y={78} s={48} peso={300} cor="#fff" style={{ top: 78 + 4 }}>{tx("oferta", "rotulo")}</P>
+      <P flip="n" x={97} y={78} s={56} peso={300} cor="#fff">{tx("oferta", "numero")}</P>
+      <P flip="rot" direita={1837} y={78} s={48} peso={300} cor="#fff" style={{ top: 78 + 4 }}>{tx("oferta", "rotulo")}</P>
       <div className="apr-p" style={{ left: 94, top: 314 + 0.105 * 124, width: 1100, display: "flex", flexDirection: "column", gap: 58 }}>
-        <h2 style={{ fontSize: 124, lineHeight: 1.19, fontWeight: 500, color: "#fff" }}>{d.oferta.titulo}</h2>
-        <p style={{ fontSize: 36, lineHeight: 1.22, color: "#fff", width: 470 }}>{d.oferta.servico.promessa}</p>
+        <h2 data-flip="t" data-fonte="124" style={{ fontSize: 124, lineHeight: 1.19, fontWeight: 500, color: "#fff" }}>{d.oferta.titulo}</h2>
+        <p data-flip="txt" data-fonte="36" style={{ fontSize: 36, lineHeight: 1.22, color: "#fff", width: 470 }}>{d.oferta.servico.promessa}</p>
       </div>
     </Slide>
   );
