@@ -250,6 +250,27 @@ function Contador({ valor, atraso = 400, duracao = 1300 }) {
   return <>{n}</>;
 }
 
+/** Preço que, na apresentação animada, mostra o valor cheio e depois "roda" até o valor final. */
+function ValorRolando({ de, por, texto, atraso = 1500, duracao = 1300 }) {
+  const animado = React.useContext(AnimadoCtx);
+  const ativo = animado && de && por && de > por;
+  const [n, setN] = useState(ativo ? de : null);
+  useEffect(() => {
+    if (!ativo) return undefined;
+    let raf;
+    const t0 = performance.now() + atraso;
+    const passo = (t) => {
+      const k = Math.min(1, Math.max(0, (t - t0) / duracao));
+      const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      setN(k >= 1 ? null : Math.round(de - (de - por) * e));
+      if (k < 1) raf = requestAnimationFrame(passo);
+    };
+    raf = requestAnimationFrame(passo);
+    return () => cancelAnimationFrame(raf);
+  }, [ativo, de, por, atraso, duracao]);
+  return <>{n === null ? texto : moeda(n)}</>;
+}
+
 // apresentar animado (padrão) ou estático: a escolha fica guardada neste navegador
 const CHAVE_MODO = "apr-modo";
 export const modoAnimado = () => { try { return localStorage.getItem(CHAVE_MODO) !== "estatico"; } catch { return true; } };
@@ -1277,8 +1298,10 @@ function Passo({ d, escala }) {
     projeto.parcela = pProj;
   }
   const [principal, outra] = !atualRecomendada && projeto ? [projeto, entrada] : [entrada, projeto];
+  // com preço "de/por": na apresentação animada o valor cheio aparece primeiro e desce até o final
+  const comDesconto = (valorNumero(principal.de) || 0) > (valorNumero(principal.valor) || 0) && !!valorNumero(principal.valor);
   return (
-    <Slide livre escala={escala} d={d}>
+    <Slide livre escala={escala} d={d} classe={comDesconto ? "com-desconto" : "sem-desconto"}>
       {/* "Investimento" pequeno, como chapéu; o nome da oferta é o título */}
       <P x={89} y={73} s={56} cor="#999999" style={{ whiteSpace: "nowrap" }}>{tx("passo", "chapeu")}</P>
       {/* esquerda: a opção recomendada, em texto, e a conta */}
@@ -1309,8 +1332,8 @@ function Passo({ d, escala }) {
         })()}
         {principal.de && <p className="de">De <s>{principal.de}</s> por</p>}
         {d.destaquePreco === "parcela" && principal.parcela
-          ? <p className="valor"><span>{principal.aPartir ? "a partir de " : ""}{principal.parcela.n}x de</span>{moeda(principal.parcela.cada)}</p>
-          : <p className="valor">{principal.aPartir && <span>a partir de</span>}{principal.valor}</p>}
+          ? <p className="valor"><span>{principal.aPartir ? "a partir de " : ""}{principal.parcela.n}x de</span><ValorRolando de={valorNumero(principal.de) && Math.round(valorNumero(principal.de) / principal.parcela.n)} por={principal.parcela.cada} texto={moeda(principal.parcela.cada)} /></p>
+          : <p className="valor">{principal.aPartir && <span>a partir de</span>}<ValorRolando de={valorNumero(principal.de)} por={valorNumero(principal.valor)} texto={principal.valor} /></p>}
         <div className="linhas">
           {d.destaquePreco === "parcela" && principal.parcela
             ? <p className="pilula">ou {principal.valor} à vista</p>
