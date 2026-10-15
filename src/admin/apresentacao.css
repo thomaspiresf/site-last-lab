@@ -727,27 +727,31 @@
 @keyframes caso-pop { from { opacity: 0; scale: .55; translate: 0 40px; } to { opacity: 1; scale: 1; translate: 0 0; } }
 @keyframes caso-zoom { from { scale: 1.35; } to { scale: 1; } }
 
-/* ---------- visão externa: a cada clique, um achado ampliado ---------- */
-.vx-zoom { display: none; }
-.apr-show.animado.em-passos .vx-zoom { display: grid; visibility: hidden; position: absolute; left: 81px; top: 300px; width: 1758px; height: 620px; z-index: 5;
-  grid-template-columns: 1100px 1fr; gap: 64px; align-items: center; background: var(--claro); transform-origin: var(--ox) 200px; }
-.vx-zoom .foto { height: 620px; border-radius: 38px; overflow: hidden; background: #e7e6e6; display: flex; align-items: center; justify-content: center; }
-.vx-zoom .foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.vx-zoom .txt { display: flex; flex-direction: column; gap: 22px; padding-right: 20px; }
-.vx-zoom .n { font-size: 30px; font-weight: 600; color: #ef4b3a; letter-spacing: 2px; }
-.vx-zoom .n span { color: #c4c4c8; font-weight: 300; }
-.vx-zoom .t { font-size: 56px; line-height: 1.15; color: #0a0a0a; letter-spacing: -1px; }
-.vx-zoom .x { font-size: 32px; line-height: 1.35; color: #77777f; }
-.apr-show.animado.em-passos.passo-1 .vx-zoom.vx-0 { visibility: visible; animation: vx-abre .8s cubic-bezier(.16, 1, .3, 1) both; }
-.apr-show.animado.em-passos.passo-1 .vx-zoom.vx-0 .txt > * { animation: apr-sobe .6s cubic-bezier(.2, .7, .2, 1) both; }
-.apr-show.animado.em-passos.passo-2 .vx-zoom.vx-1 { visibility: visible; animation: vx-abre .8s cubic-bezier(.16, 1, .3, 1) both; }
-.apr-show.animado.em-passos.passo-2 .vx-zoom.vx-1 .txt > * { animation: apr-sobe .6s cubic-bezier(.2, .7, .2, 1) both; }
-.apr-show.animado.em-passos.passo-3 .vx-zoom.vx-2 { visibility: visible; animation: vx-abre .8s cubic-bezier(.16, 1, .3, 1) both; }
-.apr-show.animado.em-passos.passo-3 .vx-zoom.vx-2 .txt > * { animation: apr-sobe .6s cubic-bezier(.2, .7, .2, 1) both; }
-.apr-show.animado.em-passos .vx-zoom .txt > *:nth-child(2) { animation-delay: .25s !important; }
-.apr-show.animado.em-passos .vx-zoom .txt > *:nth-child(3) { animation-delay: .38s !important; }
-.apr-show.animado.em-passos .vx-zoom .txt > *:nth-child(1) { animation-delay: .15s !important; }
-@keyframes vx-abre { from { opacity: 0; scale: .45; } to { opacity: 1; scale: 1; } }
+/* ---------- visão externa: a cada clique, o card do achado cresce e se reorganiza ---------- */
+.vx-txt .n { display: none; }
+.apr-show.animado.em-passos .vx-txt .n { display: block; max-height: 0; opacity: 0; overflow: hidden; font-size: 30px; font-weight: 600; color: #ef4b3a; letter-spacing: 2px; transition: max-height .6s ease, opacity .5s ease; }
+.apr-show.animado.em-passos .vx-txt .n span { color: #c4c4c8; font-weight: 300; }
+.apr-show.animado.em-passos :is(.vx-img, .vx-txt, .vx-txt .t, .vx-txt .x) {
+  transition: left .85s cubic-bezier(.65, 0, .25, 1), top .85s cubic-bezier(.65, 0, .25, 1), width .85s cubic-bezier(.65, 0, .25, 1), height .85s cubic-bezier(.65, 0, .25, 1),
+    font-size .85s cubic-bezier(.65, 0, .25, 1), opacity .5s ease, scale .6s ease, color .6s ease; }
+.apr-show.animado.em-passos.passo-1 .vx-img.vx-i0 { left: 81px !important; top: 300px !important; width: 1080px !important; height: 608px !important; }
+.apr-show.animado.em-passos.passo-1 .vx-txt.vx-i0 { left: 1225px !important; top: 330px !important; width: 614px !important; }
+.apr-show.animado.em-passos.passo-1 .vx-txt.vx-i0 .n { max-height: 60px; opacity: 1; margin-bottom: 18px; }
+.apr-show.animado.em-passos.passo-1 .vx-txt.vx-i0 .t { font-size: 60px !important; line-height: 1.12 !important; color: #0a0a0a !important; }
+.apr-show.animado.em-passos.passo-1 .vx-txt.vx-i0 .x { font-size: 32px !important; line-height: 1.35 !important; width: 590px !important; margin-top: 26px !important; color: #77777f !important; }
+.apr-show.animado.em-passos.passo-1 :is(.vx-img, .vx-txt):not(.vx-i0) { opacity: 0 !important; scale: .9; }
+.apr-show.animado.em-passos.passo-2 .vx-img.vx-i1 { left: 81px !important; top: 300px !important; width: 1080px !important; height: 608px !important; }
+.apr-show.animado.em-passos.passo-2 .vx-txt.vx-i1 { left: 1225px !important; top: 330px !important; width: 614px !important; }
+.apr-show.animado.em-passos.passo-2 .vx-txt.vx-i1 .n { max-height: 60px; opacity: 1; margin-bottom: 18px; }
+.apr-show.animado.em-passos.passo-2 .vx-txt.vx-i1 .t { font-size: 60px !important; line-height: 1.12 !important; color: #0a0a0a !important; }
+.apr-show.animado.em-passos.passo-2 .vx-txt.vx-i1 .x { font-size: 32px !important; line-height: 1.35 !important; width: 590px !important; margin-top: 26px !important; color: #77777f !important; }
+.apr-show.animado.em-passos.passo-2 :is(.vx-img, .vx-txt):not(.vx-i1) { opacity: 0 !important; scale: .9; }
+.apr-show.animado.em-passos.passo-3 .vx-img.vx-i2 { left: 81px !important; top: 300px !important; width: 1080px !important; height: 608px !important; }
+.apr-show.animado.em-passos.passo-3 .vx-txt.vx-i2 { left: 1225px !important; top: 330px !important; width: 614px !important; }
+.apr-show.animado.em-passos.passo-3 .vx-txt.vx-i2 .n { max-height: 60px; opacity: 1; margin-bottom: 18px; }
+.apr-show.animado.em-passos.passo-3 .vx-txt.vx-i2 .t { font-size: 60px !important; line-height: 1.12 !important; color: #0a0a0a !important; }
+.apr-show.animado.em-passos.passo-3 .vx-txt.vx-i2 .x { font-size: 32px !important; line-height: 1.35 !important; width: 590px !important; margin-top: 26px !important; color: #77777f !important; }
+.apr-show.animado.em-passos.passo-3 :is(.vx-img, .vx-txt):not(.vx-i2) { opacity: 0 !important; scale: .9; }
 
 /* ---------- investimento: o cartão de preço entra deslizando ---------- */
 .apr-show.animado .apr-slide > .apr-preco { animation: preco-entra 1s cubic-bezier(.16, 1, .3, 1) .35s both !important; }

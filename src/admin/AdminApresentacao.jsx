@@ -354,6 +354,7 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     // dentro de um slide com etapas, o clique revela a próxima antes de trocar de slide
     const total = animado ? nPassos(slides[iRef.current]) : 1;
     if (direcao === 1 && passoRef.current < total - 1) { setPasso((p) => p + 1); return; }
+    if (direcao === -1 && passoRef.current > 0) { setPasso((p) => p - 1); return; }
     const x = iRef.current;
     const y = Math.max(0, Math.min(slides.length - 1, x + direcao));
     if (y === x) return;
@@ -983,30 +984,23 @@ function Respostas({ d, escala }) {
 
 function Visao({ d, escala }) {
   const xs = [[81, 83], [675, 676], [1269, 1270]];
+  const total = Math.min(3, d.observacoes.length);
   return (
     <Slide livre escala={escala} d={d}>
       <Cabeca t={tx("visao", "titulo")} sub={d.visaoTitulo || <span className="apr-vazio">[A frase que resume o que você viu]</span>} />
+      {/* na apresentação animada, cada clique amplia um achado: a imagem e os textos do próprio card
+          crescem e se reorganizam, e os outros saem de cena (classes passo-N na TelaCheia) */}
       {d.observacoes.slice(0, 3).map((o, i) => (
         <React.Fragment key={i}>
-          <div className="apr-caixa" style={{ left: xs[i][0], top: 330, width: 566, height: 344, background: "#e7e6e6", overflow: "hidden" }}>
+          <div className={`apr-caixa vx-img vx-i${i}`} style={{ left: xs[i][0], top: 330, width: 566, height: 344, background: "#e7e6e6", overflow: "hidden" }}>
             {o.url && <img src={o.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />}
           </div>
-          <div className="apr-p" style={{ left: xs[i][1], top: 697, width: 566 }}>
-            <p style={{ fontSize: 40, lineHeight: 1.4, color: "#434343" }}>{ou(o.titulo, `[Observação ${i + 1}]`)}</p>
-            <p style={{ fontSize: 28, lineHeight: 1.21, color: "#999999", width: [480, 480, 360][i], marginTop: 19.7, marginLeft: 3 }}>{ou(o.texto, "[Uma frase explicando]")}</p>
+          <div className={`apr-p vx-txt vx-i${i}`} style={{ left: xs[i][1], top: 697, width: 566 }}>
+            <p className="n">{String(i + 1).padStart(2, "0")} <span>/ {String(total).padStart(2, "0")}</span></p>
+            <p className="t" style={{ fontSize: 40, lineHeight: 1.4, color: "#434343" }}>{ou(o.titulo, `[Observação ${i + 1}]`)}</p>
+            <p className="x" style={{ fontSize: 28, lineHeight: 1.21, color: "#999999", width: [480, 480, 360][i], marginTop: 19.7, marginLeft: 3 }}>{ou(o.texto, "[Uma frase explicando]")}</p>
           </div>
         </React.Fragment>
-      ))}
-      {/* na apresentação animada, cada clique amplia um achado (sai do lugar do card e cresce) */}
-      {d.observacoes.slice(0, 3).map((o, i) => (
-        <div key={`z${i}`} className={`vx-zoom vx-${i}`} style={{ "--ox": `${xs[i][0] + 283 - 81}px` }}>
-          <div className="foto">{o.url ? <img src={o.url} alt="" /> : <span className="apr-vazio">[Print {i + 1}]</span>}</div>
-          <div className="txt">
-            <p className="n">{String(i + 1).padStart(2, "0")} <span>/ {String(Math.min(3, d.observacoes.length)).padStart(2, "0")}</span></p>
-            <p className="t">{ou(o.titulo, `[Observação ${i + 1}]`)}</p>
-            <p className="x">{ou(o.texto, "[Uma frase explicando]")}</p>
-          </div>
-        </div>
       ))}
     </Slide>
   );
