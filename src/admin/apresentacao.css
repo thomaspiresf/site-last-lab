@@ -546,12 +546,12 @@
 .vt-cab-pp .s { font-size: 26px; color: #999; }
 
 /* página a página: fundo escuro e as páginas ocupando o slide, para brilharem */
-.vt-slide-pp { padding: 70px 60px 150px; gap: 26px; background: radial-gradient(90% 70% at 50% 45%, #1c1c1e 0%, #050505 70%); }
+.vt-slide-pp { padding: 70px 60px 150px; gap: 26px; }
 .vt-slide-pp .vt-cab-pp { margin: 0 0 0 23px; }
-.vt-slide-pp .vt-cab-pp .t { font-size: 22px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #fff; }
-.vt-slide-pp .vt-cab-pp .s { font-size: 22px; color: #77777c; }
+.vt-slide-pp .vt-cab-pp .t { font-size: 22px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--tinta); }
+.vt-slide-pp .vt-cab-pp .s { font-size: 22px; color: #9a9aa0; }
 .vt-slide-pp .vt-vitrine { margin: 0; align-items: center; }
 .vt-slide-pp .vt-todas { align-content: center; }
-.vt-slide-pp .vt-pag.sombra { box-shadow: 0 30px 60px -20px rgb(0 0 0 / .9), 0 0 0 1px rgb(255 255 255 / .16); }
+.vt-slide-pp .vt-pag.sombra { box-shadow: 0 30px 50px -26px rgb(0 0 0 / .45), 0 0 0 1px rgb(0 0 0 / .05); }
 .vt-slide-pp .vt-todas figcaption { color: #8a8a90; font-size: 15px; margin-top: 7px; }
-.vt-slide-pp .apr-rodape { color: #5f5f64; }
+.vt-slide-pp .apr-rodape { color: #c4c4c8; }

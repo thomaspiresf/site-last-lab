@@ -984,7 +984,7 @@ function paginasDoMaterial(k) {
     const m = d.materiais[k];
     if (!m) return null;
     return (
-      <Slide escala={escala} d={d} tipo="escuro" classe="vt-slide-pp">
+      <Slide escala={escala} d={d} classe="vt-slide-pp">
         <div className="vt-cab-pp">
           <p className="t">{tx("paginas", "titulo", { material: m.doc.nome })}</p>
           <p className="s">{tx("paginas", "sub", { paginas: m.lista.length, empresa: d.empresa || "sua marca" })}</p>
