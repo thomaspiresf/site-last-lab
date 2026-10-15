@@ -23,16 +23,16 @@ const MATERIAIS = {
   experiencia_premium: ["mapa-jornada"],
 };
 
-// as páginas que melhor mostram cada material (na ordem em que aparecem na vitrine)
+// as páginas que melhor mostram cada material (as mais visuais primeiro: são as que vão grandes)
 const DESTAQUES = {
-  "guia-mensagem": ["A frase", "Para quem", "Por que você", "Como falamos", "Mensagens-chave", "Pronto para usar"],
-  "guia-marca": ["Essência", "Proposta de valor", "Personalidade", "Como falamos", "Arquitetura", "Mensagens", "Na prática"],
-  manual: ["Logo", "Cores", "Tipografia", "Uso do logo", "O que não fazer", "Aplicações"],
-  lancamento: ["A mudança", "A mensagem", "As fases", "Onde a marca muda", "Textos prontos", "Como medir"],
-  "guia-editorial": ["Pilares", "A semana", "A legenda", "Templates", "Respostas prontas", "O que medir"],
-  "plano-campanha": ["Objetivo", "A grande ideia", "As fases", "Canais e peças", "Investimento"],
-  "roteiro-comercial": ["O processo", "A reunião", "Objeções", "Follow-up", "Mensagens prontas"],
-  "mapa-jornada": ["A jornada", "Etapa por etapa", "Mensagens prontas", "Depois da venda"],
+  "guia-mensagem": ["Pronto para usar", "Como falamos", "Por que você", "Para quem", "Mensagens-chave", "A frase"],
+  "guia-marca": ["Personalidade", "Como falamos", "Na prática", "Arquitetura", "Essência", "Proposta de valor", "Mensagens"],
+  manual: ["Cores", "Tipografia", "O que não fazer", "Uso do logo", "Logo", "Aplicações"],
+  lancamento: ["Textos prontos", "As fases", "Onde a marca muda", "A mudança", "A mensagem", "Como medir"],
+  "guia-editorial": ["A legenda", "Pilares", "A semana", "Templates", "Respostas prontas", "O que medir"],
+  "plano-campanha": ["As fases", "Objetivo", "A grande ideia", "Canais e peças", "Investimento"],
+  "roteiro-comercial": ["O processo", "Follow-up", "Objeções", "A reunião", "Mensagens prontas"],
+  "mapa-jornada": ["A jornada", "Mensagens prontas", "Etapa por etapa", "Depois da venda"],
 };
 
 // o que tem nos materiais de uma página só (mostrado ao lado dela)
@@ -64,63 +64,99 @@ export function MiniPagina({ m, x, largura, estilo, classe = "" }) {
   );
 }
 
-/** Slide "O que você recebe": a capa e duas páginas em leque (ou as capas de cada material). */
-export function LequeMateriais({ materiais }) {
-  if (materiais.length === 1) {
-    const m = materiais[0];
-    const pags = m.unica ? [m.capa] : [m.capa, ...m.destaques.slice(0, 2)];
-    const pos = [[0, 10, -4], [210, 40, 2], [400, 0, 6]];
-    return (
-      <div className="vt-leque">
-        {pags.map((x, i) => <MiniPagina key={i} m={m} x={x} largura={m.unica ? 470 : 320} classe="sombra" estilo={{ position: "absolute", left: m.unica ? 120 : pos[i][0], top: m.unica ? 0 : pos[i][1], transform: `rotate(${m.unica ? -2 : pos[i][2]}deg)`, zIndex: 3 - i }} />)}
-      </div>
-    );
-  }
-  const pos = materiais.length === 2 ? [[60, 30, -4], [330, 10, 4]] : [[0, 40, -6], [210, 0, 0], [420, 40, 6]];
+const nn = (n) => String(n).padStart(2, "0");
+const paginas = (n) => `${n} ${n === 1 ? "página" : "páginas"}`;
+
+/** Capa com as outras páginas empilhadas atrás (só as bordas aparecem): o documento na mesa. */
+function Pilha({ m, largura }) {
+  const folhas = m.unica ? 0 : Math.min(4, m.lista.length - 1);
+  const cores = ["#f5f5f2", "#0b0b0c", "#ef4b3a", "#f5f5f2"];
+  const h = Math.round(largura * 1.4144);
   return (
-    <div className="vt-leque">
-      {materiais.slice(0, 3).map((m, i) => <MiniPagina key={m.doc.id} m={m} x={m.capa} largura={300} classe="sombra" estilo={{ position: "absolute", left: pos[i][0], top: pos[i][1], transform: `rotate(${pos[i][2]}deg)`, zIndex: 3 - i }} />)}
+    <div className="vt-pilha" style={{ width: largura + folhas * 12, height: h + folhas * 10 }}>
+      {Array.from({ length: folhas }, (_, i) => folhas - i).map((k) => (
+        <span key={k} className="folha" style={{ width: largura, height: h, left: k * 12, top: k * 10, background: cores[(k - 1) % 4] }} />
+      ))}
+      <MiniPagina m={m} x={m.capa} largura={largura} classe="sombra" estilo={{ position: "relative", zIndex: 5 }} />
     </div>
   );
 }
 
-/** Slide "Como fica": a vitrine com a capa e as páginas de destaque (ou uma coluna por material). */
+/** Slide "O que você recebe": o material num palco, como foto de produto, com um selo. */
+export function PalcoMateriais({ materiais, empresa }) {
+  const um = materiais.length === 1 ? materiais[0] : null;
+  const total = materiais.reduce((t, m) => t + m.lista.length, 0);
+  const fila = materiais.slice(0, 3);
+  return (
+    <div className={`vt-palco ${um ? "um" : "varios"}`}>
+      {um ? (
+        <Pilha m={um} largura={um.unica ? 360 : 330} />
+      ) : (
+        <div className="vt-fila">
+          {fila.map((m) => <MiniPagina key={m.doc.id} m={m} x={m.capa} largura={fila.length === 2 ? 300 : 236} classe="sombra" />)}
+        </div>
+      )}
+      <div className="vt-selo">
+        <p className="num">{um ? total : materiais.length}</p>
+        <div>
+          <p className="t">{um ? (total === 1 ? "página" : "páginas") : `materiais · ${paginas(total)}`}</p>
+          <p className="s">{um ? "feito com a sua marca" : `com a marca ${empresa ? `da ${empresa}` : "da sua empresa"}`}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Slide "Como fica": as páginas grandes, lado a lado, ocupando a largura do slide. */
 export function VitrineMateriais({ materiais }) {
+  const LARG = 424;
   if (materiais.length === 1) {
     const m = materiais[0];
     if (m.unica) {
       return (
-        <div className="vt-vitrine um">
-          <MiniPagina m={m} x={m.capa} largura={440} classe="sombra" />
-          <div className="indice"><p className="rot">O que tem</p>{(CONTEUDO[m.doc.id] || [m.doc.descricao]).map((t, i) => <p key={i}><b>{String(i + 1).padStart(2, "0")}</b>{t}</p>)}</div>
+        <div className="vt-vitrine">
+          <div className="vt-unica">
+            <MiniPagina m={m} x={m.capa} largura={LARG} classe="sombra" />
+            <div className="lista">{(CONTEUDO[m.doc.id] || [m.doc.descricao]).map((t, i) => <p key={i}><b>{nn(i + 1)}</b>{t}</p>)}</div>
+          </div>
         </div>
       );
     }
+    const mostradas = [m.capa, ...m.destaques.slice(0, 3)];
+    const resto = m.lista.length - mostradas.length;
     return (
-      <div className="vt-vitrine um">
-        <MiniPagina m={m} x={m.capa} largura={420} classe="sombra" />
-        <div className="grade">
-          {m.destaques.slice(0, 6).map((x, i) => (
-            <div key={i}><MiniPagina m={m} x={x} largura={190} classe="sombra leve" /><p>{x.nome}</p></div>
+      <div className="vt-vitrine">
+        <div className="vt-linha">
+          {mostradas.map((x, i) => (
+            <figure key={i}>
+              <div className="moldura">
+                <MiniPagina m={m} x={x} largura={LARG} classe="sombra" />
+                {i === mostradas.length - 1 && resto > 0 && <span className="mais">+ {paginas(resto)}</span>}
+              </div>
+              <figcaption><b>{nn(m.lista.indexOf(x) + 1)}</b>{x.nome}</figcaption>
+            </figure>
           ))}
-        </div>
-        <div className="indice">
-          <p className="rot">{m.lista.length} páginas</p>
-          {m.lista.map((x, i) => <p key={i}><b>{String(i + 1).padStart(2, "0")}</b>{x.nome}</p>)}
         </div>
       </div>
     );
   }
+  // vários materiais: um bloco por material, com a capa grande e duas páginas empilhadas ao lado
+  const n = materiais.length;
+  const capa = Math.min(LARG, Math.floor((1754 - (n - 1) * 44 - n * 6.5) / (n * 1.5)));
+  const lado = Math.floor(capa / 2 - 4);
   return (
-    <div className="vt-vitrine varios" style={{ gridTemplateColumns: `repeat(${materiais.length}, 280px)` }}>
-      {materiais.map((m) => (
-        <div key={m.doc.id} className="coluna">
-          <MiniPagina m={m} x={m.capa} largura={280} classe="sombra" />
-          {!m.unica && <div className="trio">{m.destaques.slice(0, 3).map((x, i) => <MiniPagina key={i} m={m} x={x} largura={84} classe="sombra leve" />)}</div>}
-          <p className="nome">{m.doc.nome}</p>
-          <p className="paginas">{m.lista.length} {m.lista.length === 1 ? "página" : "páginas"}</p>
-        </div>
-      ))}
+    <div className="vt-vitrine">
+      <div className="vt-blocos" style={{ gap: n === 2 ? 120 : 44 }}>
+        {materiais.map((m) => (
+          <figure key={m.doc.id}>
+            <div className="bloco">
+              <MiniPagina m={m} x={m.capa} largura={capa} classe="sombra" />
+              {!m.unica && <div className="lado">{m.destaques.slice(0, 2).map((x, i) => <MiniPagina key={i} m={m} x={x} largura={lado} classe="sombra" />)}</div>}
+            </div>
+            <figcaption><b>{m.doc.nome}</b><span>{paginas(m.lista.length)}</span></figcaption>
+          </figure>
+        ))}
+      </div>
     </div>
   );
 }

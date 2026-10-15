@@ -12,7 +12,7 @@ import { VAZIO_MARCA, paginasDoGuiaMarca, nomesDoGuiaMarca } from "./AdminGuiaMa
 import { dia, montarCronograma, periodo } from "./cronograma";
 import { TEXTOS } from "./textosSlides";
 import { carregarCatalogo } from "./carregarCatalogo";
-import { LequeMateriais, VitrineMateriais, materiaisDoServico } from "./vitrineMateriais";
+import { PalcoMateriais, VitrineMateriais, materiaisDoServico } from "./vitrineMateriais";
 import "./apresentacao.css";
 
 // ícones das personas (os mesmos do diagnóstico, copiados de diagnostico-lastlab/src/assets/personas)
@@ -945,17 +945,26 @@ function PreviaEntrega({ d }) {
 
 function Entrega({ d, escala }) {
   const s = d.oferta.servico;
+  const comMateriais = d.materiais.length > 0;
   return (
     <Slide escala={escala} d={d}>
       <Titulo t={tx("entrega", "titulo")} sub={s.promessa} />
-      <div className="apr-entrega">
+      <div className={`vt-entrega ${comMateriais ? "" : "mockup"}`}>
         <div className="esq">
-          <div className="lista">
-            {s.entregas.map((x) => <div key={x} className="apr-check"><i />{x}</div>)}
+          <ul className={`vt-itens ${s.entregas.length > 4 ? "muitos" : ""}`}>
+            {s.entregas.map((x) => (
+              <li key={x}>
+                <span className="ok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>
+                <span>{x}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="vt-prazos">
+            <span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>{d.cronograma.total} dias úteis</span>
+            <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>{s.ajustes} de ajuste</span>
           </div>
-          <p className="prazo">{tx("entrega", "prazo", { total: d.cronograma.total, ajustes: d.oferta.servico.ajustes })}</p>
         </div>
-        {d.materiais.length ? <LequeMateriais materiais={d.materiais} /> : <PreviaEntrega d={d} />}
+        {comMateriais ? <PalcoMateriais materiais={d.materiais} empresa={d.empresa} /> : <PreviaEntrega d={d} />}
       </div>
     </Slide>
   );
