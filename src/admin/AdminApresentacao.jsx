@@ -303,18 +303,34 @@ function medirFlip(raiz) {
   return itens;
 }
 
+// slides que se revelam em etapas, a cada clique (só na apresentação animada)
+const PASSOS = { antesdepois: 2 };
+
 export function TelaCheia({ slides, inicio, canal, onSair }) {
   const [i, setI] = useState(inicio);
+  const [passo, setPasso] = useState(0);
+  const passoRef = useRef(0);
+  passoRef.current = passo;
   const raiz = useRef(null);
+  const iRef = useRef(i);
+  iRef.current = i;
   const flip = useRef(null); // medidas do slide que está saindo, para a transição com elementos compartilhados
   const S = slides[i];
   const [animado, setAnimado] = useState(modoAnimado);
   // antes de trocar de slide: se é "Por onde começar" → "A oferta", mede o card e os textos dele
-  const ir = useCallback((passo) => setI((x) => {
-    const y = Math.max(0, Math.min(slides.length - 1, x + passo));
-    flip.current = animado && passo === 1 && slides[x]?.sid === "comeco" && slides[y]?.sid === "oferta" ? medirFlip(raiz.current) : null;
-    return y;
-  }), [slides, animado]);
+  const ir = useCallback((direcao) => {
+    // dentro de um slide com etapas, o clique revela a próxima antes de trocar de slide
+    const total = animado ? PASSOS[slides[iRef.current]?.sid] || 1 : 1;
+    if (direcao === 1 && passoRef.current < total - 1) { setPasso((p) => p + 1); return; }
+    const x = iRef.current;
+    const y = Math.max(0, Math.min(slides.length - 1, x + direcao));
+    if (y === x) return;
+    flip.current = animado && direcao === 1 && slides[x]?.sid === "comeco" && slides[y]?.sid === "oferta" ? medirFlip(raiz.current) : null;
+    // indo para trás, o slide já aparece completo
+    setPasso(direcao === -1 && animado ? (PASSOS[slides[y]?.sid] || 1) - 1 : 0);
+    iRef.current = y;
+    setI(y);
+  }, [slides, animado]);
   // o roteiro (outra janela) acompanha o slide atual
   useEffect(() => {
     const bc = "BroadcastChannel" in window ? new BroadcastChannel(canal) : null;
@@ -388,7 +404,7 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     });
   }, [i]);
   return (
-    <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""}`} onClick={() => ir(1)}>
+    <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""} ${animado && PASSOS[S?.sid] ? `em-passos passo-${passo}` : ""}`} onClick={() => ir(1)}>
       {/* key: a cada slide o palco é montado de novo, e a animação de entrada roda outra vez */}
       <div className="apr-camadas">
         {saindo !== null && slides[saindo] && (() => { const A = slides[saindo]; return <div className="apr-saindo" key={`s-${saindo}`}><Palco><A /></Palco></div>; })()}
@@ -1013,23 +1029,23 @@ function AntesDepois({ d, escala }) {
   return (
     <Slide livre escala={escala} d={d}>
       <P x={77} y={40} s={88} como="h2" cor="#000">{tx("antesdepois", "titulo")}</P>
-      <div className="apr-caixa" style={{ left: 81, top: 199, width: 852, height: 718, background: "#e7e6e6" }} />
-      <div className="apr-caixa" style={{ left: 977, top: 199, width: 852, height: 718, background: "#262626" }} />
-      <P x={133} y={239} s={36} peso={300} cor="#999999">{tx("antesdepois", "antes")}</P>
-      <P x={1056} y={239} s={36} peso={300} cor="#999999">{tx("antesdepois", "depois")}</P>
+      <div className="apr-caixa ad-antes" style={{ left: 81, top: 199, width: 852, height: 718, background: "#e7e6e6" }} />
+      <div className="apr-caixa ad-depois ad-caixa" style={{ left: 977, top: 199, width: 852, height: 718, background: "#262626" }} />
+      <P className="ad-antes" x={133} y={239} s={36} peso={300} cor="#999999">{tx("antesdepois", "antes")}</P>
+      <P className="ad-depois" x={1056} y={239} s={36} peso={300} cor="#999999">{tx("antesdepois", "depois")}</P>
       {(hoje.length ? hoje : ["[O que você viu de fora]"]).map((x, i) => (
         <React.Fragment key={i}>
-          <span className="apr-bola" style={{ left: 134, top: tops[i] + 8.5 }} />
-          <P x={195} y={tops[i]} s={38} lh={1.21} cor="#434343" w={700}>{x}</P>
+          <span className="apr-bola ad-antes" style={{ left: 134, top: tops[i] + 8.5, "--k": i }} />
+          <P className="ad-antes ad-item" x={195} y={tops[i]} s={38} lh={1.21} cor="#434343" w={700} style={{ "--k": i }}>{x}</P>
         </React.Fragment>
       ))}
       {d.oferta.servico.depois.slice(0, 3).map((x, i) => (
         <React.Fragment key={i}>
-          <svg style={{ position: "absolute", left: 1053, top: tops[i] + 11, width: 33, height: 33 }} viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10.5" /><path d="m7.5 12.2 3 3 6-6.2" /></svg>
-          <P x={1110} y={tops[i]} s={38} lh={1.21} cor="#f3f3f3" w={690}>{x}</P>
+          <svg className="ad-depois ad-item" style={{ position: "absolute", left: 1053, top: tops[i] + 11, width: 33, height: 33, "--k": i }} viewBox="0 0 24 24" fill="none" stroke="#ef4b3a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10.5" /><path d="m7.5 12.2 3 3 6-6.2" /></svg>
+          <P className="ad-depois ad-item" x={1110} y={tops[i]} s={38} lh={1.21} cor="#f3f3f3" w={690} style={{ "--k": i }}>{x}</P>
         </React.Fragment>
       ))}
-      <span className="apr-seta" style={{ left: 895, top: 498 }}>
+      <span className="apr-seta ad-seta" style={{ left: 895, top: 498 }}>
         <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </span>
     </Slide>
@@ -1394,11 +1410,11 @@ function Caso({ d, escala, n }) {
   const blocos = [[tx("casos", "desafio"), c.desafio], [tx("casos", "fizemos"), c.fizemos], [tx("casos", "resultado"), c.resultado]];
   return (
     <Slide livre escala={escala} d={d}>
-      <div className="apr-caso-foto" style={{ left: 1839 - largura, top: topo, width: largura, height: altGrande }}>
+      <div className="apr-caso-foto caso-grande" style={{ left: 1839 - largura, top: topo, width: largura, height: altGrande }}>
         <img src={grande} alt="" onLoad={(e) => e.currentTarget.naturalWidth && setProporcao(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)} />
       </div>
       {menores.map((src, k) => (
-        <div key={src} className="apr-caso-foto" style={{ left: 1839 - largura + k * ((largura + vao) / 3), top: topo + altGrande + vao, width: (largura - 2 * vao) / 3, height: altMenor }}>
+        <div key={src} className="apr-caso-foto caso-menor" style={{ left: 1839 - largura + k * ((largura + vao) / 3), top: topo + altGrande + vao, width: (largura - 2 * vao) / 3, height: altMenor, "--k": k }}>
           <img src={src} alt="" />
         </div>
       ))}
