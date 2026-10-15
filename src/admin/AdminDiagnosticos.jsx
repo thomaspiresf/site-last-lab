@@ -20,10 +20,12 @@ import {
   SlidersHorizontal,
   Pencil,
   Presentation,
+  Plus,
+  X,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
-import { AREAS } from "./catalogoOfertas";
+import { AREAS, ESTRUTURA, SERVICOS, degrauDoServico, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import {
   listDiagnosticos,
@@ -36,6 +38,7 @@ import {
   linkDevolutiva,
   salvarOfertaEscolhida,
   getCatalogoOfertas,
+  criarApresentacaoManual,
 } from "../lib/api";
 
 // Leads do diagnóstico de marca (lastlab.com.br/diagnostico). A sugestão de oferta e o
@@ -86,6 +89,7 @@ export default function AdminDiagnosticos() {
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [soQualificados, setSoQualificados] = useState(false);
   const [busca, setBusca] = useState("");
+  const [criando, setCriando] = useState(false);
 
   useEffect(() => {
     listDiagnosticos()
@@ -137,10 +141,16 @@ export default function AdminDiagnosticos() {
             Leads do diagnóstico de marca (/diagnostico), com a oferta de entrada sugerida para a devolutiva.
           </p>
         </div>
-        <Link to="/admin/diagnosticos/ajustes"
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold bg-white border border-zinc-200 hover:border-black">
-          <SlidersHorizontal size={15} /> Ajustes do diagnóstico
-        </Link>
+        <div className="flex gap-2 flex-wrap">
+          <Link to="/admin/diagnosticos/ajustes"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold bg-white border border-zinc-200 hover:border-black">
+            <SlidersHorizontal size={15} /> Ajustes do diagnóstico
+          </Link>
+          <button type="button" onClick={() => setCriando(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold bg-black text-white hover:bg-zinc-800">
+            <Plus size={15} /> Nova apresentação
+          </button>
+        </div>
       </div>
 
       {erro && <p className="mb-4 text-sm text-red-600">{erro}</p>}
@@ -209,7 +219,9 @@ export default function AdminDiagnosticos() {
                     → {x.ofertaEntrada || "—"}
                   </p>
                   <div className="flex items-center gap-2 mt-1 text-xs text-zinc-500 flex-wrap">
-                    <span>{x.persona} · {x.notaGeral}/100</span>
+                    {x.dados?.origem === "manual"
+                      ? <span className="px-1.5 py-0.5 rounded-full bg-zinc-100 text-zinc-600 text-[10px] font-bold">manual</span>
+                      : <span>{x.persona} · {x.notaGeral}/100</span>}
                     {x.qualificado && (
                       <span className="px-1.5 py-0.5 rounded-full bg-black text-white text-[10px] font-bold">qualificado</span>
                     )}
@@ -239,7 +251,91 @@ export default function AdminDiagnosticos() {
           </section>
         </div>
       )}
+      {criando && <NovaApresentacao onFechar={() => setCriando(false)} />}
     </AdminLayout>
+  );
+}
+
+/** Apresentação do zero (sem diagnóstico): contato, empresa e o que vai ser oferecido. Cria o registro e abre o editor. */
+function NovaApresentacao({ onFechar }) {
+  const navigate = useNavigate();
+  const [catalogo, setCatalogo] = useState(null);
+  const [f, setF] = useState({ nome: "", empresa: "", email: "", whatsapp: "", servico: "" });
+  const [erro, setErro] = useState("");
+  const [salvando, setSalvando] = useState(false);
+
+  useEffect(() => {
+    // as mesmas opções da troca de oferta: entradas, projetos (degrau 2) e premium (degrau 3)
+    // se as ofertas do diagnóstico não carregarem, as entradas vêm do catálogo de serviços do site
+    const entradasDoCatalogo = () => Object.keys(SERVICOS).filter((k) => degrauDoServico(k) === "entrada").map((k) => ({ nome: servicoCompleto(k).nome, descricao: servicoCompleto(k).promessa || "" }));
+    Promise.all([getCatalogoOfertas().catch(() => null), carregarCatalogo()])
+      .then(([base]) => {
+        const entradas = (base && base.length ? base : entradasDoCatalogo()).map((x) => ({ ...x, grupo: "Entrada" }));
+        const degraus = Object.values(AREAS).flatMap((a) => [
+          { nome: a.principal.nome, descricao: a.principal.pitch || a.principal.entregas, grupo: "Projeto (degrau 2)" },
+          { nome: a.premium.nome, descricao: a.premium.pitch || a.premium.entregas, grupo: "Premium (degrau 3)" },
+        ]);
+        setCatalogo([...entradas, ...degraus.filter((x) => !entradas.some((b) => b.nome === x.nome))]);
+      })
+      .catch((e) => setErro(e.message));
+  }, []);
+
+  const criar = async (e) => {
+    e.preventDefault();
+    const opcao = catalogo?.find((x) => x.nome === f.servico);
+    if (!f.empresa.trim() || !opcao) { setErro("Preencha a empresa e escolha o serviço."); return; }
+    setSalvando(true);
+    setErro("");
+    try {
+      const id = await criarApresentacaoManual({
+        nome: f.nome.trim(), empresa: f.empresa.trim(), email: f.email.trim(), whatsapp: f.whatsapp.trim(),
+        oferta: { principal: { nome: opcao.nome, descricao: opcao.descricao || "" } },
+        // sem diagnóstico, a visão interna (radar e notas) começa oculta
+        ocultos: [...new Set([...(ESTRUTURA.ocultos || []), "respostas"])],
+      });
+      navigate(`/admin/diagnosticos/${id}/apresentar`);
+    } catch (e2) {
+      setErro(e2.message || "Não consegui criar.");
+      setSalvando(false);
+    }
+  };
+
+  const campo = "w-full px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm outline-none focus:border-black";
+  const rotulo = "block text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5";
+  const grupos = catalogo ? [...new Set(catalogo.map((x) => x.grupo))] : [];
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={onFechar}>
+      <form onSubmit={criar} onClick={(e) => e.stopPropagation()} className="bg-white rounded-3xl p-6 w-full max-w-lg flex flex-col gap-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-black tracking-tight">Nova apresentação</h2>
+            <p className="text-sm text-zinc-500 mt-1">Para um cliente que não passou pelo diagnóstico. Depois você preenche tudo no editor da apresentação.</p>
+          </div>
+          <button type="button" onClick={onFechar} className="p-1.5 rounded-full hover:bg-zinc-100"><X size={18} /></button>
+        </div>
+        <div><label className={rotulo}>Empresa</label><input autoFocus className={campo} value={f.empresa} onChange={(e) => setF({ ...f, empresa: e.target.value })} placeholder="Nome da marca do cliente" /></div>
+        <div><label className={rotulo}>Contato</label><input className={campo} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} placeholder="Nome da pessoa" /></div>
+        <div className="grid grid-cols-2 gap-3">
+          <div><label className={rotulo}>E-mail</label><input type="email" className={campo} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></div>
+          <div><label className={rotulo}>WhatsApp</label><input className={campo} value={f.whatsapp} onChange={(e) => setF({ ...f, whatsapp: e.target.value })} /></div>
+        </div>
+        <div>
+          <label className={rotulo}>O que vai ser oferecido</label>
+          <select className={campo} value={f.servico} onChange={(e) => setF({ ...f, servico: e.target.value })} disabled={!catalogo}>
+            <option value="">{catalogo ? "Escolha o serviço" : "Carregando os serviços..."}</option>
+            {grupos.map((g) => (
+              <optgroup key={g} label={g}>
+                {catalogo.filter((x) => x.grupo === g).map((x) => <option key={x.nome} value={x.nome}>{x.nome}</option>)}
+              </optgroup>
+            ))}
+          </select>
+        </div>
+        {erro && <p className="text-sm text-red-600">{erro}</p>}
+        <button disabled={salvando} className="self-end inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800 disabled:opacity-50">
+          <Presentation size={15} /> {salvando ? "Criando..." : "Criar e abrir o editor"}
+        </button>
+      </form>
+    </div>
   );
 }
 

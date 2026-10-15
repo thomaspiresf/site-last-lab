@@ -760,6 +760,8 @@ export function montarDados(item, ap, urls = {}) {
   const casos = (ap.casos || CASOS_PADRAO[oferta.servicoId] || projects.slice(0, 2).map((p) => p.id)).map((id) => projects.find((p) => p.id === id)).filter(Boolean);
   return {
     nome: item.nome,
+    // criada do zero (sem diagnóstico): capa e rodapé com o nome do projeto
+    manual: d.origem === "manual",
     empresa: ap.empresa || "",
     // os entregáveis do serviço, com as páginas de verdade (dados e ajustes do editor de entregáveis)
     materiais: materiaisDoServico(oferta.servicoId, ap),
@@ -819,7 +821,7 @@ function Rodape({ d }) {
   return (
     <div className="apr-rodape">
       <p style={{ left: 83 }}>{rico(tx("rodape", "col1", { empresa: d.empresa || d.nome }))}</p>
-      <p style={{ left: 723 }}>{rico(d.degrau && d.degrau !== "entrada" ? tx("rodape", "col2Projeto", { projeto: d.oferta.titulo }) : tx("rodape", "col2"))}</p>
+      <p style={{ left: 723 }}>{rico((d.degrau && d.degrau !== "entrada") || d.manual ? tx("rodape", "col2Projeto", { projeto: d.oferta.titulo }) : tx("rodape", "col2"))}</p>
       <p style={{ left: 1322 }}>{rico(tx("rodape", "col3"))}</p>
       <svg className="simbolo" viewBox="0 0 20 46" aria-hidden="true">
         <rect x="5" y="0" width="4" height="31" /><rect x="14" y="0" width="5" height="31" />
@@ -888,7 +890,7 @@ function Capa({ d, escala }) {
       {/* entrada: "Diagnóstico de marca"; principal e premium: o nome do projeto */}
       {/* o serviço pode ter o título da capa com a quebra escolhida à mão (tituloCapa); senão, quebra equilibrada */}
       <P x={68} y={324} s={d.degrau && d.degrau !== "entrada" && d.oferta.titulo.length > 16 ? 120 : 152} lh={1.15} cor="#fff" como="h1" w={1000} style={{ textWrap: "balance" }}>
-        {rico(d.degrau && d.degrau !== "entrada" ? (d.oferta.servico.tituloCapa || tx("capa", "tituloProjeto", { projeto: d.oferta.titulo })) : tx("capa", "titulo"))}
+        {rico((d.degrau && d.degrau !== "entrada") || d.manual ? (d.oferta.servico.tituloCapa || tx("capa", "tituloProjeto", { projeto: d.oferta.titulo })) : tx("capa", "titulo"))}
       </P>
       <svg viewBox="0 0 1920 1080" style={{ position: "absolute", inset: 0, width: 1920, height: 1080 }} aria-hidden="true">
         {PECAS_CAPA.map((pts) => <polygon key={pts} points={pts} fill="#ef4b3a" />)}

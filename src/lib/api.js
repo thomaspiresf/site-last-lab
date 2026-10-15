@@ -899,6 +899,29 @@ export async function enviarImagemApresentacao(id, arquivo) {
   return caminho;
 }
 
+/**
+ * Apresentação criada do zero, sem diagnóstico: um registro em diagnosticos marcado como manual
+ * (dados.origem = "manual"), com a oferta escolhida e a empresa já preenchidas.
+ */
+export async function criarApresentacaoManual({ nome, empresa, email, whatsapp, oferta, ocultos = [] }) {
+  const id = crypto.randomUUID();
+  const { error } = await supabase.from("diagnosticos").insert({
+    id,
+    nome: nome || empresa || "Sem nome",
+    email: email || "",
+    whatsapp: whatsapp || "",
+    persona: "Apresentação manual",
+    nota_geral: 0,
+    qualificado: false,
+    oferta_entrada: oferta?.principal?.nome || null,
+    oferta_escolhida: oferta || null,
+    dados: { origem: "manual", links: {}, notas: {}, devolutiva: {} },
+    apresentacao: { empresa: empresa || "", ocultos },
+  });
+  if (error) throw error;
+  return id;
+}
+
 export async function deleteDiagnostico(id) {
   const { error } = await supabase.from("diagnosticos").delete().eq("id", id);
   if (error) throw error;
