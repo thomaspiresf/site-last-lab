@@ -116,8 +116,13 @@ function BriefingCard({ briefing, onDeleted }) {
   const handleDelete = async () => {
     if (!confirm(`Excluir o briefing de ${briefing.name}?`)) return;
     setDeleting(true);
-    await deleteBrandBrief(briefing.id);
-    onDeleted(briefing.id);
+    try {
+      await deleteBrandBrief(briefing.id);
+      onDeleted(briefing.id);
+    } catch (e) {
+      alert(`Não consegui excluir: ${e.message || e}`);
+      setDeleting(false);
+    }
   };
 
   return (
@@ -156,6 +161,15 @@ function BriefingCard({ briefing, onDeleted }) {
             className="text-zinc-400 hover:text-black transition-colors"
           >
             <Download size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            title="Excluir briefing"
+            className="text-zinc-400 hover:text-red-600 transition-colors disabled:opacity-40"
+          >
+            <Trash2 size={18} />
           </button>
           <button
             type="button"
