@@ -202,7 +202,7 @@
 .apr-entra { position: relative; z-index: 1; }
 .apr-saindo .apr-slide, .apr-saindo .apr-slide * { animation: none !important; }
 .apr-saindo .apr-degrau.ativo { visibility: hidden; }
-.apr-show .apr-saindo .apr-slide > *:not(.ativo) { animation: apr-some .6s ease both !important; }
+.apr-show .apr-saindo .apr-slide > *:not(.ativo):not(.apr-rodape) { animation: apr-some .6s ease both !important; }
 @keyframes apr-some { from { opacity: 1; } to { opacity: 0; } }
 .apr-show-dica { position: fixed; bottom: 16px; right: 20px; color: #666; font: 12px/1 system-ui, sans-serif; }
 
@@ -603,7 +603,7 @@
 .apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(28) { animation-delay: 2.53s; }
 .apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(29) { animation-delay: 2.62s; }
 .apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(30) { animation-delay: 2.71s; }
-.apr-show.animado .apr-rodape { animation: apr-surge .8s ease .9s both; }
+.apr-show.animado .apr-rodape { animation: none; }
 /* título e subtítulo */
 .apr-show.animado .apr-titulo > * { animation: apr-sobe .8s cubic-bezier(.2, .7, .2, 1) both; }
 .apr-show.animado .apr-titulo > *:nth-child(2) { animation-delay: .18s; }
@@ -657,4 +657,4 @@
    novos (feito em JS, na TelaCheia); aqui só se desligam as entradas normais desse slide */
 .apr-show.animado.de-comeco .apr-slide, .apr-show.animado.de-comeco .apr-slide > *:not(.apr-rodape) { animation: none !important; }
 .apr-show.animado.de-comeco .apr-entra .apr-palco { background: transparent; }
-.apr-show.animado.de-comeco .apr-rodape { animation: apr-surge .6s ease .9s both !important; }
+.apr-show.animado.de-comeco .apr-rodape { animation: none !important; }
