@@ -293,7 +293,7 @@ export function Palco({ children }) {
 
 /** Posições dos elementos [data-flip] de um slide, em unidades do slide (1920×1080), e do card. */
 function medirFlip(raiz) {
-  const slide = raiz?.querySelector(".apr-slide");
+  const slide = (raiz?.querySelector(".apr-entra") || raiz)?.querySelector(".apr-slide");
   if (!slide) return null;
   const base = slide.getBoundingClientRect();
   const z = base.width / 1920;
@@ -339,13 +339,25 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
   useEffect(() => () => { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); }, []);
   // o slide novo já está na tela (sem pintar): cada elemento sai de onde estava no card e vai ao lugar
   // dele; o fundo laranja cresce do retângulo do card até o slide inteiro
-  const expande = !!flip.current;
+  // durante a expansão, o slide anterior fica por baixo e some devagar (sem o card, que é o que cresce);
+  // "expandido" guarda em qual slide a expansão aconteceu, para as entradas normais não voltarem a rodar
+  const [saindo, setSaindo] = useState(null);
+  const [expandido, setExpandido] = useState(null);
+  const expande = !!flip.current || expandido === i;
+  useLayoutEffect(() => {
+    if (!flip.current) return undefined;
+    setExpandido(i);
+    setSaindo(i - 1);
+    const t = setTimeout(() => setSaindo(null), 1100);
+    return () => clearTimeout(t);
+  }, [i]); // eslint-disable-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     const antes = flip.current;
     if (!antes) return;
     flip.current = null;
-    const depois = medirFlip(raiz.current);
-    const slide = raiz.current?.querySelector(".apr-slide");
+    const atual = raiz.current?.querySelector(".apr-entra");
+    const depois = medirFlip(atual);
+    const slide = atual?.querySelector(".apr-slide");
     if (!depois || !slide) return;
     const tempo = { duration: 1000, easing: "cubic-bezier(.65, 0, .2, 1)", fill: "backwards" };
     const c = antes.card;
@@ -364,7 +376,10 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
   return (
     <div ref={raiz} className={`apr-show ${animado ? "animado" : ""} ${animado && expande ? "de-comeco" : ""}`} onClick={() => ir(1)}>
       {/* key: a cada slide o palco é montado de novo, e a animação de entrada roda outra vez */}
-      <AnimadoCtx.Provider value={animado}><Palco key={`${i}-${animado}`}><S /></Palco></AnimadoCtx.Provider>
+      <div className="apr-camadas">
+        {saindo !== null && slides[saindo] && (() => { const A = slides[saindo]; return <div className="apr-saindo" key={`s-${saindo}`}><Palco><A /></Palco></div>; })()}
+        <div className="apr-entra"><AnimadoCtx.Provider value={animado}><Palco key={`${i}-${animado}`}><S /></Palco></AnimadoCtx.Provider></div>
+      </div>
       <span className="apr-show-dica">{i + 1} / {slides.length} · setas para navegar · A {animado ? "desliga" : "liga"} a animação · Esc para sair</span>
     </div>
   );

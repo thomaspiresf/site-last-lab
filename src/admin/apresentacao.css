@@ -197,6 +197,13 @@
 /* modo apresentar: tela cheia, um slide por vez */
 .apr-show { position: fixed; inset: 0; z-index: 100; background: #000; display: flex; align-items: center; justify-content: center; cursor: none; }
 .apr-show .apr-palco { width: min(100vw, calc(100vh * 16 / 9)); }
+.apr-camadas { display: grid; }
+.apr-camadas > * { grid-area: 1 / 1; }
+.apr-entra { position: relative; z-index: 1; }
+.apr-saindo .apr-slide, .apr-saindo .apr-slide * { animation: none !important; }
+.apr-saindo .apr-degrau.ativo { visibility: hidden; }
+.apr-show .apr-saindo .apr-slide > *:not(.ativo) { animation: apr-some .6s ease both !important; }
+@keyframes apr-some { from { opacity: 1; } to { opacity: 0; } }
 .apr-show-dica { position: fixed; bottom: 16px; right: 20px; color: #666; font: 12px/1 system-ui, sans-serif; }
 
 /* PDF: imprime só os slides, um por página */
@@ -640,8 +647,8 @@
 .apr-show.animado .apr-barra-cheia { transform-origin: left center; animation: apr-barra 1.3s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(1.5s + var(--i, 0) * .12s); }
 @keyframes apr-barra { from { scale: 0 1; } to { scale: 1 1; } }
 /* por onde começar: os três cards entram em cinza e o primeiro ganha o laranja */
-.apr-show.animado .apr-slide > .apr-degrau.ativo.ativo:not(.apr-rodape) { animation: apr-sobe .8s cubic-bezier(.2, .7, .2, 1) .28s both, apr-vira-laranja .7s ease 1.4s both; }
-.apr-show.animado .apr-degrau.ativo p { animation: apr-vira-branco .7s ease 1.4s both; }
+.apr-show.animado .apr-slide > .apr-degrau.ativo.ativo:not(.apr-rodape) { animation: apr-sobe .8s cubic-bezier(.2, .7, .2, 1) .28s both, apr-vira-laranja .5s ease .7s both; }
+.apr-show.animado .apr-degrau.ativo p { animation: apr-vira-branco .5s ease .7s both; }
 .apr-show.animado .apr-degrau.ativo p.n, .apr-show.animado .apr-degrau.ativo p.rot { animation-name: apr-vira-branco-n; }
 @keyframes apr-vira-branco-n { from { color: #999999; } to { color: #fff; } }
 @keyframes apr-vira-laranja { from { background: #e7e6e6; } to { background: #ef4b3a; } }
@@ -649,4 +656,5 @@
 /* … e na tela seguinte ("A oferta") o card cresce até ocupar o slide e os textos vão aos lugares
    novos (feito em JS, na TelaCheia); aqui só se desligam as entradas normais desse slide */
 .apr-show.animado.de-comeco .apr-slide, .apr-show.animado.de-comeco .apr-slide > *:not(.apr-rodape) { animation: none !important; }
+.apr-show.animado.de-comeco .apr-entra .apr-palco { background: transparent; }
 .apr-show.animado.de-comeco .apr-rodape { animation: apr-surge .6s ease .9s both !important; }
