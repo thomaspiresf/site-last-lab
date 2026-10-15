@@ -169,7 +169,7 @@ export function VitrineMateriais({ materiais }) {
 
 /** Slide "Página a página": todas as páginas do material, no maior tamanho que couber. */
 export function TodasAsPaginas({ m }) {
-  const W = 1754, H = 800, GAP = 18, VGAP = 28, LEG = 32;
+  const W = 1800, H = 830, GAP = 22, VGAP = 22, LEG = 26;
   const n = m.lista.length;
   let melhor = { c: n, larg: 0 };
   for (let c = 1; c <= n; c++) {
