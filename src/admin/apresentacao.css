@@ -657,4 +657,5 @@
    novos (feito em JS, na TelaCheia); aqui só se desligam as entradas normais desse slide */
 .apr-show.animado.de-comeco .apr-slide, .apr-show.animado.de-comeco .apr-slide > *:not(.apr-rodape) { animation: none !important; }
 .apr-show.animado.de-comeco .apr-entra .apr-palco { background: transparent; }
+.apr-fundo-flip { position: absolute; background: #ef4b3a; pointer-events: none; }
 .apr-show.animado.de-comeco .apr-rodape { animation: none !important; }

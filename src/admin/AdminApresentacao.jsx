@@ -360,8 +360,22 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     const slide = atual?.querySelector(".apr-slide");
     if (!depois || !slide) return;
     const tempo = { duration: 1000, easing: "cubic-bezier(.65, 0, .2, 1)", fill: "backwards" };
+    // o fundo laranja: um bloco que cresce do card até o slide inteiro, por baixo dos textos (sem
+    // máscara, então nada é cortado); o slide fica transparente até o bloco cobrir tudo
     const c = antes.card;
-    if (c) slide.animate([{ clipPath: `inset(${c.y}px ${1920 - c.x - c.w}px ${1080 - c.y - c.h}px ${c.x}px round 38px)` }, { clipPath: "inset(0px 0px 0px 0px round 0px)" }], tempo);
+    if (c) {
+      const fundo = document.createElement("div");
+      fundo.className = "apr-fundo-flip";
+      slide.prepend(fundo);
+      slide.style.background = "transparent";
+      const a = fundo.animate([
+        { left: `${c.x}px`, top: `${c.y}px`, width: `${c.w}px`, height: `${c.h}px`, borderRadius: "38px" },
+        { left: "0px", top: "0px", width: "1920px", height: "1080px", borderRadius: "0px" },
+      ], { ...tempo, fill: "both" });
+      a.onfinish = () => { slide.style.background = ""; fundo.remove(); };
+      // o rodapé do slide novo aparece quando o laranja já cobriu tudo
+      slide.querySelector(".apr-rodape")?.animate([{ opacity: 0 }, { opacity: 0, offset: 0.8 }, { opacity: 1 }], tempo);
+    }
     slide.querySelectorAll("[data-flip]").forEach((el) => {
       const k = el.dataset.flip, a = antes[k], b = depois[k];
       if (!a || !b || k === "card") return;
