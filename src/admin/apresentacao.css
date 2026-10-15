@@ -558,3 +558,71 @@
 .vt-slide-pp .apr-rodape { color: #c4c4c8; }
 .vt-slide-pp .apr-rodape p { top: 1026px; font-size: 15px; line-height: 18px; }
 .vt-slide-pp .apr-rodape .simbolo { top: 1022px; height: 36px; width: 16px; }
+
+/* ---------- apresentar animado: as informações entram em sequência ---------- */
+@keyframes apr-sobe { from { opacity: 0; translate: 0 28px; } to { opacity: 1; translate: 0 0; } }
+@keyframes apr-surge { from { opacity: 0; } to { opacity: 1; } }
+@keyframes apr-cresce { from { opacity: 0; translate: 0 40px; scale: .96; } to { opacity: 1; translate: 0 0; scale: 1; } }
+.apr-show.animado .apr-slide { animation: apr-surge .45s ease both; }
+/* blocos do slide (título, conteúdo...), um depois do outro */
+.apr-show.animado .apr-slide > *:not(.apr-rodape) { animation: apr-sobe .8s cubic-bezier(.2, .7, .2, 1) both; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(1) { animation-delay: 0.10s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(2) { animation-delay: 0.19s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(3) { animation-delay: 0.28s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(4) { animation-delay: 0.37s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(5) { animation-delay: 0.46s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(6) { animation-delay: 0.55s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(7) { animation-delay: 0.64s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(8) { animation-delay: 0.73s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(9) { animation-delay: 0.82s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(10) { animation-delay: 0.91s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(11) { animation-delay: 1.00s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(12) { animation-delay: 1.09s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(13) { animation-delay: 1.18s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(14) { animation-delay: 1.27s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(15) { animation-delay: 1.36s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(16) { animation-delay: 1.45s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(17) { animation-delay: 1.54s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(18) { animation-delay: 1.63s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(19) { animation-delay: 1.72s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(20) { animation-delay: 1.81s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(21) { animation-delay: 1.90s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(22) { animation-delay: 1.99s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(23) { animation-delay: 2.08s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(24) { animation-delay: 2.17s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(25) { animation-delay: 2.26s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(26) { animation-delay: 2.35s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(27) { animation-delay: 2.44s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(28) { animation-delay: 2.53s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(29) { animation-delay: 2.62s; }
+.apr-show.animado .apr-slide > *:not(.apr-rodape):nth-child(30) { animation-delay: 2.71s; }
+.apr-show.animado .apr-rodape { animation: apr-surge .8s ease .9s both; }
+/* título e subtítulo */
+.apr-show.animado .apr-titulo > * { animation: apr-sobe .8s cubic-bezier(.2, .7, .2, 1) both; }
+.apr-show.animado .apr-titulo > *:nth-child(2) { animation-delay: .18s; }
+/* listas e grades: os itens entram em cascata */
+.apr-show.animado :is(.vt-itens > li, .apr-check, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p) { animation: apr-sobe .7s cubic-bezier(.2, .7, .2, 1) both; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(1) { animation-delay: 0.35s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(2) { animation-delay: 0.42s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(3) { animation-delay: 0.49s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(4) { animation-delay: 0.56s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(5) { animation-delay: 0.63s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(6) { animation-delay: 0.70s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(7) { animation-delay: 0.77s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(8) { animation-delay: 0.84s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(9) { animation-delay: 0.91s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(10) { animation-delay: 0.98s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(11) { animation-delay: 1.05s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(12) { animation-delay: 1.12s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(13) { animation-delay: 1.19s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(14) { animation-delay: 1.26s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(15) { animation-delay: 1.33s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(16) { animation-delay: 1.40s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(17) { animation-delay: 1.47s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(18) { animation-delay: 1.54s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(19) { animation-delay: 1.61s; }
+.apr-show.animado :is(.vt-itens > li, .vt-linha > figure, .vt-todas > figure, .vt-blocos > figure, .vt-fila > .item, .vt-prazos > span, .vt-unica .lista > p):nth-child(20) { animation-delay: 1.68s; }
+/* o material entra crescendo no palco */
+.apr-show.animado :is(.vt-pilha, .vt-unica > .vt-pag) { animation: apr-cresce 1s cubic-bezier(.2, .7, .2, 1) .35s both; }
+.apr-show.animado .vt-selo { animation: apr-sobe .7s cubic-bezier(.2, .7, .2, 1) .9s both; }
+@media (prefers-reduced-motion: reduce) { .apr-show.animado * { animation: none !important; } }

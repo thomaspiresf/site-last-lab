@@ -7,7 +7,7 @@ import { MOMENTOS, aplicarCatalogo, areaDoServico, catalogoAtual, catalogoPadrao
 import { carregarCatalogo } from "./carregarCatalogo";
 import { FORMATOS } from "./mockups";
 import { ROTULOS_TEXTOS } from "./textosSlides";
-import { NOMES_SLIDES, NavSlides, Palco, SLIDES, imagensDoProjeto, inicioVisivel, ordenarSlides, resumoDoCaso, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados } from "./AdminApresentacao";
+import { NOMES_SLIDES, NavSlides, Palco, SLIDES, imagensDoProjeto, inicioVisivel, ordenarSlides, resumoDoCaso, TelaCheia, abrirTelaCheia, apresentacaoInicial, montarDados, ModoApresentar } from "./AdminApresentacao";
 import { montarObjecoes, montarPreparacao, montarRoteiro } from "./preparacao";
 import "./apresentacao.css";
 
@@ -678,7 +678,8 @@ function Servico({ id, r, padrao, set, setServ, persona, setPersona, escolher })
             <button disabled={indice === 0} onClick={() => setAtual(indice - 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">‹ Anterior</button>
             <button disabled={indice === slides.length - 1} onClick={() => setAtual(indice + 1)} className="px-3 py-1.5 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-30">Próximo ›</button>
             <span className="text-xs text-zinc-400 ml-1">{indice + 1} de {slides.length}{ocultos.includes(sid) && <b className="ml-2 text-zinc-500">· oculto</b>}</span>
-            <button onClick={() => abrirTelaCheia(setApresentando, inicioVisivel(slides, visiveis, indice))} className="ml-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
+            <span className="ml-auto"><ModoApresentar /></span>
+            <button onClick={() => abrirTelaCheia(setApresentando, inicioVisivel(slides, visiveis, indice))} className="inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-600 hover:text-black"><Play size={14} /> Apresentar daqui</button>
           </div>
           <button onClick={() => setVerRoteiro((x) => !x)} className="self-start text-sm font-semibold text-zinc-600 hover:text-black mt-2">{verRoteiro ? "Esconder" : "Ver"} roteiro e objeções deste serviço</button>
           {verRoteiro && (

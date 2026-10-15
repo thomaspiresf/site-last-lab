@@ -124,6 +124,7 @@ export default function AdminApresentacao() {
             setGerando(false);
           }
         }} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-zinc-300 text-sm font-semibold hover:border-black disabled:opacity-50"><FileDown size={15} /> {gerando ? "Gerando PDF..." : "Exportar PDF"}</button>
+        <ModoApresentar />
         <button onClick={() => abrirTelaCheia(setApresentando)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800"><Play size={15} /> Apresentar</button>
       </header>
 
@@ -226,6 +227,23 @@ export function NavSlides({ itens, ocultos, indice, onSelect, onReordenar, onAlt
   );
 }
 
+// apresentar animado (padrão) ou estático: a escolha fica guardada neste navegador
+const CHAVE_MODO = "apr-modo";
+export const modoAnimado = () => { try { return localStorage.getItem(CHAVE_MODO) !== "estatico"; } catch { return true; } };
+
+/** Escolha entre apresentar animado ou estático (fica salva no navegador). */
+export function ModoApresentar() {
+  const [animado, setAnimado] = useState(modoAnimado);
+  const mudar = (v) => { setAnimado(v); try { localStorage.setItem(CHAVE_MODO, v ? "animado" : "estatico"); } catch { /* sem armazenamento */ } };
+  return (
+    <div className="flex rounded-full bg-zinc-100 p-0.5 text-xs font-semibold" title="Como os slides aparecem ao apresentar">
+      {[[true, "Animado"], [false, "Estático"]].map(([v, r]) => (
+        <button key={r} onClick={() => mudar(v)} className={`px-3 py-1.5 rounded-full ${animado === v ? "bg-white shadow-sm text-black" : "text-zinc-500 hover:text-black"}`}>{r}</button>
+      ))}
+    </div>
+  );
+}
+
 export function abrirTelaCheia(set, i = 0) {
   set(i);
   document.documentElement.requestFullscreen?.().catch(() => {});
@@ -274,10 +292,17 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     };
   }, [slides.length, onSair]);
   const S = slides[i];
+  const [animado, setAnimado] = useState(modoAnimado);
+  useEffect(() => {
+    const t = (e) => { if (e.key === "a" || e.key === "A") setAnimado((x) => !x); };
+    window.addEventListener("keydown", t);
+    return () => window.removeEventListener("keydown", t);
+  }, []);
   return (
-    <div className="apr-show" onClick={() => setI((x) => Math.min(slides.length - 1, x + 1))}>
-      <Palco><S /></Palco>
-      <span className="apr-show-dica">{i + 1} / {slides.length} · setas para navegar · Esc para sair</span>
+    <div className={`apr-show ${animado ? "animado" : ""}`} onClick={() => setI((x) => Math.min(slides.length - 1, x + 1))}>
+      {/* key: a cada slide o palco é montado de novo, e a animação de entrada roda outra vez */}
+      <Palco key={i}><S /></Palco>
+      <span className="apr-show-dica">{i + 1} / {slides.length} · setas para navegar · A {animado ? "desliga" : "liga"} a animação · Esc para sair</span>
     </div>
   );
 }
