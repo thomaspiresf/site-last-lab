@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, MousePointerClick, UserCheck, TrendingUp, Wallet, Smartphone, Monitor, Tablet, RefreshCw, Info } from "lucide-react";
+import { Users, MousePointerClick, UserCheck, TrendingUp, Wallet, Smartphone, Monitor, Tablet, RefreshCw, Info, ArrowUp, ArrowDown, Copy, Check, Megaphone } from "lucide-react";
 import AdminLayout from "./AdminLayout";
-import { getAnalytics, getConteudoBaseDiagnostico } from "../lib/api";
+import { getAnalytics, getConteudoBaseDiagnostico, sincronizarMeta } from "../lib/api";
 
 // Analytics: visitas do site, funil do diagnóstico, origem dos leads e pipeline de vendas.
 // Os eventos são anônimos (src/lib/analytics.js no site e no diagnóstico); o banco agrega tudo
@@ -33,9 +33,12 @@ const nomeCanal = (c) => NOMES_CANAL[c] || c;
 export default function AdminAnalytics() {
   const [dias, setDias] = useState(30);
   const [dados, setDados] = useState(null);
+  const [anterior, setAnterior] = useState(null);
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [conteudo, setConteudo] = useState(null);
+  const [meta, setMeta] = useState({ estado: "livre", erro: "" });
+  const jaSincronizou = React.useRef(false);
 
   const carregar = () => {
     setCarregando(true);
@@ -43,12 +46,36 @@ export default function AdminAnalytics() {
     const desde = new Date();
     desde.setHours(0, 0, 0, 0);
     desde.setDate(desde.getDate() - (dias - 1));
-    getAnalytics(desde)
-      .then(setDados)
-      .catch((e) => setErro(e.message || String(e)))
+    // o período anterior, do mesmo tamanho, para as setas de comparação
+    const antes = new Date(desde);
+    antes.setDate(antes.getDate() - dias);
+    return Promise.all([getAnalytics(desde), getAnalytics(antes, desde)])
+      .then(([atual, ant]) => { setDados(atual); setAnterior(ant); return atual; })
+      .catch((e) => { setErro(e.message || String(e)); return null; })
       .finally(() => setCarregando(false));
   };
-  useEffect(carregar, [dias]);
+
+  const atualizarMeta = async () => {
+    setMeta({ estado: "sincronizando", erro: "" });
+    try {
+      await sincronizarMeta(Math.min(dias * 2, 90));
+      setMeta({ estado: "livre", erro: "" });
+      await carregar();
+    } catch (e) {
+      setMeta({ estado: "erro", erro: e.message || String(e), codigo: e.codigo });
+    }
+  };
+
+  useEffect(() => {
+    carregar().then((d) => {
+      // dados da Meta com mais de 6 horas: atualiza sozinho (uma vez por visita à página)
+      const quando = d?.meta?.atualizado_em && new Date(d.meta.atualizado_em).getTime();
+      if (d?.meta?.conectada && !jaSincronizou.current && (!quando || Date.now() - quando > 6 * 3600000)) {
+        jaSincronizou.current = true;
+        atualizarMeta();
+      }
+    });
+  }, [dias]);
   // nomes das perguntas do diagnóstico (para "onde as pessoas param")
   useEffect(() => { getConteudoBaseDiagnostico().then(setConteudo).catch(() => {}); }, []);
 
@@ -66,7 +93,7 @@ export default function AdminAnalytics() {
       <div className="flex items-end justify-between gap-4 flex-wrap mb-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black text-black tracking-tight">Analytics</h1>
-          <p className="text-sm text-zinc-500 mt-1">Visitas do site, funil do diagnóstico, origem dos leads e vendas.</p>
+          <p className="text-sm text-zinc-500 mt-1">Visitas do site, campanhas, funil do diagnóstico, origem dos leads e vendas. As setas comparam com os {dias} dias anteriores.</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="inline-flex rounded-full bg-white border border-zinc-200 p-1">
@@ -87,15 +114,17 @@ export default function AdminAnalytics() {
       {!dados ? (
         !erro && <p className="text-sm text-zinc-500">Carregando...</p>
       ) : (
-        <Painel d={dados} dias={dias} pergunta={pergunta} />
+        <Painel d={dados} ant={anterior} dias={dias} pergunta={pergunta} meta={meta} atualizarMeta={atualizarMeta} />
       )}
     </AdminLayout>
   );
 }
 
-function Painel({ d, dias, pergunta }) {
+function Painel({ d, ant, dias, pergunta, meta, atualizarMeta }) {
   const v = d.visitas, f = d.funil, l = d.leads, p = d.pipeline;
+  const a = ant || {};
   const decididos = (p.ganhos_total || 0) + (p.perdidos_total || 0);
+  const serie = (k) => (d.serie || []).map((x) => Number(x[k]) || 0);
   return (
     <div className="space-y-6">
       {v.sessoes === 0 && (
@@ -106,12 +135,20 @@ function Painel({ d, dias, pergunta }) {
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <Kpi icone={Users} rotulo="Visitantes" valor={num(v.visitantes)} sub={`${num(v.sessoes)} visitas · ${num(v.paginas_vistas)} páginas`} />
-        <Kpi icone={MousePointerClick} rotulo="Começaram o diagnóstico" valor={num(f.iniciou)} sub={`${pct(f.iniciou, f.abriu)} de quem abriu`} />
-        <Kpi icone={UserCheck} rotulo="Leads" valor={num(l.total)} sub={`${num(l.qualificados)} qualificados`} destaque />
-        <Kpi icone={TrendingUp} rotulo="Visitante → lead" valor={pct(l.total, v.visitantes)} sub={`${num(v.cliques_whatsapp)} cliques no WhatsApp`} />
-        <Kpi icone={Wallet} rotulo="Vendido no período" valor={reais(p.vendido)} sub={`${num(p.fechados)} ${p.fechados === 1 ? "venda" : "vendas"}`} />
+        <Kpi icone={Users} rotulo="Visitantes" valor={num(v.visitantes)} atual={v.visitantes} antes={a.visitas?.visitantes} tendencia={serie("visitantes")}
+          sub={`${num(v.sessoes)} visitas · ${num(v.paginas_vistas)} páginas`} />
+        <Kpi icone={MousePointerClick} rotulo="Começaram o diagnóstico" valor={num(f.iniciou)} atual={f.iniciou} antes={a.funil?.iniciou} tendencia={serie("iniciou")}
+          sub={`${pct(f.iniciou, f.abriu)} de quem abriu`} />
+        <Kpi icone={UserCheck} rotulo="Leads" valor={num(l.total)} atual={l.total} antes={a.leads?.total} tendencia={serie("leads")}
+          sub={`${num(l.qualificados)} qualificados`} destaque />
+        <Kpi icone={TrendingUp} rotulo="Visitante → lead" valor={pct(l.total, v.visitantes)}
+          atual={v.visitantes ? l.total / v.visitantes : null} antes={a.visitas?.visitantes ? a.leads.total / a.visitas.visitantes : null}
+          sub={`${num(v.cliques_whatsapp)} cliques no WhatsApp`} />
+        <Kpi icone={Wallet} rotulo="Vendido no período" valor={reais(p.vendido)} atual={p.vendido} antes={a.pipeline?.vendido}
+          sub={`${num(p.fechados)} ${p.fechados === 1 ? "venda" : "vendas"}`} />
       </div>
+
+      <SecaoMeta m={d.meta} ma={a.meta} serie={serie("gasto")} meta={meta} atualizarMeta={atualizarMeta} />
 
       <Bloco titulo="Visitas por dia">
         <GraficoDias dias={dias} pontos={v.por_dia} />
@@ -241,12 +278,46 @@ function Bloco({ titulo, nota, children }) {
   );
 }
 
-function Kpi({ icone: Icone, rotulo, valor, sub, destaque }) {
+/** Variação contra o período anterior. `menorMelhor` para custos (custo por lead caindo é bom). */
+function Variacao({ atual, antes, menorMelhor, claro }) {
+  if (atual == null || antes == null || !isFinite(atual) || !isFinite(antes)) return null;
+  if (!antes) return atual ? <span className={`text-xs font-semibold ${claro ? "text-zinc-400" : "text-zinc-400"}`}>novo</span> : null;
+  const v = (atual - antes) / Math.abs(antes);
+  if (Math.abs(v) < 0.005) return <span className="text-xs font-semibold text-zinc-400">=</span>;
+  const bom = menorMelhor ? v < 0 : v > 0;
+  const Seta = v > 0 ? ArrowUp : ArrowDown;
   return (
-    <div className={`rounded-2xl p-4 border ${destaque ? "bg-black text-white border-black" : "bg-white border-zinc-200/80"}`}>
-      <p className={`flex items-center gap-1.5 text-xs font-semibold ${destaque ? "text-zinc-400" : "text-zinc-500"}`}><Icone size={14} /> {rotulo}</p>
-      <p className="text-2xl sm:text-3xl font-black tracking-tight mt-2">{valor}</p>
+    <span className={`inline-flex items-center text-xs font-semibold ${bom ? "text-emerald-500" : "text-[#ef4b3a]"}`}>
+      <Seta size={12} strokeWidth={2.5} />{Math.abs(Math.round(v * 100))}%
+    </span>
+  );
+}
+
+/** Linha de tendência pequena (sem eixos), para os cartões. */
+function Tendencia({ pontos, cor = LARANJA }) {
+  if (!pontos || pontos.length < 2 || !pontos.some((x) => x)) return null;
+  const max = Math.max(...pontos) || 1;
+  const W = 120, H = 28;
+  const xy = pontos.map((y, i) => [(i / (pontos.length - 1)) * W, H - 2 - (y / max) * (H - 4)]);
+  const linha = xy.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full h-7 mt-2">
+      <path d={`${linha} L${W},${H} L0,${H} Z`} fill={cor} opacity="0.12" />
+      <path d={linha} fill="none" stroke={cor} strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+    </svg>
+  );
+}
+
+function Kpi({ icone: Icone, rotulo, valor, sub, destaque, atual, antes, tendencia, menorMelhor }) {
+  return (
+    <div className={`rounded-2xl p-4 border flex flex-col ${destaque ? "bg-black text-white border-black" : "bg-white border-zinc-200/80"}`}>
+      <p className={`flex items-center gap-1.5 text-xs font-semibold ${destaque ? "text-zinc-400" : "text-zinc-500"}`}>{Icone && <Icone size={14} />} {rotulo}</p>
+      <div className="flex items-baseline gap-2 mt-2 flex-wrap">
+        <p className="text-2xl sm:text-3xl font-black tracking-tight">{valor}</p>
+        <Variacao atual={atual} antes={antes} menorMelhor={menorMelhor} claro={destaque} />
+      </div>
       {sub && <p className={`text-xs mt-1 ${destaque ? "text-zinc-400" : "text-zinc-500"}`}>{sub}</p>}
+      {tendencia && <div className="mt-auto"><Tendencia pontos={tendencia} cor={destaque ? "#ffffff" : LARANJA} /></div>}
     </div>
   );
 }
@@ -355,5 +426,218 @@ function Aparelhos({ d }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+// ---------- Campanhas Meta ----------
+
+const UTM_META = "utm_source=meta&utm_medium=pago&utm_campaign={{campaign.name}}&utm_content={{ad.name}}";
+const div = (a, b) => (b ? a / b : null);
+const reaisOu = (n) => (n == null ? "—" : reais(n));
+const vezes = (n) => (n == null ? "—" : `${n.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}×`);
+
+function custos(m) {
+  if (!m) return {};
+  // sem investimento (Meta não conectada ou sem anúncio rodando) não existe custo
+  if (!Number(m.gasto)) return { gasto: Number(m.gasto) || 0, cpl: null, cq: null, cac: null, roas: null };
+  return {
+    gasto: Number(m.gasto) || 0,
+    cpl: div(m.gasto, m.leads),
+    cq: div(m.gasto, m.qualificados),
+    cac: div(m.gasto, m.fechados),
+    roas: m.gasto ? m.vendido / m.gasto : null,
+  };
+}
+
+function haQuanto(iso) {
+  if (!iso) return "";
+  const min = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (min < 2) return "agora";
+  if (min < 60) return `há ${min} min`;
+  const h = Math.round(min / 60);
+  return h < 24 ? `há ${h} h` : `há ${Math.round(h / 24)} dia(s)`;
+}
+
+function SecaoMeta({ m, ma, serie, meta, atualizarMeta }) {
+  const [nivel, setNivel] = useState("campanhas");
+  if (!m) return null;
+  const c = custos(m), ca = custos(ma);
+  const temDados = m.anuncios.length > 0;
+  const naoConectada = !m.conectada || meta.codigo === "nao_configurado";
+  return (
+    <section className="bg-white rounded-2xl border border-zinc-200/80 p-5">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h3 className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wide"><Megaphone size={14} /> Campanhas Meta</h3>
+          <p className="text-xs text-zinc-400 mt-1">
+            {naoConectada
+              ? "Leads e vendas por anúncio já aparecem pelas UTMs. O investimento entra quando a Meta for conectada."
+              : `Investimento da Meta atualizado ${haQuanto(m.atualizado_em)}. Leads e vendas vêm das UTMs dos anúncios.`}
+          </p>
+        </div>
+        <button type="button" onClick={atualizarMeta} disabled={meta.estado === "sincronizando"}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold bg-white border border-zinc-200 hover:border-black disabled:opacity-50">
+          <RefreshCw size={14} className={meta.estado === "sincronizando" ? "animate-spin" : ""} />
+          {meta.estado === "sincronizando" ? "Atualizando..." : naoConectada ? "Testar conexão com a Meta" : "Atualizar da Meta"}
+        </button>
+      </div>
+
+      {meta.estado === "erro" && meta.codigo === "nao_configurado" && (
+        <p className="text-sm text-amber-800 bg-amber-50 rounded-xl px-4 py-3 mt-4">{meta.erro} Veja o passo 2 abaixo.</p>
+      )}
+      {meta.estado === "erro" && meta.codigo !== "nao_configurado" && (
+        <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 mt-4">{meta.erro}</p>
+      )}
+
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
+        <Kpi rotulo="Investido" valor={naoConectada ? "—" : reais(c.gasto)} atual={c.gasto} antes={ca.gasto} tendencia={naoConectada ? null : serie}
+          sub={`${num(m.cliques)} cliques · ${num(m.impressoes)} impressões`} />
+        <Kpi rotulo="Custo por lead" valor={reaisOu(c.cpl)} atual={c.cpl} antes={ca.cpl} menorMelhor sub={`${num(m.leads)} leads`} />
+        <Kpi rotulo="Custo por lead qualificado" valor={reaisOu(c.cq)} atual={c.cq} antes={ca.cq} menorMelhor destaque
+          sub={`${num(m.qualificados)} qualificados · a métrica principal`} />
+        <Kpi rotulo="Custo por venda" valor={reaisOu(c.cac)} atual={c.cac} antes={ca.cac} menorMelhor sub={`${num(m.fechados)} vendas`} />
+        <Kpi rotulo="Retorno (vendido ÷ investido)" valor={vezes(c.roas)} atual={c.roas} antes={ca.roas} sub={`${reais(m.vendido)} vendidos`} />
+      </div>
+
+      <FunilPago m={m} />
+
+      {naoConectada && <ComoConectar semUtm={!temDados} />}
+
+      {temDados && (
+        <div className="mt-6">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide">O que está performando</h4>
+            <div className="inline-flex rounded-full bg-zinc-100 p-0.5">
+              {[["campanhas", "Campanhas"], ["anuncios", "Anúncios"]].map(([id, nome]) => (
+                <button key={id} type="button" onClick={() => setNivel(id)}
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${nivel === id ? "bg-white text-black shadow-sm" : "text-zinc-500"}`}>{nome}</button>
+              ))}
+            </div>
+          </div>
+          <TabelaPago linhas={nivel === "campanhas" ? m.campanhas : m.anuncios} nivel={nivel} />
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** Do dinheiro investido ao dinheiro vendido, com a taxa entre cada etapa. */
+function FunilPago({ m }) {
+  const etapas = [
+    ["Investido", reais(m.gasto), null],
+    ["Impressões", num(m.impressoes), null],
+    ["Cliques", num(m.cliques), ["CTR", pct(m.cliques, m.impressoes)]],
+    ["Visitas", num(m.visitas), ["chegaram", pct(m.visitas, m.cliques)]],
+    ["Diagnósticos", num(m.iniciou), ["começaram", pct(m.iniciou, m.visitas)]],
+    ["Leads", num(m.leads), ["terminaram", pct(m.leads, m.iniciou)]],
+    ["Qualificados", num(m.qualificados), ["dos leads", pct(m.qualificados, m.leads)]],
+    ["Vendas", num(m.fechados), ["dos qualificados", pct(m.fechados, m.qualificados)]],
+    ["Vendido", reais(m.vendido), null],
+  ];
+  return (
+    <div className="mt-5 overflow-x-auto">
+      <ol className="flex min-w-[860px]">
+        {etapas.map(([nome, valor, taxa], i) => (
+          <li key={nome} className="flex-1 flex items-stretch">
+            {i > 0 && (
+              <div className="flex flex-col items-center justify-center px-1 text-center">
+                <span className="text-zinc-300">›</span>
+                {taxa && <span className="text-[10px] leading-tight text-zinc-400 whitespace-nowrap">{taxa[1]}<br />{taxa[0]}</span>}
+              </div>
+            )}
+            <div className={`flex-1 rounded-xl px-3 py-2.5 ${i === 0 || i === etapas.length - 1 ? "bg-black text-white" : "bg-zinc-50"}`}>
+              <p className={`text-[11px] ${i === 0 || i === etapas.length - 1 ? "text-zinc-400" : "text-zinc-500"}`}>{nome}</p>
+              <p className="text-base font-black mt-0.5 whitespace-nowrap">{valor}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+/** Ranking: colunas de custo coloridas (verde = melhor custo por lead, vermelho = gastou sem trazer lead). */
+function TabelaPago({ linhas, nivel }) {
+  const comLead = linhas.filter((x) => x.gasto > 0 && x.leads > 0).map((x) => x.gasto / x.leads);
+  const melhor = comLead.length ? Math.min(...comLead) : null;
+  const pior = comLead.length > 1 ? Math.max(...comLead) : null;
+  const corCpl = (x) => {
+    if (!(x.gasto > 0)) return "";
+    if (!x.leads) return "bg-red-50 text-red-700";
+    const v = x.gasto / x.leads;
+    if (v === melhor) return "bg-emerald-50 text-emerald-700 font-bold";
+    if (v === pior) return "bg-amber-50 text-amber-800";
+    return "";
+  };
+  return (
+    <div className="overflow-x-auto -mx-5 px-5">
+      <table className="w-full text-sm min-w-[980px]">
+        <thead>
+          <tr className="text-left text-xs text-zinc-500">
+            <th className="font-semibold pb-2 pr-3">{nivel === "campanhas" ? "Campanha" : "Anúncio"}</th>
+            {["Investido", "Cliques", "CPC", "Diagnósticos", "Leads", "Custo/lead", "Qualificados", "Custo/qualif.", "Vendas", "Vendido", "Retorno"].map((t) => (
+              <th key={t} className="font-semibold pb-2 px-2 text-right whitespace-nowrap">{t}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {linhas.map((x, i) => (
+            <tr key={`${x.campanha}-${x.anuncio}-${i}`} className="border-t border-zinc-100">
+              <td className="py-2 pr-3 max-w-[280px]">
+                <p className="font-medium truncate" title={nivel === "campanhas" ? x.campanha : x.anuncio}>
+                  {(nivel === "campanhas" ? x.campanha : x.anuncio) || <span className="text-zinc-400">sem nome (utm_content vazio)</span>}
+                </p>
+                {nivel === "anuncios" && <p className="text-[11px] text-zinc-400 truncate">{x.campanha}</p>}
+                {nivel === "campanhas" && x.anuncios > 1 && <p className="text-[11px] text-zinc-400">{x.anuncios} anúncios</p>}
+              </td>
+              <td className="py-2 px-2 text-right whitespace-nowrap">{x.gasto ? reais(x.gasto) : "—"}</td>
+              <td className="py-2 px-2 text-right">{num(x.cliques)}</td>
+              <td className="py-2 px-2 text-right whitespace-nowrap">{x.cliques ? reais(x.gasto / x.cliques) : "—"}</td>
+              <td className="py-2 px-2 text-right">{num(x.iniciou)}</td>
+              <td className="py-2 px-2 text-right font-semibold">{num(x.leads)}</td>
+              <td className={`py-2 px-2 text-right whitespace-nowrap rounded-md ${corCpl(x)}`}>{x.gasto && x.leads ? reais(x.gasto / x.leads) : x.gasto ? "sem lead" : "—"}</td>
+              <td className="py-2 px-2 text-right">{num(x.qualificados)}</td>
+              <td className="py-2 px-2 text-right whitespace-nowrap">{x.gasto && x.qualificados ? reais(x.gasto / x.qualificados) : "—"}</td>
+              <td className="py-2 px-2 text-right">{num(x.fechados)}</td>
+              <td className="py-2 px-2 text-right whitespace-nowrap">{x.vendido ? reais(x.vendido) : "—"}</td>
+              <td className="py-2 px-2 text-right whitespace-nowrap">{x.gasto ? vezes(x.vendido / x.gasto) : "—"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="text-[11px] text-zinc-400 mt-2">Leads, qualificados e vendas são dos leads que chegaram no período. Verde: o menor custo por lead. Vermelho: gastou e não trouxe lead.</p>
+    </div>
+  );
+}
+
+function ComoConectar({ semUtm }) {
+  const [copiado, setCopiado] = useState(false);
+  const copiar = async () => {
+    try { await navigator.clipboard.writeText(UTM_META); setCopiado(true); setTimeout(() => setCopiado(false), 1800); } catch { /* sem permissão */ }
+  };
+  return (
+    <div className="grid lg:grid-cols-2 gap-4 mt-6">
+      <div className="rounded-2xl border border-zinc-200 p-4">
+        <p className="text-sm font-bold">1. Marque cada anúncio {semUtm && <span className="text-[#ef4b3a]">(ainda nenhum lead marcado)</span>}</p>
+        <p className="text-sm text-zinc-600 mt-1">No Gerenciador de Anúncios, em cada anúncio, cole no campo <b>Parâmetros de URL</b> (seção Rastreamento):</p>
+        <div className="flex items-start gap-2 mt-3">
+          <code className="flex-1 text-xs bg-zinc-50 rounded-lg px-3 py-2 break-all">{UTM_META}</code>
+          <button type="button" onClick={copiar} className="shrink-0 inline-flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-semibold bg-black text-white">
+            {copiado ? <Check size={13} /> : <Copy size={13} />} {copiado ? "Copiado" : "Copiar"}
+          </button>
+        </div>
+        <p className="text-xs text-zinc-400 mt-2">A Meta troca {"{{campaign.name}}"} e {"{{ad.name}}"} pelos nomes reais. Assim cada lead chega dizendo de que anúncio veio.</p>
+      </div>
+      <div className="rounded-2xl border border-zinc-200 p-4">
+        <p className="text-sm font-bold">2. Conecte a conta de anúncios (para o investimento)</p>
+        <ol className="text-sm text-zinc-600 mt-1 space-y-1 list-decimal pl-4">
+          <li>Em <b>business.facebook.com</b> → Configurações → Usuários do sistema, crie um usuário (função Admin).</li>
+          <li>Dê a ele acesso à sua <b>conta de anúncios</b> (permissão “Ver desempenho”).</li>
+          <li>Clique em <b>Gerar token</b>, escolha o app, marque <b>ads_read</b> e validade <b>Nunca</b>.</li>
+          <li>No Supabase (Edge Functions → Secrets), crie <b>META_ACCESS_TOKEN</b> com o token e <b>META_AD_ACCOUNT_ID</b> com o número da conta (aparece no Gerenciador, em “act_…”).</li>
+          <li>Volte aqui e clique em <b>Testar conexão com a Meta</b>. Daí em diante, os gastos se atualizam sozinhos.</li>
+        </ol>
+      </div>
+    </div>
   );
 }

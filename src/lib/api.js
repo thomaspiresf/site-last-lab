@@ -987,6 +987,18 @@ export async function getAnalytics(desde, ate = new Date()) {
   return data;
 }
 
+// Traz gasto, impressões e cliques da Meta Ads (função sync-meta-ads) para o Analytics.
+export async function sincronizarMeta(dias = 30) {
+  const { data, error } = await supabase.functions.invoke("sync-meta-ads", { body: { dias } });
+  if (error) {
+    const corpo = await error.context?.json?.().catch(() => null);
+    const e = new Error(corpo?.error || error.message);
+    e.codigo = corpo?.codigo;
+    throw e;
+  }
+  return data;
+}
+
 export async function getConteudoBaseDiagnostico() {
   const res = await fetch(`${DIAGNOSTICO_URL}/conteudo.json`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Não consegui ler o conteúdo do diagnóstico (${res.status}).`);

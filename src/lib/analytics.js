@@ -52,6 +52,7 @@ function sessao() {
       origem: q.get("utm_source")?.slice(0, 80) || null,
       midia: q.get("utm_medium")?.slice(0, 80) || null,
       campanha: q.get("utm_campaign")?.slice(0, 120) || null,
+      anuncio: q.get("utm_content")?.slice(0, 160) || null,
       referencia,
       dispositivo: /Mobi|Android|iPhone/i.test(navigator.userAgent) ? (w >= 700 ? "tablet" : "celular") : w < 700 ? "celular" : "computador",
     };
@@ -68,7 +69,7 @@ export function registrar(tipo, { pagina = location.pathname, detalhe = null } =
   const corpo = {
     app: "site", visitante: visitanteId(), sessao: s.id, tipo,
     pagina: pagina.slice(0, 200), detalhe: detalhe ? String(detalhe).slice(0, 120) : null,
-    origem: s.origem, midia: s.midia, campanha: s.campanha, referencia: s.referencia, dispositivo: s.dispositivo,
+    origem: s.origem, midia: s.midia, campanha: s.campanha, anuncio: s.anuncio, referencia: s.referencia, dispositivo: s.dispositivo,
   };
   fetch(`${URL_SB}/rest/v1/eventos`, {
     method: "POST",

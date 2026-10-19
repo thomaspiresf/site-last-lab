@@ -24,9 +24,12 @@ create table if not exists eventos (
   origem text check (length(origem) <= 80),      -- utm_source
   midia text check (length(midia) <= 80),        -- utm_medium
   campanha text check (length(campanha) <= 120), -- utm_campaign
+  anuncio text check (length(anuncio) <= 160),   -- utm_content (nome do anúncio, na Meta: {{ad.name}})
   referencia text check (length(referencia) <= 120), -- domínio de onde veio (google.com, instagram.com...)
   dispositivo text check (dispositivo in ('celular', 'tablet', 'computador'))
 );
+
+alter table eventos add column if not exists anuncio text check (length(anuncio) <= 160);
 
 create index if not exists eventos_criado_em on eventos (criado_em);
 create index if not exists eventos_visitante on eventos (visitante, criado_em);
@@ -38,6 +41,27 @@ drop policy if exists eventos_admin_le on eventos;
 create policy eventos_admin_le on eventos for select using (auth.uid() is not null);
 drop policy if exists eventos_admin_apaga on eventos;
 create policy eventos_admin_apaga on eventos for delete using (auth.uid() is not null);
+
+-- Gastos da Meta Ads por dia e anúncio, trazidos pela função sync-meta-ads (botão no admin).
+create table if not exists meta_gastos (
+  dia date not null,
+  anuncio_id text not null,
+  anuncio text,
+  conjunto_id text,
+  conjunto text,
+  campanha_id text,
+  campanha text,
+  gasto numeric not null default 0,
+  impressoes integer not null default 0,
+  alcance integer not null default 0,
+  cliques integer not null default 0,   -- cliques no link
+  atualizado_em timestamptz not null default now(),
+  primary key (dia, anuncio_id)
+);
+create index if not exists meta_gastos_campanha on meta_gastos (lower(campanha));
+alter table meta_gastos enable row level security;
+drop policy if exists meta_gastos_admin on meta_gastos;
+create policy meta_gastos_admin on meta_gastos for all using (auth.uid() is not null) with check (auth.uid() is not null);
 
 -- Venda: valor fechado e quando (a data entra sozinha quando o status vira "fechado").
 alter table diagnosticos add column if not exists valor_fechado numeric;
@@ -119,6 +143,58 @@ begin
     select id, status, valor_fechado, fechado_em,
       nullif(regexp_replace(split_part(coalesce(apresentacao->>'investimento', ''), ',', 1), '[^0-9]', '', 'g'), '')::numeric as proposto
     from diagnosticos
+  ),
+  -- série diária para as linhas de tendência dos cartões
+  serie as (
+    select to_char(dia, 'YYYY-MM-DD') as dia,
+      (select count(distinct visitante) from ev where (criado_em at time zone 'America/Sao_Paulo')::date = dia) as visitantes,
+      (select count(distinct visitante) from ev where tipo = 'diag_iniciou' and (criado_em at time zone 'America/Sao_Paulo')::date = dia) as iniciou,
+      (select count(*) from leads where (created_at at time zone 'America/Sao_Paulo')::date = dia) as leads,
+      (select coalesce(sum(gasto), 0) from meta_gastos g where g.dia = d.dia) as gasto
+    from generate_series((desde at time zone 'America/Sao_Paulo')::date, ((ate at time zone 'America/Sao_Paulo') - interval '1 second')::date, interval '1 day') as d(dia)
+  ),
+  -- Campanhas pagas: gasto da Meta + visitas e diagnósticos (eventos) + leads e vendas (diagnósticos),
+  -- ligados pelo nome da campanha e do anúncio (utm_campaign={{campaign.name}}, utm_content={{ad.name}})
+  pago_g as (
+    select lower(campanha) as c, lower(coalesce(anuncio, '')) as a, max(campanha) as campanha, max(anuncio) as anuncio,
+      sum(gasto) as gasto, sum(impressoes) as impressoes, sum(cliques) as cliques
+    from meta_gastos
+    where dia >= (desde at time zone 'America/Sao_Paulo')::date and dia < (ate at time zone 'America/Sao_Paulo')::date + 1
+      and anuncio_id <> '_sincronizado'  -- marcador de "sincronizou sem anúncio rodando"
+    group by 1, 2
+  ),
+  pago_e as (
+    select lower(campanha) as c, lower(coalesce(anuncio, '')) as a, max(campanha) as campanha, max(anuncio) as anuncio,
+      count(distinct sessao) as visitas,
+      count(distinct visitante) filter (where tipo = 'diag_iniciou') as iniciou
+    from ev
+    where campanha is not null
+      and (lower(coalesce(origem, '')) in ('meta', 'facebook', 'instagram', 'fb', 'ig') or lower(coalesce(midia, '')) in ('pago', 'paid', 'cpc', 'ads'))
+    group by 1, 2
+  ),
+  pago_l as (
+    select lower(dados->'utms'->>'utm_campaign') as c, lower(coalesce(dados->'utms'->>'utm_content', '')) as a,
+      max(dados->'utms'->>'utm_campaign') as campanha, max(dados->'utms'->>'utm_content') as anuncio,
+      count(*) as leads,
+      count(*) filter (where qualificado) as qualificados,
+      count(*) filter (where status = 'fechado') as fechados,
+      coalesce(sum(case when status = 'fechado' then coalesce(valor_fechado,
+        nullif(regexp_replace(split_part(coalesce(apresentacao->>'investimento', ''), ',', 1), '[^0-9]', '', 'g'), '')::numeric) end), 0) as vendido
+    from leads
+    where coalesce(dados->'utms'->>'utm_campaign', '') <> ''
+      and (lower(coalesce(dados->'utms'->>'utm_source', '')) in ('meta', 'facebook', 'instagram', 'fb', 'ig') or lower(coalesce(dados->'utms'->>'utm_medium', '')) in ('pago', 'paid', 'cpc', 'ads'))
+    group by 1, 2
+  ),
+  pago as (
+    select coalesce(g.campanha, e.campanha, l.campanha) as campanha,
+      nullif(coalesce(g.anuncio, e.anuncio, l.anuncio), '') as anuncio,
+      coalesce(g.gasto, 0) as gasto, coalesce(g.impressoes, 0) as impressoes, coalesce(g.cliques, 0) as cliques,
+      coalesce(e.visitas, 0) as visitas, coalesce(e.iniciou, 0) as iniciou,
+      coalesce(l.leads, 0) as leads, coalesce(l.qualificados, 0) as qualificados,
+      coalesce(l.fechados, 0) as fechados, coalesce(l.vendido, 0) as vendido
+    from pago_g g
+    full join pago_e e on e.c = g.c and e.a = g.a
+    full join pago_l l on l.c = coalesce(g.c, e.c) and l.a = coalesce(g.a, e.a)
   )
   select jsonb_build_object(
     'visitas', jsonb_build_object(
@@ -194,6 +270,28 @@ begin
             'fechados', count(*), 'vendido', coalesce(sum(coalesce(valor_fechado, proposto)), 0)) as x
           from valores where status = 'fechado' and fechado_em is not null
           group by to_char(fechado_em at time zone 'America/Sao_Paulo', 'YYYY-MM')
+        ) t), '[]'::jsonb)
+    ),
+    'serie', coalesce((select jsonb_agg(to_jsonb(serie) order by dia) from serie), '[]'::jsonb),
+    'meta', jsonb_build_object(
+      'conectada', exists (select 1 from meta_gastos),
+      'atualizado_em', (select max(atualizado_em) from meta_gastos),
+      'gasto', (select coalesce(sum(gasto), 0) from pago),
+      'impressoes', (select coalesce(sum(impressoes), 0) from pago),
+      'cliques', (select coalesce(sum(cliques), 0) from pago),
+      'visitas', (select coalesce(sum(visitas), 0) from pago),
+      'iniciou', (select coalesce(sum(iniciou), 0) from pago),
+      'leads', (select coalesce(sum(leads), 0) from pago),
+      'qualificados', (select coalesce(sum(qualificados), 0) from pago),
+      'fechados', (select coalesce(sum(fechados), 0) from pago),
+      'vendido', (select coalesce(sum(vendido), 0) from pago),
+      'anuncios', coalesce((select jsonb_agg(to_jsonb(pago) order by leads desc, gasto desc) from pago), '[]'::jsonb),
+      'campanhas', coalesce((select jsonb_agg(x order by (x->>'leads')::int desc, (x->>'gasto')::numeric desc) from (
+          select jsonb_build_object('campanha', campanha, 'anuncios', count(*),
+            'gasto', sum(gasto), 'impressoes', sum(impressoes), 'cliques', sum(cliques), 'visitas', sum(visitas),
+            'iniciou', sum(iniciou), 'leads', sum(leads), 'qualificados', sum(qualificados),
+            'fechados', sum(fechados), 'vendido', sum(vendido)) as x
+          from pago group by campanha
         ) t), '[]'::jsonb)
     )
   ) into r;
