@@ -871,6 +871,176 @@
     "promessa_nao_qualificado": "Você recebe por e-mail a análise completa de cada pilar."
   },
 
+  "ajuda": {
+    "_nota": "Fim do chat, depois que a pessoa envia tudo: cartões que passam sozinhos (o pilar mais fraco e os dados de mercado, sempre com fonte) e o botão, que abre o WhatsApp com a dor da pessoa (objetivo que ela marcou + pilar mais fraco).",
+    "botao": "Veja como podemos te ajudar com {pilar}",
+    "nota": "Seu ponto mais fraco · {nota}/100",
+    "secao_dados": "Por que {pilar} pesa",
+    "secao_setor": "No seu setor",
+    "fonte": "Fonte",
+    "mensagem": "Oi, Thomás! Fiz o diagnóstico da {empresa}. {cta}.",
+    "_ctas": "O botão junta o objetivo que a pessoa marcou no começo com o pilar mais fraco. Sem objetivo (ou 'só curiosidade'), vale o botão do pilar em ctas.",
+    "ctas_objetivo": {
+      "cobrar_mais": {
+        "A": "Quero cobrar mais sem disputar preço",
+        "B": "Quero cobrar mais com uma marca clara",
+        "C": "Quero cobrar mais e ser bem visto online",
+        "D": "Quero uma proposta que justifique meu preço",
+        "E": "Quero uma experiência que valha o preço"
+      },
+      "vender_mais": {
+        "A": "Quero vender mais sem baixar o preço",
+        "B": "Quero vender mais e ser fácil de indicar",
+        "C": "Quero vender mais e ser encontrado",
+        "D": "Quero vender mais mesmo sem estar presente",
+        "E": "Quero vender mais com clientes que voltam"
+      },
+      "lancamento": {
+        "A": "Quero lançar com o preço certo",
+        "B": "Quero lançar com uma mensagem clara",
+        "C": "Quero lançar e ser encontrado",
+        "D": "Quero lançar com um material que vende",
+        "E": "Quero lançar e gerar indicação"
+      },
+      "nao_representa": {
+        "A": "Quero uma marca à altura do meu valor",
+        "B": "Quero uma marca que explique quem somos hoje",
+        "C": "Quero uma presença online à altura da empresa",
+        "D": "Quero uma apresentação à altura da empresa",
+        "E": "Quero uma experiência à altura da empresa"
+      }
+    },
+    "ctas": {
+      "A": "Quero parar de disputar preço",
+      "B": "Quero que entendam o que eu faço",
+      "C": "Quero ser encontrado",
+      "D": "Quero vender sem estar presente",
+      "E": "Quero clientes que voltam e indicam"
+    },
+    "pilares": {
+      "A": [
+        {
+          "numero": "94%",
+          "texto": "do quanto as pessoas aceitam pagar por uma marca vem de ela ser relevante e diferente das outras.",
+          "fonte": "Kantar BrandZ",
+          "url": "https://kantar.com/inspiration/brands/get-an-equity-booster-how-meaningful-difference-supercharges-growth"
+        },
+        {
+          "numero": "+32 pts",
+          "texto": "de crescimento de receita em 5 anos para as empresas que mais se destacam em design, comparadas às concorrentes.",
+          "fonte": "McKinsey, The Business Value of Design",
+          "url": "https://www.mckinsey.com/capabilities/growth-marketing-and-sales/our-insights/the-business-value-of-design"
+        }
+      ],
+      "B": [
+        {
+          "numero": "64%",
+          "texto": "pagam mais por marcas simples de entender, e 61% recomendam mais essas marcas.",
+          "fonte": "Siegel+Gale, Global Brand Simplicity Index",
+          "url": "https://www.prnewsonline.com/consumers-willing-to-pay-more-for-simpler-brands/"
+        },
+        {
+          "numero": "81%",
+          "texto": "dizem que confiar na marca decide a compra. Só 34% confiam na maioria das marcas que compram.",
+          "fonte": "Edelman Trust Barometer, 2019",
+          "url": "https://edelman.com/news-awards/only-one-third-of-consumers-trust-most-of-the-brands-they-buy"
+        }
+      ],
+      "C": [
+        {
+          "numero": "97%",
+          "texto": "das pessoas leem avaliações antes de escolher um negócio.",
+          "fonte": "BrightLocal, Local Consumer Review Survey 2026",
+          "url": "https://www.brightlocal.com/research/local-consumer-review-survey-2025/"
+        },
+        {
+          "numero": "2,7×",
+          "texto": "mais chances de uma empresa parecer confiável quando o perfil dela no Google está completo.",
+          "fonte": "Google, Perfil da Empresa",
+          "url": "https://support.google.com/business/answer/10515606?hl=pt-BR"
+        }
+      ],
+      "D": [
+        {
+          "numero": "17%",
+          "texto": "é o tempo que um comprador passa falando com fornecedores. No resto, ele decide sozinho, com o material que você deixou.",
+          "fonte": "Gartner",
+          "url": "https://gcom.pdo.aws.gartner.com/smarterwithgartner/b2b-sales-reps-maximize-customer-interactions"
+        },
+        {
+          "numero": "7×",
+          "texto": "mais chances de uma conversa de verdade quando o contato é respondido em até 1 hora.",
+          "fonte": "Harvard Business Review",
+          "url": "https://hbr.org/2011/03/the-short-life-of-online-sales-leads"
+        }
+      ],
+      "E": [
+        {
+          "numero": "88%",
+          "texto": "confiam mais na indicação de conhecidos do que em qualquer anúncio.",
+          "fonte": "Nielsen, Trust in Advertising 2021",
+          "url": "https://www.research-live.com/article/news/nielsen-study-reveals-top-attributes-for-successful-adverts-/id/5093662"
+        },
+        {
+          "numero": "49%",
+          "texto": "dos latino-americanos deixam uma marca de que gostam depois de uma única experiência ruim.",
+          "fonte": "PwC, Future of Customer Experience",
+          "url": "https://www.pwc.com/cb/en/services/consulting/pdf/customer-experience-placemat.pdf"
+        }
+      ]
+    },
+    "setores": {
+      "saude": {
+        "numero": "47%",
+        "texto": "dos brasileiros usam o Google para tirar dúvidas de saúde, e 23% usam as redes sociais.",
+        "fonte": "Datafolha 2022, em Doctoralia: Perfil do Paciente Digital 2025",
+        "url": "https://static.poder360.com.br/2025/03/Perfil-Paciente-Digital-2025.pdf"
+      },
+      "educacao": {
+        "numero": "82%",
+        "texto": "dos brasileiros se informam sobre educação no YouTube antes de escolher onde estudar.",
+        "fonte": "Educa Insights e Google, 2024",
+        "url": "https://business.google.com/br/think/search-and-video/educacao-youtube-2025/"
+      },
+      "liberal": {
+        "numero": "57%",
+        "texto": "procuram um profissional por conta própria, mesmo quando também pedem indicação.",
+        "fonte": "Clio, Legal Trends Report 2019 (EUA)",
+        "url": "https://blog.lawline.com/what-do-clients-look-for-in-a-lawyer-takeaways-from-the-2019-clio-legal-trends-report"
+      },
+      "projetos": {
+        "numero": "62%",
+        "texto": "de quem chega por indicação ainda olha site, avaliações e portfólio antes de pedir orçamento.",
+        "fonte": "Houzz, 2021",
+        "url": "https://www.architectureanddesign.com.au/news/latest-homeowner-survey-reveals-architects-and-bui"
+      },
+      "local": {
+        "numero": "70%",
+        "texto": "mais visitas para negócios com o perfil no Google completo.",
+        "fonte": "Google, Perfil da Empresa",
+        "url": "https://support.google.com/business/answer/10515606?hl=pt-BR"
+      },
+      "produto": {
+        "numero": "70%",
+        "texto": "dos carrinhos de compra online são abandonados antes de fechar o pedido.",
+        "fonte": "Baymard Institute, 2025",
+        "url": "https://baymard.com/lists/cart-abandonment-rate"
+      },
+      "empresas": {
+        "numero": "95%",
+        "texto": "dos compradores de empresas não estão comprando agora. Quando chegar a hora, eles chamam a marca de que lembram.",
+        "fonte": "Ehrenberg-Bass e LinkedIn B2B Institute",
+        "url": "https://www.marketingweek.com/peter-weinberg-jon-lombardo-95-5-rule"
+      },
+      "outro": {
+        "numero": "81%",
+        "texto": "dos pequenos negócios vendem pelo WhatsApp, e 60% pelo Instagram. A concorrência está no mesmo lugar que você.",
+        "fonte": "Sebrae, Pulso dos Pequenos Negócios 2024",
+        "url": "https://www.jornalopcao.com.br/ultimas-noticias/whatsapp-lidera-vendas-on-line-entre-pequenos-negocios-aponta-pesquisa-do-sebrae-816391/"
+      }
+    }
+  },
+
   "resultado": {
     "_nota": "Página de resultado que o cliente recebe depois da sua análise (diagnostico/resultado/?t=...). Textos por pilar valem para nota baixa (até 39), média (40 a 69) e alta (70+).",
     "titulo": "Diagnóstico de marca",
@@ -968,7 +1138,7 @@
     "erro_aceite": "Para receber a análise, marque que você concorda.",
     "erro_obrigatorio": "Preencha este campo ou marque “Não tenho”.",
     "erro_arquivo_enviando": "Espere o arquivo terminar de enviar.",
-    "confirmacao": "Recebido, {nome}! Enquanto isso, dá uma olhada em alguns projetos da Last Lab.",
+    "confirmacao": "Recebido, {nome}! Enquanto isso, separei alguns dados sobre o ponto que mais pesa hoje na sua marca.",
     "portfolio_rotulo": "Ver portfólio da Last Lab",
     "portfolio_url": "https://www.lastlab.com.br/",
     "digite_aqui": "Digite aqui",

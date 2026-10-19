@@ -124,6 +124,7 @@ export default function AdminDiagnosticoAjustes() {
             <Selos ctx={ctx} />
             <Ofertas ctx={ctx} />
             <Encerramento ctx={ctx} />
+            {ctx.base.ajuda && <ComoAjudar ctx={ctx} />}
             <OutrosTextos ctx={ctx} />
           </div>
         </div>
@@ -164,6 +165,7 @@ const SECOES = [
   ["selos", "Selos"],
   ["ofertas", "Ofertas de entrada"],
   ["encerramento", "Encerramento e devolutiva"],
+  ["ajuda", "Como podemos ajudar"],
   ["outros", "Outros textos"],
 ];
 
@@ -421,6 +423,65 @@ function Encerramento({ ctx }) {
         {r("stories_rodape", "Rodapé da imagem dos stories")}
         {r("stories_link", "Link na imagem dos stories")}
         {r("nao_encontrado", "Link inválido ou não publicado")}
+      </Caixa>
+    </Secao>
+  );
+}
+
+// Página "Veja como podemos te ajudar com {pilar}", aberta no fim do diagnóstico: o pilar mais
+// fraco decide os dois dados de cima; o tipo de negócio, o dado "No seu setor".
+function ComoAjudar({ ctx }) {
+  const a = (k, rotulo, dica) => <Campo ctx={ctx} caminho={`ajuda.${k}`} rotulo={rotulo} dica={dica} />;
+  const base = ctx.base;
+  const Dado = ({ caminho }) => (
+    <div className="rounded-xl border border-zinc-200 p-4 space-y-2.5">
+      <div className="flex items-baseline gap-3">
+        <span className="text-3xl font-black tracking-tight" style={{ color: LARANJA }}>{ctx.valor(`${caminho}.numero`)}</span>
+        <a href={ctx.valor(`${caminho}.url`)} target="_blank" rel="noopener"
+          className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-zinc-500 hover:text-black">
+          <ExternalLink size={12} /> Ver fonte
+        </a>
+      </div>
+      <div className="grid sm:grid-cols-[120px_minmax(0,1fr)] gap-3">
+        <Campo ctx={ctx} caminho={`${caminho}.numero`} rotulo="Número" />
+        <Campo ctx={ctx} caminho={`${caminho}.texto`} rotulo="Texto" linhas={2} />
+      </div>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <Campo ctx={ctx} caminho={`${caminho}.fonte`} rotulo="Fonte (aparece para o cliente)" />
+        <Campo ctx={ctx} caminho={`${caminho}.url`} rotulo="Link da fonte" />
+      </div>
+    </div>
+  );
+  return (
+    <Secao id="ajuda" titulo="Como podemos ajudar"
+      nota="Botão no fim do chat, depois que a pessoa envia tudo. Cartões que passam sozinhos com o pilar mais fraco, dois dados de mercado desse pilar e um do setor, e o botão “Veja como podemos te ajudar com…”, que abre o WhatsApp com a dor da pessoa. Todo dado precisa ter fonte.">
+      <Caixa titulo="Textos">
+        {a("botao", "Botão no fim do chat", "{pilar} vira o nome do pilar mais fraco. O botão abre o WhatsApp.")}
+        {a("nota", "Primeiro cartão: rótulo", "{nota} vira a nota do pilar.")}
+        {a("secao_dados", "Rótulo dos cartões do pilar", "{pilar} vira o nome do pilar.")}
+        {a("secao_setor", "Rótulo do cartão do setor")}
+        {a("fonte", "Palavra antes da fonte")}
+        {a("mensagem", "Mensagem que vai no WhatsApp", "{empresa} e {cta} (a dor: objetivo + pilar, abaixo) são preenchidos.")}
+      </Caixa>
+      {base.pilares.map((p) => (
+        <Caixa key={p.id} titulo={`Pilar mais fraco: ${p.nome}`}>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {Object.keys(base.ajuda.ctas_objetivo || {}).map((o) => (
+              <Campo key={o} ctx={ctx} caminho={`ajuda.ctas_objetivo.${o}.${p.id}`}
+                rotulo={`Dor no WhatsApp se o objetivo foi “${base.perfil.find((q) => q.id === "objetivo")?.opcoes?.find((x) => x.id === o)?.texto || o}”`} />
+            ))}
+            {base.ajuda.ctas?.[p.id] !== undefined && <Campo ctx={ctx} caminho={`ajuda.ctas.${p.id}`} rotulo="Dor no WhatsApp sem objetivo (ou “Só curiosidade”)" />}
+          </div>
+          {(base.ajuda.pilares?.[p.id] || []).map((_, i) => <Dado key={i} caminho={`ajuda.pilares.${p.id}.${i}`} />)}
+        </Caixa>
+      ))}
+      <Caixa titulo="No seu setor (um por tipo de negócio)">
+        {Object.keys(base.ajuda.setores || {}).map((g) => (
+          <div key={g}>
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1.5">{nomeGrupo(base, g)}</p>
+            <Dado caminho={`ajuda.setores.${g}`} />
+          </div>
+        ))}
       </Caixa>
     </Secao>
   );
