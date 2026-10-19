@@ -6,6 +6,10 @@
 const URL_SB = import.meta.env.VITE_SUPABASE_URL;
 const CHAVE = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+// Meta Pixel (conjunto de dados "Last Lab - Site", portfólio Last Lab). O ID é público.
+const PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID || "2314908892694814";
+// eventos do site que também vão para a Meta (padrão da Meta → para otimizar anúncios)
+const PIXEL_EVENTOS = { whatsapp: "Contact", brief_iniciou: ["BriefingIniciado", true], brief_enviado: "Lead" };
 
 const K_VISITANTE = "ll-visitante";
 const K_SESSAO = "ll-sessao";
@@ -77,13 +81,20 @@ export function registrar(tipo, { pagina = location.pathname, detalhe = null } =
     body: JSON.stringify(corpo),
     keepalive: true,
   }).catch(() => {});
+  if (window.fbq) {
+    if (tipo === "pagina") window.fbq("track", "PageView");
+    else if (PIXEL_EVENTOS[tipo]) {
+      const [nome, proprio] = [].concat(PIXEL_EVENTOS[tipo]);
+      window.fbq(proprio ? "trackCustom" : "track", nome, { origem: tipo === "brief_enviado" ? "briefing" : pagina });
+    }
+  }
   if (window.gtag) {
     if (tipo === "pagina") window.gtag("event", "page_view", { page_path: pagina, page_location: location.href });
     else window.gtag("event", tipo === "whatsapp" ? "clique_whatsapp" : tipo, { pagina });
   }
 }
 
-/** Liga o GA4 (se houver o ID) e conta cliques em qualquer link de WhatsApp. Chamar uma vez. */
+/** Liga o Pixel da Meta e o GA4 (se houver o ID) e conta cliques em qualquer link de WhatsApp. Chamar uma vez. */
 export function iniciarAnalytics() {
   if (desligado()) return;
   if (GA_ID && !window.gtag) {
@@ -96,6 +107,19 @@ export function iniciarAnalytics() {
     window.gtag("js", new Date());
     // as páginas são enviadas por registrar() a cada troca de rota
     window.gtag("config", GA_ID, { send_page_view: false });
+  }
+  if (PIXEL_ID && !window.fbq) {
+    /* eslint-disable */
+    (function (f, b, e, v) {
+      const n = (f.fbq = function () { n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments); });
+      if (!f._fbq) f._fbq = n;
+      n.push = n; n.loaded = true; n.version = "2.0"; n.queue = [];
+      const t = b.createElement(e); t.async = true; t.src = v;
+      b.head.appendChild(t);
+    })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+    /* eslint-enable */
+    // o PageView vai a cada troca de página, por registrar("pagina")
+    window.fbq("init", PIXEL_ID);
   }
   document.addEventListener("click", (e) => {
     const a = e.target.closest?.('a[href*="wa.me"], a[href*="api.whatsapp.com"]');
