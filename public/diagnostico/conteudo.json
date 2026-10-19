@@ -73,6 +73,26 @@
       ]
     },
     {
+      "id": "canais",
+      "pergunta": "Por onde os clientes encontram e falam com a sua empresa? Marque todos que você usa.",
+      "tipo": "multipla",
+      "antes_de": "C1",
+      "botao": "Continuar",
+      "comentario": "Anotado. Na segunda parte, é por aí que eu vou olhar a sua marca de fora.",
+      "opcoes": [
+        { "id": "instagram", "texto": "Instagram", "nome": "Instagram" },
+        { "id": "site", "texto": "Site", "nome": "site" },
+        { "id": "google", "texto": "Google (perfil da empresa no Maps)", "nome": "Google" },
+        { "id": "whatsapp", "texto": "WhatsApp", "nome": "WhatsApp" },
+        { "id": "linkedin", "texto": "LinkedIn", "nome": "LinkedIn" },
+        { "id": "facebook", "texto": "Facebook", "nome": "Facebook" },
+        { "id": "tiktok", "texto": "TikTok", "nome": "TikTok" },
+        { "id": "youtube", "texto": "YouTube", "nome": "YouTube" },
+        { "id": "marketplace", "texto": "Marketplace ou app (iFood, Mercado Livre, Shopee...)", "nome": "marketplace" },
+        { "id": "nenhum", "texto": "Nenhum: meus clientes chegam por indicação", "exclusiva": true, "comentario": "Indicação é um ótimo sinal: quem compra fala bem de você. Mas quem recebe a indicação quase sempre procura antes de chamar. Vamos ver o que essa pessoa encontra." }
+      ]
+    },
+    {
       "id": "objetivo",
       "pergunta": "Por que você está fazendo este diagnóstico?",
       "tipo": "escolha",
@@ -175,6 +195,9 @@
         {
           "id": "C2",
           "pergunta": "Seus canais (Instagram, site, Google, WhatsApp) parecem a mesma empresa?",
+          "pergunta_canais": "Seus canais ({canais}) parecem a mesma empresa?",
+          "pergunta_um_canal": "O seu {canal} e o jeito como você atende parecem a mesma empresa?",
+          "pergunta_sem_canais": "Do primeiro contato ao orçamento, tudo que o cliente vê da sua marca parece a mesma empresa?",
           "opcoes": [
             { "texto": "Não, cada um foi feito de um jeito", "pontos": 0 },
             { "texto": "Mais ou menos", "pontos": 1 },
@@ -775,7 +798,7 @@
       {"id": "frase_de_bolso", "icone": "🗣️", "nome": "Frase de bolso", "frase": "Seus clientes sabem explicar o que você faz.", "regra": {"tipo": "resposta", "pergunta": "B1", "min_pontos": 2}},
       {"id": "fala_do_depois", "icone": "🎯", "nome": "Fala do depois", "frase": "Você vende o resultado, não o serviço.", "regra": {"tipo": "resposta", "pergunta": "B2", "min_pontos": 3}},
       {"id": "site_que_vende", "icone": "🧲", "nome": "Site que vende", "frase": "Seu site trabalha enquanto você dorme.", "regra": {"tipo": "resposta", "pergunta": "C1", "min_pontos": 3}},
-      {"id": "mesma_voz", "icone": "🔗", "nome": "Mesma voz em todo canal", "frase": "Site e Instagram contam a mesma história.", "regra": {"tipo": "resposta", "pergunta": "C2", "min_pontos": 3}},
+      {"id": "mesma_voz", "icone": "🔗", "nome": "Mesma voz em todo canal", "frase": "Todos os seus canais contam a mesma história.", "regra": {"tipo": "resposta", "pergunta": "C2", "min_pontos": 3}},
       {"id": "proposta_sob_medida", "icone": "✂️", "nome": "Proposta sob medida", "frase": "Cada cliente recebe uma proposta só dele.", "regra": {"tipo": "resposta", "pergunta": "D1", "min_pontos": 3}},
       {"id": "apresentacao_conduz", "icone": "🎤", "nome": "Apresentação que conduz", "frase": "Seu material vende até quando é repassado.", "regra": {"tipo": "resposta", "pergunta": "D2", "min_pontos": 3}},
       {"id": "caminho_no_trilho", "icone": "🧭", "nome": "Caminho no trilho", "frase": "Do primeiro contato ao fechamento, ninguém se perde.", "regra": {"tipo": "resposta", "pergunta": "E1", "min_pontos": 2}},
@@ -814,8 +837,14 @@
   "encerramento": {
     "fala_pos_resultado": "Essa é a sua marca vista por você. Agora falta a outra metade: como ela é vista de fora.",
     "links": [
-      { "id": "site", "tipo": "texto", "rotulo": "Site", "obrigatorio": false, "nao_tenho": "Não tenho", "nao_tenho_resposta": "Não tenho site" },
-      { "id": "instagram", "tipo": "texto", "rotulo": "@ do Instagram", "obrigatorio": true, "nao_tenho": "Não tenho", "nao_tenho_resposta": "Não tenho Instagram" },
+      { "id": "instagram", "tipo": "texto", "canal": "instagram", "rotulo": "@ do Instagram", "placeholder": "@suamarca", "obrigatorio": false },
+      { "id": "site", "tipo": "texto", "canal": "site", "rotulo": "Site", "placeholder": "suamarca.com.br", "obrigatorio": false },
+      { "id": "linkedin", "tipo": "texto", "canal": "linkedin", "rotulo": "LinkedIn (seu perfil ou o da empresa)", "placeholder": "linkedin.com/in/voce", "obrigatorio": false },
+      { "id": "google", "tipo": "texto", "canal": "google", "rotulo": "Nome da empresa no Google, ou o link do perfil", "placeholder": "Sua Marca, Sorocaba", "obrigatorio": false },
+      { "id": "facebook", "tipo": "texto", "canal": "facebook", "rotulo": "Facebook", "placeholder": "facebook.com/suamarca", "obrigatorio": false },
+      { "id": "tiktok", "tipo": "texto", "canal": "tiktok", "rotulo": "@ do TikTok", "placeholder": "@suamarca", "obrigatorio": false },
+      { "id": "youtube", "tipo": "texto", "canal": "youtube", "rotulo": "Canal do YouTube", "placeholder": "youtube.com/@suamarca", "obrigatorio": false },
+      { "id": "marketplace", "tipo": "texto", "canal": "marketplace", "rotulo": "Link da sua loja no marketplace ou app", "placeholder": "Cole o link da sua loja", "obrigatorio": false },
       {
         "id": "apresentacao", "tipo": "arquivo", "rotulo": "Material que você usa para vender", "obrigatorio": false,
         "exemplos": "apresentação, proposta, orçamento, catálogo ou a mensagem que você manda no WhatsApp",
@@ -909,6 +938,8 @@
     "perguntas_negocio": "Antes da segunda parte, só duas perguntas rápidas sobre o negócio. Elas me ajudam a ajustar as recomendações ao seu momento, e ficam só entre nós.",
     "resultado_persona": "Momento da sua marca",
     "links_pedido": "Me mande os links da sua marca:",
+    "links_pedido_sem_canais": "Me mande o que você usa para vender:",
+    "erro_um_canal": "Preencha pelo menos um dos seus canais.",
     "etapa_1_curto": "Vista por você",
     "etapa_2_curto": "Vista de fora",
     "etapa_1_rotulo": "Parte 1 de 2",

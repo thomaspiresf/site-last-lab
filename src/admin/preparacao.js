@@ -15,6 +15,20 @@ const DOR = [
 
 const ehLink = (v) => typeof v === "string" && v.trim() && !/\s/.test(v.trim());
 
+// canais que o diagnóstico pergunta além de site e Instagram (a pessoa marca quais usa)
+const CANAIS = [
+  ["linkedin", "LinkedIn", (v) => `https://${v.replace(/^https?:\/\//, "")}`],
+  ["google", "Google", (v) => (ehLink(v) && /\./.test(v) ? `https://${v.replace(/^https?:\/\//, "")}` : `https://www.google.com/search?q=${encodeURIComponent(v)}`)],
+  ["facebook", "Facebook", (v) => `https://${v.replace(/^https?:\/\//, "")}`],
+  ["tiktok", "TikTok", (v) => (v.startsWith("@") ? `https://www.tiktok.com/${v}` : `https://${v.replace(/^https?:\/\//, "")}`)],
+  ["youtube", "YouTube", (v) => `https://${v.replace(/^https?:\/\//, "")}`],
+  ["marketplace", "Loja no marketplace", (v) => `https://${v.replace(/^https?:\/\//, "")}`],
+];
+
+/** Os links dos outros canais que o lead mandou: [{ rotulo, url }]. */
+export const outrosCanais = (links = {}) =>
+  CANAIS.filter(([k]) => typeof links[k] === "string" && links[k].trim()).map(([k, rotulo, url]) => ({ rotulo, url: url(links[k].trim()) }));
+
 /** Monta a preparação a partir do lead e dos dados da apresentação (montarDados). */
 export function montarPreparacao(item, dados) {
   const d = item.dados || {};
@@ -47,6 +61,7 @@ export function montarPreparacao(item, dados) {
       // "Não tenho site" e afins ficam de fora
       ehLink(links.site) && { rotulo: "Site", url: links.site.startsWith("http") ? links.site : `https://${links.site}` },
       ehLink(links.instagram) && { rotulo: "Instagram", url: links.instagram.startsWith("http") ? links.instagram : `https://instagram.com/${links.instagram.replace(/^@/, "")}` },
+      ...outrosCanais(links),
       links.apresentacao && /^https?:/.test(links.apresentacao) && { rotulo: "Material de venda", url: links.apresentacao },
     ].filter(Boolean),
     perguntasDor: fracos.flatMap((p) => (DOR[p.i] || []).map((q) => ({ q, pilar: p.nome }))),

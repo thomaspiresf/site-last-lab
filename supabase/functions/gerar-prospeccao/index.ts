@@ -66,6 +66,9 @@ function contexto(lead: Record<string, any>) {
   }
   if (d.links?.instagram) linhas.push(`Instagram: ${d.links.instagram}`);
   if (d.links?.site) linhas.push(`Site: ${d.links.site}`);
+  for (const [k, nome] of [["linkedin", "LinkedIn"], ["google", "Google"], ["facebook", "Facebook"], ["tiktok", "TikTok"], ["youtube", "YouTube"], ["marketplace", "Marketplace"]])
+    if (d.links?.[k]) linhas.push(`${nome}: ${d.links[k]}`);
+  if (perfil.canais) linhas.push(`Canais que usa: ${perfil.canais}`);
   return linhas.join("\n");
 }
 

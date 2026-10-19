@@ -29,6 +29,7 @@ import AdminLayout from "./AdminLayout";
 import BotaoExcluir from "./components/BotaoExcluir";
 import { AREAS, ESTRUTURA, SERVICOS, areaDoServico, degrauDoServico, ofertaDoLead, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
+import { outrosCanais } from "./preparacao";
 import {
   listDiagnosticos,
   updateDiagnostico,
@@ -458,8 +459,10 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
     naoTem(links.site) && links.site,
     naoTem(links.instagram) && links.instagram,
     links.apresentacao?.startsWith("Não tenho") && links.apresentacao,
+    perfil.canais && `Canais: ${perfil.canais}`,
     links.referencias && `Concorrentes: ${links.referencias}`,
   ].filter(Boolean);
+  const canais = outrosCanais(links);
 
   // se você trocou a oferta, o roteiro acompanha
   const escolhida = item.ofertaEscolhida;
@@ -536,6 +539,11 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
             <AtSign size={15} /> Instagram
           </a>
         )}
+        {canais.map((l) => (
+          <a key={l.rotulo} href={l.url} target="_blank" rel="noopener" className={`${botao} bg-white border border-zinc-200 hover:border-black`}>
+            <Globe size={15} /> {l.rotulo}
+          </a>
+        ))}
         {links.apresentacao_caminho && (
           <button type="button" onClick={abrirArquivo} disabled={abrindoArquivo}
             className={`${botao} bg-white border border-zinc-200 hover:border-black max-w-full`}>
