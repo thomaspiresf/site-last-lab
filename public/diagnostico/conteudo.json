@@ -51,6 +51,7 @@
       "id": "ticket",
       "pergunta": "Qual é o valor médio de uma venda?",
       "tipo": "escolha",
+      "depois": true,
       "opcoes": [
         { "id": "ate_500", "texto": "Até R$ 500" },
         { "id": "500_5k", "texto": "R$ 500 a 5 mil" },
@@ -62,6 +63,7 @@
       "id": "faturamento",
       "pergunta": "Qual é o faturamento mensal aproximado?",
       "tipo": "escolha",
+      "depois": true,
       "opcoes": [
         { "id": "ate_30k", "texto": "Até R$ 30 mil" },
         { "id": "30k_100k", "texto": "R$ 30 a 100 mil" },
@@ -904,6 +906,7 @@
     "aviso_pilar": "{pilar} ✓ {n} de {total}",
     "inicio_diagnostico": "Obrigado, {nome}. Agora são 12 perguntas sobre a sua marca, em 5 pilares. Responda pensando em como as coisas são hoje, não em como gostaria que fossem.",
     "resultado_pronto": "Pronto, {nome}. Aqui está o seu resultado.",
+    "perguntas_negocio": "Antes da segunda parte, só duas perguntas rápidas sobre o negócio. Elas me ajudam a ajustar as recomendações ao seu momento, e ficam só entre nós.",
     "resultado_persona": "Momento da sua marca",
     "links_pedido": "Me mande os links da sua marca:",
     "etapa_1_curto": "Vista por você",
