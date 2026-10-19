@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { Cookie } from "lucide-react";
 
 // Aviso de cookies, só informativo: a medição (GA, Pixel e a própria) já roda desde o primeiro
 // acesso. Some depois do "Entendi" (no site e no diagnóstico, que usam a mesma chave).
@@ -16,12 +17,13 @@ export default function AvisoCookies() {
   };
   return (
     <div role="region" aria-label="Aviso de cookies"
-      className="fixed z-40 left-3 bottom-3 sm:left-6 sm:bottom-6 flex items-center gap-3 rounded-full bg-black text-white pl-4 pr-1.5 py-1.5 shadow-lg">
-      <p className="text-[12.5px] leading-tight text-zinc-300">
+      className="fixed z-40 left-3 right-[88px] bottom-8 sm:right-auto sm:left-6 sm:bottom-6 flex items-center justify-between gap-2 sm:gap-3 rounded-full bg-black text-white pl-3 pr-1.5 py-1.5 shadow-lg">
+      <Cookie size={16} className="shrink-0 -mr-1 text-white" aria-hidden="true" />
+      <p className="text-[12px] sm:text-[12.5px] leading-tight text-zinc-300 whitespace-nowrap">
         Usamos cookies. <Link to="/privacidade" className="text-white underline underline-offset-2">Saiba mais</Link>
       </p>
       <button type="button" onClick={fechar}
-        className="shrink-0 px-3.5 py-1.5 rounded-full bg-white text-black text-[12.5px] font-semibold hover:bg-zinc-200 transition-colors">
+        className="shrink-0 px-3 sm:px-3.5 py-1.5 rounded-full bg-white text-black text-[12px] sm:text-[12.5px] font-semibold hover:bg-zinc-200 transition-colors">
         Entendi
       </button>
     </div>
