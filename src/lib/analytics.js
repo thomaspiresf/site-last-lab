@@ -5,7 +5,7 @@
 
 const URL_SB = import.meta.env.VITE_SUPABASE_URL;
 const CHAVE = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || "G-LXEVXVRHB8"; // GA4 "Last Lab - Site" (ID público)
 // Meta Pixel (conjunto de dados "Last Lab - Site", portfólio Last Lab). O ID é público.
 const PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID || "2314908892694814";
 // eventos do site que também vão para a Meta (padrão da Meta → para otimizar anúncios)
@@ -90,7 +90,7 @@ export function registrar(tipo, { pagina = location.pathname, detalhe = null } =
   }
   if (window.gtag) {
     if (tipo === "pagina") window.gtag("event", "page_view", { page_path: pagina, page_location: location.href });
-    else window.gtag("event", tipo === "whatsapp" ? "clique_whatsapp" : tipo, { pagina });
+    else window.gtag("event", tipo === "whatsapp" ? "clique_whatsapp" : tipo === "brief_enviado" ? "generate_lead" : tipo, { pagina, origem_lead: tipo === "brief_enviado" ? "briefing" : undefined });
   }
 }
 
