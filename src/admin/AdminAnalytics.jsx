@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, MousePointerClick, UserCheck, TrendingUp, Wallet, Smartphone, Monitor, Tablet, RefreshCw, Info, ArrowUp, ArrowDown, Copy, Check, Megaphone } from "lucide-react";
+import { Users, Wallet, Smartphone, Monitor, Tablet, RefreshCw, Info, ArrowUp, ArrowDown, Copy, Check, Megaphone, Gauge, FileText, Globe, LayoutGrid } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { getAnalytics, getConteudoBaseDiagnostico, sincronizarMeta } from "../lib/api";
 
-// Analytics: visitas do site, funil do diagnóstico, origem dos leads e pipeline de vendas.
+// Analytics, em abas: visão geral, Meta Ads, diagnóstico, briefing e site.
 // Os eventos são anônimos (src/lib/analytics.js no site e no diagnóstico); o banco agrega tudo
 // na função analytics_resumo (supabase/schema_analytics.sql).
 
@@ -24,8 +24,17 @@ const STATUS = [
   { id: "perdido", nome: "Perdido" },
 ];
 
+const ABAS = [
+  { id: "geral", nome: "Visão geral", icone: LayoutGrid },
+  { id: "meta", nome: "Meta Ads", icone: Megaphone },
+  { id: "diagnostico", nome: "Diagnóstico", icone: Gauge },
+  { id: "briefing", nome: "Briefing", icone: FileText },
+  { id: "site", nome: "Site", icone: Globe },
+];
+
 const num = (n) => Number(n || 0).toLocaleString("pt-BR");
 const reais = (n) => Number(n || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const plural = (n, um, varios) => `${num(n)} ${Number(n) === 1 ? um : varios}`;
 const pct = (a, b) => (b ? `${Math.round((a / b) * 100)}%` : "—");
 const NOMES_CANAL = { direto: "Direto (digitou ou link salvo)", instagram: "Instagram", google: "Google", facebook: "Facebook", linkedin: "LinkedIn", whatsapp: "WhatsApp" };
 const nomeCanal = (c) => NOMES_CANAL[c] || c;
@@ -38,6 +47,8 @@ export default function AdminAnalytics() {
   const [carregando, setCarregando] = useState(true);
   const [conteudo, setConteudo] = useState(null);
   const [meta, setMeta] = useState({ estado: "livre", erro: "" });
+  const [aba, setAba] = useState(() => (ABAS.some((a) => `#${a.id}` === window.location.hash) ? window.location.hash.slice(1) : "geral"));
+  const trocarAba = (id) => { setAba(id); window.history.replaceState(null, "", `#${id}`); };
   const jaSincronizou = React.useRef(false);
 
   const carregar = () => {
@@ -110,74 +121,115 @@ export default function AdminAnalytics() {
         </div>
       </div>
 
+      <nav className="flex gap-1 overflow-x-auto border-b border-zinc-200 mb-6 -mx-1 px-1">
+        {ABAS.map((a) => (
+          <button key={a.id} type="button" onClick={() => trocarAba(a.id)}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px transition-colors ${
+              aba === a.id ? "border-black text-black" : "border-transparent text-zinc-500 hover:text-black"}`}>
+            <a.icone size={15} /> {a.nome}
+          </button>
+        ))}
+      </nav>
+
       {erro && <p className="text-sm text-red-600 mb-4">{erro}</p>}
       {!dados ? (
         !erro && <p className="text-sm text-zinc-500">Carregando...</p>
       ) : (
-        <Painel d={dados} ant={anterior} dias={dias} pergunta={pergunta} meta={meta} atualizarMeta={atualizarMeta} />
+        <Painel aba={aba} d={dados} ant={anterior} dias={dias} pergunta={pergunta} meta={meta} atualizarMeta={atualizarMeta} />
       )}
     </AdminLayout>
   );
 }
 
-function Painel({ d, ant, dias, pergunta, meta, atualizarMeta }) {
-  const v = d.visitas, f = d.funil, l = d.leads, p = d.pipeline;
+function Painel({ aba, d, ant, dias, pergunta, meta, atualizarMeta }) {
   const a = ant || {};
-  const decididos = (p.ganhos_total || 0) + (p.perdidos_total || 0);
   const serie = (k) => (d.serie || []).map((x) => Number(x[k]) || 0);
+  if (aba === "meta") return <MetaAds m={d.meta} ma={a.meta} serie={serie} meta={meta} atualizarMeta={atualizarMeta} />;
+  if (aba === "diagnostico") return <AbaDiagnostico d={d} a={a} serie={serie} pergunta={pergunta} />;
+  if (aba === "briefing") return <AbaBriefing b={d.briefing} ba={a.briefing} serie={serie} />;
+  if (aba === "site") return <AbaSite v={d.visitas} va={a.visitas} dias={dias} serie={serie} />;
+  return <VisaoGeral d={d} a={a} serie={serie} />;
+}
+
+// ---------- Visão geral: um número de cada fonte + o pipeline ----------
+
+function VisaoGeral({ d, a, serie }) {
+  const v = d.visitas, l = d.leads, p = d.pipeline, b = d.briefing, m = d.meta;
   return (
     <div className="space-y-6">
       {v.sessoes === 0 && (
         <p className="flex items-start gap-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-2xl px-4 py-3">
           <Info size={16} className="mt-0.5 shrink-0" />
-          As visitas começaram a ser contadas agora. Leads, origem e vendas já usam o histórico dos diagnósticos.
+          As visitas começaram a ser contadas agora. Leads, briefings e vendas já usam o histórico.
         </p>
       )}
-
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <Kpi icone={Users} rotulo="Visitantes" valor={num(v.visitantes)} atual={v.visitantes} antes={a.visitas?.visitantes} tendencia={serie("visitantes")}
-          sub={`${num(v.sessoes)} visitas · ${num(v.paginas_vistas)} páginas`} />
-        <Kpi icone={MousePointerClick} rotulo="Começaram o diagnóstico" valor={num(f.iniciou)} atual={f.iniciou} antes={a.funil?.iniciou} tendencia={serie("iniciou")}
-          sub={`${pct(f.iniciou, f.abriu)} de quem abriu`} />
-        <Kpi icone={UserCheck} rotulo="Leads" valor={num(l.total)} atual={l.total} antes={a.leads?.total} tendencia={serie("leads")}
-          sub={`${num(l.qualificados)} qualificados`} destaque />
-        <Kpi icone={TrendingUp} rotulo="Visitante → lead" valor={pct(l.total, v.visitantes)}
-          atual={v.visitantes ? l.total / v.visitantes : null} antes={a.visitas?.visitantes ? a.leads.total / a.visitas.visitantes : null}
-          sub={`${num(v.cliques_whatsapp)} cliques no WhatsApp`} />
+        <Kpi icone={Users} rotulo="Visitantes do site" valor={num(v.visitantes)} atual={v.visitantes} antes={a.visitas?.visitantes} tendencia={serie("visitantes")}
+          sub={`${plural(v.cliques_whatsapp, "clique", "cliques")} no WhatsApp`} />
+        <Kpi icone={Megaphone} rotulo="Investido na Meta" valor={m.conectada ? reais(m.gasto) : "—"} atual={m.gasto} antes={a.meta?.gasto} tendencia={m.conectada ? serie("gasto") : null}
+          sub={m.conectada ? `${plural(m.leads, "lead", "leads")} pelos anúncios` : "Meta não conectada"} />
+        <Kpi icone={Gauge} rotulo="Leads do diagnóstico" valor={num(l.total)} atual={l.total} antes={a.leads?.total} tendencia={serie("leads")}
+          sub={plural(l.qualificados, "qualificado", "qualificados")} destaque />
+        <Kpi icone={FileText} rotulo="Briefings recebidos" valor={num(b.recebidos)} atual={b.recebidos} antes={a.briefing?.recebidos} tendencia={serie("briefings")} />
         <Kpi icone={Wallet} rotulo="Vendido no período" valor={reais(p.vendido)} atual={p.vendido} antes={a.pipeline?.vendido}
           sub={`${num(p.fechados)} ${p.fechados === 1 ? "venda" : "vendas"}`} />
       </div>
+      <Pipeline p={p} />
+    </div>
+  );
+}
 
-      <SecaoMeta m={d.meta} ma={a.meta} serie={serie("gasto")} meta={meta} atualizarMeta={atualizarMeta} />
+function Pipeline({ p }) {
+  const decididos = (p.ganhos_total || 0) + (p.perdidos_total || 0);
+  return (
+    <Bloco titulo="Pipeline e vendas" nota="Situação de hoje de todos os leads do diagnóstico. As vendas contam pela data em que o status virou “Fechado”.">
+      <div className="grid grid-cols-3 lg:grid-cols-6 gap-2">
+        {STATUS.map((s) => (
+          <Link key={s.id} to="/admin/diagnosticos"
+            className={`rounded-xl px-3 py-3 border ${s.id === "fechado" ? "bg-emerald-50 border-emerald-100" : s.id === "perdido" ? "bg-zinc-50 border-zinc-100" : "bg-white border-zinc-200"} hover:border-black`}>
+            <p className="text-2xl font-black">{num(p.por_status?.[s.id])}</p>
+            <p className="text-xs text-zinc-500 mt-0.5">{s.nome}</p>
+          </Link>
+        ))}
+      </div>
+      <div className="grid sm:grid-cols-3 gap-3 mt-4">
+        <Mini rotulo="Em proposta (valor das apresentações)" valor={reais(p.em_proposta)} />
+        <Mini rotulo="Taxa de fechamento" valor={pct(p.ganhos_total, decididos)} sub={`${num(p.ganhos_total)} fechados de ${num(decididos)} decididos`} />
+        <Mini rotulo="Ticket médio" valor={p.fechados ? reais(p.vendido / p.fechados) : "—"} sub="no período" />
+      </div>
+      {p.sem_valor > 0 && (
+        <p className="text-xs text-amber-700 mt-3">{p.sem_valor} venda(s) sem valor informado: usei o investimento da apresentação. Preencha o valor fechado na ficha do lead.</p>
+      )}
+      {p.por_mes.length > 0 && (
+        <div className="mt-5">
+          <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Vendas por mês</h4>
+          <Barras itens={p.por_mes.map((x) => [mesNome(x.mes), x.vendido, `${reais(x.vendido)} · ${x.fechados}`])} />
+        </div>
+      )}
+    </Bloco>
+  );
+}
 
-      <Bloco titulo="Visitas por dia">
-        <GraficoDias dias={dias} pontos={v.por_dia} />
-      </Bloco>
+// ---------- Diagnóstico ----------
+
+function AbaDiagnostico({ d, a, serie, pergunta }) {
+  const f = d.funil, l = d.leads, fa = a.funil || {};
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <Kpi rotulo="Abriram" valor={num(f.abriu)} atual={f.abriu} antes={fa.abriu} />
+        <Kpi rotulo="Começaram" valor={num(f.iniciou)} atual={f.iniciou} antes={fa.iniciou} tendencia={serie("iniciou")} sub={`${pct(f.iniciou, f.abriu)} de quem abriu`} />
+        <Kpi rotulo="Viram o resultado" valor={num(f.resultado)} atual={f.resultado} antes={fa.resultado} sub={`${pct(f.resultado, f.iniciou)} de quem começou`} />
+        <Kpi rotulo="Leads" valor={num(l.total)} atual={l.total} antes={a.leads?.total} tendencia={serie("leads")} sub={`${num(l.qualificados)} qualificados (${pct(l.qualificados, l.total)})`} destaque />
+        <Kpi rotulo="Clicaram em “como podemos ajudar”" valor={num(f.ajuda)} atual={f.ajuda} antes={fa.ajuda} sub={`${pct(f.ajuda, f.lead)} dos leads`} />
+      </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         <Bloco titulo="Funil do diagnóstico" nota="Pessoas (visitantes únicos) que chegaram a cada etapa no período.">
-          <Funil etapas={[
-            ["Abriram o diagnóstico", f.abriu],
-            ["Começaram (responderam o nome)", f.iniciou],
-            ["Viram o resultado", f.resultado],
-            ["Mandaram os links", f.links],
-            ["Deixaram o contato (lead)", f.lead],
-            ["Clicaram em “como podemos ajudar”", f.ajuda],
-          ]} />
-          {f.parou_em?.length > 0 && (
-            <div className="mt-5">
-              <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Onde as pessoas param</h4>
-              <ul className="space-y-1.5">
-                {f.parou_em.map((x) => (
-                  <li key={x.pergunta} className="flex items-start justify-between gap-3 text-sm">
-                    <span className="text-zinc-700">Depois de “{pergunta(x.pergunta)}”</span>
-                    <b className="shrink-0">{num(x.pessoas)}</b>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-[11px] text-zinc-400 mt-2">Última pergunta respondida por quem começou e não deixou o contato.</p>
-            </div>
-          )}
+          <FunilCone etapas={[
+            ["Abriram", f.abriu], ["Começaram", f.iniciou], ["Viram o resultado", f.resultado], ["Mandaram os links", f.links], ["Deixaram o contato", f.lead],
+          ]} taxas={["começaram", "terminaram a parte 1", "mandaram os links", "viraram lead"]} />
+          <OndeParam itens={f.parou_em} nome={pergunta} rodape="Última pergunta respondida por quem começou e não deixou o contato." />
         </Bloco>
 
         <Bloco titulo="Origem dos leads" nota="Pela UTM do link; sem UTM, pelo site de onde a pessoa veio na primeira visita.">
@@ -218,32 +270,81 @@ function Painel({ d, ant, dias, pergunta, meta, atualizarMeta }) {
         </Bloco>
       </div>
 
-      <Bloco titulo="Pipeline e vendas" nota="Situação de hoje de todos os leads. As vendas contam pela data em que o status virou “Fechado”.">
-        <div className="grid grid-cols-3 lg:grid-cols-6 gap-2">
-          {STATUS.map((s) => (
-            <Link key={s.id} to="/admin/diagnosticos"
-              className={`rounded-xl px-3 py-3 border ${s.id === "fechado" ? "bg-emerald-50 border-emerald-100" : s.id === "perdido" ? "bg-zinc-50 border-zinc-100" : "bg-white border-zinc-200"} hover:border-black`}>
-              <p className="text-2xl font-black">{num(p.por_status?.[s.id])}</p>
-              <p className="text-xs text-zinc-500 mt-0.5">{s.nome}</p>
-            </Link>
-          ))}
-        </div>
-        <div className="grid sm:grid-cols-3 gap-3 mt-4">
-          <Mini rotulo="Em proposta (valor das apresentações)" valor={reais(p.em_proposta)} />
-          <Mini rotulo="Taxa de fechamento" valor={pct(p.ganhos_total, decididos)} sub={`${num(p.ganhos_total)} fechados de ${num(decididos)} decididos`} />
-          <Mini rotulo="Ticket médio" valor={p.fechados ? reais(p.vendido / p.fechados) : "—"} sub="no período" />
-        </div>
-        {p.sem_valor > 0 && (
-          <p className="text-xs text-amber-700 mt-3">{p.sem_valor} venda(s) sem valor informado: usei o investimento da apresentação. Preencha o valor fechado na ficha do lead.</p>
-        )}
-        {p.por_mes.length > 0 && (
-          <div className="mt-5">
-            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Vendas por mês</h4>
-            <Barras itens={p.por_mes.map((x) => [mesNome(x.mes), x.vendido, `${reais(x.vendido)} · ${x.fechados}`])} />
-          </div>
-        )}
-      </Bloco>
+      <Pipeline p={d.pipeline} />
+    </div>
+  );
+}
 
+// ---------- Briefing ----------
+
+const CAMPOS_BRIEFING = {
+  name: "Nome", email: "E-mail", phone: "Telefone", businessStage: "Situação do negócio", brandName: "Nome da marca",
+  activity: "Atividade", targetAudience: "Público-alvo", differentiators: "Diferenciais", desiredFeelings: "Sensações desejadas",
+  styleAdjectives: "Adjetivos da marca", visualStyles: "Estilos visuais", colorPreferences: "Cores preferidas",
+  admiredBrands: "Marcas de referência", desiredElements: "Elementos desejados", avoidElements: "O que evitar", extraInfo: "Algo mais",
+};
+const SITUACOES = { tem_empresa: "Já tem empresa", comecando: "Está começando agora", nao_sei: "Ainda não sabe direito" };
+
+function AbaBriefing({ b, ba = {}, serie }) {
+  return (
+    <div className="space-y-6">
+      {b.abriu === 0 && b.recebidos > 0 && (
+        <p className="flex items-start gap-2 text-sm text-zinc-600 bg-white border border-zinc-200 rounded-2xl px-4 py-3">
+          <Info size={16} className="mt-0.5 shrink-0" />
+          O funil do briefing começou a ser contado agora. Os briefings recebidos já usam o histórico.
+        </p>
+      )}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Kpi rotulo="Abriram o briefing" valor={num(b.abriu)} atual={b.abriu} antes={ba.abriu} />
+        <Kpi rotulo="Começaram" valor={num(b.iniciou)} atual={b.iniciou} antes={ba.iniciou} sub={`${pct(b.iniciou, b.abriu)} de quem abriu`} />
+        <Kpi rotulo="Chegaram na revisão" valor={num(b.revisao)} atual={b.revisao} antes={ba.revisao} sub={`${pct(b.revisao, b.iniciou)} de quem começou`} />
+        <Kpi rotulo="Briefings recebidos" valor={num(b.recebidos)} atual={b.recebidos} antes={ba.recebidos} tendencia={serie("briefings")} destaque />
+      </div>
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Bloco titulo="Funil do briefing">
+          <FunilCone etapas={[["Abriram", b.abriu], ["Começaram", b.iniciou], ["Chegaram na revisão", b.revisao], ["Enviaram", b.enviado]]}
+            taxas={["começaram", "responderam tudo", "enviaram"]} />
+          <OndeParam itens={b.parou_em} nome={(k) => CAMPOS_BRIEFING[k] || k} rodape="Última pergunta respondida por quem começou e não enviou." />
+        </Bloco>
+        <Bloco titulo="Quem mandou briefing">
+          <div className="grid sm:grid-cols-2 gap-5">
+            <div>
+              <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Situação do negócio</h4>
+              <Barras itens={b.por_situacao.map((x) => [SITUACOES[x.situacao] || x.situacao, x.n])} />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">De onde veio</h4>
+              <Barras itens={b.por_canal.map((x) => [nomeCanal(x.canal), x.n])} />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Estilos visuais mais pedidos</h4>
+              <Barras itens={b.estilos.map((x) => [x.nome, x.n])} />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Como querem ser vistos</h4>
+              <Barras itens={b.adjetivos.map((x) => [x.nome, x.n])} />
+            </div>
+          </div>
+        </Bloco>
+      </div>
+    </div>
+  );
+}
+
+// ---------- Site ----------
+
+function AbaSite({ v, va = {}, dias, serie }) {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Kpi icone={Users} rotulo="Visitantes" valor={num(v.visitantes)} atual={v.visitantes} antes={va.visitantes} tendencia={serie("visitantes")} destaque />
+        <Kpi rotulo="Visitas" valor={num(v.sessoes)} atual={v.sessoes} antes={va.sessoes} sub="sessões (30 min sem atividade encerram)" />
+        <Kpi rotulo="Páginas vistas" valor={num(v.paginas_vistas)} atual={v.paginas_vistas} antes={va.paginas_vistas} sub={v.sessoes ? `${(v.paginas_vistas / v.sessoes).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} por visita` : ""} />
+        <Kpi rotulo="Cliques no WhatsApp" valor={num(v.cliques_whatsapp)} atual={v.cliques_whatsapp} antes={va.cliques_whatsapp} sub={pct(v.cliques_whatsapp, v.sessoes) + " das visitas"} />
+      </div>
+      <Bloco titulo="Visitantes por dia">
+        <GraficoDias dias={dias} pontos={v.por_dia} />
+      </Bloco>
       <div className="grid lg:grid-cols-3 gap-6">
         <Bloco titulo="De onde vêm as visitas">
           {v.canais.length ? <Barras itens={v.canais.map((x) => [nomeCanal(x.canal), x.sessoes])} /> : <Vazio />}
@@ -261,6 +362,69 @@ function Painel({ d, ant, dias, pergunta, meta, atualizarMeta }) {
           {Object.keys(v.dispositivos).length ? <Aparelhos d={v.dispositivos} /> : <Vazio />}
         </Bloco>
       </div>
+    </div>
+  );
+}
+
+function OndeParam({ itens, nome, rodape }) {
+  if (!itens?.length) return null;
+  return (
+    <div className="mt-5">
+      <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2">Onde as pessoas param</h4>
+      <ul className="space-y-1.5">
+        {itens.map((x) => (
+          <li key={x.pergunta} className="flex items-start justify-between gap-3 text-sm">
+            <span className="text-zinc-700">Depois de “{nome(x.pergunta)}”</span>
+            <b className="shrink-0">{num(x.pessoas)}</b>
+          </li>
+        ))}
+      </ul>
+      <p className="text-[11px] text-zinc-400 mt-2">{rodape}</p>
+    </div>
+  );
+}
+
+/**
+ * Funil em cone (como o dos relatórios de anúncio): cada etapa é uma faixa que estreita, com o
+ * número dentro; à direita, a taxa de passagem de uma etapa para a seguinte.
+ */
+function FunilCone({ etapas, taxas = [], formatos = [] }) {
+  const n = etapas.length;
+  const H = 76, W = 300, MIN = 0.34;
+  const larg = (i) => W * (1 - (i / Math.max(1, n)) * (1 - MIN));
+  const cores = ["#18181b", "#3f3f46", "#52525b", "#71717a", LARANJA, LARANJA];
+  return (
+    <div className="flex items-stretch gap-4">
+      <svg viewBox={`0 0 ${W} ${H * n}`} className="w-[56%] max-w-[340px] shrink-0" role="img" aria-label="Funil">
+        {etapas.map(([nome, valor], i) => {
+          const a = larg(i), b = larg(i + 1);
+          const x1 = (W - a) / 2, x2 = (W - b) / 2, y = i * H;
+          const ultima = i === n - 1;
+          return (
+            <g key={nome}>
+              <path d={`M${x1},${y + 2} L${x1 + a},${y + 2} L${x2 + b},${y + H - 2} L${x2},${y + H - 2} Z`}
+                fill={ultima ? LARANJA : cores[Math.min(i, 3)]} rx="6" />
+              <text x={W / 2} y={y + H / 2 - 6} textAnchor="middle" fontSize="12" fill="#ffffff" opacity="0.75">{nome}</text>
+              <text x={W / 2} y={y + H / 2 + 16} textAnchor="middle" fontSize="22" fontWeight="800" fill="#ffffff">
+                {formatos[i] ? formatos[i](valor) : num(valor)}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      <ol className="flex-1 flex flex-col justify-around py-4">
+        {taxas.map((t, i) => {
+          const [de, para] = [etapas[i][1], etapas[i + 1]?.[1]];
+          const rotulo = typeof t === "string" ? t : t[0];
+          const valor = typeof t === "string" ? pct(para, de) : t[1];
+          return (
+            <li key={i} className="border-b border-zinc-100 pb-2">
+              <p className="text-[11px] text-zinc-500">{rotulo}</p>
+              <p className="text-xl font-black">{valor}</p>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }
@@ -354,31 +518,6 @@ function Barras({ itens }) {
   );
 }
 
-function Funil({ etapas }) {
-  const topo = Math.max(1, etapas[0][1]);
-  return (
-    <ol className="space-y-2.5">
-      {etapas.map(([nome, n], i) => {
-        const anterior = i ? etapas[i - 1][1] : null;
-        return (
-          <li key={nome}>
-            <div className="flex items-baseline justify-between gap-3 text-sm">
-              <span className="text-zinc-700">{nome}</span>
-              <span className="shrink-0">
-                <b>{num(n)}</b>
-                {anterior !== null && <span className="text-xs text-zinc-400 ml-1.5">{pct(n, anterior)} da etapa anterior</span>}
-              </span>
-            </div>
-            <div className="h-6 rounded-lg bg-zinc-100 mt-1 overflow-hidden">
-              <div className="h-full rounded-lg" style={{ width: `${Math.max(n ? 2 : 0, (n / topo) * 100)}%`, background: i === etapas.length - 2 ? LARANJA : "#18181b", opacity: 1 - i * 0.08 }} />
-            </div>
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
 function GraficoDias({ dias, pontos }) {
   // todos os dias do período, mesmo os sem visita
   const mapa = Object.fromEntries((pontos || []).map((x) => [x.dia, x]));
@@ -458,100 +597,131 @@ function haQuanto(iso) {
   return h < 24 ? `há ${h} h` : `há ${Math.round(h / 24)} dia(s)`;
 }
 
-function SecaoMeta({ m, ma, serie, meta, atualizarMeta }) {
+function MetaAds({ m, ma, serie, meta, atualizarMeta }) {
   const [nivel, setNivel] = useState("campanhas");
   if (!m) return null;
-  const c = custos(m), ca = custos(ma);
+  const c = custos(m), ca = custos(ma), mma = ma || {};
   const temDados = m.anuncios.length > 0;
   const naoConectada = !m.conectada || meta.codigo === "nao_configurado";
+  const cpc = m.gasto && m.cliques ? m.gasto / m.cliques : null;
+  const cpcA = mma.gasto && mma.cliques ? mma.gasto / mma.cliques : null;
+  const ctr = m.impressoes ? m.cliques / m.impressoes : null;
+  const ctrA = mma.impressoes ? mma.cliques / mma.impressoes : null;
+  const pctN = (x) => (x == null ? "—" : `${(x * 100).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`);
   return (
-    <section className="bg-white rounded-2xl border border-zinc-200/80 p-5">
+    <div className="space-y-6">
       <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h3 className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wide"><Megaphone size={14} /> Campanhas Meta</h3>
-          <p className="text-xs text-zinc-400 mt-1">
-            {naoConectada
-              ? "Leads e vendas por anúncio já aparecem pelas UTMs. O investimento entra quando a Meta for conectada."
-              : `Investimento da Meta atualizado ${haQuanto(m.atualizado_em)}. Leads e vendas vêm das UTMs dos anúncios.`}
-          </p>
-        </div>
+        <p className="text-sm text-zinc-500 max-w-2xl">
+          {naoConectada
+            ? "Leads e vendas por anúncio já aparecem pelas UTMs. Investimento, cliques e custos entram quando a conta de anúncios for conectada (passo a passo abaixo)."
+            : `Investimento, impressões e cliques vêm da Meta (atualizado ${haQuanto(m.atualizado_em)}). Visitas, diagnósticos, leads e vendas vêm do site, pelas UTMs dos anúncios.`}
+        </p>
         <button type="button" onClick={atualizarMeta} disabled={meta.estado === "sincronizando"}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-semibold bg-white border border-zinc-200 hover:border-black disabled:opacity-50">
           <RefreshCw size={14} className={meta.estado === "sincronizando" ? "animate-spin" : ""} />
           {meta.estado === "sincronizando" ? "Atualizando..." : naoConectada ? "Testar conexão com a Meta" : "Atualizar da Meta"}
         </button>
       </div>
-
-      {meta.estado === "erro" && meta.codigo === "nao_configurado" && (
-        <p className="text-sm text-amber-800 bg-amber-50 rounded-xl px-4 py-3 mt-4">{meta.erro} Veja o passo 2 abaixo.</p>
-      )}
-      {meta.estado === "erro" && meta.codigo !== "nao_configurado" && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3 mt-4">{meta.erro}</p>
+      {meta.estado === "erro" && (
+        <p className={`text-sm rounded-xl px-4 py-3 ${meta.codigo === "nao_configurado" ? "text-amber-800 bg-amber-50" : "text-red-600 bg-red-50"}`}>
+          {meta.erro}{meta.codigo === "nao_configurado" && " Veja o passo 2 abaixo."}
+        </p>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
-        <Kpi rotulo="Investido" valor={naoConectada ? "—" : reais(c.gasto)} atual={c.gasto} antes={ca.gasto} tendencia={naoConectada ? null : serie}
-          sub={`${num(m.cliques)} cliques · ${num(m.impressoes)} impressões`} />
-        <Kpi rotulo="Custo por lead" valor={reaisOu(c.cpl)} atual={c.cpl} antes={ca.cpl} menorMelhor sub={`${num(m.leads)} leads`} />
-        <Kpi rotulo="Custo por lead qualificado" valor={reaisOu(c.cq)} atual={c.cq} antes={ca.cq} menorMelhor destaque
-          sub={`${num(m.qualificados)} qualificados · a métrica principal`} />
-        <Kpi rotulo="Custo por venda" valor={reaisOu(c.cac)} atual={c.cac} antes={ca.cac} menorMelhor sub={`${num(m.fechados)} vendas`} />
-        <Kpi rotulo="Retorno (vendido ÷ investido)" valor={vezes(c.roas)} atual={c.roas} antes={ca.roas} sub={`${reais(m.vendido)} vendidos`} />
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <Kpi rotulo="Investido" valor={naoConectada ? "—" : reais(m.gasto)} atual={m.gasto} antes={mma.gasto} tendencia={naoConectada ? null : serie("gasto")} />
+        <Kpi rotulo="Cliques no link" valor={naoConectada ? "—" : num(m.cliques)} atual={m.cliques} antes={mma.cliques} />
+        <Kpi rotulo="CPC" valor={reaisCent(cpc)} atual={cpc} antes={cpcA} menorMelhor />
+        <Kpi rotulo="CTR" valor={pctN(ctr)} atual={ctr} antes={ctrA} />
+        <Kpi rotulo="Leads pelos anúncios" valor={num(m.leads)} atual={m.leads} antes={mma.leads} tendencia={serie("leads_meta")} destaque />
       </div>
 
-      <FunilPago m={m} />
+      <div className="grid lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.8fr)_minmax(0,1.3fr)] gap-6">
+        <Bloco titulo="Funil de tráfego">
+          <FunilCone
+            etapas={[["Cliques", m.cliques], ["Visitas", m.visitas], ["Diagnósticos", m.iniciou], ["Leads", m.leads], ["Vendas", m.fechados]]}
+            taxas={[
+              ["Taxa de cliques (CTR)", pctN(ctr)],
+              ["Connect rate", pct(m.visitas, m.cliques)],
+              ["Começaram o diagnóstico", pct(m.iniciou, m.visitas)],
+              ["Viraram lead", pct(m.leads, m.iniciou)],
+              ["Viraram venda", pct(m.fechados, m.leads)],
+            ]} />
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            <Mini rotulo="Impressões" valor={naoConectada ? "—" : num(m.impressoes)} />
+            <Mini rotulo="Frequência" valor={m.alcance ? (m.impressoes / m.alcance).toLocaleString("pt-BR", { maximumFractionDigits: 2 }) : "—"} />
+            <Mini rotulo="CPM" valor={m.impressoes ? reaisCent((m.gasto / m.impressoes) * 1000) : "—"} />
+          </div>
+        </Bloco>
+
+        <div className="grid gap-3 content-start">
+          <CartaoCusto rotulo="Custo por lead" valor={reaisOu(c.cpl)} atual={c.cpl} antes={ca.cpl} sub={plural(m.leads, "lead", "leads")} />
+          <CartaoCusto rotulo="Custo por lead qualificado" valor={reaisOu(c.cq)} atual={c.cq} antes={ca.cq} sub={`${plural(m.qualificados, "qualificado", "qualificados")} · a métrica principal`} destaque />
+          <CartaoCusto rotulo="Custo por venda" valor={reaisOu(c.cac)} atual={c.cac} antes={ca.cac} sub={plural(m.fechados, "venda", "vendas")} />
+          <CartaoCusto rotulo="Valor vendido" valor={reais(m.vendido)} atual={m.vendido} antes={mma.vendido} maiorMelhor sub={`Retorno: ${vezes(c.roas)} o investido`} />
+        </div>
+
+        <Bloco titulo="Investimento × leads por dia">
+          <GraficoDuplo gasto={serie("gasto")} leads={serie("leads_meta")} />
+        </Bloco>
+      </div>
 
       {naoConectada && <ComoConectar semUtm={!temDados} />}
 
-      {temDados && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wide">O que está performando</h4>
-            <div className="inline-flex rounded-full bg-zinc-100 p-0.5">
-              {[["campanhas", "Campanhas"], ["anuncios", "Anúncios"]].map(([id, nome]) => (
-                <button key={id} type="button" onClick={() => setNivel(id)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${nivel === id ? "bg-white text-black shadow-sm" : "text-zinc-500"}`}>{nome}</button>
-              ))}
+      <Bloco titulo="O que está performando">
+        {temDados ? (
+          <>
+            <div className="flex justify-end -mt-9 mb-3">
+              <div className="inline-flex rounded-full bg-zinc-100 p-0.5">
+                {[["campanhas", "Campanhas"], ["anuncios", "Anúncios"]].map(([id, nome]) => (
+                  <button key={id} type="button" onClick={() => setNivel(id)}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${nivel === id ? "bg-white text-black shadow-sm" : "text-zinc-500"}`}>{nome}</button>
+                ))}
+              </div>
             </div>
-          </div>
-          <TabelaPago linhas={nivel === "campanhas" ? m.campanhas : m.anuncios} nivel={nivel} />
-        </div>
-      )}
-    </section>
+            <TabelaPago linhas={nivel === "campanhas" ? m.campanhas : m.anuncios} nivel={nivel} />
+          </>
+        ) : <p className="text-sm text-zinc-400">Nenhum anúncio com resultado no período. Os anúncios aparecem aqui assim que tiverem investimento (Meta conectada) ou leads marcados pelas UTMs.</p>}
+      </Bloco>
+    </div>
   );
 }
 
-/** Do dinheiro investido ao dinheiro vendido, com a taxa entre cada etapa. */
-function FunilPago({ m }) {
-  const etapas = [
-    ["Investido", reais(m.gasto), null],
-    ["Impressões", num(m.impressoes), null],
-    ["Cliques", num(m.cliques), ["CTR", pct(m.cliques, m.impressoes)]],
-    ["Visitas", num(m.visitas), ["chegaram", pct(m.visitas, m.cliques)]],
-    ["Diagnósticos", num(m.iniciou), ["começaram", pct(m.iniciou, m.visitas)]],
-    ["Leads", num(m.leads), ["terminaram", pct(m.leads, m.iniciou)]],
-    ["Qualificados", num(m.qualificados), ["dos leads", pct(m.qualificados, m.leads)]],
-    ["Vendas", num(m.fechados), ["dos qualificados", pct(m.fechados, m.qualificados)]],
-    ["Vendido", reais(m.vendido), null],
-  ];
+const reaisCent = (n) => (n == null || !isFinite(n) ? "—" : Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" }));
+
+function CartaoCusto({ rotulo, valor, sub, atual, antes, destaque, maiorMelhor }) {
   return (
-    <div className="mt-5 overflow-x-auto">
-      <ol className="flex min-w-[860px]">
-        {etapas.map(([nome, valor, taxa], i) => (
-          <li key={nome} className="flex-1 flex items-stretch">
-            {i > 0 && (
-              <div className="flex flex-col items-center justify-center px-1 text-center">
-                <span className="text-zinc-300">›</span>
-                {taxa && <span className="text-[10px] leading-tight text-zinc-400 whitespace-nowrap">{taxa[1]}<br />{taxa[0]}</span>}
-              </div>
-            )}
-            <div className={`flex-1 rounded-xl px-3 py-2.5 ${i === 0 || i === etapas.length - 1 ? "bg-black text-white" : "bg-zinc-50"}`}>
-              <p className={`text-[11px] ${i === 0 || i === etapas.length - 1 ? "text-zinc-400" : "text-zinc-500"}`}>{nome}</p>
-              <p className="text-base font-black mt-0.5 whitespace-nowrap">{valor}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+    <div className={`rounded-2xl p-4 border ${destaque ? "bg-black text-white border-black" : "bg-white border-zinc-200/80"}`}>
+      <p className={`text-xs font-semibold ${destaque ? "text-zinc-400" : "text-zinc-500"}`}>{rotulo}</p>
+      <div className="flex items-baseline gap-2 mt-1.5 flex-wrap">
+        <p className="text-2xl font-black tracking-tight">{valor}</p>
+        <Variacao atual={atual} antes={antes} menorMelhor={!maiorMelhor} />
+      </div>
+      {sub && <p className={`text-xs mt-1 ${destaque ? "text-zinc-400" : "text-zinc-500"}`}>{sub}</p>}
+    </div>
+  );
+}
+
+/** Duas séries no mesmo gráfico: investimento (barras) e leads (linha), cada uma na sua escala. */
+function GraficoDuplo({ gasto, leads }) {
+  const n = Math.max(gasto.length, leads.length);
+  if (!n || (!gasto.some(Boolean) && !leads.some(Boolean))) return <Vazio />;
+  const W = 400, H = 180;
+  const mg = Math.max(1, ...gasto), ml = Math.max(1, ...leads);
+  const x = (i) => (n === 1 ? W / 2 : (i / (n - 1)) * (W - 8) + 4);
+  const linha = leads.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${(H - 8 - (v / ml) * (H - 24)).toFixed(1)}`).join(" ");
+  const bw = Math.max(2, (W / n) * 0.6);
+  return (
+    <div>
+      <div className="flex gap-4 text-xs text-zinc-500 mb-2">
+        <span className="inline-flex items-center gap-1.5"><i className="w-3 h-2 rounded-sm bg-zinc-300 inline-block" /> Investimento (máx. {reais(mg)}/dia)</span>
+        <span className="inline-flex items-center gap-1.5"><i className="w-3 h-0.5 inline-block" style={{ background: LARANJA }} /> Leads (máx. {ml}/dia)</span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full h-48">
+        {gasto.map((v, i) => v ? <rect key={i} x={x(i) - bw / 2} y={H - 8 - (v / mg) * (H - 24)} width={bw} height={(v / mg) * (H - 24)} rx="1.5" fill="#d4d4d8" /> : null)}
+        <path d={linha} fill="none" stroke={LARANJA} strokeWidth="2" vectorEffect="non-scaling-stroke" />
+      </svg>
+      <div className="flex justify-between text-[11px] text-zinc-400 mt-1"><span>{n} dias atrás</span><span>hoje</span></div>
     </div>
   );
 }

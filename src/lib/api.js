@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { visitanteId } from "./analytics";
 import { compressImageToBlob } from "./image";
 
 // Backed by Supabase (Postgres + Auth + Storage). Components only ever import
@@ -711,6 +712,7 @@ export async function submitBrandBrief(answers) {
     desired_elements: answers.desiredElements || null,
     avoid_elements: answers.avoidElements || null,
     extra_info: answers.extraInfo || null,
+    visitante: visitanteId(), // liga o briefing à origem da visita (aba Analytics)
   });
   if (error) throw error;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
@@ -20,6 +20,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { submitBrandBrief } from "../lib/api";
+import { registrar } from "../lib/analytics";
 
 const STEPS = [
   {
@@ -642,7 +643,14 @@ export default function BrandBriefing() {
 
   const setAnswer = (key, value) => setAnswers((prev) => ({ ...prev, [key]: value }));
 
+  // funil do briefing (aba Analytics): cada pergunta conta uma vez, edições pela revisão não
+  const respondidas = useRef(new Set());
   const handleNext = () => {
+    if (!editingFromReview && !respondidas.current.has(step.key)) {
+      respondidas.current.add(step.key);
+      registrar("brief_pergunta", { detalhe: step.key });
+      if (stepIndex === STEPS.length - 1) registrar("brief_revisao");
+    }
     if (editingFromReview) {
       setEditingFromReview(false);
       setPhase("review");
@@ -677,6 +685,7 @@ export default function BrandBriefing() {
     setError("");
     try {
       await submitBrandBrief(answers);
+      registrar("brief_enviado");
       setPhase("success");
     } catch (err) {
       setError(err.message || "Erro ao enviar o briefing. Tente novamente.");
@@ -685,7 +694,7 @@ export default function BrandBriefing() {
   };
 
   if (phase === "intro") {
-    return <IntroScreen onStart={() => setPhase("form")} />;
+    return <IntroScreen onStart={() => { registrar("brief_iniciou"); setPhase("form"); }} />;
   }
 
   if (phase === "success") {

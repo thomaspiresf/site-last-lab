@@ -17,7 +17,11 @@ create table if not exists eventos (
     'diag_lead',          -- deixou o contato (virou lead)
     'diag_ajuda',         -- clicou em "Veja como podemos te ajudar"
     'diag_portfolio',     -- clicou em "Ver portfólio"
-    'whatsapp'            -- clicou no WhatsApp do site
+    'whatsapp',           -- clicou no WhatsApp do site
+    'brief_iniciou',      -- começou o briefing (/briefing)
+    'brief_pergunta',     -- avançou uma pergunta do briefing (detalhe = campo)
+    'brief_revisao',      -- chegou na revisão
+    'brief_enviado'       -- enviou o briefing
   )),
   pagina text check (length(pagina) <= 200),
   detalhe text check (length(detalhe) <= 120),
@@ -30,6 +34,14 @@ create table if not exists eventos (
 );
 
 alter table eventos add column if not exists anuncio text check (length(anuncio) <= 160);
+alter table eventos drop constraint if exists eventos_tipo_check;
+alter table eventos add constraint eventos_tipo_check check (tipo in (
+  'pagina', 'diag_iniciou', 'diag_pergunta', 'diag_resultado', 'diag_links', 'diag_lead', 'diag_ajuda', 'diag_portfolio',
+  'whatsapp', 'brief_iniciou', 'brief_pergunta', 'brief_revisao', 'brief_enviado'
+));
+
+-- o briefing guarda o visitante anônimo, para saber de onde veio
+alter table brand_briefs add column if not exists visitante text check (length(visitante) <= 64);
 
 create index if not exists eventos_criado_em on eventos (criado_em);
 create index if not exists eventos_visitante on eventos (visitante, criado_em);
@@ -150,14 +162,17 @@ begin
       (select count(distinct visitante) from ev where (criado_em at time zone 'America/Sao_Paulo')::date = dia) as visitantes,
       (select count(distinct visitante) from ev where tipo = 'diag_iniciou' and (criado_em at time zone 'America/Sao_Paulo')::date = dia) as iniciou,
       (select count(*) from leads where (created_at at time zone 'America/Sao_Paulo')::date = dia) as leads,
-      (select coalesce(sum(gasto), 0) from meta_gastos g where g.dia = d.dia) as gasto
+      (select coalesce(sum(gasto), 0) from meta_gastos g where g.dia = d.dia) as gasto,
+      (select count(*) from leads where (created_at at time zone 'America/Sao_Paulo')::date = dia
+        and (lower(coalesce(dados->'utms'->>'utm_source', '')) in ('meta', 'facebook', 'instagram', 'fb', 'ig') or lower(coalesce(dados->'utms'->>'utm_medium', '')) in ('pago', 'paid', 'cpc', 'ads'))) as leads_meta,
+      (select count(*) from brand_briefs b where (b.created_at at time zone 'America/Sao_Paulo')::date = dia) as briefings
     from generate_series((desde at time zone 'America/Sao_Paulo')::date, ((ate at time zone 'America/Sao_Paulo') - interval '1 second')::date, interval '1 day') as d(dia)
   ),
   -- Campanhas pagas: gasto da Meta + visitas e diagnósticos (eventos) + leads e vendas (diagnósticos),
   -- ligados pelo nome da campanha e do anúncio (utm_campaign={{campaign.name}}, utm_content={{ad.name}})
   pago_g as (
     select lower(campanha) as c, lower(coalesce(anuncio, '')) as a, max(campanha) as campanha, max(anuncio) as anuncio,
-      sum(gasto) as gasto, sum(impressoes) as impressoes, sum(cliques) as cliques
+      sum(gasto) as gasto, sum(impressoes) as impressoes, sum(cliques) as cliques, sum(alcance) as alcance
     from meta_gastos
     where dia >= (desde at time zone 'America/Sao_Paulo')::date and dia < (ate at time zone 'America/Sao_Paulo')::date + 1
       and anuncio_id <> '_sincronizado'  -- marcador de "sincronizou sem anúncio rodando"
@@ -188,15 +203,51 @@ begin
   pago as (
     select coalesce(g.campanha, e.campanha, l.campanha) as campanha,
       nullif(coalesce(g.anuncio, e.anuncio, l.anuncio), '') as anuncio,
-      coalesce(g.gasto, 0) as gasto, coalesce(g.impressoes, 0) as impressoes, coalesce(g.cliques, 0) as cliques,
+      coalesce(g.gasto, 0) as gasto, coalesce(g.impressoes, 0) as impressoes, coalesce(g.cliques, 0) as cliques, coalesce(g.alcance, 0) as alcance,
       coalesce(e.visitas, 0) as visitas, coalesce(e.iniciou, 0) as iniciou,
       coalesce(l.leads, 0) as leads, coalesce(l.qualificados, 0) as qualificados,
       coalesce(l.fechados, 0) as fechados, coalesce(l.vendido, 0) as vendido
     from pago_g g
     full join pago_e e on e.c = g.c and e.a = g.a
     full join pago_l l on l.c = coalesce(g.c, e.c) and l.a = coalesce(g.a, e.a)
+  ),
+  briefs as (
+    select b.*, coalesce(pt.canal, 'direto') as canal
+    from brand_briefs b
+    left join primeiro_toque pt on pt.visitante = b.visitante
+    where b.created_at >= desde and b.created_at < ate
+  ),
+  brief_parou as (
+    select distinct on (e.visitante) e.visitante, e.detalhe
+    from ev e
+    where e.tipo = 'brief_pergunta'
+      and not exists (select 1 from ev l where l.visitante = e.visitante and l.tipo = 'brief_enviado')
+    order by e.visitante, e.criado_em desc
   )
   select jsonb_build_object(
+    'briefing', jsonb_build_object(
+      'abriu', (select count(distinct visitante) from ev where tipo = 'pagina' and pagina like '/briefing%'),
+      'iniciou', (select count(distinct visitante) from ev where tipo = 'brief_iniciou'),
+      'revisao', (select count(distinct visitante) from ev where tipo = 'brief_revisao'),
+      'enviado', (select count(distinct visitante) from ev where tipo = 'brief_enviado'),
+      'parou_em', coalesce((select jsonb_agg(x) from (
+          select jsonb_build_object('pergunta', detalhe, 'pessoas', count(*)) as x
+          from brief_parou group by detalhe order by count(*) desc limit 12
+        ) t), '[]'::jsonb),
+      'recebidos', (select count(*) from briefs),
+      'por_situacao', coalesce((select jsonb_agg(x) from (
+          select jsonb_build_object('situacao', business_stage, 'n', count(*)) as x from briefs group by business_stage order by count(*) desc
+        ) t), '[]'::jsonb),
+      'por_canal', coalesce((select jsonb_agg(x) from (
+          select jsonb_build_object('canal', canal, 'n', count(*)) as x from briefs group by canal order by count(*) desc
+        ) t), '[]'::jsonb),
+      'estilos', coalesce((select jsonb_agg(x) from (
+          select jsonb_build_object('nome', v, 'n', count(*)) as x from briefs, unnest(visual_styles) v group by v order by count(*) desc limit 8
+        ) t), '[]'::jsonb),
+      'adjetivos', coalesce((select jsonb_agg(x) from (
+          select jsonb_build_object('nome', v, 'n', count(*)) as x from briefs, unnest(style_adjectives) v group by v order by count(*) desc limit 8
+        ) t), '[]'::jsonb)
+    ),
     'visitas', jsonb_build_object(
       'sessoes', (select count(*) from sessoes),
       'visitantes', (select count(distinct visitante) from sessoes),
@@ -278,6 +329,7 @@ begin
       'atualizado_em', (select max(atualizado_em) from meta_gastos),
       'gasto', (select coalesce(sum(gasto), 0) from pago),
       'impressoes', (select coalesce(sum(impressoes), 0) from pago),
+      'alcance', (select coalesce(sum(alcance), 0) from pago),
       'cliques', (select coalesce(sum(cliques), 0) from pago),
       'visitas', (select coalesce(sum(visitas), 0) from pago),
       'iniciou', (select coalesce(sum(iniciou), 0) from pago),
