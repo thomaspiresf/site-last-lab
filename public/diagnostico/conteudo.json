@@ -183,14 +183,14 @@
       "perguntas": [
         {
           "id": "C1",
-          "pergunta": "Qual é o papel do seu site hoje?",
+          "pergunta": "Quando um cliente novo pesquisa a sua empresa antes de chamar, o que ele encontra?",
           "opcoes": [
-            { "texto": "Não tenho, ou está desatualizado", "pontos": 0 },
-            { "texto": "Funciona como cartão de visita", "pontos": 1 },
-            { "texto": "Apresenta bem a empresa, mas quase não gera contatos", "pontos": 2 },
-            { "texto": "Gera contatos qualificados com frequência", "pontos": 3 }
+            { "texto": "Pouca coisa, ou canais desatualizados", "pontos": 0 },
+            { "texto": "Canais que existem, mas funcionam só como cartão de visita", "pontos": 1 },
+            { "texto": "Uma presença bem cuidada, mas que quase não gera contatos", "pontos": 2 },
+            { "texto": "Uma presença que passa confiança e traz contatos qualificados", "pontos": 3 }
           ],
-          "comentario": "Antes de falar com você, quase todo cliente pesquisa. O site é o vendedor que trabalha quando você não está lá."
+          "comentario": "Antes de falar com você, quase todo cliente pesquisa. O que ele encontra é o vendedor que trabalha quando você não está lá."
         },
         {
           "id": "C2",
@@ -302,14 +302,14 @@
       },
       "perguntas": {
         "C1": {
-          "pergunta": "Quando alguém procura um lugar como o seu na região, como você aparece?",
+          "pergunta": "Quando um cliente novo procura um lugar como o seu na região, o que ele encontra?",
           "opcoes": [
-            "Quase não apareço, ou o perfil está desatualizado",
-            "Tenho Instagram e Google, mas sem muito cuidado",
+            "Pouca coisa, ou perfis desatualizados",
+            "Perfis que existem, mas sem muito cuidado",
             "Perfis bem cuidados, mas poucos clientes chegam por eles",
-            "Recebo agendamentos ou pedidos com frequência pelo Instagram e pelo Google"
+            "Uma presença que traz agendamentos e pedidos com frequência"
           ],
-          "comentario": "Antes de entrar, quase todo cliente procura no Google ou no Instagram. É ali que ele decide se você parece o lugar certo."
+          "comentario": "Antes de entrar, quase todo cliente procura. É ali que ele decide se você parece o lugar certo."
         },
         "D1": {
           "pergunta": "Quando alguém pergunta preço ou horário pelo WhatsApp, o que acontece?",
@@ -386,7 +386,7 @@
             "Pouca coisa, ou perfis desatualizados",
             "Perfis que existem, mas não passam muita confiança",
             "Perfis bem cuidados, mas que geram poucos agendamentos",
-            "Instagram, Google e site que passam confiança e trazem agendamentos"
+            "Uma presença que passa confiança e traz agendamentos"
           ],
           "comentario": "O paciente pesquisa antes de marcar. O que ele encontra decide se a primeira consulta vai ser com você ou com outro profissional."
         },
@@ -460,7 +460,7 @@
       },
       "perguntas": {
         "C1": {
-          "pergunta": "Quando alguém te pesquisa depois de uma indicação, o que encontra?",
+          "pergunta": "Quando um cliente novo te pesquisa antes de ligar, mesmo indicado, o que ele encontra?",
           "opcoes": [
             "Quase nada sobre mim ou meu escritório",
             "Um perfil ou site parado, de cartão de visita",
@@ -523,12 +523,12 @@
       },
       "perguntas": {
         "C1": {
-          "pergunta": "Como está o seu portfólio online (site, Instagram, Behance)?",
+          "pergunta": "Quando um cliente novo pesquisa o seu trabalho antes de pedir orçamento, o que ele encontra?",
           "opcoes": [
-            "Não tenho portfólio organizado",
+            "Pouca coisa, sem portfólio organizado",
             "Alguns trabalhos soltos, sem muita curadoria",
-            "Portfólio bonito, mas gera poucos pedidos de orçamento",
-            "Portfólio que traz pedidos de orçamento do cliente certo"
+            "Um portfólio bonito, mas que gera poucos pedidos de orçamento",
+            "Um portfólio que traz pedidos de orçamento do cliente certo"
           ],
           "comentario": "Em projeto sob medida, o portfólio é a prova. É ele que faz o cliente certo pedir orçamento, e o errado desistir antes."
         },
@@ -595,12 +595,12 @@
       },
       "perguntas": {
         "C1": {
-          "pergunta": "Seu Instagram e seu site fazem alguém querer estudar com você?",
+          "pergunta": "Quando um aluno novo te pesquisa antes de se matricular, o que ele encontra?",
           "opcoes": [
-            "Quase não uso, ou estão desatualizados",
-            "Uso para avisos e divulgação de turmas",
+            "Pouca coisa, ou perfis desatualizados",
+            "Só avisos e divulgação de turmas",
             "Conteúdo bom, mas que gera poucos interessados",
-            "Conteúdo que atrai alunos e enche turmas"
+            "Conteúdo que faz querer estudar com você e enche turmas"
           ],
           "comentario": "Antes de se matricular, o aluno quer sentir como é aprender com você. Conteúdo bom é a aula experimental que trabalha 24 horas."
         },
@@ -684,14 +684,14 @@
       },
       "perguntas": {
         "C1": {
-          "pergunta": "Sua loja online (site, marketplace ou Instagram) vende sem você precisar estar lá?",
+          "pergunta": "Quando um cliente novo encontra a sua marca, ele consegue comprar sem você precisar estar lá?",
           "opcoes": [
-            "Não vendo online",
-            "Vendo só conversando pelo direct ou pelo WhatsApp",
-            "Tenho loja online, mas vende pouco",
-            "Minha loja online vende com frequência"
+            "Não, ainda não vendo online",
+            "Só conversando comigo, por mensagem",
+            "Sim, tenho loja online, mas ela vende pouco",
+            "Sim, minha loja online vende com frequência"
           ],
-          "comentario": "Sua loja online é o vendedor que não dorme. Se ela depende de conversa no direct, você vende só quando está disponível."
+          "comentario": "Sua loja online é o vendedor que não dorme. Se a venda depende de conversa, você vende só quando está disponível."
         },
         "D1": {
           "pergunta": "Sua página de produto (ou post de venda) mostra por que vale o preço?",
@@ -797,7 +797,7 @@
       {"id": "blindado_desconto", "icone": "🛡️", "nome": "Blindado contra desconto", "frase": "A conversa não gira em torno do preço.", "regra": {"tipo": "resposta", "pergunta": "A3", "min_pontos": 3}},
       {"id": "frase_de_bolso", "icone": "🗣️", "nome": "Frase de bolso", "frase": "Seus clientes sabem explicar o que você faz.", "regra": {"tipo": "resposta", "pergunta": "B1", "min_pontos": 2}},
       {"id": "fala_do_depois", "icone": "🎯", "nome": "Fala do depois", "frase": "Você vende o resultado, não o serviço.", "regra": {"tipo": "resposta", "pergunta": "B2", "min_pontos": 3}},
-      {"id": "site_que_vende", "icone": "🧲", "nome": "Site que vende", "frase": "Seu site trabalha enquanto você dorme.", "regra": {"tipo": "resposta", "pergunta": "C1", "min_pontos": 3}},
+      {"id": "site_que_vende", "icone": "🧲", "nome": "Presença que vende", "frase": "Sua marca trabalha enquanto você dorme.", "regra": {"tipo": "resposta", "pergunta": "C1", "min_pontos": 3}},
       {"id": "mesma_voz", "icone": "🔗", "nome": "Mesma voz em todo canal", "frase": "Todos os seus canais contam a mesma história.", "regra": {"tipo": "resposta", "pergunta": "C2", "min_pontos": 3}},
       {"id": "proposta_sob_medida", "icone": "✂️", "nome": "Proposta sob medida", "frase": "Cada cliente recebe uma proposta só dele.", "regra": {"tipo": "resposta", "pergunta": "D1", "min_pontos": 3}},
       {"id": "apresentacao_conduz", "icone": "🎤", "nome": "Apresentação que conduz", "frase": "Seu material vende até quando é repassado.", "regra": {"tipo": "resposta", "pergunta": "D2", "min_pontos": 3}},
