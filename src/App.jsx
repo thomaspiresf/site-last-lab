@@ -12,6 +12,7 @@ import Privacidade from "./pages/Privacidade";
 import ThomasSobre from "./pages/ThomasSobre";
 import ThomasProjectDetail from "./pages/ThomasProjectDetail";
 import WhatsAppButton from "./components/WhatsAppButton";
+import AvisoCookies from "./components/AvisoCookies";
 import { iniciarAnalytics, registrar } from "./lib/analytics";
 import AdminLogin from "./admin/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
@@ -126,6 +127,7 @@ function Shell() {
       </main>
       {!hideAgencyChrome && <Footer />}
       {!hideAgencyChrome && <WhatsAppButton />}
+      {!PRIVADAS.test(pathname) && <AvisoCookies />}
     </div>
   );
 }

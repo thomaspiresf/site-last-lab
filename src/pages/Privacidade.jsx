@@ -48,10 +48,13 @@ export default function Privacidade() {
           "Os links e materiais que você decidir enviar: site, Instagram, concorrentes, arquivos, links ou textos com o seu material de venda.",
           "Seu e-mail e WhatsApp, para enviarmos a devolutiva.",
         ]} />
-        <p>Também coletamos dados de navegação:</p>
+        <p>No briefing de identidade visual: seu nome, e-mail, telefone (opcional) e as respostas sobre o seu negócio e o estilo que você procura.</p>
+        <p>Também coletamos dados de navegação, em todo o site:</p>
         <Lista itens={[
-          "A origem da visita (parâmetros de campanha, como utm_source), para saber de onde você veio.",
-          "Eventos medidos pelo Pixel da Meta (Facebook e Instagram), como a visita à página e o envio do diagnóstico.",
+          "A origem da visita (parâmetros de campanha, como utm_source, ou o site de onde você veio), para saber de onde você veio.",
+          "Medição própria e anônima das visitas: páginas vistas, etapas do diagnóstico e do briefing e o tipo de aparelho, ligadas a um código aleatório guardado no seu navegador. Não guardamos seu IP nesse registro.",
+          "Dados do Google Analytics, como páginas vistas, tempo na página, região aproximada e aparelho.",
+          "Eventos medidos pelo Pixel da Meta (Facebook e Instagram), como a visita à página, o clique no WhatsApp e o envio do diagnóstico ou do briefing.",
           "O seu progresso no diagnóstico, guardado no próprio navegador, para você não perder as respostas se recarregar a página.",
         ]} />
       </Secao>
@@ -69,7 +72,7 @@ export default function Privacidade() {
       <Secao titulo="4. Com base em quê">
         <p>
           Usamos seus dados com base no seu <b>consentimento</b>, dado ao marcar a caixa no fim do diagnóstico, e no nosso
-          <b> legítimo interesse</b> em medir e melhorar nossas campanhas. Quando você pede uma proposta, também usamos os dados
+          <b> legítimo interesse</b> em medir as visitas ao site e melhorar nossas campanhas (medição própria, Google Analytics e Pixel da Meta). Quando você pede uma proposta, também usamos os dados
           para os procedimentos que antecedem um contrato com você.
         </p>
       </Secao>
@@ -80,6 +83,7 @@ export default function Privacidade() {
           "Supabase: banco de dados e armazenamento dos arquivos enviados.",
           "Resend: envio dos e-mails com a devolutiva.",
           "Meta (Facebook e Instagram): medição de campanhas pelo Pixel.",
+          "Google: medição das visitas pelo Google Analytics.",
           "Hostinger: hospedagem do site.",
         ]} />
         <p>
@@ -109,11 +113,18 @@ export default function Privacidade() {
         <p>Basta escrever para <b>{EMPRESA.email}</b>. Respondemos em até 15 dias.</p>
       </Secao>
 
-      <Secao titulo="8. Cookies e Pixel">
+      <Secao titulo="8. Cookies e medição">
+        <p>Usamos cookies e armazenamento do navegador para:</p>
+        <Lista itens={[
+          "Google Analytics: entender quantas pessoas visitam o site, de onde vêm e o que acessam.",
+          "Pixel da Meta: medir os resultados das nossas campanhas no Facebook e no Instagram e mostrar anúncios a quem já visitou o site.",
+          "Medição própria: um código aleatório e anônimo, guardado no seu navegador, para contar as visitas sem repetir a mesma pessoa.",
+          "Diagnóstico: guardar o seu progresso, para você não perder as respostas.",
+        ]} />
         <p>
-          O Pixel da Meta usa cookies para medir campanhas. Você pode bloquear ou apagar cookies nas configurações do seu
-          navegador e ajustar suas preferências de anúncios nas configurações da sua conta Meta. O progresso do diagnóstico
-          fica só no seu navegador e some se você limpar os dados do site.
+          Você pode bloquear ou apagar cookies nas configurações do seu navegador, instalar o complemento de desativação
+          do Google Analytics (tools.google.com/dlpage/gaoptout) e ajustar suas preferências de anúncios nas configurações
+          da sua conta Meta. Se preferir que nada seja medido, escreva para <b>{EMPRESA.email}</b>.
         </p>
       </Secao>
 
