@@ -12,6 +12,7 @@ import Privacidade from "./pages/Privacidade";
 import ThomasSobre from "./pages/ThomasSobre";
 import ThomasProjectDetail from "./pages/ThomasProjectDetail";
 import WhatsAppButton from "./components/WhatsAppButton";
+import { iniciarAnalytics, registrar } from "./lib/analytics";
 import AdminLogin from "./admin/AdminLogin";
 import AdminDashboard from "./admin/AdminDashboard";
 import AdminClientDetail from "./admin/AdminClientDetail";
@@ -19,6 +20,7 @@ import AdminClientReferences from "./admin/AdminClientReferences";
 import AdminBriefings from "./admin/AdminBriefings";
 import AdminDiagnosticos from "./admin/AdminDiagnosticos";
 import AdminDiagnosticoAjustes from "./admin/AdminDiagnosticoAjustes";
+import AdminAnalytics from "./admin/AdminAnalytics";
 import AdminApresentacao from "./admin/AdminApresentacao";
 import AdminRoteiro from "./admin/AdminRoteiro";
 import AdminServicos from "./admin/AdminServicos";
@@ -62,8 +64,15 @@ function IrParaDiagnostico() {
   return jaTentou ? <Home /> : null;
 }
 
+// páginas privadas (admin, portal e aprovação do cliente) não entram nas estatísticas
+const PRIVADAS = /^\/(admin|aprovar|portal)/;
+
 function Shell() {
   const { pathname } = useLocation();
+  useEffect(() => { iniciarAnalytics(); }, []);
+  useEffect(() => {
+    if (!PRIVADAS.test(pathname)) registrar("pagina", { pagina: pathname });
+  }, [pathname]);
   const hideAgencyChrome =
     pathname.startsWith("/thomas") ||
     pathname.startsWith("/admin") ||
@@ -89,6 +98,7 @@ function Shell() {
           <Route path="/admin/clientes/:clientId" element={<AdminClientDetail />} />
           <Route path="/admin/clientes/:clientId/referencias" element={<AdminClientReferences />} />
           <Route path="/admin/briefings" element={<AdminBriefings />} />
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/diagnosticos" element={<AdminDiagnosticos />} />
           <Route path="/admin/diagnosticos/ajustes" element={<AdminDiagnosticoAjustes />} />
           <Route path="/admin/diagnosticos/:id/apresentar" element={<AdminApresentacao />} />

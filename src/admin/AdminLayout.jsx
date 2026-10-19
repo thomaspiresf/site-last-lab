@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Link, useLocation } from "react-router-dom";
-import { LayoutGrid, LogOut, FileText, Sparkles, Gauge, Package, BookOpen } from "lucide-react";
+import { LayoutGrid, LogOut, FileText, Sparkles, Gauge, Package, BookOpen, BarChart3 } from "lucide-react";
 import { getAdminSession, onAdminAuthChange, adminLogout } from "../lib/api";
+import { marcarInterno } from "../lib/analytics";
 
 export default function AdminLayout({ children }) {
   const location = useLocation();
@@ -11,6 +12,8 @@ export default function AdminLayout({ children }) {
     getAdminSession().then(setSession);
     return onAdminAuthChange(setSession);
   }, []);
+  // quem entra no admin não conta nas estatísticas do site
+  useEffect(() => { if (session) marcarInterno(); }, [session]);
 
   if (session === undefined) {
     return (
@@ -38,6 +41,15 @@ export default function AdminLayout({ children }) {
             Last Lab · Admin
           </Link>
           <div className="flex items-center gap-5">
+            <Link
+              to="/admin/analytics"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                location.pathname.startsWith("/admin/analytics") ? "text-black" : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <BarChart3 size={16} />
+              Analytics
+            </Link>
             <Link
               to="/admin/briefings"
               className={`flex items-center gap-2 text-sm font-medium transition-colors ${

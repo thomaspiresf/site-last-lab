@@ -444,6 +444,35 @@ function Bloco({ titulo, acao, children, className = "" }) {
   );
 }
 
+// Valor da venda (entra no Analytics). Sem valor, o Analytics usa o investimento da apresentação.
+const numeroReais = (t) => {
+  const n = String(t || "").split(",")[0].replace(/[^0-9]/g, "");
+  return n ? Number(n) : null;
+};
+function ValorFechado({ item, onAtualizar }) {
+  const sugerido = numeroReais(item.apresentacao?.investimento);
+  const [v, setV] = useState(item.valorFechado ?? "");
+  useEffect(() => setV(item.valorFechado ?? ""), [item.id, item.valorFechado]);
+  const gravar = () => {
+    const n = v === "" ? null : numeroReais(v);
+    if (n !== (item.valorFechado ?? null)) onAtualizar({ valorFechado: n });
+  };
+  return (
+    <div className="flex items-center gap-3 flex-wrap rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3">
+      <label className="text-sm font-semibold text-emerald-900" htmlFor="valor-fechado">Valor fechado</label>
+      <div className="flex items-center gap-1.5 rounded-xl bg-white border border-emerald-200 px-3 py-1.5">
+        <span className="text-sm text-zinc-400">R$</span>
+        <input id="valor-fechado" inputMode="numeric" value={v} onChange={(e) => setV(e.target.value)} onBlur={gravar}
+          onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+          placeholder={sugerido ? sugerido.toLocaleString("pt-BR") : "0"} className="w-28 text-sm font-semibold outline-none" />
+      </div>
+      <p className="text-xs text-emerald-800">
+        {item.valorFechado == null && sugerido ? `Sem valor, o Analytics usa o da apresentação (R$ ${sugerido.toLocaleString("pt-BR")}).` : "Entra nas vendas do Analytics."}
+      </p>
+    </div>
+  );
+}
+
 function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
   const d = item.dados;
   const dev = d.devolutiva || {};
@@ -521,6 +550,7 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
           <BotaoExcluir onExcluir={onExcluir} titulo="Excluir diagnóstico" aviso="Excluir este lead, a apresentação e os entregáveis? Não dá para desfazer." />
         </div>
       </div>
+      {item.status === "fechado" && <ValorFechado item={item} onAtualizar={onAtualizar} />}
 
       <div className="flex flex-wrap gap-2">
         <a href={linkWhats(item.whatsapp)} target="_blank" rel="noopener" className={`${botao} bg-black text-white hover:bg-zinc-800`}>

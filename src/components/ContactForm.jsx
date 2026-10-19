@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, CheckCircle2, Mail, Send, MessageSquare, Loader2 } from "lucide-react";
+import { registrar } from '../lib/analytics';
 
 export default function ContactForm() {
   const [step, setStep] = useState(1);
@@ -62,7 +63,8 @@ export default function ContactForm() {
 
   const handleWhatsAppRedirect = () => {
     const text = `Olá Last Lab! Meu nome é ${formData.name || 'Cliente'}. Empresa/Marca: ${formData.company || 'N/A'}. E-mail: ${formData.email || 'N/A'}. Mensagem: ${formData.message || 'Sem detalhes fornecidos.'}`;
-    const url = `https://wa.me/5511999999999?text=${encodeURIComponent(text)}`;
+    const url = `https://wa.me/5515991295541?text=${encodeURIComponent(text)}`;
+    registrar('whatsapp', { detalhe: 'formulario-contato' });
     window.open(url, '_blank');
   };
 

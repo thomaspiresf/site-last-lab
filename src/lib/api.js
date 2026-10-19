@@ -859,6 +859,8 @@ function mapDiagnostico(row) {
     ofertaEscolhida: row.oferta_escolhida,
     personaAvaliacao: row.persona_avaliacao,
     personaSugerida: row.persona_sugerida,
+    valorFechado: row.valor_fechado,
+    fechadoEm: row.fechado_em,
     // a empresa respondida no diagnóstico preenche a da apresentação (e dos entregáveis) até ser trocada
     apresentacao: { ...(row.apresentacao || {}), empresa: row.apresentacao?.empresa || row.dados?.empresa || "" },
   };
@@ -873,8 +875,9 @@ export async function listDiagnosticos() {
   return data.map(mapDiagnostico);
 }
 
-export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao }) {
+export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao, valorFechado }) {
   const patch = {};
+  if (valorFechado !== undefined) patch.valor_fechado = valorFechado;
   if (apresentacao !== undefined) patch.apresentacao = apresentacao;
   if (personaAvaliacao !== undefined) patch.persona_avaliacao = personaAvaliacao;
   if (personaSugerida !== undefined) patch.persona_sugerida = personaSugerida;
@@ -977,6 +980,13 @@ export async function enviarDevolutivaPorEmail(id, link) {
 // --- Ajustes de texto do diagnóstico (/admin/diagnosticos/ajustes) ---
 
 // Conteúdo-base (o JSON do código do diagnóstico), publicado em <diagnóstico>/conteudo.json.
+// Analytics (aba Analytics do admin): tudo agregado no banco, pela função analytics_resumo.
+export async function getAnalytics(desde, ate = new Date()) {
+  const { data, error } = await supabase.rpc("analytics_resumo", { desde: desde.toISOString(), ate: ate.toISOString() });
+  if (error) throw error;
+  return data;
+}
+
 export async function getConteudoBaseDiagnostico() {
   const res = await fetch(`${DIAGNOSTICO_URL}/conteudo.json`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Não consegui ler o conteúdo do diagnóstico (${res.status}).`);
