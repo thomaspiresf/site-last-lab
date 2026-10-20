@@ -969,6 +969,7 @@ export const MAPA = {
   "Página de produto e embalagem": "pagina",
   "Pack de artes para o Instagram": "instagram",
   "Instagram e Google em dia": "instagram",
+  "Perfil do Google em dia": "revisao", // atendimento no local, sem Instagram
   "Conteúdo que matricula": "instagram",
   "Apresentação comercial essencial": "apresentacao",
   "Proposta de honorários": "proposta",

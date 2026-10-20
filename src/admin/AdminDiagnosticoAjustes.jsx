@@ -367,6 +367,12 @@ function Ofertas({ ctx }) {
             <Caixa key={q} titulo={`${nomePilar(pilar)} mais fraco · pior em ${q}`}>
               <Campo ctx={ctx} caminho={`ofertas_entrada.por_pilar.${pilar}.por_pergunta_mais_fraca.${q}.nome`} rotulo="Oferta" />
               <Campo ctx={ctx} caminho={`ofertas_entrada.por_pilar.${pilar}.por_pergunta_mais_fraca.${q}.descricao`} rotulo="Descrição" />
+              {def.por_pergunta_mais_fraca[q].sem_instagram?.nome !== undefined && (
+                <Campo ctx={ctx} caminho={`ofertas_entrada.por_pilar.${pilar}.por_pergunta_mais_fraca.${q}.sem_instagram.nome`} rotulo="Oferta para quem não usa Instagram" />
+              )}
+              {def.por_pergunta_mais_fraca[q].sem_instagram?.descricao !== undefined && (
+                <Campo ctx={ctx} caminho={`ofertas_entrada.por_pilar.${pilar}.por_pergunta_mais_fraca.${q}.sem_instagram.descricao`} rotulo="Descrição para quem não usa Instagram" />
+              )}
             </Caixa>
           ))
         ) : (

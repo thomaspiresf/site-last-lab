@@ -357,7 +357,7 @@
       "ofertas": {
         "C": {
           "nome": "Instagram e Google em dia",
-          "descricao": "Perfil do Google e Instagram organizados para quem procura na região: fotos, informações, avaliações e destaques."
+          "descricao": "Perfil do Google e Instagram organizados para quem procura na região: fotos, informações, avaliações e destaques.", "sem_instagram": {"nome": "Perfil do Google em dia", "descricao": "Perfil do Google e os canais que você usa organizados para quem procura na região: fotos, informações e avaliações."}
         },
         "D": {
           "nome": "Kit de atendimento no WhatsApp",
@@ -436,7 +436,7 @@
       "ofertas": {
         "C": {
           "nome": "Presença que passa confiança",
-          "descricao": "Instagram, Google e página com informações claras sobre você, a estrutura e os tratamentos."
+          "descricao": "Instagram, Google e página com informações claras sobre você, a estrutura e os tratamentos.", "sem_instagram": {"descricao": "Perfil do Google e página com informações claras sobre você, a estrutura e os tratamentos."}
         },
         "D": {
           "nome": "Plano de tratamento apresentado",
@@ -499,7 +499,7 @@
       "ofertas": {
         "C": {
           "nome": "Página de autoridade",
-          "descricao": "Uma página que mostra sua especialidade e confirma a indicação, com Instagram ou LinkedIn alinhados."
+          "descricao": "Uma página que mostra sua especialidade e confirma a indicação, com Instagram ou LinkedIn alinhados.", "sem_instagram": {"descricao": "Uma página que mostra sua especialidade e confirma a indicação, com os seus canais alinhados."}
         },
         "D": {
           "nome": "Proposta de honorários",
@@ -571,7 +571,7 @@
       "ofertas": {
         "C": {
           "nome": "Portfólio que atrai",
-          "descricao": "Portfólio organizado (site ou Instagram) para trazer pedidos de orçamento do cliente certo."
+          "descricao": "Portfólio organizado (site ou Instagram) para trazer pedidos de orçamento do cliente certo.", "sem_instagram": {"descricao": "Portfólio organizado no site ou nos canais que você usa, para trazer pedidos de orçamento do cliente certo."}
         },
         "D": {
           "nome": "Proposta de projeto",
@@ -650,7 +650,7 @@
       "ofertas": {
         "C": {
           "nome": "Conteúdo que matricula",
-          "descricao": "Pack de artes e linha editorial para o Instagram atrair alunos."
+          "descricao": "Pack de artes e linha editorial para o Instagram atrair alunos.", "sem_instagram": {"descricao": "Linha editorial e modelos de conteúdo para os canais que você usa atraírem alunos."}
         },
         "D": {
           "nome": "Jornada de matrícula",
@@ -822,8 +822,8 @@
       "C": {
         "_nota": "Escolhe pela pergunta mais fraca do pilar (empate: a primeira).",
         "por_pergunta_mais_fraca": {
-          "C1": { "nome": "Landing page", "descricao": "Uma página feita para gerar contato, com bio e destaques do Instagram alinhados a ela." },
-          "C2": { "nome": "Pack de artes para o Instagram", "descricao": "Modelos de post editáveis, capas de destaque e bio alinhados ao site e ao posicionamento da marca." }
+          "C1": { "nome": "Landing page", "descricao": "Uma página feita para gerar contato, com bio e destaques do Instagram alinhados a ela.", "sem_instagram": { "descricao": "Uma página feita para gerar contato, alinhada aos canais que você já usa." } },
+          "C2": { "nome": "Pack de artes para o Instagram", "descricao": "Modelos de post editáveis, capas de destaque e bio alinhados ao site e ao posicionamento da marca.", "sem_instagram": { "nome": "Revisão de pontos de contato", "descricao": "Ajuste dos canais que você usa e dos materiais que mais pesam, para todos contarem a mesma história." } }
         }
       },
       "D": { "nome": "Apresentação comercial essencial", "descricao": "Apresentação e modelo de proposta para vender mesmo quando você não está na sala." },
