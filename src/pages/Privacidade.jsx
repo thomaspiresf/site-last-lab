@@ -43,10 +43,10 @@ export default function Privacidade() {
       <Secao titulo="2. Quais dados coletamos">
         <p>No diagnóstico de marca:</p>
         <Lista itens={[
-          "Seu nome, cargo, tipo de negócio, faixa de valor de venda e de faturamento e o seu objetivo.",
-          "As respostas das perguntas sobre a sua marca e o resultado calculado a partir delas.",
+          "Seu nome, o nome da empresa, cargo, tipo de negócio, os canais que você usa e o seu objetivo.",
+          "As respostas das perguntas sobre a sua marca e o resultado calculado a partir delas. Elas ficam registradas a cada etapa, mesmo que você não chegue ao fim, para sabermos em que ponto o diagnóstico precisa melhorar. Esse registro não inclui e-mail nem telefone.",
           "Os links e materiais que você decidir enviar: site, Instagram, concorrentes, arquivos, links ou textos com o seu material de venda.",
-          "Seu e-mail e WhatsApp, para enviarmos a devolutiva.",
+          "Seu e-mail e/ou WhatsApp, que você informa para liberar o resultado e receber a análise.",
         ]} />
         <p>No briefing de identidade visual: seu nome, e-mail, telefone (opcional) e as respostas sobre o seu negócio e o estilo que você procura.</p>
         <p>Também coletamos dados de navegação, em todo o site:</p>
@@ -71,8 +71,8 @@ export default function Privacidade() {
 
       <Secao titulo="4. Com base em quê">
         <p>
-          Usamos seus dados com base no seu <b>consentimento</b>, dado ao marcar a caixa no fim do diagnóstico, e no nosso
-          <b> legítimo interesse</b> em medir as visitas ao site e melhorar nossas campanhas (medição própria, Google Analytics e Pixel da Meta). Quando você pede uma proposta, também usamos os dados
+          Usamos seus dados com base no seu <b>consentimento</b>, dado ao marcar a caixa antes de ver o resultado do diagnóstico, e no nosso
+          <b> legítimo interesse</b> em medir as visitas ao site, o andamento do diagnóstico e melhorar nossas campanhas (medição própria, Google Analytics e Pixel da Meta). Quando você pede uma proposta, também usamos os dados
           para os procedimentos que antecedem um contrato com você.
         </p>
       </Secao>

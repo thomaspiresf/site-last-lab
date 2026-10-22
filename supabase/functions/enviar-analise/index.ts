@@ -1,7 +1,7 @@
 // Análise automática por e-mail, para todos os leads (promessa do chat: "Você recebe por e-mail a
 // análise completa de cada pilar"). O diagnóstico chama esta função logo depois de salvar o lead;
 // ela publica a página de resultado (que já tem a análise de cada pilar) e manda o link por e-mail.
-// Para os qualificados, o e-mail avisa que a análise com a visão de fora (feita no admin) vem depois.
+// O e-mail convida para a análise de fora (grátis); quem aceita no próprio diagnóstico já mandou os materiais.
 //
 // É chamada sem login (pelo próprio diagnóstico), então só age em condições estreitas:
 // lead recém-criado (15 min), ainda não publicado nem enviado, e no máximo um
@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
         from: REMETENTE,
         to: [d.email],
         subject: `${primeiroNome}, a análise da sua marca chegou`,
-        html: montarEmail(primeiroNome, link, d.dados, d.qualificado),
+        html: montarEmail(primeiroNome, link, d.dados),
       }),
     });
     if (!res.ok) return json({ error: `Resend: ${await res.text()}` }, 502);
@@ -71,7 +71,7 @@ function esc(t: string) {
   return String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function montarEmail(nome: string, link: string, dados: Record<string, any>, qualificado: boolean) {
+function montarEmail(nome: string, link: string, dados: Record<string, any>) {
   const momento = dados?.persona;
   const nota = dados?.nota_geral;
   const story = dados?.story_url;
@@ -86,9 +86,7 @@ ${p("O link é só seu.")}
 ${story ? `${p("Também fiz uma imagem do seu resultado, se quiser postar nos stories:")}
 <p style="margin:0 0 8px"><a href="${esc(story)}"><img src="${esc(story)}" width="270" alt="Seu resultado no diagnóstico de marca" style="display:block;width:270px;max-width:100%;border-radius:12px"></a></p>
 <p style="margin:0 0 24px;font-size:13px;color:#5c5c63">(no celular, toque e segure a imagem para salvar)</p>` : ""}
-${qualificado
-  ? p("E tem mais: vou olhar os materiais que você mandou (site, Instagram e material de venda) e, em breve, te envio uma devolutiva com a visão de fora da sua marca.")
-  : p("Se quiser ajuda para colocar alguma dessas ideias em prática, é só responder este e-mail.")}
+${p("Se quiser que eu olhe a sua marca de fora, como um cliente olharia, é de graça: é só responder este e-mail com o seu Instagram ou site. Se você já mandou no diagnóstico, já estou com eles.")}
 ${p("Um abraço,<br>Thomás<br><span style=\"color:#5c5c63\">Last Lab</span>")}
 </div></body></html>`;
 }

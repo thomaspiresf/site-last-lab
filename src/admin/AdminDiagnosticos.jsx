@@ -44,7 +44,9 @@ import {
   criarApresentacaoManual,
   gerarMensagemProspeccao,
   getDiagnostico,
+  listSessoesDiagnostico,
 } from "../lib/api";
+import PainelSessoes, { ABANDONO_MIN } from "./PainelSessoes";
 
 // Leads do diagnóstico de marca (lastlab.com.br/diagnostico). A sugestão de oferta e o
 // roteiro da devolutiva já chegam calculados pela página do diagnóstico, em dados.devolutiva.
@@ -95,6 +97,9 @@ export default function AdminDiagnosticos() {
   const [soQualificados, setSoQualificados] = useState(false);
   const [busca, setBusca] = useState("");
   const [criando, setCriando] = useState(false);
+  // abas: todos (quem começou), concluidos (deixou contato), pedidos (análise profissional), abandonados
+  const [aba, setAba] = useState("concluidos");
+  const [sessoes, setSessoes] = useState(null);
 
   useEffect(() => {
     listDiagnosticos()
@@ -103,6 +108,9 @@ export default function AdminDiagnosticos() {
         setErro(e.message || String(e));
         setItens([]);
       });
+    listSessoesDiagnostico()
+      .then(setSessoes)
+      .catch(() => setSessoes([])); // tabela ainda não criada: as abas de andamento ficam vazias
   }, []);
 
   const atualizar = async (id, patch) => {
@@ -129,6 +137,7 @@ export default function AdminDiagnosticos() {
     const q = busca.trim().toLowerCase();
     return (itens || []).filter(
       (x) =>
+        (aba !== "pedidos" || x.dados?.pediu_analise) &&
         (filtroStatus === "todos" || x.status === filtroStatus) &&
         (!soQualificados || x.qualificado) &&
         (!q ||
@@ -136,8 +145,31 @@ export default function AdminDiagnosticos() {
             .join(" ")
             .toLowerCase()
             .includes(q))
-    );
-  }, [itens, filtroStatus, soQualificados, busca]);
+    )
+      // quem pediu a análise profissional e ainda está "novo" sobe para o topo
+      .sort((a, b) => Number(b.dados?.pediu_analise && b.status === "novo") - Number(a.dados?.pediu_analise && a.status === "novo"));
+  }, [itens, filtroStatus, soQualificados, busca, aba]);
+
+  const agora = Date.now();
+  const abandonada = (x) => !x.concluido && agora - new Date(x.atualizado_em).getTime() > ABANDONO_MIN * 60000;
+  const contagem = {
+    todos: sessoes?.length ?? 0,
+    concluidos: itens?.length ?? 0,
+    pedidos: (itens || []).filter((x) => x.dados?.pediu_analise).length,
+    abandonados: (sessoes || []).filter(abandonada).length,
+  };
+  const ABAS = [
+    ["todos", "Todos"],
+    ["concluidos", "Testes concluídos"],
+    ["pedidos", "Pedidos de análise profissional"],
+    ["abandonados", "Abandonados"],
+  ];
+  // na aba Todos, clicar num diagnóstico concluído abre a ficha do lead
+  const abrirLead = (id) => {
+    if (!itens?.some((x) => x.id === id)) return;
+    setAba("concluidos");
+    setAbertoId(id);
+  };
 
   const atual = itens?.find((x) => x.id === abertoId);
 
@@ -164,7 +196,20 @@ export default function AdminDiagnosticos() {
 
       {erro && <p className="mb-4 text-sm text-red-600">{erro}</p>}
 
-      {itens === null ? (
+      <div className="mb-6 flex gap-1 overflow-x-auto border-b border-zinc-200">
+        {ABAS.map(([id, nome]) => (
+          <button key={id} type="button" onClick={() => { setAba(id); setAbertoId(null); }}
+            className={`px-4 py-2.5 -mb-px text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${
+              aba === id ? "border-black text-black" : "border-transparent text-zinc-500 hover:text-black"
+            }`}>
+            {nome} <span className={`ml-1 text-xs ${aba === id ? "text-zinc-500" : "text-zinc-400"}`}>{contagem[id]}</span>
+          </button>
+        ))}
+      </div>
+
+      {aba === "todos" || aba === "abandonados" ? (
+        <PainelSessoes sessoes={sessoes} aba={aba} leads={itens || []} onAbrirLead={abrirLead} />
+      ) : itens === null ? (
         <p className="text-sm text-zinc-500">Carregando...</p>
       ) : itens.length === 0 ? (
         <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-zinc-300">
@@ -233,6 +278,9 @@ export default function AdminDiagnosticos() {
                       : <span>{x.persona} · {x.notaGeral}/100</span>}
                     {x.qualificado && (
                       <span className="px-1.5 py-0.5 rounded-full bg-black text-white text-[10px] font-bold">qualificado</span>
+                    )}
+                    {x.dados?.pediu_analise && (
+                      <span className="px-1.5 py-0.5 rounded-full text-white text-[10px] font-bold" style={{ background: LARANJA }} title="Clicou em 'Quero minha marca analisada por um profissional' e mandou os materiais">pediu análise</span>
                     )}
                     <span className="ml-auto">{formatDate(x.createdAt)}</span>
                   </div>
@@ -552,13 +600,22 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
       </div>
       {item.status === "fechado" && <ValorFechado item={item} onAtualizar={onAtualizar} />}
 
+      {d.pediu_analise && (
+        <p className="text-sm rounded-2xl border px-4 py-3" style={{ borderColor: LARANJA, color: LARANJA }}>
+          Pediu a análise profissional grátis e mandou os materiais: lead quente.
+        </p>
+      )}
       <div className="flex flex-wrap gap-2">
-        <a href={linkWhats(item.whatsapp)} target="_blank" rel="noopener" className={`${botao} bg-black text-white hover:bg-zinc-800`}>
-          <MessageCircle size={15} /> {item.whatsapp}
-        </a>
-        <a href={`mailto:${item.email}`} className={`${botao} bg-black text-white hover:bg-zinc-800`}>
-          <Mail size={15} /> {item.email}
-        </a>
+        {item.whatsapp && (
+          <a href={linkWhats(item.whatsapp)} target="_blank" rel="noopener" className={`${botao} bg-black text-white hover:bg-zinc-800`}>
+            <MessageCircle size={15} /> {item.whatsapp}
+          </a>
+        )}
+        {item.email && (
+          <a href={`mailto:${item.email}`} className={`${botao} bg-black text-white hover:bg-zinc-800`}>
+            <Mail size={15} /> {item.email}
+          </a>
+        )}
         {site && (
           <a href={site} target="_blank" rel="noopener" className={`${botao} bg-white border border-zinc-200 hover:border-black`}>
             <Globe size={15} /> Site
@@ -849,13 +906,17 @@ function BlocoDevolutiva({ item, onAtualizar, onSubstituir }) {
             <button type="button" onClick={copiar} className={`${botao} bg-white border border-zinc-200 hover:border-black`}>
               {copiado ? <Check size={15} /> : <Link2 size={15} />} {copiado ? "Copiado" : "Copiar link"}
             </button>
-            <a href={`${linkWhats(item.whatsapp)}?text=${encodeURIComponent(mensagemWhats)}`} target="_blank" rel="noopener"
-              onClick={marcarEnviada} className={`${botao} bg-black text-white hover:bg-zinc-800`}>
-              <MessageCircle size={15} /> Enviar por WhatsApp
-            </a>
-            <button type="button" onClick={enviarEmail} disabled={!!ocupado} className={`${botao} bg-black text-white hover:bg-zinc-800`}>
-              <Send size={15} /> {ocupado === "email" ? "Enviando..." : item.emailEnviadoEm ? "Reenviar e-mail" : "Enviar por e-mail"}
-            </button>
+            {item.whatsapp && (
+              <a href={`${linkWhats(item.whatsapp)}?text=${encodeURIComponent(mensagemWhats)}`} target="_blank" rel="noopener"
+                onClick={marcarEnviada} className={`${botao} bg-black text-white hover:bg-zinc-800`}>
+                <MessageCircle size={15} /> Enviar por WhatsApp
+              </a>
+            )}
+            {item.email && (
+              <button type="button" onClick={enviarEmail} disabled={!!ocupado} className={`${botao} bg-black text-white hover:bg-zinc-800`}>
+                <Send size={15} /> {ocupado === "email" ? "Enviando..." : item.emailEnviadoEm ? "Reenviar e-mail" : "Enviar por e-mail"}
+              </button>
+            )}
             <button type="button" onClick={despublicar} className={`${botao} text-zinc-500 hover:text-black`}>
               <EyeOff size={15} /> Despublicar
             </button>

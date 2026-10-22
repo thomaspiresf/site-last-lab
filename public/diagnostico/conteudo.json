@@ -48,31 +48,6 @@
       ]
     },
     {
-      "id": "ticket",
-      "pergunta": "Qual é o valor médio de uma venda?",
-      "tipo": "escolha",
-      "depois": true,
-      "opcoes": [
-        { "id": "ate_500", "texto": "Até R$ 500" },
-        { "id": "500_5k", "texto": "R$ 500 a 5 mil" },
-        { "id": "5k_50k", "texto": "R$ 5 mil a 50 mil" },
-        { "id": "acima_50k", "texto": "Acima de R$ 50 mil" }
-      ]
-    },
-    {
-      "id": "faturamento",
-      "pergunta": "Qual é o faturamento mensal aproximado?",
-      "tipo": "escolha",
-      "depois": true,
-      "opcoes": [
-        { "id": "ate_30k", "texto": "Até R$ 30 mil" },
-        { "id": "30k_100k", "texto": "R$ 30 a 100 mil" },
-        { "id": "100k_500k", "texto": "R$ 100 a 500 mil" },
-        { "id": "acima_500k", "texto": "Acima de R$ 500 mil" },
-        { "id": "nao_informado", "texto": "Prefiro não dizer" }
-      ]
-    },
-    {
       "id": "canais",
       "pergunta": "Por onde os clientes encontram e falam com a sua empresa? Marque todos que você usa.",
       "tipo": "multipla",
@@ -835,7 +810,7 @@
   },
 
   "encerramento": {
-    "fala_pos_resultado": "Essa é a sua marca vista por você. Agora falta a outra metade: como ela é vista de fora.",
+    "fala_pos_resultado": "Essa é a sua marca vista por você. A outra metade é como ela é vista de fora, pelos olhos de quem ainda não te conhece. Isso eu posso olhar para você.",
     "links": [
       { "id": "instagram", "tipo": "texto", "canal": "instagram", "rotulo": "@ do Instagram", "placeholder": "@suamarca", "obrigatorio": false },
       { "id": "site", "tipo": "texto", "canal": "site", "rotulo": "Site", "placeholder": "suamarca.com.br", "obrigatorio": false },
@@ -1104,7 +1079,27 @@
     "painel_ponto_fraco": "Ponto a melhorar",
     "aviso_pilar": "{pilar} ✓",
     "inicio_diagnostico": "Obrigado, {nome}. Agora são 12 perguntas sobre a sua marca, em 5 pilares. Responda pensando em como as coisas são hoje, não em como gostaria que fossem.",
-    "resultado_pronto": "Pronto, {nome}. Aqui está o seu resultado.",
+    "resultado_pronto": "Pronto, {nome}! Já calculei a sua nota geral, o momento da sua marca e por onde começar. Me diz para onde eu mando e o resultado abre aqui na hora.",
+    "resultado_liberado": "Liberado, {nome}. Aqui está o seu resultado.",
+    "convite_pergunta": "Qual é o próximo passo?",
+    "convite_sim": "Pedir análise de um profissional",
+    "convite_sim_detalhe": "Olhamos seu Instagram, site e materiais como um cliente olharia e te mandamos uma devolutiva.",
+    "convite_selo": "Grátis",
+    "convite_nao": "Agora não",
+    "convite_nao_resposta": "Sem problema. Se mudar de ideia, é só me chamar.",
+    "convite_whats": "Quero conversar pelo WhatsApp",
+    "convite_whats_resposta": "Te espero lá no WhatsApp! Já deixei a mensagem pronta, é só enviar.",
+    "promessa_materiais": "Combinado. Vou olhar a sua marca como um cliente olharia e, em breve, te mando uma devolutiva com a visão de fora.",
+    "painel_trancado_titulo": "Resultado pronto",
+    "painel_trancado_texto": "Deixe seu e-mail ou WhatsApp no chat para liberar a nota, o momento da sua marca e por onde começar.",
+    "status_trancado_chapeu": "Resultado pronto",
+    "status_trancado": "Falta só um contato",
+    "sessao_perfil": "Perfil",
+    "sessao_pergunta": "pergunta",
+    "sessao_contato": "Contato (resultado travado)",
+    "sessao_convite": "Próximo passo (depois do resultado)",
+    "sessao_links": "Envio dos materiais",
+    "sessao_fim": "Terminou",
     "perguntas_negocio": "Antes da segunda parte, só duas perguntas rápidas sobre o negócio. Elas me ajudam a ajustar as recomendações ao seu momento, e ficam só entre nós.",
     "resultado_persona": "Momento da sua marca",
     "links_pedido": "Me mande os links da sua marca:",
@@ -1124,13 +1119,15 @@
     "arquivo_erro": "Não consegui enviar o arquivo. Tente de novo ou cole um link.",
     "arquivo_grande": "Arquivo maior que {max} MB. Tente um PDF mais leve ou cole um link.",
     "arquivo_remover": "Remover",
-    "contato_pedido": "Para onde eu mando?",
+    "contato_pedido": "Para onde eu mando o seu resultado?",
+    "contato_dica": "Preencha pelo menos um. Com os dois fica mais fácil falar com você.",
+    "erro_contato_um": "Deixe pelo menos um contato: e-mail ou WhatsApp.",
     "contato_email": "E-mail",
     "contato_whatsapp": "WhatsApp",
     "contato_consentimento": "Concordo em receber a análise e outros contatos da Last Lab, conforme a",
     "contato_politica": "política de privacidade",
     "contato_politica_url": "https://www.lastlab.com.br/privacidade",
-    "contato_botao": "Receber minha análise",
+    "contato_botao": "Ver meu resultado",
     "contato_enviando": "Enviando…",
     "contato_erro": "Não consegui enviar. Confira sua conexão e tente de novo.",
     "erro_email": "Confira o e-mail: parece que falta alguma coisa (ex.: nome@empresa.com.br).",
@@ -1138,7 +1135,7 @@
     "erro_aceite": "Para receber a análise, marque que você concorda.",
     "erro_obrigatorio": "Preencha este campo ou marque “Não tenho”.",
     "erro_arquivo_enviando": "Espere o arquivo terminar de enviar.",
-    "confirmacao": "Recebido, {nome}! Enquanto isso, separei alguns dados sobre o ponto que mais pesa hoje na sua marca.",
+    "confirmacao": "Separei alguns dados sobre o ponto que mais pesa hoje na sua marca.",
     "portfolio_rotulo": "Ver portfólio da Last Lab",
     "portfolio_url": "https://www.lastlab.com.br/",
     "digite_aqui": "Digite aqui",
@@ -1158,7 +1155,7 @@
     "bv_botao": "Começar diagnóstico",
     "bv_continuar": "Continuar meu diagnóstico",
     "bv_recomecar": "Começar de novo",
-    "bv_nota": "Suas respostas são usadas só para montar o seu resultado.",
+    "bv_nota": "Suas respostas são usadas para montar o seu resultado e melhorar o diagnóstico.",
     "bv_exemplo": "Exemplo de resultado",
     "status_perfil_chapeu": "Conhecendo",
     "status_perfil": "Seu negócio",
@@ -1167,7 +1164,7 @@
   },
 
   "qualificacao": {
-    "regra": "qualificado = cargo == dono E faturamento NOT IN [ate_30k] E ticket != ate_500 E objetivo != curiosidade",
+    "regra": "qualificado = cargo == dono E objetivo != curiosidade",
     "observacao": "Faturamento 'nao_informado' conta como qualificado. Critério provisório, ajustar com os dados dos primeiros testes."
   }
 }

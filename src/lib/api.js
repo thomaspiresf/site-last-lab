@@ -877,6 +877,17 @@ export async function listDiagnosticos() {
   return data.map(mapDiagnostico);
 }
 
+// Todo mundo que começou o diagnóstico (tabela diagnostico_sessoes): concluídos, pedidos e abandonos.
+export async function listSessoesDiagnostico() {
+  const { data, error } = await supabase
+    .from("diagnostico_sessoes")
+    .select("*")
+    .order("criado_em", { ascending: false })
+    .limit(3000);
+  if (error) throw error;
+  return data;
+}
+
 export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao, valorFechado }) {
   const patch = {};
   if (valorFechado !== undefined) patch.valor_fechado = valorFechado;
