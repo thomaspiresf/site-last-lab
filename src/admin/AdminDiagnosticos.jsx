@@ -47,6 +47,7 @@ import {
   listSessoesDiagnostico,
 } from "../lib/api";
 import PainelSessoes, { ABANDONO_MIN } from "./PainelSessoes";
+import { mensagemMateriais } from "./mensagemMateriais";
 
 // Leads do diagnóstico de marca (lastlab.com.br/diagnostico). A sugestão de oferta e o
 // roteiro da devolutiva já chegam calculados pela página do diagnóstico, em dados.devolutiva.
@@ -133,11 +134,12 @@ export default function AdminDiagnosticos() {
     }
   };
 
+  const sessaoDe = useMemo(() => Object.fromEntries((sessoes || []).map((x) => [x.id, x])), [sessoes]);
   const visiveis = useMemo(() => {
     const q = busca.trim().toLowerCase();
     return (itens || []).filter(
       (x) =>
-        (aba !== "pedidos" || x.dados?.pediu_analise) &&
+        (aba !== "pedidos" || x.dados?.pediu_analise || sessaoDe[x.id]?.convite === "sim") &&
         (filtroStatus === "todos" || x.status === filtroStatus) &&
         (!soQualificados || x.qualificado) &&
         (!q ||
@@ -148,14 +150,14 @@ export default function AdminDiagnosticos() {
     )
       // quem pediu a análise profissional e ainda está "novo" sobe para o topo
       .sort((a, b) => Number(b.dados?.pediu_analise && b.status === "novo") - Number(a.dados?.pediu_analise && a.status === "novo"));
-  }, [itens, filtroStatus, soQualificados, busca, aba]);
+  }, [itens, filtroStatus, soQualificados, busca, aba, sessaoDe]);
 
   const agora = Date.now();
   const abandonada = (x) => !x.concluido && agora - new Date(x.atualizado_em).getTime() > ABANDONO_MIN * 60000;
   const contagem = {
     todos: sessoes?.length ?? 0,
     concluidos: itens?.length ?? 0,
-    pedidos: (itens || []).filter((x) => x.dados?.pediu_analise).length,
+    pedidos: (itens || []).filter((x) => x.dados?.pediu_analise || sessaoDe[x.id]?.convite === "sim").length,
     abandonados: (sessoes || []).filter(abandonada).length,
   };
   const ABAS = [
@@ -279,6 +281,9 @@ export default function AdminDiagnosticos() {
                     {x.qualificado && (
                       <span className="px-1.5 py-0.5 rounded-full bg-black text-white text-[10px] font-bold">qualificado</span>
                     )}
+                    {!x.dados?.pediu_analise && sessaoDe[x.id]?.convite === "sim" && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold" title="Clicou em pedir análise, mas não enviou os materiais">faltam materiais</span>
+                    )}
                     {x.dados?.pediu_analise && (
                       <span className="px-1.5 py-0.5 rounded-full text-white text-[10px] font-bold" style={{ background: LARANJA }} title="Clicou em 'Quero minha marca analisada por um profissional' e mandou os materiais">pediu análise</span>
                     )}
@@ -299,6 +304,7 @@ export default function AdminDiagnosticos() {
                 onAtualizar={(patch) => atualizar(atual.id, patch)}
                 onExcluir={() => excluir(atual)}
                 onSubstituir={(novo) => setItens((prev) => prev.map((x) => (x.id === novo.id ? novo : x)))}
+                sessao={sessaoDe[atual.id]}
               />
             ) : (
               <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-zinc-300">
@@ -393,6 +399,59 @@ function NovaApresentacao({ onFechar }) {
         </button>
       </form>
     </div>
+  );
+}
+
+/**
+ * Para quem não mandou links/materiais: mensagem pronta oferecendo a análise sem custo.
+ * WhatsApp abre a conversa com o texto; no Instagram não dá para preencher o direct, então copia e abre o app.
+ */
+function BlocoPedirMateriais({ item }) {
+  const [canal, setCanal] = useState(item.whatsapp ? "whatsapp" : "instagram");
+  const [texto, setTexto] = useState(() => mensagemMateriais(item, item.whatsapp ? "whatsapp" : "instagram"));
+  const [copiado, setCopiado] = useState(false);
+  const enviado = item.apresentacao?.pedidoMateriais?.enviadoEm;
+  const trocar = (c) => { setCanal(c); setTexto(mensagemMateriais(item, c)); };
+  const marcar = async () => {
+    try {
+      const atual = await getDiagnostico(item.id);
+      await updateDiagnostico(item.id, { apresentacao: { ...(atual.apresentacao || {}), pedidoMateriais: { canal, enviadoEm: new Date().toISOString() } } });
+    } catch { /* não impede o envio */ }
+  };
+  const copiarEAbrir = async () => {
+    try { await navigator.clipboard.writeText(texto); setCopiado(true); setTimeout(() => setCopiado(false), 2500); } catch { /* sem permissão */ }
+    marcar();
+    window.open("https://www.instagram.com/direct/inbox/", "_blank", "noopener");
+  };
+  const aba = (c, nome) => (
+    <button type="button" onClick={() => trocar(c)}
+      className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${canal === c ? "bg-black text-white border-black" : "bg-white border-zinc-200 hover:border-black"}`}>{nome}</button>
+  );
+  return (
+    <Bloco titulo="Pedir materiais (sem custo)">
+      <p className="text-sm text-zinc-500 -mt-1 mb-3">
+        Não mandou Instagram, site nem material. Mensagem pronta oferecendo a análise, com o ponto que mais pesou. Edite se quiser e envie.
+      </p>
+      <div className="flex gap-2 mb-3">{aba("instagram", "Instagram")}{aba("whatsapp", "WhatsApp")}</div>
+      <textarea className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm leading-relaxed outline-none focus:border-black" rows={8}
+        value={texto} onChange={(e) => setTexto(e.target.value)} />
+      <div className="flex flex-wrap gap-2 mt-2 items-center">
+        {canal === "whatsapp" ? (
+          item.whatsapp
+            ? <a href={`${linkWhats(item.whatsapp)}?text=${encodeURIComponent(texto)}`} target="_blank" rel="noopener" onClick={marcar}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#25D366] text-white text-sm font-semibold hover:brightness-95">
+                <Send size={15} /> Enviar pelo WhatsApp
+              </a>
+            : <span className="text-xs text-zinc-400">Sem WhatsApp neste lead: use o Instagram.</span>
+        ) : (
+          <button type="button" onClick={copiarEAbrir}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800">
+            {copiado ? <Check size={15} /> : <Send size={15} />} {copiado ? "Copiado! Cole no direct" : "Copiar e abrir o Instagram"}
+          </button>
+        )}
+        <span className="text-xs text-zinc-400 ml-auto">{enviado ? `Enviado em ${new Date(enviado).toLocaleDateString("pt-BR")}` : ""}</span>
+      </div>
+    </Bloco>
   );
 }
 
@@ -521,7 +580,7 @@ function ValorFechado({ item, onAtualizar }) {
   );
 }
 
-function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
+function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao }) {
   const d = item.dados;
   const dev = d.devolutiva || {};
   const links = d.links || {};
@@ -605,6 +664,12 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir }) {
           Pediu a análise profissional grátis e mandou os materiais: lead quente.
         </p>
       )}
+      {!d.pediu_analise && sessao?.convite && (
+        <p className="text-sm rounded-2xl bg-zinc-50 border border-zinc-200 px-4 py-3 text-zinc-700">
+          Depois do resultado: {{ sim: "clicou em pedir análise, mas não enviou os materiais", whats: "clicou para falar pelo WhatsApp", nao: "escolheu \"Agora não\"" }[sessao.convite]}.
+        </p>
+      )}
+      {!Object.keys(links).length && d.origem !== "manual" && <BlocoPedirMateriais item={item} />}
       <div className="flex flex-wrap gap-2">
         {item.whatsapp && (
           <a href={linkWhats(item.whatsapp)} target="_blank" rel="noopener" className={`${botao} bg-black text-white hover:bg-zinc-800`}>
