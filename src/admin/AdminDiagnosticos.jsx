@@ -268,9 +268,12 @@ export default function AdminDiagnosticos() {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <p className="font-bold text-black truncate">{x.nome}{x.apresentacao?.empresa && <span className="font-normal text-zinc-500"> · {x.apresentacao.empresa}</span>}</p>
+                    <p className="font-bold text-black truncate">{x.apresentacao?.empresa || x.nome}</p>
                     <StatusPill status={x.status} />
                   </div>
+                  <p className="text-xs text-zinc-500 truncate mt-0.5">
+                    {[x.apresentacao?.empresa && x.nome, x.dados?.devolutiva?.perfil_textos?.segmento].filter(Boolean).join(" · ")}
+                  </p>
                   <p className="text-sm font-semibold mt-1" style={{ color: LARANJA }}>
                     → {x.ofertaEntrada || "—"}
                   </p>
@@ -452,6 +455,37 @@ function BlocoPedirMateriais({ item }) {
         <span className="text-xs text-zinc-400 ml-auto">{enviado ? `Enviado em ${new Date(enviado).toLocaleDateString("pt-BR")}` : ""}</span>
       </div>
     </Bloco>
+  );
+}
+
+// origem legível: anúncio (qual) ou acesso direto
+function origemDe(utms = {}) {
+  if (utms.utm_medium === "pago" || utms.fbclid) return `Anúncio${utms.utm_content ? ` · ${utms.utm_content}` : ""}`;
+  if (utms.utm_source) return utms.utm_source;
+  return "Direto / orgânico";
+}
+
+/** Resumo da empresa no topo da ficha: área, quem respondeu, objetivo, canais, origem e resultado. */
+function SobreEmpresa({ item, perfil }) {
+  const d = item.dados || {};
+  const campos = [
+    ["Área de atuação", perfil.segmento],
+    ["Quem respondeu", [item.nome, perfil.cargo].filter(Boolean).join(" · ")],
+    ["Objetivo", perfil.objetivo],
+    ["Canais que usa", perfil.canais],
+    ["Veio de", d.origem === "manual" ? "Criado no admin" : origemDe(d.utms)],
+    ["Resultado", d.persona ? `${d.persona} · ${item.notaGeral ?? d.nota_geral}/100 · ponto fraco: ${d.pilar_mais_fraco}` : null],
+  ].filter(([, v]) => v);
+  if (!campos.length) return null;
+  return (
+    <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 bg-white rounded-2xl border border-zinc-200/80 p-5">
+      {campos.map(([rotulo, valor]) => (
+        <div key={rotulo} className="min-w-0">
+          <dt className="text-xs font-semibold text-zinc-500">{rotulo}</dt>
+          <dd className="text-sm text-black mt-0.5 break-words">{valor}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -639,9 +673,11 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="min-w-0">
-          <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight">{item.nome}</h2>
+          {/* a empresa em destaque; quem respondeu logo abaixo */}
+          {perfil.segmento && <p className="text-xs font-bold uppercase tracking-wide" style={{ color: LARANJA }}>{perfil.segmento}</p>}
+          <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight mt-0.5">{item.apresentacao?.empresa || item.nome}</h2>
           <p className="text-sm text-zinc-500 mt-1">
-            {[item.apresentacao?.empresa, perfil.cargo, perfil.segmento, formatDate(item.createdAt)].filter(Boolean).join(" · ")}
+            {[item.apresentacao?.empresa && item.nome, perfil.cargo, formatDate(item.createdAt)].filter(Boolean).join(" · ")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -670,6 +706,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
         </p>
       )}
       {!Object.keys(links).length && d.origem !== "manual" && <BlocoPedirMateriais item={item} />}
+      <SobreEmpresa item={item} perfil={perfil} />
+
       <div className="flex flex-wrap gap-2">
         {item.whatsapp && (
           <a href={linkWhats(item.whatsapp)} target="_blank" rel="noopener" className={`${botao} bg-black text-white hover:bg-zinc-800`}>
@@ -851,7 +889,7 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
       <details className="bg-white rounded-2xl border border-zinc-200/80 p-5">
         <summary className="cursor-pointer text-sm font-bold text-black">Perfil e todas as respostas</summary>
         <div className="mt-4 space-y-2">
-          {[["Valor médio de venda", perfil.ticket], ["Faturamento", perfil.faturamento], ["Objetivo", perfil.objetivo]].map(([rotulo, valor]) => (
+          {[["Valor médio de venda", perfil.ticket], ["Faturamento", perfil.faturamento]].filter(([, v]) => v).map(([rotulo, valor]) => (
             <div key={rotulo} className="px-4 py-3 rounded-[10px] bg-zinc-50">
               <p className="text-xs font-semibold text-zinc-500">{rotulo}</p>
               <p className="text-sm text-zinc-800 mt-0.5">{valor || "—"}</p>

@@ -122,7 +122,7 @@ export default function PainelSessoes({ sessoes, aba, leads, onAbrirLead }) {
                     className={`w-full text-left px-5 py-3.5 flex items-center gap-4 flex-wrap ${clicavel ? "hover:bg-zinc-50" : ""}`}>
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-black truncate">
-                        {x.nome || "Sem nome"}{x.empresa && <span className="font-normal text-zinc-500"> · {x.empresa}</span>}
+                        {x.empresa || x.nome || "Sem nome"}{x.empresa && x.nome && <span className="font-normal text-zinc-500"> · {x.nome}</span>}
                       </p>
                       <p className="text-xs text-zinc-500 mt-0.5 truncate">
                         {x.concluido ? "Deixou o contato" : `Parou em: ${x.parou_em || "—"}`} · {x.respondidas}/{x.total} etapas · {origem(x)}
