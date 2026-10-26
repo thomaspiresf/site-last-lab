@@ -749,6 +749,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
       </div>
       {item.status === "fechado" && <ValorFechado item={item} onAtualizar={onAtualizar} />}
 
+      <ProximaAcao item={item} onAtualizar={onAtualizar} />
+
       {d.pediu_analise && (temMaterial ? (
         <p className="text-sm rounded-2xl border px-4 py-3" style={{ borderColor: LARANJA, color: LARANJA }}>
           Pediu a análise profissional grátis e mandou os materiais: lead quente.
@@ -765,9 +767,6 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
           Depois do resultado: {{ sim: "clicou em pedir análise, mas não enviou os materiais", whats: "clicou para falar pelo WhatsApp", nao: "escolheu \"Agora não\"" }[sessao.convite]}.
         </p>
       )}
-      {!temMaterial && d.origem !== "manual" && <BlocoPedirMateriais item={item} onAtualizar={onAtualizar} />}
-      <ProximaAcao item={item} onAtualizar={onAtualizar} />
-
       <SobreEmpresa item={item} perfil={perfil} />
 
       <div className="flex flex-wrap gap-2">
@@ -815,6 +814,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
           <p className="text-sm text-zinc-800 whitespace-pre-wrap break-words">{links.apresentacao_texto}</p>
         </div>
       )}
+
+      {!temMaterial && d.origem !== "manual" && <BlocoPedirMateriais item={item} onAtualizar={onAtualizar} />}
 
       {/* Oferta: a sugestão automática ou a que você escolheu depois de olhar a marca */}
       <CartaoOferta item={item} dev={dev} onSubstituir={onSubstituir} />
