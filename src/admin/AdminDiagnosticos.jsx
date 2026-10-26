@@ -48,6 +48,8 @@ import {
 } from "../lib/api";
 import PainelSessoes, { ABANDONO_MIN } from "./PainelSessoes";
 import { Hoje, Quadro } from "./PainelCRM";
+import HistoricoContatos, { avisarHistorico } from "./HistoricoContatos";
+import { addContato } from "../lib/api";
 import { ABERTOS, STATUS, hojeISO, statusDe } from "./crmEtapas";
 import { ETAPAS, mensagemMateriais } from "./mensagemMateriais";
 
@@ -503,7 +505,10 @@ function ProximaAcao({ item, onAtualizar }) {
       <input type="date" value={data} onChange={(e) => { setData(e.target.value); salvar({ proximaAcaoEm: e.target.value || null }); }}
         className={`${campo} border-zinc-200`} />
       {(texto || data) && (
-        <button type="button" onClick={() => { setTexto(""); setData(""); salvar({ proximaAcao: "", proximaAcaoEm: null }); }}
+        <button type="button" onClick={() => {
+            if (texto) addContato(item.id, { tipo: "acao", texto }).then(() => avisarHistorico(item.id)).catch(() => {});
+            setTexto(""); setData(""); salvar({ proximaAcao: "", proximaAcaoEm: null });
+          }}
           className="text-xs font-semibold px-3 py-2 rounded-full border border-zinc-200 hover:border-black">Feito</button>
       )}
     </div>
@@ -816,6 +821,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
       )}
 
       {!temMaterial && d.origem !== "manual" && <BlocoPedirMateriais item={item} onAtualizar={onAtualizar} />}
+
+      <HistoricoContatos item={item} sessao={sessao} />
 
       {/* Oferta: a sugestão automática ou a que você escolheu depois de olhar a marca */}
       <CartaoOferta item={item} dev={dev} onSubstituir={onSubstituir} />

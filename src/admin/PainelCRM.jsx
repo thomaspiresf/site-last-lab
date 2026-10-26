@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { addContato } from "../lib/api";
 import { ABERTOS, COLUNAS, dataCurta, diasNaEtapa, empresaDe, hojeISO, statusDe } from "./crmEtapas";
 
 // CRM dos leads do diagnóstico: a tela "Hoje" (o que fazer agora) e o quadro do funil (arrastar entre etapas).
@@ -64,7 +65,10 @@ export function Hoje({ itens, onAbrir, onAtualizar }) {
                 <Pill status={x.status} />
                 {x.proximaAcaoEm && (
                   <button type="button" title="Marcar como feita (limpa a próxima ação)"
-                    onClick={() => onAtualizar(x.id, { proximaAcao: "", proximaAcaoEm: null })}
+                    onClick={() => {
+                      if (x.proximaAcao) addContato(x.id, { tipo: "acao", texto: x.proximaAcao }).catch(() => {});
+                      onAtualizar(x.id, { proximaAcao: "", proximaAcaoEm: null });
+                    }}
                     className="text-xs font-semibold px-3 py-1.5 rounded-full border border-zinc-200 hover:border-black whitespace-nowrap">
                     Feito
                   </button>

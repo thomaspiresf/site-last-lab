@@ -891,6 +891,32 @@ export async function listSessoesDiagnostico() {
   return data;
 }
 
+// Histórico de contatos de um lead (tabela diagnostico_contatos): registros manuais e mudanças de etapa.
+export async function listContatos(diagnosticoId) {
+  const { data, error } = await supabase
+    .from("diagnostico_contatos")
+    .select("*")
+    .eq("diagnostico_id", diagnosticoId)
+    .order("quando", { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function addContato(diagnosticoId, { tipo, canal = null, texto = "", quando }) {
+  const { data, error } = await supabase
+    .from("diagnostico_contatos")
+    .insert({ diagnostico_id: diagnosticoId, tipo, canal, texto, ...(quando ? { quando } : {}) })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteContato(id) {
+  const { error } = await supabase.from("diagnostico_contatos").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao, valorFechado, proximaAcao, proximaAcaoEm }) {
   const patch = {};
   if (proximaAcao !== undefined) patch.proxima_acao = proximaAcao || null;
