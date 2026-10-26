@@ -640,8 +640,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
 
   const site = linkSite(links.site);
   const insta = linkInstagram(links.instagram);
-  // algo de verdade para analisar (link, arquivo, texto ou concorrentes), e não só "Não tenho"
-  const temMaterial = Object.entries(links).some(([k, v]) => v && !String(v).startsWith("Não tenho") && !k.endsWith("_caminho"));
+  // algo da própria marca para analisar (link, arquivo ou texto), e não só "Não tenho" ou concorrentes
+  const temMaterial = Object.entries(links).some(([k, v]) => v && !String(v).startsWith("Não tenho") && !k.endsWith("_caminho") && k !== "referencias");
   const extras = [
     naoTem(links.site) && links.site,
     naoTem(links.instagram) && links.instagram,
