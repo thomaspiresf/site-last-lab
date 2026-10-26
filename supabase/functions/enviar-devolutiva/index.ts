@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     if (!res.ok) return json({ error: `Resend: ${await res.text()}` }, 502);
 
     const patch: Record<string, unknown> = { email_enviado_em: new Date().toISOString() };
-    if (d.status === "novo" || d.status === "analisando") patch.status = "devolutiva";
+    if (["novo", "conversa", "analisando"].includes(d.status)) patch.status = "devolutiva";
     await supabase.from("diagnosticos").update(patch).eq("id", id);
     return json({ ok: true, ...patch });
   } catch (err) {

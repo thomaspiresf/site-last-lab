@@ -862,6 +862,9 @@ function mapDiagnostico(row) {
     personaAvaliacao: row.persona_avaliacao,
     personaSugerida: row.persona_sugerida,
     valorFechado: row.valor_fechado,
+    proximaAcao: row.proxima_acao || "",
+    proximaAcaoEm: row.proxima_acao_em || null,
+    etapaDesde: row.etapa_desde || row.created_at,
     fechadoEm: row.fechado_em,
     // a empresa respondida no diagnóstico preenche a da apresentação (e dos entregáveis) até ser trocada
     apresentacao: { ...(row.apresentacao || {}), empresa: row.apresentacao?.empresa || row.dados?.empresa || "" },
@@ -888,8 +891,10 @@ export async function listSessoesDiagnostico() {
   return data;
 }
 
-export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao, valorFechado }) {
+export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao, valorFechado, proximaAcao, proximaAcaoEm }) {
   const patch = {};
+  if (proximaAcao !== undefined) patch.proxima_acao = proximaAcao || null;
+  if (proximaAcaoEm !== undefined) patch.proxima_acao_em = proximaAcaoEm || null;
   if (valorFechado !== undefined) patch.valor_fechado = valorFechado;
   if (apresentacao !== undefined) patch.apresentacao = apresentacao;
   if (personaAvaliacao !== undefined) patch.persona_avaliacao = personaAvaliacao;

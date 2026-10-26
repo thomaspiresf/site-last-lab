@@ -47,6 +47,8 @@ import {
   listSessoesDiagnostico,
 } from "../lib/api";
 import PainelSessoes, { ABANDONO_MIN } from "./PainelSessoes";
+import { Hoje, Quadro } from "./PainelCRM";
+import { ABERTOS, STATUS, hojeISO, statusDe } from "./crmEtapas";
 import { ETAPAS, mensagemMateriais } from "./mensagemMateriais";
 
 // Leads do diagnóstico de marca (lastlab.com.br/diagnostico). A sugestão de oferta e o
@@ -54,15 +56,6 @@ import { ETAPAS, mensagemMateriais } from "./mensagemMateriais";
 
 const LARANJA = "#ef4b3a";
 
-const STATUS = [
-  { id: "novo", nome: "Novo", cor: "bg-[#ef4b3a] text-white" },
-  { id: "analisando", nome: "Analisando", cor: "bg-amber-100 text-amber-800" },
-  { id: "devolutiva", nome: "Devolutiva enviada", cor: "bg-blue-100 text-blue-800" },
-  { id: "proposta", nome: "Proposta enviada", cor: "bg-indigo-100 text-indigo-800" },
-  { id: "fechado", nome: "Fechado", cor: "bg-emerald-100 text-emerald-800" },
-  { id: "perdido", nome: "Perdido", cor: "bg-zinc-100 text-zinc-500" },
-];
-const statusDe = (id) => STATUS.find((s) => s.id === id) || STATUS[0];
 
 function formatDate(timestamp) {
   return new Date(timestamp).toLocaleString("pt-BR", {
@@ -99,7 +92,7 @@ export default function AdminDiagnosticos() {
   const [busca, setBusca] = useState("");
   const [criando, setCriando] = useState(false);
   // abas: todos (quem começou), concluidos (deixou contato), pedidos (análise profissional), abandonados
-  const [aba, setAba] = useState("concluidos");
+  const [aba, setAba] = useState("hoje");
   const [sessoes, setSessoes] = useState(null);
 
   useEffect(() => {
@@ -115,7 +108,9 @@ export default function AdminDiagnosticos() {
   }, []);
 
   const atualizar = async (id, patch) => {
-    setItens((prev) => prev.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+    // mudar de etapa zera o "dias na etapa" (o banco faz o mesmo por trigger)
+    const local = patch.status ? { ...patch, etapaDesde: new Date().toISOString() } : patch;
+    setItens((prev) => prev.map((x) => (x.id === id ? { ...x, ...local } : x)));
     try {
       await updateDiagnostico(id, patch);
     } catch {
@@ -154,13 +149,18 @@ export default function AdminDiagnosticos() {
 
   const agora = Date.now();
   const abandonada = (x) => !x.concluido && agora - new Date(x.atualizado_em).getTime() > ABANDONO_MIN * 60000;
+  const hoje = hojeISO();
   const contagem = {
+    hoje: (itens || []).filter((x) => ABERTOS.includes(x.status) && x.proximaAcaoEm && x.proximaAcaoEm <= hoje).length,
+    funil: (itens || []).filter((x) => ABERTOS.includes(x.status)).length,
     todos: sessoes?.length ?? 0,
     concluidos: itens?.length ?? 0,
     pedidos: (itens || []).filter((x) => x.dados?.pediu_analise || sessaoDe[x.id]?.convite === "sim").length,
     abandonados: (sessoes || []).filter(abandonada).length,
   };
   const ABAS = [
+    ["hoje", "Hoje"],
+    ["funil", "Funil"],
     ["todos", "Todos"],
     ["concluidos", "Testes concluídos"],
     ["pedidos", "Pedidos de análise profissional"],
@@ -209,7 +209,11 @@ export default function AdminDiagnosticos() {
         ))}
       </div>
 
-      {aba === "todos" || aba === "abandonados" ? (
+      {aba === "hoje" ? (
+        itens === null ? <p className="text-sm text-zinc-500">Carregando...</p> : <Hoje itens={itens} onAbrir={abrirLead} onAtualizar={atualizar} />
+      ) : aba === "funil" ? (
+        itens === null ? <p className="text-sm text-zinc-500">Carregando...</p> : <Quadro itens={itens} onAbrir={abrirLead} onAtualizar={atualizar} />
+      ) : aba === "todos" || aba === "abandonados" ? (
         <PainelSessoes sessoes={sessoes} aba={aba} leads={itens || []} onAbrirLead={abrirLead} />
       ) : itens === null ? (
         <p className="text-sm text-zinc-500">Carregando...</p>
@@ -410,7 +414,7 @@ function NovaApresentacao({ onFechar }) {
  * WhatsApp abre a conversa com o texto; no Instagram não dá para preencher o direct, então copia e abre o app.
  * Cada etapa enviada fica marcada com a data (apresentacao.aquecimento).
  */
-function BlocoPedirMateriais({ item }) {
+function BlocoPedirMateriais({ item, onAtualizar }) {
   const salvo = item.apresentacao?.aquecimento || {};
   const [canal, setCanal] = useState(item.whatsapp ? "whatsapp" : "instagram");
   // abre na próxima etapa ainda não enviada
@@ -422,6 +426,15 @@ function BlocoPedirMateriais({ item }) {
   const marcar = async () => {
     const novos = { ...enviados, [etapa]: new Date().toISOString() };
     setEnviados(novos);
+    // CRM: começou a conversa → etapa "Em conversa" e lembrete para ver a resposta em 2 dias
+    const crm = {};
+    if (item.status === "novo") crm.status = "conversa";
+    if (etapa !== "convite") {
+      const d = new Date(Date.now() + 2 * 86400000);
+      crm.proximaAcao = etapa === "pergunta" || etapa === "lembrete" ? "Ver se respondeu (mandar a dica)" : "Ver se respondeu (mandar o convite)";
+      crm.proximaAcaoEm = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+    if (Object.keys(crm).length) onAtualizar?.(crm);
     try {
       const atual = await getDiagnostico(item.id);
       await updateDiagnostico(item.id, { apresentacao: { ...(atual.apresentacao || {}), aquecimento: novos } });
@@ -470,6 +483,30 @@ function BlocoPedirMateriais({ item }) {
         )}
       </div>
     </Bloco>
+  );
+}
+
+/** CRM: o que fazer a seguir com este lead e quando (aparece na tela Hoje e no quadro). */
+function ProximaAcao({ item, onAtualizar }) {
+  const [texto, setTexto] = useState(item.proximaAcao || "");
+  const [data, setData] = useState(item.proximaAcaoEm || "");
+  useEffect(() => { setTexto(item.proximaAcao || ""); setData(item.proximaAcaoEm || ""); }, [item.id, item.proximaAcao, item.proximaAcaoEm]);
+  const salvar = (patch) => onAtualizar(patch);
+  const atrasada = data && data < hojeISO();
+  const campo = "px-3 py-2 rounded-xl border bg-white text-sm outline-none focus:border-black";
+  return (
+    <div className={`flex flex-wrap items-center gap-2 rounded-2xl border px-4 py-3 ${atrasada ? "border-red-200 bg-red-50" : "border-zinc-200/80 bg-white"}`}>
+      <span className={`text-xs font-bold uppercase tracking-wide ${atrasada ? "text-red-600" : "text-zinc-500"}`}>Próxima ação</span>
+      <input value={texto} onChange={(e) => setTexto(e.target.value)} onBlur={() => texto !== (item.proximaAcao || "") && salvar({ proximaAcao: texto })}
+        onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
+        placeholder="Ex.: mandar a dica, ligar, enviar proposta" className={`${campo} flex-1 min-w-[12rem] border-zinc-200`} />
+      <input type="date" value={data} onChange={(e) => { setData(e.target.value); salvar({ proximaAcaoEm: e.target.value || null }); }}
+        className={`${campo} border-zinc-200`} />
+      {(texto || data) && (
+        <button type="button" onClick={() => { setTexto(""); setData(""); salvar({ proximaAcao: "", proximaAcaoEm: null }); }}
+          className="text-xs font-semibold px-3 py-2 rounded-full border border-zinc-200 hover:border-black">Feito</button>
+      )}
+    </div>
   );
 }
 
@@ -728,7 +765,9 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
           Depois do resultado: {{ sim: "clicou em pedir análise, mas não enviou os materiais", whats: "clicou para falar pelo WhatsApp", nao: "escolheu \"Agora não\"" }[sessao.convite]}.
         </p>
       )}
-      {!temMaterial && d.origem !== "manual" && <BlocoPedirMateriais item={item} />}
+      {!temMaterial && d.origem !== "manual" && <BlocoPedirMateriais item={item} onAtualizar={onAtualizar} />}
+      <ProximaAcao item={item} onAtualizar={onAtualizar} />
+
       <SobreEmpresa item={item} perfil={perfil} />
 
       <div className="flex flex-wrap gap-2">
