@@ -625,6 +625,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
 
   const site = linkSite(links.site);
   const insta = linkInstagram(links.instagram);
+  // algo de verdade para analisar (link, arquivo, texto ou concorrentes), e não só "Não tenho"
+  const temMaterial = Object.entries(links).some(([k, v]) => v && !String(v).startsWith("Não tenho") && !k.endsWith("_caminho"));
   const extras = [
     naoTem(links.site) && links.site,
     naoTem(links.instagram) && links.instagram,
@@ -695,17 +697,23 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
       </div>
       {item.status === "fechado" && <ValorFechado item={item} onAtualizar={onAtualizar} />}
 
-      {d.pediu_analise && (
+      {d.pediu_analise && (temMaterial ? (
         <p className="text-sm rounded-2xl border px-4 py-3" style={{ borderColor: LARANJA, color: LARANJA }}>
           Pediu a análise profissional grátis e mandou os materiais: lead quente.
         </p>
-      )}
+      ) : (
+        <p className="text-sm rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 px-4 py-3">
+          Pediu a análise profissional grátis, mas não mandou nada para olhar
+          {perfil.canais?.startsWith("Nenhum") ? ": disse que não usa canais online (os clientes chegam por indicação)" : ""}
+          {naoTem(links.apresentacao) && links.apresentacao ? " e que não tem material de venda" : ""}. Quer ajuda, então vale conversar direto.
+        </p>
+      ))}
       {!d.pediu_analise && sessao?.convite && (
         <p className="text-sm rounded-2xl bg-zinc-50 border border-zinc-200 px-4 py-3 text-zinc-700">
           Depois do resultado: {{ sim: "clicou em pedir análise, mas não enviou os materiais", whats: "clicou para falar pelo WhatsApp", nao: "escolheu \"Agora não\"" }[sessao.convite]}.
         </p>
       )}
-      {!Object.keys(links).length && d.origem !== "manual" && <BlocoPedirMateriais item={item} />}
+      {!temMaterial && d.origem !== "manual" && <BlocoPedirMateriais item={item} />}
       <SobreEmpresa item={item} perfil={perfil} />
 
       <div className="flex flex-wrap gap-2">

@@ -38,6 +38,13 @@ export function mensagemMateriais(item, canal = "instagram") {
   const empresa = d.empresa || item.apresentacao?.empresa || "sua empresa";
   const pilar = PILARES.find((p) => p.chave.test(d.pilar_mais_fraco || "")) || PILARES[0];
   const frase = pilar.frase;
+  // sem canais online e sem material: não há o que pedir, então convida para conversar
+  if (d.perfil?.canais === "nenhum")
+    return [
+      `Oi, ${primeiroNome(item.nome)}! Tudo bem? Aqui é o Thomás, da Last Lab, vi que você fez nosso diagnóstico de marca${d.pediu_analise ? " e pediu a análise" : ""} 😊`,
+      `Vi que hoje os clientes da ${empresa} chegam por indicação, e o que mais pesa é ${frase}. Faz sentido pra você? Ou tem outra coisa te incomodando mais?`,
+      `Como não tem Instagram nem site pra eu olhar, acho que rende mais a gente conversar uns 15 minutos: você me conta como funciona hoje e eu te falo o que faria primeiro. Sem custo. Que dia fica bom pra você?`,
+    ].join("\n\n");
   // no direct o Instagram já está à vista; no WhatsApp, pede o @ junto
   const pedido = canal === "whatsapp" ? `o @ do Instagram e ${pilar.pedido}` : pilar.pedido;
   return [
