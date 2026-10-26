@@ -47,7 +47,7 @@ import {
   listSessoesDiagnostico,
 } from "../lib/api";
 import PainelSessoes, { ABANDONO_MIN } from "./PainelSessoes";
-import { mensagemMateriais } from "./mensagemMateriais";
+import { ETAPAS, mensagemMateriais } from "./mensagemMateriais";
 
 // Leads do diagnóstico de marca (lastlab.com.br/diagnostico). A sugestão de oferta e o
 // roteiro da devolutiva já chegam calculados pela página do diagnóstico, em dados.devolutiva.
@@ -406,19 +406,25 @@ function NovaApresentacao({ onFechar }) {
 }
 
 /**
- * Para quem não mandou links/materiais: mensagem pronta oferecendo a análise sem custo.
+ * Conversa de aquecimento para quem não mandou links/materiais: pergunta → dica → convite (e lembrete).
  * WhatsApp abre a conversa com o texto; no Instagram não dá para preencher o direct, então copia e abre o app.
+ * Cada etapa enviada fica marcada com a data (apresentacao.aquecimento).
  */
 function BlocoPedirMateriais({ item }) {
+  const salvo = item.apresentacao?.aquecimento || {};
   const [canal, setCanal] = useState(item.whatsapp ? "whatsapp" : "instagram");
-  const [texto, setTexto] = useState(() => mensagemMateriais(item, item.whatsapp ? "whatsapp" : "instagram"));
+  // abre na próxima etapa ainda não enviada
+  const [etapa, setEtapa] = useState(() => (ETAPAS.find(([id]) => id !== "lembrete" && !salvo[id]) || ETAPAS[2])[0]);
+  const [texto, setTexto] = useState(() => mensagemMateriais(item, etapa, canal));
+  const [enviados, setEnviados] = useState(salvo);
   const [copiado, setCopiado] = useState(false);
-  const enviado = item.apresentacao?.pedidoMateriais?.enviadoEm;
-  const trocar = (c) => { setCanal(c); setTexto(mensagemMateriais(item, c)); };
+  useEffect(() => setTexto(mensagemMateriais(item, etapa, canal)), [etapa, canal]);
   const marcar = async () => {
+    const novos = { ...enviados, [etapa]: new Date().toISOString() };
+    setEnviados(novos);
     try {
       const atual = await getDiagnostico(item.id);
-      await updateDiagnostico(item.id, { apresentacao: { ...(atual.apresentacao || {}), pedidoMateriais: { canal, enviadoEm: new Date().toISOString() } } });
+      await updateDiagnostico(item.id, { apresentacao: { ...(atual.apresentacao || {}), aquecimento: novos } });
     } catch { /* não impede o envio */ }
   };
   const copiarEAbrir = async () => {
@@ -426,18 +432,28 @@ function BlocoPedirMateriais({ item }) {
     marcar();
     window.open("https://www.instagram.com/direct/inbox/", "_blank", "noopener");
   };
-  const aba = (c, nome) => (
-    <button type="button" onClick={() => trocar(c)}
-      className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${canal === c ? "bg-black text-white border-black" : "bg-white border-zinc-200 hover:border-black"}`}>{nome}</button>
-  );
+  const pilula = (ativo) => `px-3 py-1.5 rounded-full text-xs font-semibold border ${ativo ? "bg-black text-white border-black" : "bg-white border-zinc-200 hover:border-black"}`;
+  const dia = (iso) => new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   return (
-    <Bloco titulo="Pedir materiais (sem custo)">
+    <Bloco titulo="Conversa de aquecimento">
       <p className="text-sm text-zinc-500 -mt-1 mb-3">
-        Não mandou Instagram, site nem material. Mensagem pronta oferecendo a análise, com o ponto que mais pesou. Edite se quiser e envie.
+        Não mandou material para analisar. Primeiro uma pergunta sobre o ponto que mais pesou; quando a pessoa responder, a dica; depois, o convite.
       </p>
-      <div className="flex gap-2 mb-3">{aba("instagram", "Instagram")}{aba("whatsapp", "WhatsApp")}</div>
-      <textarea className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm leading-relaxed outline-none focus:border-black" rows={8}
+      <div className="flex flex-wrap gap-2 mb-2">
+        {ETAPAS.map(([id, nome]) => (
+          <button key={id} type="button" onClick={() => setEtapa(id)} className={pilula(etapa === id)}>
+            {nome}{enviados[id] && <span className={etapa === id ? "text-zinc-300" : "text-emerald-600"}> ✓ {dia(enviados[id])}</span>}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-2 mb-3 text-xs text-zinc-500 items-center">
+        Enviar por:
+        <button type="button" onClick={() => setCanal("instagram")} className={pilula(canal === "instagram")}>Instagram</button>
+        <button type="button" onClick={() => setCanal("whatsapp")} className={pilula(canal === "whatsapp")}>WhatsApp</button>
+      </div>
+      <textarea className="w-full px-3 py-2.5 rounded-xl border border-zinc-200 bg-white text-sm leading-relaxed outline-none focus:border-black" rows={6}
         value={texto} onChange={(e) => setTexto(e.target.value)} />
+      {etapa === "dica" && <p className="text-xs text-zinc-500 mt-1">Ajuste a dica ao que a pessoa respondeu antes de enviar.</p>}
       <div className="flex flex-wrap gap-2 mt-2 items-center">
         {canal === "whatsapp" ? (
           item.whatsapp
@@ -452,40 +468,8 @@ function BlocoPedirMateriais({ item }) {
             {copiado ? <Check size={15} /> : <Send size={15} />} {copiado ? "Copiado! Cole no direct" : "Copiar e abrir o Instagram"}
           </button>
         )}
-        <span className="text-xs text-zinc-400 ml-auto">{enviado ? `Enviado em ${new Date(enviado).toLocaleDateString("pt-BR")}` : ""}</span>
       </div>
     </Bloco>
-  );
-}
-
-// origem legível: anúncio (qual) ou acesso direto
-function origemDe(utms = {}) {
-  if (utms.utm_medium === "pago" || utms.fbclid) return `Anúncio${utms.utm_content ? ` · ${utms.utm_content}` : ""}`;
-  if (utms.utm_source) return utms.utm_source;
-  return "Direto / orgânico";
-}
-
-/** Resumo da empresa no topo da ficha: área, quem respondeu, objetivo, canais, origem e resultado. */
-function SobreEmpresa({ item, perfil }) {
-  const d = item.dados || {};
-  const campos = [
-    ["Área de atuação", perfil.segmento],
-    ["Quem respondeu", [item.nome, perfil.cargo].filter(Boolean).join(" · ")],
-    ["Objetivo", perfil.objetivo],
-    ["Canais que usa", perfil.canais],
-    ["Veio de", d.origem === "manual" ? "Criado no admin" : origemDe(d.utms)],
-    ["Resultado", d.persona ? `${d.persona} · ${item.notaGeral ?? d.nota_geral}/100 · ponto fraco: ${d.pilar_mais_fraco}` : null],
-  ].filter(([, v]) => v);
-  if (!campos.length) return null;
-  return (
-    <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 bg-white rounded-2xl border border-zinc-200/80 p-5">
-      {campos.map(([rotulo, valor]) => (
-        <div key={rotulo} className="min-w-0">
-          <dt className="text-xs font-semibold text-zinc-500">{rotulo}</dt>
-          <dd className="text-sm text-black mt-0.5 break-words">{valor}</dd>
-        </div>
-      ))}
-    </dl>
   );
 }
 
