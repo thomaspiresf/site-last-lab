@@ -473,6 +473,37 @@ function BlocoPedirMateriais({ item }) {
   );
 }
 
+// origem legível: anúncio (qual) ou acesso direto
+function origemDe(utms = {}) {
+  if (utms.utm_medium === "pago" || utms.fbclid) return `Anúncio${utms.utm_content ? ` · ${utms.utm_content}` : ""}`;
+  if (utms.utm_source) return utms.utm_source;
+  return "Direto / orgânico";
+}
+
+/** Resumo da empresa no topo da ficha: área, quem respondeu, objetivo, canais, origem e resultado. */
+function SobreEmpresa({ item, perfil }) {
+  const d = item.dados || {};
+  const campos = [
+    ["Área de atuação", perfil.segmento],
+    ["Quem respondeu", [item.nome, perfil.cargo].filter(Boolean).join(" · ")],
+    ["Objetivo", perfil.objetivo],
+    ["Canais que usa", perfil.canais],
+    ["Veio de", d.origem === "manual" ? "Criado no admin" : origemDe(d.utms)],
+    ["Resultado", d.persona ? `${d.persona} · ${item.notaGeral ?? d.nota_geral}/100 · ponto fraco: ${d.pilar_mais_fraco}` : null],
+  ].filter(([, v]) => v);
+  if (!campos.length) return null;
+  return (
+    <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 bg-white rounded-2xl border border-zinc-200/80 p-5">
+      {campos.map(([rotulo, valor]) => (
+        <div key={rotulo} className="min-w-0">
+          <dt className="text-xs font-semibold text-zinc-500">{rotulo}</dt>
+          <dd className="text-sm text-black mt-0.5 break-words">{valor}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 const GRUPO_DEGRAU = { entrada: "Entrada", principal: "Projeto (degrau 2)", premium: "Premium (degrau 3)" };
 
 /**
