@@ -1301,8 +1301,9 @@ function Produto({ d, escala }) {
   if (d.oferta.servico.vitrine) {
     return (
       <Slide livre escala={escala} d={d} classe="rodape-suave">
-        <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">{`Como fica: o brand board da própria Last Lab. O da ${d.empresa || "sua marca"} segue o mesmo padrão.`}</P>
-        <img src={d.oferta.servico.vitrine} alt="" style={{ position: "absolute", left: 240, top: 120, width: 1440, height: 810, objectFit: "contain", borderRadius: 20, boxShadow: "0 30px 60px rgba(0,0,0,.12)" }} />
+        <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a" w={560}>Como fica</P>
+        <P x={77} y={110} s={26} peso={300} cor="#8a8a8a" w={520} lh={1.45}>{`O guia de marca da própria Last Lab, com os templates e o Instagram. O da ${d.empresa || "sua marca"} segue o mesmo padrão.`}</P>
+        <img src={d.oferta.servico.vitrine} alt="" style={{ position: "absolute", left: 700, top: 40, height: 900, width: "auto", borderRadius: 14, boxShadow: "0 30px 60px rgba(0,0,0,.14)" }} />
       </Slide>
     );
   }
