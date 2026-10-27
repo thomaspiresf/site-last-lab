@@ -1239,9 +1239,9 @@ function Entrega({ d, escala }) {
   const onePage = s.vitrineEntrega;
   const comMateriais = !onePage && d.materiais.length > 0;
   return (
-    <Slide escala={escala} d={d} classe={comMateriais ? "vt-slide-entrega" : ""}>
+    <Slide escala={escala} d={d} classe={comMateriais ? "vt-slide-entrega" : onePage ? "sem-rodape" : ""}>
       <Titulo t={tx("entrega", "titulo")} sub={s.promessa} />
-      <div className={`vt-entrega ${comMateriais ? "so-lista" : "mockup"}`}>
+      <div className={`vt-entrega ${comMateriais || onePage ? "so-lista" : "mockup"}`}>
         <div className="esq">
           <ul className={`vt-itens ${s.entregas.length > 4 ? "muitos" : ""}`}>
             {s.entregas.map((x) => (
@@ -1256,11 +1256,10 @@ function Entrega({ d, escala }) {
             <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>{s.ajustes} de ajuste</span>
           </div>
         </div>
-        {!comMateriais && (onePage
-          ? <div className="vt-onepage"><img src={onePage} alt="" /><span>Exemplo: o guia de marca da própria Last Lab</span></div>
-          : <PreviaEntrega d={d} />)}
+        {!comMateriais && !onePage && <PreviaEntrega d={d} />}
       </div>
       {comMateriais && <PalcoMateriais materiais={d.materiais} empresa={d.empresa} />}
+      {onePage && <img className="vt-onepage-img" src={onePage} alt="" />}
     </Slide>
   );
 }
@@ -1300,10 +1299,8 @@ function Produto({ d, escala }) {
   // vitrine: um entregável pronto, feito para a própria Last Lab (mostra o nível do que o cliente recebe)
   if (d.oferta.servico.vitrine) {
     return (
-      <Slide livre escala={escala} d={d} classe="rodape-suave">
-        <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a" w={560}>Como fica</P>
-        <P x={77} y={110} s={26} peso={300} cor="#8a8a8a" w={520} lh={1.45}>{`O guia de marca da própria Last Lab, com os templates e o Instagram. O da ${d.empresa || "sua marca"} segue o mesmo padrão.`}</P>
-        <img src={d.oferta.servico.vitrine} alt="" style={{ position: "absolute", left: 700, top: 40, height: 900, width: "auto", borderRadius: 14, boxShadow: "0 30px 60px rgba(0,0,0,.14)" }} />
+      <Slide livre escala={escala} d={d} classe="sem-rodape">
+        <img src={d.oferta.servico.vitrine} alt="" style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, objectFit: "cover" }} />
       </Slide>
     );
   }

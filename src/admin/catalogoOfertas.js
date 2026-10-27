@@ -9,7 +9,7 @@ export const SERVICOS = {
   padronizacao: {
     etapas: [{"nome": "Briefing", "texto": "1 hora de conversa e acesso ao que você usa hoje", "dias": 1, "cliente": "Participar da conversa de briefing", "aprovacao": false}, {"nome": "Logo e cores", "texto": "Logo ajustado, cores e fontes para aprovar", "dias": 4, "cliente": "Aprovar logo, cores e fontes", "aprovacao": true}, {"nome": "Templates e perfil", "texto": "3 templates no Canva, bio e destaques", "dias": 4, "cliente": "", "aprovacao": false}, {"nome": "Entrega", "texto": "Arquivos, Canva e 1 rodada de ajuste", "dias": 1, "cliente": "", "aprovacao": false}],
     exemplo: "redes",
-    vitrine: "/images/entregaveis/guia-padronizacao.jpg",
+    vitrine: "/images/entregaveis/guia-padronizacao-h.jpg",
     vitrineEntrega: "/images/entregaveis/guia-padronizacao.jpg",
     depois: ["Uma marca só, do Instagram ao orçamento", "Posts no padrão, feitos por você em minutos", "Quem chega entende de cara o que vocês fazem"],
     nome: "Padronização da marca",

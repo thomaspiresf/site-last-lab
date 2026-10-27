@@ -479,9 +479,9 @@
 /* o que você recebe */
 .vt-entrega { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 860px; gap: 72px; margin: -20px -45px -60px -45px; }
 .vt-entrega.mockup { grid-template-columns: 1fr 720px; }
-.vt-onepage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 0; }
-.vt-onepage img { height: 640px; margin-top: -40px; width: auto; border-radius: 6px; box-shadow: 0 30px 60px rgba(0, 0, 0, .16), 0 0 0 1px rgba(0, 0, 0, .06); }
-.vt-onepage span { margin-top: 14px; font-size: 20px; color: #8a8a8a; font-weight: 300; }
+/* a one-page de vitrine em destaque, à direita (o que você recebe) */
+.vt-onepage-img { position: absolute; right: 110px; top: 46px; height: 990px; width: auto; border-radius: 12px; box-shadow: 0 40px 80px rgba(0, 0, 0, .2), 0 0 0 1px rgba(0, 0, 0, .05); }
+.apr-slide.sem-rodape .apr-rodape { display: none; }
 .vt-entrega .esq { display: flex; flex-direction: column; justify-content: space-between; padding: 4px 0 8px; }
 .vt-itens { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 26px; }
 .vt-itens li { display: grid; grid-template-columns: 46px 1fr; gap: 22px; align-items: start; font-size: 32px; line-height: 1.3; }
