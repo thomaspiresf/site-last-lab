@@ -804,7 +804,9 @@
 
 /* Prévia e Perfil organizado, em 3 cliques: os dois sempre na tela; o destacado fica no tamanho cheio e o
    outro encolhe (nada passa do título nem do rodapé). 1º: hoje; 2º: como ficaria; 3º: os dois iguais */
-.pv-mov { transition: transform .9s cubic-bezier(.65, 0, .2, 1); }
+.pv-mov { transition: transform .9s cubic-bezier(.65, 0, .2, 1), opacity .9s ease; }
 .pv-mov.pv-hoje:not(.pv-perfil) { transform-origin: 100% 50%; }
 .pv-mov.pv-depois:not(.pv-perfil) { transform-origin: 0% 50%; }
-.apr-show.animado.em-passos.passo-0 .pv-depois, .apr-show.animado.em-passos.passo-1 .pv-hoje { transform: scale(.78); }
+.apr-show.animado.em-passos.passo-0 .pv-depois, .apr-show.animado.em-passos.passo-1 .pv-hoje { transform: scale(.78); opacity: .3; }
+/* slide escuro (Prévia): o próprio slide é escuro, sem quinas claras aparecendo */
+.apr-slide.fundo-escuro { background: #0b0b0c; }
