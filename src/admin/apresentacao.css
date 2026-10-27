@@ -801,3 +801,18 @@
 .apr-show.animado .apr-slide > .apr-crono2-nota { animation: apr-surge .6s ease 2.3s both !important; }
 @keyframes crono-linha { from { scale: 0 1; } to { scale: 1 1; } }
 @keyframes crono-marco { from { opacity: 0; scale: 0; } to { opacity: 1; scale: 1; } }
+
+/* Prévia e Perfil organizado, em 3 cliques: os dois sempre na tela; o destacado cresce (para fora) e o
+   outro encolhe (para dentro). 1º clique: hoje; 2º: como ficaria; 3º: os dois do mesmo tamanho */
+.pv-mov { position: relative; transition: transform .9s cubic-bezier(.65, 0, .2, 1); }
+.pv-mov.pv-hoje { transform-origin: 100% 35%; }
+.pv-mov.pv-depois { transform-origin: 0% 35%; }
+.apr-show.animado.em-passos.passo-0 .pv-hoje { transform: scale(1.18); }
+.apr-show.animado.em-passos.passo-0 .pv-depois { transform: scale(.8); }
+.apr-show.animado.em-passos.passo-1 .pv-hoje { transform: scale(.8); }
+.apr-show.animado.em-passos.passo-1 .pv-depois { transform: scale(1.18); }
+/* no slide 10 o post cresce a partir do meio (não sobe sobre o título) */
+.apr-show .pv-mov:not(.pv-perfil).pv-hoje { transform-origin: 100% 55%; }
+.apr-show .pv-mov:not(.pv-perfil).pv-depois { transform-origin: 0% 55%; }
+.apr-show.animado.em-passos.passo-0 .pv-mov:not(.pv-perfil).pv-hoje, .apr-show.animado.em-passos.passo-1 .pv-mov:not(.pv-perfil).pv-depois { transform: scale(1.12); }
+.apr-show.animado.em-passos.passo-0 .pv-mov:not(.pv-perfil).pv-depois, .apr-show.animado.em-passos.passo-1 .pv-mov:not(.pv-perfil).pv-hoje { transform: scale(.82); }

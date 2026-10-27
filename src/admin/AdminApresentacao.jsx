@@ -333,7 +333,7 @@ function medirFlip(raiz) {
 
 // slides que se revelam em etapas, a cada clique (só na apresentação animada). Visão externa: os três
 // achados juntos e, a cada clique, um deles ampliado
-const PASSOS = { antesdepois: 2 };
+const PASSOS = { antesdepois: 2, previa: 3, sistema: 3 };
 export const PASSOS_DO_SLIDE = { visao: (d) => 1 + Math.min(3, d?.observacoes?.length || 0) };
 
 const nPassos = (S) => S?.passos?.() || PASSOS[S?.sid] || 1;
@@ -1147,10 +1147,10 @@ function AntesDepois({ d, escala }) {
 }
 
 /** Um post como aparece no Instagram, no tema escuro: só o @, a imagem e os ícones em volta. */
-function PostIG({ x, src, conta, rotulo, destaque }) {
+function PostIG({ x, src, conta, rotulo, destaque, classe = "" }) {
   const branco = "#f5f5f5";
   return (
-    <div style={{ position: "absolute", left: x, top: 120, width: 500 }}>
+    <div style={{ position: "absolute", left: x, top: 120, width: 500 }}><div className={`pv-mov ${classe}`}>
       <p style={{ fontSize: 22, letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, color: destaque ? "#ef4b3a" : "#8a8a8a", marginBottom: 26 }}>{rotulo}</p>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16, color: branco, fontSize: 24, fontWeight: 600, fontFamily: "-apple-system, Helvetica Neue, Arial, sans-serif" }}>
         <span style={{ width: 48, height: 48, borderRadius: "50%", border: "1.5px solid #555", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#bbb" }}>{(conta[0] || "").toUpperCase()}</span>
@@ -1166,7 +1166,7 @@ function PostIG({ x, src, conta, rotulo, destaque }) {
         ))}
         <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke={branco} strokeWidth="1.6" strokeLinejoin="round" style={{ marginLeft: "auto" }}><path d="M6 3h12v18l-6-5-6 5z" /></svg>
       </div>
-    </div>
+    </div></div>
   );
 }
 
@@ -1177,11 +1177,11 @@ function Previa({ d, escala }) {
     <Slide livre escala={escala} d={d} classe="rodape-suave fundo-escuro">
       <div className="apr-caixa" style={{ left: 0, top: 0, width: 1920, height: 1080, background: "#0b0b0c" }} />
       <P x={77} y={44} s={36} peso={300} como="h2" cor="#9a9a9a">O mesmo post, com a marca padronizada</P>
-      <PostIG x={385} src={d.previa.hoje} conta={conta} rotulo="Hoje" />
-      <span className="apr-seta" style={{ left: 900, top: 488, background: "#1f1f21", borderColor: "#0b0b0c" }}>
+      <PostIG x={385} src={d.previa.hoje} conta={conta} rotulo="Hoje" classe="pv-hoje" />
+      <div style={{ position: "absolute", left: 900, top: 488, width: 120, height: 120 }}><span className="apr-seta pv-seta" style={{ left: 0, top: 0, background: "#1f1f21", borderColor: "#0b0b0c" }}>
         <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#f5f5f5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-      </span>
-      <PostIG x={1035} src={d.previa.templates[0]} conta={conta} rotulo="Com a marca padronizada" destaque />
+      </span></div>
+      <PostIG x={1035} src={d.previa.templates[0]} conta={conta} rotulo="Com a marca padronizada" destaque classe="pv-depois" />
     </Slide>
   );
 }
@@ -1191,7 +1191,13 @@ function Sistema({ d, escala }) {
   return (
     <Slide livre escala={escala} d={d} classe="rodape-suave">
       <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">O perfil inteiro, organizado</P>
-      {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 0, top: 110, width: 1920, height: 840, objectFit: "contain" }} />}
+      {d.previa.sistema && [["pv-hoje", 0, 915], ["pv-seta", 915, 90], ["pv-depois", 1005, 915]].map(([c, x, w]) => (
+        <div key={c} style={{ position: "absolute", left: x, top: 140, width: w, height: 781 }}>
+          <div className={`pv-mov pv-perfil ${c}`} style={{ width: w, height: 781, overflow: "hidden" }}>
+            <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: -x, top: 0, width: 1920, height: 781, maxWidth: "none" }} />
+          </div>
+        </div>
+      ))}
     </Slide>
   );
 }
