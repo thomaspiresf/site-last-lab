@@ -1282,6 +1282,15 @@ export function imagensDoProjeto(p) {
 /** "Mostrar o produto": os entregáveis de verdade (vitrine), ou o mockup do formato / galeria do projeto de exemplo. */
 function Produto({ d, escala }) {
   const ex = d.oferta.servico.exemplo;
+  // vitrine: um entregável pronto, feito para a própria Last Lab (mostra o nível do que o cliente recebe)
+  if (d.oferta.servico.vitrine) {
+    return (
+      <Slide livre escala={escala} d={d} classe="rodape-suave">
+        <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">{`Como fica: o brand board da própria Last Lab. O da ${d.empresa || "sua marca"} segue o mesmo padrão.`}</P>
+        <img src={d.oferta.servico.vitrine} alt="" style={{ position: "absolute", left: 240, top: 120, width: 1440, height: 810, objectFit: "contain", borderRadius: 20, boxShadow: "0 30px 60px rgba(0,0,0,.12)" }} />
+      </Slide>
+    );
+  }
   if (d.materiais.length) {
     const um = d.materiais.length === 1 ? d.materiais[0] : null;
     return (
