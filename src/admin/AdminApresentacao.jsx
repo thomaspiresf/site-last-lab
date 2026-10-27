@@ -69,10 +69,9 @@ export default function AdminApresentacao() {
 
   // links temporários dos prints (bucket privado)
   useEffect(() => {
-    (ap?.observacoes || []).forEach((o) => {
-      if (o.imagem && !urls[o.imagem]) {
-        getDiagnosticoArquivoUrl(o.imagem).then((u) => setUrls((x) => ({ ...x, [o.imagem]: u }))).catch(() => {});
-      }
+    const caminhos = [...(ap?.observacoes || []).map((o) => o.imagem), ap?.previa?.hoje, ...(ap?.previa?.templates || [])];
+    caminhos.forEach((c) => {
+      if (c && !urls[c]) getDiagnosticoArquivoUrl(c).then((u) => setUrls((x) => ({ ...x, [c]: u }))).catch(() => {});
     });
   }, [ap, urls]);
 
@@ -471,6 +470,19 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     salvar(obs(i, { imagem: caminho }));
   };
 
+  const previa = rascunho.previa || {};
+  const enviarPrevia = async (onde, arquivo) => {
+    if (!arquivo) return;
+    const caminho = await enviarImagemApresentacao(item.id, arquivo);
+    const templates = [...(previa.templates || [])];
+    if (onde === "hoje") salvar({ ...rascunho, previa: { ...previa, hoje: caminho } });
+    else { templates[onde] = caminho; salvar({ ...rascunho, previa: { ...previa, templates } }); }
+  };
+  const tirarPrevia = (onde) => {
+    if (onde === "hoje") salvar({ ...rascunho, previa: { ...previa, hoje: "" } });
+    else salvar({ ...rascunho, previa: { ...previa, templates: (previa.templates || []).map((c, j) => (j === onde ? "" : c)) } });
+  };
+
   const campo = "w-full px-3 py-2 rounded-lg bg-zinc-50 border border-zinc-200 text-sm outline-none focus:border-zinc-400";
   const rotulo = "block text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-1.5";
 
@@ -641,6 +653,27 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
       </div>
 
     </>,
+    previa: <>
+      {[["hoje", "Hoje (um post atual do cliente)"], [0, "Template 1 (4:5)"], [1, "Template 2 (4:5)"], [2, "Template 3 (story, 9:16)"]].map(([onde, nome]) => {
+        const c = onde === "hoje" ? previa.hoje : (previa.templates || [])[onde];
+        return (
+          <div key={onde} className="rounded-xl border border-zinc-200 p-3 flex items-center gap-2">
+            <span className="text-xs font-semibold text-zinc-600 flex-1">{nome}</span>
+            {c ? (
+              <>
+                {urls[c] && <img src={urls[c]} alt="" className="w-10 h-12 object-cover rounded" />}
+                <button onClick={() => tirarPrevia(onde)} className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-red-600"><X size={13} /> Tirar</button>
+              </>
+            ) : (
+              <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-600 cursor-pointer hover:text-black">
+                <ImagePlus size={14} /> Enviar
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => enviarPrevia(onde, e.target.files?.[0])} />
+              </label>
+            )}
+          </div>
+        );
+      })}
+    </>,
     casos: <>
       <div className="flex flex-col gap-2">
         <span className={rotulo}>Casos do portfólio</span>
@@ -663,6 +696,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     custo: [SEC.custo, fixo("O texto padrão vem da área da oferta; aqui você ajusta só para este lead. Use **assim** para o negrito.")],
     comeco: [doCatalogo("Os três cartões vêm da escada da área desta oferta.", aid ? `a=${aid}` : `s=${svc}`)],
     oferta: [doCatalogo("O nome é a oferta escolhida no diagnóstico; a frase é a promessa do serviço.")],
+    previa: [fixo("Mostre como a marca do cliente pode ficar: um post de hoje e até 3 templates de exemplo. O slide só aparece com pelo menos um template."), SEC.previa],
     antesdepois: [fixo("O lado \"Antes\" usa os títulos das observações da Visão externa."), <button key="b" onClick={() => irPara("visao")} className="self-start text-xs font-semibold underline underline-offset-2">Editar as observações</button>, doCatalogo("O lado \"Depois\" vem do serviço.")],
     casos: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
     casos2: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
@@ -690,7 +724,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 
 export const NOMES_SLIDES = {
   capa: "Capa", objetivo: "Nossa conversa", conversa: "O seu momento", respostas: "Visão interna", visao: "Visão externa",
-  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", casos: "Caso 1", casos2: "Caso 2",
+  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", previa: "Prévia da marca", casos: "Caso 1", casos2: "Caso 2",
   entrega: "O que você recebe", produto: "Como fica", paginas: "Página a página", paginas2: "Página a página (2º material)", paginas3: "Página a página (3º material)", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
   proximos: "Cronograma", fim: "Fechamento",
 };
@@ -786,6 +820,11 @@ export function montarDados(item, ap, urls = {}) {
     segundo: segundo?.nome,
     visaoTitulo: ap.visaoTitulo || "",
     observacoes: (ap.observacoes || []).map((o) => ({ ...o, url: o.imagem ? urls[o.imagem] : "" })),
+    // prévia: um post de hoje e até 3 templates feitos com a marca do cliente
+    previa: {
+      hoje: ap.previa?.hoje ? urls[ap.previa.hoje] || "" : "",
+      templates: (ap.previa?.templates || []).filter(Boolean).map((c) => urls[c] || ""),
+    },
     custo,
     oferta,
     investimento: ap.investimento || oferta.servico.investimento || "",
@@ -1089,6 +1128,33 @@ function AntesDepois({ d, escala }) {
       <span className="apr-seta ad-seta" style={{ left: 895, top: 498 }}>
         <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </span>
+    </Slide>
+  );
+}
+
+/** Prévia da marca do cliente: um post de hoje ao lado dos templates de exemplo (imagens enviadas no painel). */
+function Previa({ d, escala }) {
+  const pos = [[610, 432], [1072, 432], [1534, 304]];
+  const nomes = ["Post de caso", "Post de serviço", "Story"];
+  const foto = { position: "absolute", top: 250, height: 540, objectFit: "cover", objectPosition: "top", borderRadius: 18, boxShadow: "0 18px 40px rgba(0,0,0,.14)" };
+  return (
+    <Slide livre escala={escala} d={d}>
+      <P x={77} y={40} s={88} como="h2" cor="#000">{`Como a ${d.empresa || "sua marca"} pode ficar`}</P>
+      <P x={81} y={190} s={30} peso={300} cor="#999999">Hoje</P>
+      <P x={610} y={190} s={30} peso={300} cor="#999999">Com a marca padronizada</P>
+      {d.previa.hoje
+        ? <img src={d.previa.hoje} alt="" style={{ ...foto, left: 81, width: 432, filter: "saturate(.85)" }} />
+        : <div className="apr-caixa" style={{ left: 81, top: 250, width: 432, height: 540, background: "#e7e6e6", borderRadius: 18 }} />}
+      <span className="apr-seta" style={{ left: 532, top: 500 }}>
+        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      </span>
+      {d.previa.templates.slice(0, 3).map((src, i) => (
+        <React.Fragment key={i}>
+          {src && <img src={src} alt="" style={{ ...foto, left: pos[i][0], width: pos[i][1] }} />}
+          <P x={pos[i][0]} y={812} s={26} peso={300} cor="#434343">{nomes[i]}</P>
+        </React.Fragment>
+      ))}
+      <P x={81} y={812} s={26} peso={300} cor="#434343">Um post atual</P>
     </Slide>
   );
 }
@@ -1550,5 +1616,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["previa", Previa, (d) => d.previa.templates.length > 0], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];

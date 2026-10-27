@@ -104,13 +104,14 @@ export function montarRoteiro(item, dados, prep) {
       ],
     },
     {
-      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["comeco", "oferta", "antesdepois", "casos", "casos2"], dica: "A hora da autoridade. Fale do resultado, não do serviço.",
+      id: "plano", titulo: "Plano de ação", tempo: "22 a 27 min", slides: ["comeco", "oferta", "antesdepois", "previa", "casos", "casos2"], dica: "A hora da autoridade. Fale do resultado, não do serviço.",
       falas: [
         `"Independente de trabalharmos juntos, te falo o que eu faria se fosse você: começaria pelo ponto que mais pesa."`,
         `"Hoje é isto que a gente viu. Depois, é isto que muda." Leia o "depois" olhando para o cliente.`,
         `"Qual desses resultados faz mais diferença para você agora?"`,
+        dados.previa?.templates?.length && `Na prévia: "Este é um post de vocês hoje. Estes são exemplos com a marca padronizada. Imagina o perfil inteiro assim." Deixe o cliente olhar em silêncio.`,
         `Nos casos: "Foi o mesmo caminho que fizemos com estes clientes."`,
-      ],
+      ].filter(Boolean),
     },
     {
       id: "proposta", titulo: "Proposta", tempo: "27 a 35 min", slides: ["entrega", "produto", "sessao", "passo", "condicoes"], dica: "Fale o valor e fique em silêncio. Quem fala primeiro depois do preço perde.",

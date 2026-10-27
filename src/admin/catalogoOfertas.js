@@ -6,6 +6,26 @@
 // dias úteis, o que depende do cliente e se termina numa aprovação: vira o cronograma da proposta.
 
 export const SERVICOS = {
+  padronizacao: {
+    etapas: [{"nome": "Briefing", "texto": "1 hora de conversa e acesso ao que você usa hoje", "dias": 1, "cliente": "Participar da conversa de briefing", "aprovacao": false}, {"nome": "Logo e cores", "texto": "Logo ajustado, cores e fontes para aprovar", "dias": 4, "cliente": "Aprovar logo, cores e fontes", "aprovacao": true}, {"nome": "Templates e perfil", "texto": "3 templates no Canva, bio e destaques", "dias": 4, "cliente": "", "aprovacao": false}, {"nome": "Entrega", "texto": "Arquivos, Canva e 1 rodada de ajuste", "dias": 1, "cliente": "", "aprovacao": false}],
+    exemplo: "redes",
+    depois: ["Uma marca só, do Instagram ao orçamento", "Posts no padrão, feitos por você em minutos", "Quem chega entende de cara o que vocês fazem"],
+    nome: "Padronização da marca",
+    promessa: "Uma marca só, com cara de empresa séria, fácil de manter.",
+    pitch: "A sua marca passa a ter um padrão: o logo que vocês já têm, ajustado; cores e fontes definidas; e templates prontos para postar no mesmo estilo, sem começar do zero. Quem chega pelo Instagram entende o que vocês fazem e vê uma empresa organizada, antes de pedir orçamento.",
+    fechamento: "Vamos deixar a sua marca **com cara de empresa séria?**",
+    entregas: [
+      "Logo atual ajustado e vetorizado, com versão principal e símbolo",
+      "Brand board de 1 página: cores, fontes e uso do logo",
+      "3 templates editáveis no Canva: caso, serviço e story",
+      "Bio e destaques do Instagram reescritos",
+    ],
+    naoInclui: "logo novo do zero, manual completo, papelaria, site e produção mensal de posts",
+    prazo: "2 semanas",
+    investimento: "R$ 1.400",
+    parcelas: 3,
+    ajustes: "1 rodada",
+  },
   revisao: {
     etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao que você usa hoje", "dias": 1, "cliente": "Enviar acessos e materiais atuais", "aprovacao": false}, {"nome": "Ajuste visual", "texto": "Logo, cores e fontes para aprovar", "dias": 4, "cliente": "Aprovar logo, cores e fontes", "aprovacao": true}, {"nome": "Aplicação", "texto": "Perfil, WhatsApp e brand board", "dias": 3, "cliente": "", "aprovacao": false}, {"nome": "Ajuste", "texto": "1 rodada, por escrito", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "marca",
@@ -871,7 +891,7 @@ export const AREAS = {
   },
   valor: {
     nome: "Percepção de valor", foco: "Como parecer", problema: "O cliente acha caro; a marca parece mais barata que o trabalho.",
-    entradas: ["revisao", "kit"],
+    entradas: ["padronizacao", "revisao", "kit"],
     principal: { servico: "valor_principal", nome: "Identidade visual", pitch: "Uma identidade visual completa, pensada para o seu negócio, que faz o cliente perceber o valor antes de ver o preço.", entregas: "Conceito, logo e variações, sistema visual (cores, fontes, grafismos, fotos), manual de marca, papelaria e kit para redes", prazo: "4 a 6 semanas", valor: "R$ 4.500 a R$ 9.000" },
     premium: { servico: "valor_premium", nome: "Rebranding", entregas: "Imersão e diagnóstico, posicionamento e tom de voz, nova identidade visual, manual, aplicações principais e plano de lançamento", prazo: "8 a 12 semanas", valor: "R$ 12.000 a R$ 25.000" },
     custo: { frase: "O cliente decide pelo preço **antes de conhecer o seu valor.**", consequencias: ["Quem compara pela aparência escolhe o mais barato.", "Você negocia desconto em vez de valor.", "O trabalho bom não aparece na primeira impressão."] },
@@ -1009,6 +1029,14 @@ export const CUSTO_PADRAO = {
 // Ponto de partida do slide "O que eu vi de fora", pelo serviço que vamos oferecer: as
 // observações preparam o terreno para ele. Vem preenchido e é editado lead a lead.
 export const VISAO_PADRAO = {
+  padronizacao: {
+    titulo: "A marca não tem um padrão: cada peça sai de um jeito.",
+    observacoes: [
+      { titulo: "Logo diferente em cada lugar", texto: "Instagram, WhatsApp e orçamento mostram versões diferentes." },
+      { titulo: "Posts sem padrão", texto: "Cada post parece de uma empresa diferente." },
+      { titulo: "Não fica claro o que vocês fazem", texto: "Quem chega não sabe qual é o serviço principal." },
+    ],
+  },
   clareza_principal: {
     titulo: "Em nenhum lugar fica claro o que você faz e para quem.",
     observacoes: [
@@ -1077,6 +1105,7 @@ export const VISAO_PADRAO = {
 
 // Casos do portfólio (ids de src/data/projects.js) que mais conversam com cada serviço.
 export const CASOS_PADRAO = {
+  padronizacao: ["studio-vzo", "una"],
   revisao: ["studio-vzo", "una"],
   pagina: ["site-pronto-pra-partir", "semantix"],
   instagram: ["impacto-conquer", "quarteirao-magico"],
@@ -1138,7 +1167,11 @@ export function aplicarCatalogo(dados = {}) {
     }
     // serviços que saíram da escada não voltam pelo catálogo salvo antes da remoção
     if (["servicos", "visao", "casos"].includes(grupo)) for (const id of REMOVIDOS) delete final[id];
-    if (grupo === "areas") for (const k of Object.keys(final)) final[k] = { ...final[k], entradas: (final[k].entradas || []).filter((id) => !REMOVIDOS.includes(id)) };
+    // serviços criados no código depois do catálogo salvo entram na área deles (o salvo não os conhece)
+    if (grupo === "areas") for (const k of Object.keys(final)) {
+      const novos = (ORIGINAL.areas[k]?.entradas || []).filter((id) => !(dados.servicos || {})[id] && !(final[k].entradas || []).includes(id));
+      final[k] = { ...final[k], entradas: [...novos, ...(final[k].entradas || [])].filter((id) => !REMOVIDOS.includes(id)) };
+    }
     if (grupo === "mapa") for (const [nome, id] of Object.entries(final)) if (REMOVIDOS.includes(id)) final[nome] = ORIGINAL.mapa[nome] || "revisao";
     for (const k of Object.keys(alvo)) delete alvo[k];
     Object.assign(alvo, JSON.parse(JSON.stringify(final)));

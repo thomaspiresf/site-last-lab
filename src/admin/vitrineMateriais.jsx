@@ -8,6 +8,7 @@ import { PaginaCtx } from "./docs/ctx";
 
 const MATERIAIS = {
   mensagem: ["guia-mensagem"],
+  padronizacao: ["brand-board"],
   revisao: ["brand-board"],
   kit: ["brand-board"],
   instagram: ["guia-editorial"],
