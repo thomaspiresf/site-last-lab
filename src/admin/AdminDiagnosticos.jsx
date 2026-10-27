@@ -27,7 +27,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
 import BotaoExcluir from "./components/BotaoExcluir";
-import { AREAS, ESTRUTURA, SERVICOS, areaDoServico, degrauDoServico, ofertaDoLead, servicoCompleto } from "./catalogoOfertas";
+import { AREAS, ESTRUTURA, SERVICOS, areaDoServico, degrauDoServico, nomeOferta, ofertaDoLead, servicoCompleto } from "./catalogoOfertas";
 import { carregarCatalogo } from "./carregarCatalogo";
 import { outrosCanais } from "./preparacao";
 import {
@@ -281,7 +281,7 @@ export default function AdminDiagnosticos() {
                     {[x.apresentacao?.empresa && x.nome, x.dados?.devolutiva?.perfil_textos?.segmento, equipeDe(x)].filter(Boolean).join(" · ")}
                   </p>
                   <p className="text-sm font-semibold mt-1" style={{ color: LARANJA }}>
-                    → {x.ofertaEntrada || "—"}
+                    → {nomeOferta(x.ofertaEntrada) || "—"}
                   </p>
                   <div className="flex items-center gap-2 mt-1 text-xs text-zinc-500 flex-wrap">
                     {x.dados?.origem === "manual"

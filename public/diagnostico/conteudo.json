@@ -804,7 +804,7 @@
     "_nota": "Serviço de entrada sugerido para o retorno (não aparece na página, vai para a planilha). Regra: pilar mais fraco → oferta do pilar; 'Ainda no começo' → oferta própria; 'Marca estruturada' → oferta do pilar mais fraco, como refinamento. Segundo ponto fraco vira complemento.",
     "por_pilar": {
       "A": { "nome": "Revisão de pontos de contato", "descricao": "Ajuste da proposta, do perfil e dos materiais que mais pesam na percepção de preço." },
-      "B": { "nome": "Workshop de mensagem", "descricao": "Um encontro para definir a frase, para quem é e o tom da marca, entregue como guia." },
+      "B": { "nome": "Revisão de pontos de contato", "descricao": "Ajuste do perfil, da bio e dos materiais que mais pesam, para todos dizerem com clareza o que você faz e para quem." },
       "C": {
         "_nota": "Escolhe pela pergunta mais fraca do pilar (empate: a primeira).",
         "por_pergunta_mais_fraca": {

@@ -6,24 +6,6 @@
 // dias úteis, o que depende do cliente e se termina numa aprovação: vira o cronograma da proposta.
 
 export const SERVICOS = {
-  mensagem: {
-    etapas: [{"nome": "Formulário", "texto": "Você responde 8 perguntas antes da sessão", "dias": 2, "cliente": "Responder o formulário", "aprovacao": false}, {"nome": "Workshop", "texto": "2 horas, online, juntos", "dias": 1, "cliente": "Reservar 2 horas na agenda", "aprovacao": false}, {"nome": "Guia de mensagem", "texto": "O PDF com tudo o que definimos", "dias": 5, "cliente": "Aprovar o guia", "aprovacao": true}, {"nome": "Ajuste", "texto": "1 rodada, por escrito", "dias": 2, "cliente": "", "aprovacao": false}],
-    exemplo: "guia",
-    depois: ["Uma frase que qualquer cliente consegue repetir", "Bio, site e apresentação dizendo a mesma coisa", "Um cliente ideal claro, para atrair mais gente certa"],
-    nome: "Workshop de mensagem",
-    promessa: "Uma frase que qualquer cliente consegue repetir.",
-    pitch: "Em 2 horas, a gente tira da sua cabeça o que torna o seu negócio único e transforma numa mensagem que qualquer cliente entende e repete: o que você faz, para quem e por que escolher você. Você sai com tudo pronto para usar na bio, no site e em cada conversa de venda.",
-    fechamento: "Vamos fazer todo mundo entender **o que você faz?**",
-    entregas: [
-      "Guia de mensagem: frase, para quem é e o que diferencia",
-      "Tom de voz e 3 mensagens-chave",
-      "Bio do Instagram reescrita",
-    ],
-    naoInclui: "identidade visual, site e produção de conteúdo",
-    prazo: "2 semanas",
-    investimento: null,
-    ajustes: "1 rodada",
-  },
   revisao: {
     etapas: [{"nome": "Briefing", "texto": "Reunião e acesso ao que você usa hoje", "dias": 1, "cliente": "Enviar acessos e materiais atuais", "aprovacao": false}, {"nome": "Ajuste visual", "texto": "Logo, cores e fontes para aprovar", "dias": 4, "cliente": "Aprovar logo, cores e fontes", "aprovacao": true}, {"nome": "Aplicação", "texto": "Perfil, WhatsApp e brand board", "dias": 3, "cliente": "", "aprovacao": false}, {"nome": "Ajuste", "texto": "1 rodada, por escrito", "dias": 2, "cliente": "", "aprovacao": false}],
     exemplo: "marca",
@@ -880,7 +862,7 @@ export const SERVICOS = {
 export const AREAS = {
   clareza: {
     nome: "Clareza", foco: "O que dizer", problema: "Ninguém entende o que você faz.",
-    entradas: ["mensagem"],
+    entradas: [], // o Workshop de mensagem saiu em 27/10/2026; quem tem Clareza fraca recebe a Revisão de pontos de contato
     principal: { servico: "clareza_principal", nome: "Posicionamento de marca", pitch: "Do posicionamento ao texto final: uma proposta de valor clara, uma personalidade definida e as palavras certas em cada canal da sua marca.", entregas: "2 sessões, análise de 5 concorrentes, plataforma de marca (propósito, proposta de valor, público, personalidade, manifesto), guia de tom completo, textos do site e da apresentação", prazo: "3 a 4 semanas", valor: "R$ 3.500 a R$ 6.000" },
     premium: { servico: "clareza_premium", nome: "Posicionamento e arquitetura de marca", entregas: "Imersão e entrevistas com clientes, plataforma de marca, tom de voz e manifesto, arquitetura das linhas de serviço com naming e apresentação para a equipe", prazo: "5 a 8 semanas", valor: "R$ 8.000 a R$ 12.000" },
     custo: { frase: "Se o cliente não sabe explicar o que você faz, ele **não consegue te indicar.**", consequencias: ["Cada cliente entende uma coisa diferente.", "A indicação chega sem saber o que pedir.", "O preço vira a única comparação."] },
@@ -960,7 +942,7 @@ export function servicoCompleto(id) {
 // Nome da oferta no diagnóstico → serviço do catálogo.
 export const MAPA = {
   "Revisão de pontos de contato": "revisao",
-  "Workshop de mensagem": "mensagem",
+  "Workshop de mensagem": "revisao", // leads antigos: o workshop saiu da escada em 27/10/2026
   "Landing page": "pagina",
   "Presença que passa confiança": "pagina",
   "Página de autoridade": "pagina",
@@ -1035,14 +1017,6 @@ export const VISAO_PADRAO = {
       { titulo: "Orçamento sem cara de marca", texto: "Um trabalho de alto valor chega num documento simples demais." },
     ],
   },
-  mensagem: {
-    titulo: "Em nenhum lugar fica claro o que você faz e para quem.",
-    observacoes: [
-      { titulo: "Bio genérica", texto: "A frase da bio serviria para qualquer empresa do setor." },
-      { titulo: "Cada canal diz uma coisa", texto: "Site e Instagram contam histórias diferentes sobre o negócio." },
-      { titulo: "Serviços demais", texto: "Quem chega não sabe por onde começar." },
-    ],
-  },
   pagina: {
     titulo: "Quem chega por indicação não encontra o seu trabalho.",
     observacoes: [
@@ -1096,7 +1070,6 @@ export const VISAO_PADRAO = {
 // Casos do portfólio (ids de src/data/projects.js) que mais conversam com cada serviço.
 export const CASOS_PADRAO = {
   revisao: ["studio-vzo", "una"],
-  mensagem: ["una", "studio-vzo"],
   pagina: ["site-pronto-pra-partir", "semantix"],
   instagram: ["impacto-conquer", "quarteirao-magico"],
   proposta: ["boo", "semantix"],
@@ -1129,6 +1102,12 @@ export const CASOS_TEXTOS = {};
 
 const GRUPOS = { estrutura: ESTRUTURA, textos: TEXTOS, casosTextos: CASOS_TEXTOS, servicos: SERVICOS, areas: AREAS, continuidade: CONTINUIDADE, visao: VISAO_PADRAO, casos: CASOS_PADRAO, custo: CUSTO_PADRAO, mapa: MAPA };
 const ORIGINAL = JSON.parse(JSON.stringify(GRUPOS));
+// Workshop de mensagem: tirado das ofertas em 27/10/2026 (pouco valor percebido, depende demais do cliente)
+const REMOVIDOS = ["mensagem"];
+
+/** Ofertas do diagnóstico que saíram da escada → serviço que as substitui (leads antigos mostram o novo). */
+const SUBSTITUIDAS = { "Workshop de mensagem": "revisao" };
+export const nomeOferta = (nome) => (SUBSTITUIDAS[nome] ? servicoCompleto(SUBSTITUIDAS[nome])?.nome || nome : nome);
 
 /** O catálogo padrão do código (para comparar e para "voltar ao padrão"). */
 export const catalogoPadrao = () => JSON.parse(JSON.stringify(ORIGINAL));
@@ -1147,6 +1126,10 @@ export function aplicarCatalogo(dados = {}) {
       if (!ORIGINAL.areas[k]) continue;
       for (const deg of ["principal", "premium"]) final[k] = { ...final[k], [deg]: { ...ORIGINAL.areas[k][deg], ...(final[k][deg] || {}) } };
     }
+    // serviços que saíram da escada não voltam pelo catálogo salvo antes da remoção
+    if (["servicos", "visao", "casos"].includes(grupo)) for (const id of REMOVIDOS) delete final[id];
+    if (grupo === "areas") for (const k of Object.keys(final)) final[k] = { ...final[k], entradas: (final[k].entradas || []).filter((id) => !REMOVIDOS.includes(id)) };
+    if (grupo === "mapa") for (const [nome, id] of Object.entries(final)) if (REMOVIDOS.includes(id)) final[nome] = ORIGINAL.mapa[nome] || "revisao";
     for (const k of Object.keys(alvo)) delete alvo[k];
     Object.assign(alvo, JSON.parse(JSON.stringify(final)));
   }
@@ -1162,5 +1145,5 @@ export function ofertaDoLead(item) {
   const servico = servicoCompleto(id);
   // o passo seguinte (fechamento do roteiro): entrada → principal, principal → premium, premium → recorrência
   const projeto = degrau === "entrada" ? area?.principal.nome : degrau === "principal" ? area?.premium.nome : CONTINUIDADE[area?.continuidade]?.nome;
-  return { titulo: oferta?.nome || servico.nome, servicoId: id, servico: { ...servico, projeto: projeto || "" }, area, degrau };
+  return { titulo: nomeOferta(oferta?.nome) || servico.nome, servicoId: id, servico: { ...servico, projeto: projeto || "" }, area, degrau };
 }
