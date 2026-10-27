@@ -917,6 +917,32 @@ export async function deleteContato(id) {
   if (error) throw error;
 }
 
+// ---------- agenda de reuniões ----------
+
+const COLUNAS_REUNIAO = "*, lead:diagnosticos(id, nome, status, apresentacao, empresa:dados->>empresa)";
+
+/** Reuniões a partir de uma data (ISO), com o nome e a empresa do lead ligado. */
+export async function listReunioes(desde) {
+  let q = supabase.from("reunioes").select(COLUNAS_REUNIAO).order("inicio", { ascending: true });
+  if (desde) q = q.gte("inicio", desde);
+  const { data, error } = await q;
+  if (error) throw error;
+  return data;
+}
+
+/** Cria (sem id) ou atualiza (com id) uma reunião. */
+export async function salvarReuniao({ id, ...campos }) {
+  const q = id ? supabase.from("reunioes").update(campos).eq("id", id) : supabase.from("reunioes").insert(campos);
+  const { data, error } = await q.select(COLUNAS_REUNIAO).single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteReuniao(id) {
+  const { error } = await supabase.from("reunioes").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function updateDiagnostico(id, { status, anotacoes, analise, personaAvaliacao, personaSugerida, apresentacao, valorFechado, proximaAcao, proximaAcaoEm }) {
   const patch = {};
   if (proximaAcao !== undefined) patch.proxima_acao = proximaAcao || null;

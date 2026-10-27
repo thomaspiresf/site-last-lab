@@ -20,6 +20,7 @@ import AdminClientDetail from "./admin/AdminClientDetail";
 import AdminClientReferences from "./admin/AdminClientReferences";
 import AdminBriefings from "./admin/AdminBriefings";
 import AdminDiagnosticos from "./admin/AdminDiagnosticos";
+import AdminAgenda from "./admin/AdminAgenda";
 import AdminDiagnosticoAjustes from "./admin/AdminDiagnosticoAjustes";
 import AdminAnalytics from "./admin/AdminAnalytics";
 import AdminApresentacao from "./admin/AdminApresentacao";
@@ -101,6 +102,7 @@ function Shell() {
           <Route path="/admin/briefings" element={<AdminBriefings />} />
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/diagnosticos" element={<AdminDiagnosticos />} />
+          <Route path="/admin/agenda" element={<AdminAgenda />} />
           <Route path="/admin/diagnosticos/ajustes" element={<AdminDiagnosticoAjustes />} />
           <Route path="/admin/diagnosticos/:id/apresentar" element={<AdminApresentacao />} />
           <Route path="/admin/diagnosticos/:id/roteiro" element={<AdminRoteiro />} />

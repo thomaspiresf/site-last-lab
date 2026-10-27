@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Link, useLocation } from "react-router-dom";
-import { LayoutGrid, LogOut, FileText, Sparkles, Gauge, Package, BookOpen, BarChart3 } from "lucide-react";
+import { LayoutGrid, LogOut, FileText, Sparkles, Gauge, Package, BookOpen, BarChart3, CalendarDays } from "lucide-react";
 import { getAdminSession, onAdminAuthChange, adminLogout } from "../lib/api";
 import { marcarInterno } from "../lib/analytics";
 
@@ -67,6 +67,15 @@ export default function AdminLayout({ children }) {
             >
               <Gauge size={16} />
               Diagnósticos
+            </Link>
+            <Link
+              to="/admin/agenda"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                location.pathname.startsWith("/admin/agenda") ? "text-black" : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <CalendarDays size={16} />
+              Agenda
             </Link>
             <Link
               to="/admin/servicos"

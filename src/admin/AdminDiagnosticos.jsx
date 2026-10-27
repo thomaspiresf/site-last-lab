@@ -24,7 +24,7 @@ import {
   X,
   Sparkles,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AdminLayout from "./AdminLayout";
 import BotaoExcluir from "./components/BotaoExcluir";
 import { AREAS, ESTRUTURA, SERVICOS, areaDoServico, degrauDoServico, nomeOferta, ofertaDoLead, servicoCompleto } from "./catalogoOfertas";
@@ -174,6 +174,13 @@ export default function AdminDiagnosticos() {
     setAba("concluidos");
     setAbertoId(id);
   };
+
+  // /admin/diagnosticos?lead=<id> (links da agenda) abre a ficha do lead
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    const id = params.get("lead");
+    if (id && itens?.some((x) => x.id === id)) { setAba("concluidos"); setAbertoId(id); setParams({}, { replace: true }); }
+  }, [itens]);
 
   const atual = itens?.find((x) => x.id === abertoId);
 
@@ -856,8 +863,8 @@ function Ficha({ item, onVoltar, onAtualizar, onExcluir, onSubstituir, sessao })
         </span>
         <span className="text-sm font-semibold">Abrir →</span>
       </Link>
-      <Link to={`/admin/diagnosticos/${item.id}/guia`} className="-mt-2 self-start text-xs font-semibold text-zinc-500 hover:text-black">
-        Guia de mensagem (entregável do Workshop de mensagem) →
+      <Link to={`/admin/agenda?lead=${item.id}`} className="-mt-2 self-start text-xs font-semibold text-zinc-500 hover:text-black">
+        Marcar reunião na agenda →
       </Link>
       <Link to={`/admin/diagnosticos/${item.id}/guia-marca`} className="-mt-2 self-start text-xs font-semibold text-zinc-500 hover:text-black">
         Guia da marca (entregável do Posicionamento de marca) →
