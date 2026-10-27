@@ -1009,6 +1009,14 @@ export const CUSTO_PADRAO = {
 // Ponto de partida do slide "O que eu vi de fora", pelo serviço que vamos oferecer: as
 // observações preparam o terreno para ele. Vem preenchido e é editado lead a lead.
 export const VISAO_PADRAO = {
+  clareza_principal: {
+    titulo: "Em nenhum lugar fica claro o que você faz e para quem.",
+    observacoes: [
+      { titulo: "Bio genérica", texto: "A frase da bio serviria para qualquer empresa do setor." },
+      { titulo: "Cada canal diz uma coisa", texto: "Site e Instagram contam histórias diferentes sobre o negócio." },
+      { titulo: "Serviços demais", texto: "Quem chega não sabe por onde começar." },
+    ],
+  },
   revisao: {
     titulo: "O trabalho é premium, mas a marca parece mais barata que ele.",
     observacoes: [
@@ -1082,8 +1090,10 @@ export const CASOS_PADRAO = {
 for (const [aid, a] of Object.entries(AREAS)) {
   for (const deg of ["principal", "premium"]) {
     const sid = a[deg]?.servico;
-    if (sid && !VISAO_PADRAO[sid]) VISAO_PADRAO[sid] = JSON.parse(JSON.stringify(VISAO_PADRAO[a.entradas[0]]));
-    if (sid && !CASOS_PADRAO[sid]) CASOS_PADRAO[sid] = [...(CASOS_PADRAO[a.entradas[0]] || [])];
+    // área sem oferta de entrada (Clareza, desde 27/10/2026): o premium herda do principal
+    const base = a.entradas[0] || a.principal?.servico;
+    if (sid && !VISAO_PADRAO[sid] && VISAO_PADRAO[base]) VISAO_PADRAO[sid] = JSON.parse(JSON.stringify(VISAO_PADRAO[base]));
+    if (sid && !CASOS_PADRAO[sid]) CASOS_PADRAO[sid] = [...(CASOS_PADRAO[base] || ["una", "studio-vzo"])];
   }
 }
 
