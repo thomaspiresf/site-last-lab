@@ -115,8 +115,9 @@ export function montarRoteiro(item, dados, prep) {
       ].filter(Boolean),
     },
     {
-      id: "proposta", titulo: "Proposta", tempo: "27 a 35 min", slides: ["entrega", "produto", "sessao", "passo", "condicoes"], dica: "Fale o valor e fique em silêncio. Quem fala primeiro depois do preço perde.",
+      id: "proposta", titulo: "Proposta", tempo: "27 a 35 min", slides: ["entrega", "produto", "aplicacoes", "sessao", "passo", "condicoes"], dica: "Fale o valor e fique em silêncio. Quem fala primeiro depois do preço perde.",
       falas: [
+        dados.oferta.servico.vitrine && `No brand board e nas aplicações: "Este é o nível do que vocês recebem. Fizemos para a nossa própria marca, e o da ${dados.empresa || "sua empresa"} segue o mesmo padrão: nos posts, nos stories, na proposta e no WhatsApp."`,
         `"Para começar, minha proposta é ${dados.oferta.titulo}. Você recebe: ${dados.oferta.servico.entregas.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}."`,
         dados.ancora
           ? `"Tem dois caminhos: ${dados.oferta.titulo}, ${dados.investimento || "[valor]"}${dados.parcelamento ? ` (${dados.parcelamento})` : ""}, e ${dados.ancora.nome.charAt(0).toLowerCase() + dados.ancora.nome.slice(1)}, ${dados.investimentoProjeto || `a partir de ${(String(dados.ancora.valor).match(/R\$\s*[\d.]+/) || ["[valor]"])[0]}`}. ${dados.destaque === "projeto" ? `Para o seu momento, eu recomendo ${dados.ancora.nome.charAt(0).toLowerCase() + dados.ancora.nome.slice(1)}.` : `Para o seu momento, eu recomendo ${dados.oferta.titulo}.`}${dados.degrau === "entrada" && dados.destaque !== "projeto" ? " E o que você investir vira desconto se seguir para o próximo passo em até 60 dias." : ""}"`

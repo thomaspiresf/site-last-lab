@@ -706,6 +706,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     casos: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
     casos2: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
     entrega: [doCatalogo("A lista do que o cliente recebe e a ilustração vêm do serviço.")],
+    aplicacoes: [fixo("Imagem de vitrine do serviço: a marca da Last Lab aplicada nos posts e pontos de contato.")],
     produto: [doCatalogo("A ilustração do entregável vem do serviço (campo \"Como fica\").")],
     sessao: [fixo("Este slide é igual para todos os leads do workshop.")],
     passo: [SEC.invest, SEC.conta, doCatalogo("Os textos comerciais das duas opções vêm do serviço e da área.")],
@@ -730,7 +731,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 export const NOMES_SLIDES = {
   capa: "Capa", objetivo: "Nossa conversa", conversa: "O seu momento", respostas: "Visão interna", visao: "Visão externa",
   custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", previa: "Prévia da marca", sistema: "Perfil organizado", casos: "Caso 1", casos2: "Caso 2",
-  entrega: "O que você recebe", produto: "Como fica", paginas: "Página a página", paginas2: "Página a página (2º material)", paginas3: "Página a página (3º material)", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
+  entrega: "O que você recebe", produto: "Como fica", aplicacoes: "Aplicações", paginas: "Página a página", paginas2: "Página a página (2º material)", paginas3: "Página a página (3º material)", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
   proximos: "Cronograma", fim: "Fechamento",
 };
 
@@ -1185,6 +1186,16 @@ function Sistema({ d, escala }) {
     <Slide livre escala={escala} d={d} classe="rodape-suave">
       <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">O perfil inteiro, organizado</P>
       {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 0, top: 110, width: 1920, height: 840, objectFit: "contain" }} />}
+    </Slide>
+  );
+}
+
+/** Aplicações de vitrine: a marca da Last Lab nos posts e pontos de contato (como a identidade se materializa). */
+function Aplicacoes({ d, escala }) {
+  return (
+    <Slide livre escala={escala} d={d} classe="rodape-suave">
+      <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">{`Na prática: a marca aplicada nos posts e em cada ponto de contato.`}</P>
+      <img src={d.oferta.servico.vitrineAplicacoes} alt="" style={{ position: "absolute", left: 240, top: 120, width: 1440, height: 810, objectFit: "contain", borderRadius: 20, boxShadow: "0 30px 60px rgba(0,0,0,.12)" }} />
     </Slide>
   );
 }
@@ -1655,5 +1666,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["previa", Previa, (d) => d.previa.templates.length > 0 || ["padronizacao", "instagram"].includes(d.oferta.servicoId)], ["sistema", Sistema, (d) => !!d.previa.sistema], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["previa", Previa, (d) => d.previa.templates.length > 0 || ["padronizacao", "instagram"].includes(d.oferta.servicoId)], ["sistema", Sistema, (d) => !!d.previa.sistema], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["aplicacoes", Aplicacoes, (d) => !!d.oferta.servico.vitrineAplicacoes], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];
