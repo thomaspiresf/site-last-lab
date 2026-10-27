@@ -12,6 +12,7 @@ import { VAZIO_MARCA, paginasDoGuiaMarca, nomesDoGuiaMarca } from "./AdminGuiaMa
 import { dia, montarCronograma, periodo } from "./cronograma";
 import { TEXTOS } from "./textosSlides";
 import { carregarCatalogo } from "./carregarCatalogo";
+import { GUIA_VITRINE } from "./guiaVitrine";
 import { PalcoMateriais, TodasAsPaginas, VitrineMateriais, materiaisDoServico } from "./vitrineMateriais";
 import "./apresentacao.css";
 
@@ -358,7 +359,7 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     const x = iRef.current;
     const y = Math.max(0, Math.min(slides.length - 1, x + direcao));
     if (y === x) return;
-    flip.current = animado && direcao === 1 && slides[x]?.sid === "comeco" && slides[y]?.sid === "oferta" ? medirFlip(raiz.current) : null;
+    flip.current = animado && direcao === 1 && ((slides[x]?.sid === "comeco" && slides[y]?.sid === "oferta") || (slides[x]?.sid === "entrega" && slides[y]?.sid === "produto")) ? medirFlip(raiz.current) : null;
     // indo para trás, o slide já aparece completo
     setPasso(direcao === -1 && animado ? nPassos(slides[y]) - 1 : 0);
     iRef.current = y;
@@ -429,6 +430,11 @@ export function TelaCheia({ slides, inicio, canal, onSair }) {
     slide.querySelectorAll("[data-flip]").forEach((el) => {
       const k = el.dataset.flip, a = antes[k], b = depois[k];
       if (!a || !b || k === "card") return;
+      // blocos do guia: a caixa cresce e se reorganiza (posição e tamanho), sem distorcer a imagem
+      if (k.startsWith("g-")) {
+        el.animate([{ left: `${a.x}px`, top: `${a.y}px`, width: `${a.w}px`, height: `${a.h}px` }, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px` }], tempo);
+        return;
+      }
       const esc = a.fonte / b.fonte;
       // texto alinhado à direita (o rótulo): a âncora é a borda direita
       const direita = getComputedStyle(el).textAlign === "right";
@@ -1200,6 +1206,23 @@ function Aplicacoes({ d, escala }) {
   );
 }
 
+/** O guia de vitrine em blocos, numa caixa (x, y, altura) do slide; data-flip liga os blocos entre os slides. */
+function GuiaBlocos({ versao, x, y, alt }) {
+  const L = GUIA_VITRINE[versao];
+  const e = alt / L.h;
+  const caixa = (k, [bx, by, bw, bh]) => ({ position: "absolute", left: x + bx * e, top: y + by * e, width: bw * e, height: bh * e, borderRadius: k === "topo" ? 0 : 16 * e, overflow: "hidden" });
+  return (
+    <>
+      <div data-flip="g-fundo" style={{ position: "absolute", left: x, top: y, width: L.w * e, height: alt, background: GUIA_VITRINE.fundo, borderRadius: versao === "v" ? 12 : 0, boxShadow: versao === "v" ? "0 40px 80px rgba(0,0,0,.18)" : "none" }} />
+      {Object.entries(L.blocos).map(([k, b]) => (
+        <div key={k} data-flip={`g-${k}`} style={caixa(k, b)}>
+          <img src={`${GUIA_VITRINE.pasta}/${versao}-${k}.jpg`} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </div>
+      ))}
+    </>
+  );
+}
+
 /** Prévia visual da entrega: as páginas do Guia (workshop) ou imagens de um projeto parecido do portfólio. */
 function PreviaEntrega({ d }) {
   const ex = d.oferta.servico.exemplo;
@@ -1239,7 +1262,7 @@ function Entrega({ d, escala }) {
   const onePage = s.vitrineEntrega;
   const comMateriais = !onePage && d.materiais.length > 0;
   return (
-    <Slide escala={escala} d={d} classe={comMateriais ? "vt-slide-entrega" : onePage ? "sem-rodape" : ""}>
+    <Slide escala={escala} d={d} classe={comMateriais ? "vt-slide-entrega" : onePage ? "rodape-suave" : ""}>
       <Titulo t={tx("entrega", "titulo")} sub={s.promessa} />
       <div className={`vt-entrega ${comMateriais || onePage ? "so-lista" : "mockup"}`}>
         <div className="esq">
@@ -1259,7 +1282,7 @@ function Entrega({ d, escala }) {
         {!comMateriais && !onePage && <PreviaEntrega d={d} />}
       </div>
       {comMateriais && <PalcoMateriais materiais={d.materiais} empresa={d.empresa} />}
-      {onePage && <img className="vt-onepage-img" src={onePage} alt="" />}
+      {onePage && <GuiaBlocos versao="v" x={1340} y={40} alt={900} />}
     </Slide>
   );
 }
@@ -1300,7 +1323,7 @@ function Produto({ d, escala }) {
   if (d.oferta.servico.vitrine) {
     return (
       <Slide livre escala={escala} d={d} classe="sem-rodape">
-        <img src={d.oferta.servico.vitrine} alt="" style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, objectFit: "cover" }} />
+        <GuiaBlocos versao="h" x={0} y={0} alt={1080} />
       </Slide>
     );
   }
