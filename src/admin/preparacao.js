@@ -110,7 +110,7 @@ export function montarRoteiro(item, dados, prep) {
         `"Hoje é isto que a gente viu. Depois, é isto que muda." Leia o "depois" olhando para o cliente.`,
         `"Qual desses resultados faz mais diferença para você agora?"`,
         dados.previa?.templates?.length && `Na prévia: "Este é um post de vocês hoje. Este é o mesmo post com a marca padronizada." Deixe o cliente olhar em silêncio.`,
-        dados.previa?.sistema && `No sistema: "E é assim que o perfil inteiro fica: feed, stories e a marca, tudo no mesmo padrão. Vocês continuam postando sozinhos, só trocando foto e texto."`,
+        dados.previa?.sistema && `No perfil: "Este é o Instagram de vocês hoje. E assim ele fica com a marca padronizada: quem chega entende o que vocês fazem e vê uma empresa organizada. E vocês continuam postando sozinhos, só trocando foto e texto."`,
         `Nos casos: "Foi o mesmo caminho que fizemos com estes clientes."`,
       ].filter(Boolean),
     },

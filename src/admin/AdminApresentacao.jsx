@@ -658,7 +658,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
         <label className={rotulo}>@ do Instagram (aparece nos celulares)</label>
         <input className={campo} value={previa.conta || ""} onChange={(e) => mudar({ previa: { ...previa, conta: e.target.value } })} onBlur={gravar} placeholder="suamarca" />
       </div>
-      {[["hoje", "Hoje (um post atual do cliente)"], [0, "Depois (o mesmo post padronizado, 4:5)"], ["sistema", "Sistema montado (slide seguinte)"]].map(([onde, nome]) => {
+      {[["hoje", "Hoje (um post atual do cliente)"], [0, "Depois (o mesmo post padronizado, 4:5)"], ["sistema", "Perfil hoje × organizado (slide seguinte)"]].map(([onde, nome]) => {
         const c = typeof onde === "number" ? (previa.templates || [])[onde] : previa[onde];
         return (
           <div key={onde} className="rounded-xl border border-zinc-200 p-3 flex items-center gap-2">
@@ -700,8 +700,8 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     custo: [SEC.custo, fixo("O texto padrão vem da área da oferta; aqui você ajusta só para este lead. Use **assim** para o negrito.")],
     comeco: [doCatalogo("Os três cartões vêm da escada da área desta oferta.", aid ? `a=${aid}` : `s=${svc}`)],
     oferta: [doCatalogo("O nome é a oferta escolhida no diagnóstico; a frase é a promessa do serviço.")],
-    sistema: [fixo("A imagem do sistema montado (perfil, stories e brand board) é enviada no slide Prévia da marca."), <button key="b" onClick={() => irPara("previa")} className="self-start text-xs font-semibold underline underline-offset-2">Ir para a Prévia da marca</button>],
-    previa: [fixo("Um post de hoje e o mesmo post padronizado, em dois celulares. A imagem do sistema montado vira o slide seguinte. O slide aparece nas ofertas com templates (Padronização, Visual das redes) ou quando há um template enviado."), SEC.previa],
+    sistema: [fixo("A imagem do perfil hoje × organizado é enviada no slide Prévia da marca."), <button key="b" onClick={() => irPara("previa")} className="self-start text-xs font-semibold underline underline-offset-2">Ir para a Prévia da marca</button>],
+    previa: [fixo("Um post de hoje e o mesmo post padronizado, lado a lado como no Instagram. A imagem do perfil hoje × organizado vira o slide seguinte. O slide aparece nas ofertas com templates (Padronização, Visual das redes) ou quando há um template enviado."), SEC.previa],
     antesdepois: [fixo("O lado \"Antes\" usa os títulos das observações da Visão externa."), <button key="b" onClick={() => irPara("visao")} className="self-start text-xs font-semibold underline underline-offset-2">Editar as observações</button>, doCatalogo("O lado \"Depois\" vem do serviço.")],
     casos: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
     casos2: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
@@ -729,7 +729,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 
 export const NOMES_SLIDES = {
   capa: "Capa", objetivo: "Nossa conversa", conversa: "O seu momento", respostas: "Visão interna", visao: "Visão externa",
-  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", previa: "Prévia da marca", sistema: "Sistema da marca", casos: "Caso 1", casos2: "Caso 2",
+  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", previa: "Prévia da marca", sistema: "Perfil organizado", casos: "Caso 1", casos2: "Caso 2",
   entrega: "O que você recebe", produto: "Como fica", paginas: "Página a página", paginas2: "Página a página (2º material)", paginas3: "Página a página (3º material)", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
   proximos: "Cronograma", fim: "Fechamento",
 };
@@ -1139,47 +1139,42 @@ function AntesDepois({ d, escala }) {
   );
 }
 
-/** Um post dentro de um celular, como aparece no Instagram (antes e depois da prévia). */
-function CelularPost({ x, src, conta }) {
-  const tela = 338;
+/** Um post como aparece no Instagram, no tema escuro: só o @, a imagem e os ícones em volta. */
+function PostIG({ x, src, conta, rotulo, destaque }) {
+  const branco = "#f5f5f5";
   return (
-    <div style={{ position: "absolute", left: x, top: 160, width: 366, height: 735, background: "#0d0e10", borderRadius: 58, padding: 14, boxShadow: "0 30px 60px rgba(0,0,0,.22)" }}>
-      <div style={{ position: "relative", width: tela, height: 707, borderRadius: 44, overflow: "hidden", background: "#fff", fontFamily: "-apple-system, Helvetica Neue, Arial, sans-serif", color: "#111" }}>
-        <div style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", width: 110, height: 30, borderRadius: 16, background: "#000" }} />
-        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "62px 16px 12px", fontSize: 16, fontWeight: 600 }}>
-          <span style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(45deg,#c9a24d,#e8cf8e)", padding: 2 }}>
-            <span style={{ display: "block", width: "100%", height: "100%", borderRadius: "50%", background: "#14161a", border: "2px solid #fff" }} />
-          </span>
-          {conta}
-          <span style={{ marginLeft: "auto", fontSize: 20 }}>⋯</span>
-        </div>
-        {src ? <img src={src} alt="" style={{ display: "block", width: tela, height: tela * 1.25, objectFit: "cover" }} /> : <div style={{ width: tela, height: tela * 1.25, background: "#e7e6e6" }} />}
-        <div style={{ display: "flex", gap: 16, padding: "12px 16px 6px" }}>
-          {["M12 21s-7-4.4-9.3-9C1 8.6 3.2 5 6.6 5c2 0 3.5 1.2 4.4 2.6C11.9 6.2 13.4 5 15.4 5 18.8 5 21 8.6 19.3 12c-2.3 4.6-7.3 9-7.3 9Z", "M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12Z", "M22 3 11 14M22 3l-7 18-4-7-7-4 18-7Z"].map((d, i) => (
-            <svg key={i} viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#111" strokeWidth="1.8" strokeLinejoin="round"><path d={d} /></svg>
-          ))}
-        </div>
-        <div style={{ padding: "4px 16px", fontSize: 14, lineHeight: 1.5 }}>
-          <b>{conta}</b> <span style={{ color: "#555" }}>Mais um estabelecimento regularizado junto ao Corpo de Bombeiros...</span>
-        </div>
+    <div style={{ position: "absolute", left: x, top: 172, width: 448 }}>
+      <p style={{ fontSize: 22, letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, color: destaque ? "#ef4b3a" : "#8a8a8a", marginBottom: 26 }}>{rotulo}</p>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16, color: branco, fontSize: 24, fontWeight: 600, fontFamily: "-apple-system, Helvetica Neue, Arial, sans-serif" }}>
+        <span style={{ width: 48, height: 48, borderRadius: "50%", border: "1.5px solid #555", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#bbb" }}>{(conta[0] || "").toUpperCase()}</span>
+        {conta}
+        <span style={{ marginLeft: "auto", fontSize: 28, letterSpacing: 2 }}>···</span>
+      </div>
+      {src
+        ? <img src={src} alt="" style={{ display: "block", width: 448, height: 560, objectFit: "cover", objectPosition: "top", borderRadius: 14 }} />
+        : <div style={{ width: 448, height: 560, borderRadius: 14, background: "#2a2a2a" }} />}
+      <div style={{ display: "flex", gap: 22, marginTop: 20 }}>
+        {["M12 21s-7-4.4-9.3-9C1 8.6 3.2 5 6.6 5c2 0 3.5 1.2 4.4 2.6C11.9 6.2 13.4 5 15.4 5 18.8 5 21 8.6 19.3 12c-2.3 4.6-7.3 9-7.3 9Z", "M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12Z", "M22 3 11 14M22 3l-7 18-4-7-7-4 18-7Z"].map((d, i) => (
+          <svg key={i} viewBox="0 0 24 24" width="34" height="34" fill="none" stroke={branco} strokeWidth="1.6" strokeLinejoin="round"><path d={d} /></svg>
+        ))}
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke={branco} strokeWidth="1.6" strokeLinejoin="round" style={{ marginLeft: "auto" }}><path d="M6 3h12v18l-6-5-6 5z" /></svg>
       </div>
     </div>
   );
 }
 
-/** Prévia da marca: o mesmo post hoje e com a marca padronizada, cada um num celular. */
+/** Prévia da marca: o mesmo post hoje e com a marca padronizada, no tema escuro do Instagram. */
 function Previa({ d, escala }) {
   const conta = d.previa.conta || "suamarca";
   return (
     <Slide livre escala={escala} d={d}>
-      <P x={77} y={40} s={80} como="h2" cor="#000">O mesmo post, com a marca padronizada</P>
-      <P x={81} y={480} s={36} peso={300} cor="#999999" w={300}>Hoje</P>
-      <CelularPost x={400} src={d.previa.hoje} conta={conta} />
-      <span className="apr-seta" style={{ left: 940, top: 505 }}>
-        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      <div className="apr-caixa" style={{ left: 0, top: 0, width: 1920, height: 1080, background: "#0b0b0c" }} />
+      <P x={77} y={40} s={64} como="h2" cor="#f5f5f5">O mesmo post, com a marca padronizada</P>
+      <PostIG x={430} src={d.previa.hoje} conta={conta} rotulo="Hoje" />
+      <span className="apr-seta" style={{ left: 900, top: 494, background: "#1f1f21", borderColor: "#0b0b0c" }}>
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#f5f5f5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </span>
-      <CelularPost x={1140} src={d.previa.templates[0]} conta={conta} />
-      <P x={1560} y={460} s={36} peso={300} cor="#999999" w={300}>Com a marca padronizada</P>
+      <PostIG x={1042} src={d.previa.templates[0]} conta={conta} rotulo="Com a marca padronizada" destaque />
     </Slide>
   );
 }
@@ -1188,8 +1183,8 @@ function Previa({ d, escala }) {
 function Sistema({ d, escala }) {
   return (
     <Slide livre escala={escala} d={d}>
-      <P x={77} y={40} s={80} como="h2" cor="#000">A marca toda no mesmo padrão</P>
-      <P x={83} y={148} s={32} peso={300} cor="#999999">Feed, stories e brand board saindo do mesmo sistema.</P>
+      <P x={77} y={40} s={80} como="h2" cor="#000">O perfil inteiro, organizado</P>
+      <P x={83} y={148} s={32} peso={300} cor="#999999">Como o Instagram de vocês está hoje e como fica com a marca padronizada.</P>
       {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 81, top: 205, width: 1758, height: 715, objectFit: "contain", borderRadius: 24 }} />}
     </Slide>
   );
