@@ -1190,7 +1190,7 @@ function Sistema({ d, escala }) {
     <Slide livre escala={escala} d={d}>
       <P x={77} y={40} s={80} como="h2" cor="#000">A marca toda no mesmo padrão</P>
       <P x={83} y={148} s={32} peso={300} cor="#999999">Feed, stories e brand board saindo do mesmo sistema.</P>
-      {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 81, top: 215, width: 1758, height: 762, objectFit: "contain", borderRadius: 24 }} />}
+      {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 81, top: 205, width: 1758, height: 715, objectFit: "contain", borderRadius: 24 }} />}
     </Slide>
   );
 }
