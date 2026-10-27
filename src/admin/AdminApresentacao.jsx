@@ -1235,6 +1235,15 @@ function PreviaEntrega({ d }) {
 
 function Entrega({ d, escala }) {
   const s = d.oferta.servico;
+  // one-page de vitrine: os entregáveis de verdade, feitos com a marca da Last Lab
+  if (s.vitrineEntrega) {
+    return (
+      <Slide livre escala={escala} d={d} classe="rodape-suave">
+        <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">{`O que você recebe · ${d.oferta.titulo}`}</P>
+        <img src={s.vitrineEntrega} alt="" style={{ position: "absolute", left: 240, top: 120, width: 1440, height: 810, objectFit: "contain", borderRadius: 20, boxShadow: "0 30px 60px rgba(0,0,0,.12)" }} />
+      </Slide>
+    );
+  }
   const comMateriais = d.materiais.length > 0;
   return (
     <Slide escala={escala} d={d} classe={comMateriais ? "vt-slide-entrega" : ""}>

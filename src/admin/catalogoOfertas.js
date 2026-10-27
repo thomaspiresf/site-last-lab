@@ -11,6 +11,7 @@ export const SERVICOS = {
     exemplo: "redes",
     vitrine: "/images/entregaveis/brand-board-lastlab.jpg",
     vitrineAplicacoes: "/images/entregaveis/aplicacoes-lastlab.jpg",
+    vitrineEntrega: "/images/entregaveis/recebe-padronizacao.jpg",
     depois: ["Uma marca só, do Instagram ao orçamento", "Posts no padrão, feitos por você em minutos", "Quem chega entende de cara o que vocês fazem"],
     nome: "Padronização da marca",
     promessa: "Uma marca só, com cara de empresa séria, fácil de manter.",
