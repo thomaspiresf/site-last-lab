@@ -69,7 +69,7 @@ export default function AdminApresentacao() {
 
   // links temporários dos prints (bucket privado)
   useEffect(() => {
-    const caminhos = [...(ap?.observacoes || []).map((o) => o.imagem), ap?.previa?.hoje, ...(ap?.previa?.templates || [])];
+    const caminhos = [...(ap?.observacoes || []).map((o) => o.imagem), ap?.previa?.hoje, ap?.previa?.sistema, ...(ap?.previa?.templates || [])];
     caminhos.forEach((c) => {
       if (c && !urls[c]) getDiagnosticoArquivoUrl(c).then((u) => setUrls((x) => ({ ...x, [c]: u }))).catch(() => {});
     });
@@ -475,11 +475,11 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     if (!arquivo) return;
     const caminho = await enviarImagemApresentacao(item.id, arquivo);
     const templates = [...(previa.templates || [])];
-    if (onde === "hoje") salvar({ ...rascunho, previa: { ...previa, hoje: caminho } });
+    if (onde === "hoje" || onde === "sistema") salvar({ ...rascunho, previa: { ...previa, [onde]: caminho } });
     else { templates[onde] = caminho; salvar({ ...rascunho, previa: { ...previa, templates } }); }
   };
   const tirarPrevia = (onde) => {
-    if (onde === "hoje") salvar({ ...rascunho, previa: { ...previa, hoje: "" } });
+    if (onde === "hoje" || onde === "sistema") salvar({ ...rascunho, previa: { ...previa, [onde]: "" } });
     else salvar({ ...rascunho, previa: { ...previa, templates: (previa.templates || []).map((c, j) => (j === onde ? "" : c)) } });
   };
 
@@ -654,8 +654,12 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 
     </>,
     previa: <>
-      {[["hoje", "Hoje (um post atual do cliente)"], [0, "Template 1 (4:5)"], [1, "Template 2 (4:5)"], [2, "Template 3 (story, 9:16)"]].map(([onde, nome]) => {
-        const c = onde === "hoje" ? previa.hoje : (previa.templates || [])[onde];
+      <div>
+        <label className={rotulo}>@ do Instagram (aparece nos celulares)</label>
+        <input className={campo} value={previa.conta || ""} onChange={(e) => mudar({ previa: { ...previa, conta: e.target.value } })} onBlur={gravar} placeholder="suamarca" />
+      </div>
+      {[["hoje", "Hoje (um post atual do cliente)"], [0, "Depois (o mesmo post padronizado, 4:5)"], ["sistema", "Sistema montado (slide seguinte)"]].map(([onde, nome]) => {
+        const c = typeof onde === "number" ? (previa.templates || [])[onde] : previa[onde];
         return (
           <div key={onde} className="rounded-xl border border-zinc-200 p-3 flex items-center gap-2">
             <span className="text-xs font-semibold text-zinc-600 flex-1">{nome}</span>
@@ -696,7 +700,8 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     custo: [SEC.custo, fixo("O texto padrão vem da área da oferta; aqui você ajusta só para este lead. Use **assim** para o negrito.")],
     comeco: [doCatalogo("Os três cartões vêm da escada da área desta oferta.", aid ? `a=${aid}` : `s=${svc}`)],
     oferta: [doCatalogo("O nome é a oferta escolhida no diagnóstico; a frase é a promessa do serviço.")],
-    previa: [fixo("Mostre como a marca do cliente pode ficar: um post de hoje e até 3 templates de exemplo. O slide aparece nas ofertas com templates (Padronização, Visual das redes) ou quando há um template enviado."), SEC.previa],
+    sistema: [fixo("A imagem do sistema montado (perfil, stories e brand board) é enviada no slide Prévia da marca."), <button key="b" onClick={() => irPara("previa")} className="self-start text-xs font-semibold underline underline-offset-2">Ir para a Prévia da marca</button>],
+    previa: [fixo("Um post de hoje e o mesmo post padronizado, em dois celulares. A imagem do sistema montado vira o slide seguinte. O slide aparece nas ofertas com templates (Padronização, Visual das redes) ou quando há um template enviado."), SEC.previa],
     antesdepois: [fixo("O lado \"Antes\" usa os títulos das observações da Visão externa."), <button key="b" onClick={() => irPara("visao")} className="self-start text-xs font-semibold underline underline-offset-2">Editar as observações</button>, doCatalogo("O lado \"Depois\" vem do serviço.")],
     casos: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
     casos2: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
@@ -724,7 +729,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
 
 export const NOMES_SLIDES = {
   capa: "Capa", objetivo: "Nossa conversa", conversa: "O seu momento", respostas: "Visão interna", visao: "Visão externa",
-  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", previa: "Prévia da marca", casos: "Caso 1", casos2: "Caso 2",
+  custo: "O custo de ficar como está", comeco: "Por onde começar", oferta: "A oferta", antesdepois: "Antes & Depois", previa: "Prévia da marca", sistema: "Sistema da marca", casos: "Caso 1", casos2: "Caso 2",
   entrega: "O que você recebe", produto: "Como fica", paginas: "Página a página", paginas2: "Página a página (2º material)", paginas3: "Página a página (3º material)", sessao: "Como é a sessão", passo: "Investimento", condicoes: "Condições",
   proximos: "Cronograma", fim: "Fechamento",
 };
@@ -824,6 +829,8 @@ export function montarDados(item, ap, urls = {}) {
     previa: {
       hoje: ap.previa?.hoje ? urls[ap.previa.hoje] || "" : "",
       templates: (ap.previa?.templates || []).filter(Boolean).map((c) => urls[c] || ""),
+      sistema: ap.previa?.sistema ? urls[ap.previa.sistema] || "" : "",
+      conta: ap.previa?.conta || "",
     },
     custo,
     oferta,
@@ -1132,31 +1139,58 @@ function AntesDepois({ d, escala }) {
   );
 }
 
-/** Prévia da marca do cliente: um post de hoje ao lado dos templates de exemplo (imagens enviadas no painel). */
+/** Um post dentro de um celular, como aparece no Instagram (antes e depois da prévia). */
+function CelularPost({ x, src, conta }) {
+  const tela = 338;
+  return (
+    <div style={{ position: "absolute", left: x, top: 160, width: 366, height: 735, background: "#0d0e10", borderRadius: 58, padding: 14, boxShadow: "0 30px 60px rgba(0,0,0,.22)" }}>
+      <div style={{ position: "relative", width: tela, height: 707, borderRadius: 44, overflow: "hidden", background: "#fff", fontFamily: "-apple-system, Helvetica Neue, Arial, sans-serif", color: "#111" }}>
+        <div style={{ position: "absolute", top: 12, left: "50%", transform: "translateX(-50%)", width: 110, height: 30, borderRadius: 16, background: "#000" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "62px 16px 12px", fontSize: 16, fontWeight: 600 }}>
+          <span style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(45deg,#c9a24d,#e8cf8e)", padding: 2 }}>
+            <span style={{ display: "block", width: "100%", height: "100%", borderRadius: "50%", background: "#14161a", border: "2px solid #fff" }} />
+          </span>
+          {conta}
+          <span style={{ marginLeft: "auto", fontSize: 20 }}>⋯</span>
+        </div>
+        {src ? <img src={src} alt="" style={{ display: "block", width: tela, height: tela * 1.25, objectFit: "cover" }} /> : <div style={{ width: tela, height: tela * 1.25, background: "#e7e6e6" }} />}
+        <div style={{ display: "flex", gap: 16, padding: "12px 16px 6px" }}>
+          {["M12 21s-7-4.4-9.3-9C1 8.6 3.2 5 6.6 5c2 0 3.5 1.2 4.4 2.6C11.9 6.2 13.4 5 15.4 5 18.8 5 21 8.6 19.3 12c-2.3 4.6-7.3 9-7.3 9Z", "M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12Z", "M22 3 11 14M22 3l-7 18-4-7-7-4 18-7Z"].map((d, i) => (
+            <svg key={i} viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#111" strokeWidth="1.8" strokeLinejoin="round"><path d={d} /></svg>
+          ))}
+        </div>
+        <div style={{ padding: "4px 16px", fontSize: 14, lineHeight: 1.5 }}>
+          <b>{conta}</b> <span style={{ color: "#555" }}>Mais um estabelecimento regularizado junto ao Corpo de Bombeiros...</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Prévia da marca: o mesmo post hoje e com a marca padronizada, cada um num celular. */
 function Previa({ d, escala }) {
-  const pos = [[610, 432], [1072, 432], [1534, 304]];
-  const nomes = ["Post de caso", "Post de serviço", "Story"];
-  const foto = { position: "absolute", top: 250, height: 540, objectFit: "cover", objectPosition: "top", borderRadius: 18, boxShadow: "0 18px 40px rgba(0,0,0,.14)" };
+  const conta = d.previa.conta || "suamarca";
   return (
     <Slide livre escala={escala} d={d}>
-      <P x={77} y={40} s={88} como="h2" cor="#000">{`Como a ${d.empresa || "sua marca"} pode ficar`}</P>
-      <P x={81} y={190} s={30} peso={300} cor="#999999">Hoje</P>
-      <P x={610} y={190} s={30} peso={300} cor="#999999">Com a marca padronizada</P>
-      {d.previa.hoje
-        ? <img src={d.previa.hoje} alt="" style={{ ...foto, left: 81, width: 432, filter: "saturate(.85)" }} />
-        : <div className="apr-caixa" style={{ left: 81, top: 250, width: 432, height: 540, background: "#e7e6e6", borderRadius: 18 }} />}
-      <span className="apr-seta" style={{ left: 532, top: 500 }}>
-        <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+      <P x={77} y={40} s={80} como="h2" cor="#000">O mesmo post, com a marca padronizada</P>
+      <P x={81} y={480} s={36} peso={300} cor="#999999" w={300}>Hoje</P>
+      <CelularPost x={400} src={d.previa.hoje} conta={conta} />
+      <span className="apr-seta" style={{ left: 940, top: 505 }}>
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </span>
-      {[0, 1, 2].map((i) => d.previa.templates[i]).map((src, i) => (
-        <React.Fragment key={i}>
-          {src
-            ? <img src={src} alt="" style={{ ...foto, left: pos[i][0], width: pos[i][1] }} />
-            : <div className="apr-caixa" style={{ left: pos[i][0], top: 250, width: pos[i][1], height: 540, background: "#e7e6e6", borderRadius: 18 }} />}
-          <P x={pos[i][0]} y={812} s={26} peso={300} cor="#434343">{nomes[i]}</P>
-        </React.Fragment>
-      ))}
-      <P x={81} y={812} s={26} peso={300} cor="#434343">Um post atual</P>
+      <CelularPost x={1140} src={d.previa.templates[0]} conta={conta} />
+      <P x={1560} y={460} s={36} peso={300} cor="#999999" w={300}>Com a marca padronizada</P>
+    </Slide>
+  );
+}
+
+/** O sistema todo: o mockup montado (perfil, stories, brand board) enviado no painel. */
+function Sistema({ d, escala }) {
+  return (
+    <Slide livre escala={escala} d={d}>
+      <P x={77} y={40} s={80} como="h2" cor="#000">A marca toda no mesmo padrão</P>
+      <P x={83} y={148} s={32} peso={300} cor="#999999">Feed, stories e brand board saindo do mesmo sistema.</P>
+      {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 81, top: 215, width: 1758, height: 762, objectFit: "contain", borderRadius: 24 }} />}
     </Slide>
   );
 }
@@ -1618,5 +1652,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["previa", Previa, (d) => d.previa.templates.length > 0 || ["padronizacao", "instagram"].includes(d.oferta.servicoId)], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["previa", Previa, (d) => d.previa.templates.length > 0 || ["padronizacao", "instagram"].includes(d.oferta.servicoId)], ["sistema", Sistema, (d) => !!d.previa.sistema], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];
