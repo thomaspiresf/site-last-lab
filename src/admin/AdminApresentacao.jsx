@@ -70,7 +70,7 @@ export default function AdminApresentacao() {
 
   // links temporários dos prints (bucket privado)
   useEffect(() => {
-    const caminhos = [...(ap?.observacoes || []).map((o) => o.imagem), ap?.previa?.hoje, ap?.previa?.sistema, ...(ap?.previa?.templates || [])];
+    const caminhos = [...(ap?.observacoes || []).map((o) => o.imagem), ap?.previa?.hoje, ap?.previa?.sistema, ap?.previa?.sistemaHoje, ap?.previa?.sistemaDepois, ...(ap?.previa?.templates || [])];
     caminhos.forEach((c) => {
       if (c && !urls[c]) getDiagnosticoArquivoUrl(c).then((u) => setUrls((x) => ({ ...x, [c]: u }))).catch(() => {});
     });
@@ -481,11 +481,11 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     if (!arquivo) return;
     const caminho = await enviarImagemApresentacao(item.id, arquivo);
     const templates = [...(previa.templates || [])];
-    if (onde === "hoje" || onde === "sistema") salvar({ ...rascunho, previa: { ...previa, [onde]: caminho } });
+    if (typeof onde === "string") salvar({ ...rascunho, previa: { ...previa, [onde]: caminho } });
     else { templates[onde] = caminho; salvar({ ...rascunho, previa: { ...previa, templates } }); }
   };
   const tirarPrevia = (onde) => {
-    if (onde === "hoje" || onde === "sistema") salvar({ ...rascunho, previa: { ...previa, [onde]: "" } });
+    if (typeof onde === "string") salvar({ ...rascunho, previa: { ...previa, [onde]: "" } });
     else salvar({ ...rascunho, previa: { ...previa, templates: (previa.templates || []).map((c, j) => (j === onde ? "" : c)) } });
   };
 
@@ -664,7 +664,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
         <label className={rotulo}>@ do Instagram (aparece nos celulares)</label>
         <input className={campo} value={previa.conta || ""} onChange={(e) => mudar({ previa: { ...previa, conta: e.target.value } })} onBlur={gravar} placeholder="suamarca" />
       </div>
-      {[["hoje", "Hoje (um post atual do cliente)"], [0, "Depois (o mesmo post padronizado, 4:5)"], ["sistema", "Perfil hoje × organizado (slide seguinte)"]].map(([onde, nome]) => {
+      {[["hoje", "Hoje (um post atual do cliente)"], [0, "Depois (o mesmo post padronizado, 4:5)"], ["sistema", "Perfil hoje × organizado (imagem única)"], ["sistemaHoje", "Perfil hoje, só o celular (PNG transparente)"], ["sistemaDepois", "Perfil organizado, só o celular (PNG transparente)"]].map(([onde, nome]) => {
         const c = typeof onde === "number" ? (previa.templates || [])[onde] : previa[onde];
         return (
           <div key={onde} className="rounded-xl border border-zinc-200 p-3 flex items-center gap-2">
@@ -837,6 +837,8 @@ export function montarDados(item, ap, urls = {}) {
       hoje: ap.previa?.hoje ? urls[ap.previa.hoje] || "" : "",
       templates: (ap.previa?.templates || []).filter(Boolean).map((c) => urls[c] || ""),
       sistema: ap.previa?.sistema ? urls[ap.previa.sistema] || "" : "",
+      sistemaHoje: ap.previa?.sistemaHoje ? urls[ap.previa.sistemaHoje] || "" : "",
+      sistemaDepois: ap.previa?.sistemaDepois ? urls[ap.previa.sistemaDepois] || "" : "",
       conta: ap.previa?.conta || "",
     },
     custo,
@@ -1191,13 +1193,16 @@ function Sistema({ d, escala }) {
   return (
     <Slide livre escala={escala} d={d} classe="rodape-suave">
       <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">O perfil inteiro, organizado</P>
-      {d.previa.sistema && [["pv-hoje", 0, 915], ["pv-seta", 915, 90], ["pv-depois", 1005, 915]].map(([c, x, w]) => (
-        <div key={c} style={{ position: "absolute", left: x, top: 140, width: w, height: 781 }}>
-          <div className={`pv-mov pv-perfil ${c}`} style={{ width: w, height: 781, overflow: "hidden" }}>
-            <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: -x, top: 0, width: 1920, height: 781, maxWidth: "none" }} />
-          </div>
-        </div>
-      ))}
+      {d.previa.sistemaHoje && d.previa.sistemaDepois ? (
+        <>
+          {/* cada celular é uma imagem inteira, com fundo transparente, no mesmo lugar: cresce/encolhe em volta dele */}
+          <img className="pv-mov pv-perfil pv-hoje" src={d.previa.sistemaHoje} alt="" style={{ position: "absolute", left: 0, top: 140, width: 1920, height: 781, maxWidth: "none", transformOrigin: "717px 380px" }} />
+          <img className="pv-mov pv-perfil pv-depois" src={d.previa.sistemaDepois} alt="" style={{ position: "absolute", left: 0, top: 140, width: 1920, height: 781, maxWidth: "none", transformOrigin: "1201px 380px" }} />
+          <span className="apr-seta" style={{ left: 899, top: 460 }}>
+            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </span>
+        </>
+      ) : d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 0, top: 140, width: 1920, height: 781, maxWidth: "none" }} />}
     </Slide>
   );
 }
