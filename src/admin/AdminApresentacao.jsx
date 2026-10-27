@@ -1235,16 +1235,9 @@ function PreviaEntrega({ d }) {
 
 function Entrega({ d, escala }) {
   const s = d.oferta.servico;
-  // one-page de vitrine: os entregáveis de verdade, feitos com a marca da Last Lab
-  if (s.vitrineEntrega) {
-    return (
-      <Slide livre escala={escala} d={d} classe="rodape-suave">
-        <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">{`O que você recebe · ${d.oferta.titulo}`}</P>
-        <img src={s.vitrineEntrega} alt="" style={{ position: "absolute", left: 240, top: 120, width: 1440, height: 810, objectFit: "contain", borderRadius: 20, boxShadow: "0 30px 60px rgba(0,0,0,.12)" }} />
-      </Slide>
-    );
-  }
-  const comMateriais = d.materiais.length > 0;
+  // one-page de vitrine (a marca da Last Lab): a lista à esquerda, a página de verdade à direita
+  const onePage = s.vitrineEntrega;
+  const comMateriais = !onePage && d.materiais.length > 0;
   return (
     <Slide escala={escala} d={d} classe={comMateriais ? "vt-slide-entrega" : ""}>
       <Titulo t={tx("entrega", "titulo")} sub={s.promessa} />
@@ -1263,7 +1256,9 @@ function Entrega({ d, escala }) {
             <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7" /><path d="M20 5v6h-6" /></svg>{s.ajustes} de ajuste</span>
           </div>
         </div>
-        {!comMateriais && <PreviaEntrega d={d} />}
+        {!comMateriais && (onePage
+          ? <div className="vt-onepage"><img src={onePage} alt="" /><span>Exemplo: o guia de marca da própria Last Lab</span></div>
+          : <PreviaEntrega d={d} />)}
       </div>
       {comMateriais && <PalcoMateriais materiais={d.materiais} empresa={d.empresa} />}
     </Slide>

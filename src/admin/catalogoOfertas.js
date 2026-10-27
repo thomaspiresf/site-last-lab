@@ -11,7 +11,7 @@ export const SERVICOS = {
     exemplo: "redes",
     vitrine: "/images/entregaveis/brand-board-lastlab.jpg",
     vitrineAplicacoes: "/images/entregaveis/aplicacoes-lastlab.jpg",
-    vitrineEntrega: "/images/entregaveis/recebe-padronizacao.jpg",
+    vitrineEntrega: "/images/entregaveis/onepage-padronizacao.jpg",
     depois: ["Uma marca só, do Instagram ao orçamento", "Posts no padrão, feitos por você em minutos", "Quem chega entende de cara o que vocês fazem"],
     nome: "Padronização da marca",
     promessa: "Uma marca só, com cara de empresa séria, fácil de manter.",
@@ -19,7 +19,7 @@ export const SERVICOS = {
     fechamento: "Vamos deixar a sua marca **com cara de empresa séria?**",
     entregas: [
       "Logo atual ajustado e vetorizado, com versão principal e símbolo",
-      "Brand board de 1 página: cores, fontes e uso do logo",
+      "Guia de marca de 1 página: logo, cores, tipografia e estilo das peças",
       "3 templates editáveis no Canva: caso, serviço e story",
       "Bio e destaques do Instagram reescritos",
     ],
