@@ -696,7 +696,7 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
     custo: [SEC.custo, fixo("O texto padrão vem da área da oferta; aqui você ajusta só para este lead. Use **assim** para o negrito.")],
     comeco: [doCatalogo("Os três cartões vêm da escada da área desta oferta.", aid ? `a=${aid}` : `s=${svc}`)],
     oferta: [doCatalogo("O nome é a oferta escolhida no diagnóstico; a frase é a promessa do serviço.")],
-    previa: [fixo("Mostre como a marca do cliente pode ficar: um post de hoje e até 3 templates de exemplo. O slide só aparece com pelo menos um template."), SEC.previa],
+    previa: [fixo("Mostre como a marca do cliente pode ficar: um post de hoje e até 3 templates de exemplo. O slide aparece nas ofertas com templates (Padronização, Visual das redes) ou quando há um template enviado."), SEC.previa],
     antesdepois: [fixo("O lado \"Antes\" usa os títulos das observações da Visão externa."), <button key="b" onClick={() => irPara("visao")} className="self-start text-xs font-semibold underline underline-offset-2">Editar as observações</button>, doCatalogo("O lado \"Depois\" vem do serviço.")],
     casos: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
     casos2: [SEC.casos, fixo("Os textos e as imagens vêm da página do projeto no site.")],
@@ -1148,9 +1148,11 @@ function Previa({ d, escala }) {
       <span className="apr-seta" style={{ left: 532, top: 500 }}>
         <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </span>
-      {d.previa.templates.slice(0, 3).map((src, i) => (
+      {[0, 1, 2].map((i) => d.previa.templates[i]).map((src, i) => (
         <React.Fragment key={i}>
-          {src && <img src={src} alt="" style={{ ...foto, left: pos[i][0], width: pos[i][1] }} />}
+          {src
+            ? <img src={src} alt="" style={{ ...foto, left: pos[i][0], width: pos[i][1] }} />
+            : <div className="apr-caixa" style={{ left: pos[i][0], top: 250, width: pos[i][1], height: 540, background: "#e7e6e6", borderRadius: 18 }} />}
           <P x={pos[i][0]} y={812} s={26} peso={300} cor="#434343">{nomes[i]}</P>
         </React.Fragment>
       ))}
@@ -1616,5 +1618,5 @@ function Fim({ d, escala }) {
 // [id, componente]: o id liga cada slide a uma etapa do roteiro (preparacao.js)
 export const SLIDES = [
   ["capa", Capa], ["objetivo", Objetivo], ["conversa", Conversa], ["respostas", Respostas], ["visao", Visao],
-  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["previa", Previa, (d) => d.previa.templates.length > 0], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
+  ["custo", Custo], ["comeco", Comeco], ["oferta", OfertaCapa], ["antesdepois", AntesDepois], ["previa", Previa, (d) => d.previa.templates.length > 0 || ["padronizacao", "instagram"].includes(d.oferta.servicoId)], ["casos", Casos], ["casos2", Casos2, (d) => d.casos.length > 1], ["entrega", Entrega], ["produto", Produto], ["paginas", paginasDoMaterial(0), (d) => d.materiais.length > 0 && !d.materiais[0].unica], ["paginas2", paginasDoMaterial(1), (d) => d.materiais.length > 1 && !d.materiais[1].unica], ["paginas3", paginasDoMaterial(2), (d) => d.materiais.length > 2 && !d.materiais[2].unica], ["sessao", Sessao, (d) => d.oferta.servico.exemplo === "guia"], ["passo", Passo], ["condicoes", Condicoes], ["proximos", Proximos], ["fim", Fim],
 ];
