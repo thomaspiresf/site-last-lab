@@ -693,6 +693,37 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
           </select>
         ))}
       </div>
+      {/* fotos de cada caso, só nesta apresentação: clique na ordem (1ª = grande, até 4); vazio = padrão do serviço */}
+      {casos.slice(0, 2).map((id) => {
+        const p = projects.find((x) => x.id === id);
+        if (!p) return null;
+        const fotos = rascunho.fotosCasos?.[id] || [];
+        const marcar = (src) => {
+          const nova = fotos.includes(src) ? fotos.filter((x) => x !== src) : [...fotos, src].slice(0, 4);
+          salvar({ ...rascunho, fotosCasos: { ...(rascunho.fotosCasos || {}), [id]: nova } });
+        };
+        return (
+          <div key={id} className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <span className={rotulo}>Fotos · {p.title}</span>
+              {fotos.length > 0 && <button onClick={() => salvar({ ...rascunho, fotosCasos: { ...(rascunho.fotosCasos || {}), [id]: [] } })} className="text-[11px] text-zinc-500 hover:text-red-600">Voltar ao padrão</button>}
+            </div>
+            <p className="text-[11px] text-zinc-400 -mt-1">Clique na ordem: a 1ª fica grande, as outras 3 embaixo.</p>
+            <div className="grid grid-cols-4 gap-1.5">
+              {imagensDoProjeto(p).map((src) => {
+                const k = fotos.indexOf(src);
+                return (
+                  <button key={src} type="button" onClick={() => marcar(src)} title={src.split("/").pop()}
+                    className={`relative aspect-square rounded-md overflow-hidden border-2 ${k >= 0 ? "border-[#ef4b3a]" : "border-transparent hover:border-zinc-300"}`}>
+                    <img src={src} alt="" className={`w-full h-full object-cover ${k >= 0 ? "" : "opacity-70"}`} loading="lazy" />
+                    {k >= 0 && <span className="absolute top-1 left-1 w-5 h-5 rounded-full bg-[#ef4b3a] text-white text-[11px] font-bold flex items-center justify-center">{k + 1}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </>,
   };
 
@@ -854,6 +885,7 @@ export function montarDados(item, ap, urls = {}) {
     pagamento: ap.pagamento || PAGAMENTO_PADRAO,
     validade: ap.validade || VALIDADE_PADRAO,
     casos,
+    fotosCasos: ap.fotosCasos || {},
     cronograma: montarCronograma(oferta.servico.etapas, ap.inicio),
     continuidade: CONTINUIDADE[oferta.area?.continuidade] || null,
   };
@@ -1593,6 +1625,8 @@ function Caso({ d, escala, n }) {
   const [proporcao, setProporcao] = useState(2);
   if (!p) return <Slide livre escala={escala} d={d}><Cabeca t={tx("casos", "titulo")} sub="Escolha os casos no painel." /></Slide>;
   const c = resumoDoCaso(p, d.oferta.servico);
+  // fotos escolhidas nesta apresentação têm prioridade sobre as do serviço
+  if (d.fotosCasos?.[p.id]?.length) c.escolhidas = d.fotosCasos[p.id];
   const [grande, ...outras] = c.escolhidas || (c.imagens.length ? c.imagens : [p.coverImage]);
   const menores = c.escolhidas
     ? outras.slice(0, 3)
