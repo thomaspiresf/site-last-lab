@@ -1196,8 +1196,8 @@ function Sistema({ d, escala }) {
       {d.previa.sistemaHoje && d.previa.sistemaDepois ? (
         <>
           {/* cada celular é uma imagem inteira, com fundo transparente, no mesmo lugar: cresce/encolhe em volta dele */}
-          <img className="pv-mov pv-perfil pv-hoje" src={d.previa.sistemaHoje} alt="" style={{ position: "absolute", left: 0, top: 140, width: 1920, height: 781, maxWidth: "none", transformOrigin: "717px 380px" }} />
-          <img className="pv-mov pv-perfil pv-depois" src={d.previa.sistemaDepois} alt="" style={{ position: "absolute", left: 0, top: 140, width: 1920, height: 781, maxWidth: "none", transformOrigin: "1201px 380px" }} />
+          <img className="pv-mov pv-perfil pv-hoje" src={d.previa.sistemaHoje} alt="" style={{ position: "absolute", left: 0, top: 140, width: 1920, height: 896, maxWidth: "none", transformOrigin: "717px 380px" }} />
+          <img className="pv-mov pv-perfil pv-depois" src={d.previa.sistemaDepois} alt="" style={{ position: "absolute", left: 0, top: 140, width: 1920, height: 896, maxWidth: "none", transformOrigin: "1201px 380px" }} />
           <span className="apr-seta" style={{ left: 899, top: 460 }}>
             <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
           </span>
