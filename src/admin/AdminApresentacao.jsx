@@ -1143,7 +1143,7 @@ function AntesDepois({ d, escala }) {
 function PostIG({ x, src, conta, rotulo, destaque }) {
   const branco = "#f5f5f5";
   return (
-    <div style={{ position: "absolute", left: x, top: 172, width: 448 }}>
+    <div style={{ position: "absolute", left: x, top: 120, width: 500 }}>
       <p style={{ fontSize: 22, letterSpacing: ".18em", textTransform: "uppercase", fontWeight: 600, color: destaque ? "#ef4b3a" : "#8a8a8a", marginBottom: 26 }}>{rotulo}</p>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16, color: branco, fontSize: 24, fontWeight: 600, fontFamily: "-apple-system, Helvetica Neue, Arial, sans-serif" }}>
         <span style={{ width: 48, height: 48, borderRadius: "50%", border: "1.5px solid #555", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: "#bbb" }}>{(conta[0] || "").toUpperCase()}</span>
@@ -1151,8 +1151,8 @@ function PostIG({ x, src, conta, rotulo, destaque }) {
         <span style={{ marginLeft: "auto", fontSize: 28, letterSpacing: 2 }}>···</span>
       </div>
       {src
-        ? <img src={src} alt="" style={{ display: "block", width: 448, height: 560, objectFit: "cover", objectPosition: "top", borderRadius: 14 }} />
-        : <div style={{ width: 448, height: 560, borderRadius: 14, background: "#2a2a2a" }} />}
+        ? <img src={src} alt="" style={{ display: "block", width: 500, height: 625, objectFit: "cover", objectPosition: "top", borderRadius: 14 }} />
+        : <div style={{ width: 500, height: 625, borderRadius: 14, background: "#2a2a2a" }} />}
       <div style={{ display: "flex", gap: 22, marginTop: 20 }}>
         {["M12 21s-7-4.4-9.3-9C1 8.6 3.2 5 6.6 5c2 0 3.5 1.2 4.4 2.6C11.9 6.2 13.4 5 15.4 5 18.8 5 21 8.6 19.3 12c-2.3 4.6-7.3 9-7.3 9Z", "M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12Z", "M22 3 11 14M22 3l-7 18-4-7-7-4 18-7Z"].map((d, i) => (
           <svg key={i} viewBox="0 0 24 24" width="34" height="34" fill="none" stroke={branco} strokeWidth="1.6" strokeLinejoin="round"><path d={d} /></svg>
@@ -1167,14 +1167,14 @@ function PostIG({ x, src, conta, rotulo, destaque }) {
 function Previa({ d, escala }) {
   const conta = d.previa.conta || "suamarca";
   return (
-    <Slide livre escala={escala} d={d}>
+    <Slide livre escala={escala} d={d} classe="rodape-suave fundo-escuro">
       <div className="apr-caixa" style={{ left: 0, top: 0, width: 1920, height: 1080, background: "#0b0b0c" }} />
-      <P x={77} y={40} s={64} como="h2" cor="#f5f5f5">O mesmo post, com a marca padronizada</P>
-      <PostIG x={430} src={d.previa.hoje} conta={conta} rotulo="Hoje" />
-      <span className="apr-seta" style={{ left: 900, top: 494, background: "#1f1f21", borderColor: "#0b0b0c" }}>
+      <P x={77} y={44} s={36} peso={300} como="h2" cor="#9a9a9a">O mesmo post, com a marca padronizada</P>
+      <PostIG x={385} src={d.previa.hoje} conta={conta} rotulo="Hoje" />
+      <span className="apr-seta" style={{ left: 900, top: 488, background: "#1f1f21", borderColor: "#0b0b0c" }}>
         <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#f5f5f5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
       </span>
-      <PostIG x={1042} src={d.previa.templates[0]} conta={conta} rotulo="Com a marca padronizada" destaque />
+      <PostIG x={1035} src={d.previa.templates[0]} conta={conta} rotulo="Com a marca padronizada" destaque />
     </Slide>
   );
 }
@@ -1182,10 +1182,9 @@ function Previa({ d, escala }) {
 /** O sistema todo: o mockup montado (perfil, stories, brand board) enviado no painel. */
 function Sistema({ d, escala }) {
   return (
-    <Slide livre escala={escala} d={d}>
-      <P x={77} y={40} s={80} como="h2" cor="#000">O perfil inteiro, organizado</P>
-      <P x={83} y={148} s={32} peso={300} cor="#999999">Como o Instagram de vocês está hoje e como fica com a marca padronizada.</P>
-      {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 81, top: 205, width: 1758, height: 715, objectFit: "contain", borderRadius: 24 }} />}
+    <Slide livre escala={escala} d={d} classe="rodape-suave">
+      <P x={77} y={44} s={36} peso={300} como="h2" cor="#8a8a8a">O perfil inteiro, organizado</P>
+      {d.previa.sistema && <img src={d.previa.sistema} alt="" style={{ position: "absolute", left: 0, top: 110, width: 1920, height: 840, objectFit: "contain" }} />}
     </Slide>
   );
 }

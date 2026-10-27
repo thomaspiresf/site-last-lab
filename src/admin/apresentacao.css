@@ -26,6 +26,9 @@
 .apr-rodape .simbolo { position: absolute; left: 1816px; top: 959px; width: 20px; height: 46px; fill: currentColor; }
 .apr-rodape { top: 0; height: 1080px; }
 .apr-slide.laranja .apr-rodape { color: #fff; }
+/* rodapé como marca d'água: nos slides em que a imagem é o assunto */
+.apr-slide.rodape-suave .apr-rodape { color: #0a0a0a; opacity: .22; }
+.apr-slide.rodape-suave.fundo-escuro .apr-rodape { color: #fff; opacity: .2; }
 
 .apr-vazio { color: #a3a3ab; }
 .apr-slide.escuro .apr-vazio { color: #6b6b73; }
