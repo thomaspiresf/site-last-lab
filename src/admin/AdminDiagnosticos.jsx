@@ -50,7 +50,7 @@ import PainelSessoes, { ABANDONO_MIN } from "./PainelSessoes";
 import { Hoje, Quadro } from "./PainelCRM";
 import HistoricoContatos, { avisarHistorico } from "./HistoricoContatos";
 import { addContato } from "../lib/api";
-import { ABERTOS, STATUS, hojeISO, statusDe } from "./crmEtapas";
+import { ABERTOS, STATUS, equipeDe, hojeISO, statusDe } from "./crmEtapas";
 import { ETAPAS, mensagemMateriais } from "./mensagemMateriais";
 
 // Leads do diagnóstico de marca (lastlab.com.br/diagnostico). A sugestão de oferta e o
@@ -278,7 +278,7 @@ export default function AdminDiagnosticos() {
                     <StatusPill status={x.status} />
                   </div>
                   <p className="text-xs text-zinc-500 truncate mt-0.5">
-                    {[x.apresentacao?.empresa && x.nome, x.dados?.devolutiva?.perfil_textos?.segmento].filter(Boolean).join(" · ")}
+                    {[x.apresentacao?.empresa && x.nome, x.dados?.devolutiva?.perfil_textos?.segmento, equipeDe(x)].filter(Boolean).join(" · ")}
                   </p>
                   <p className="text-sm font-semibold mt-1" style={{ color: LARANJA }}>
                     → {x.ofertaEntrada || "—"}
@@ -528,6 +528,7 @@ function SobreEmpresa({ item, perfil }) {
   const campos = [
     ["Área de atuação", perfil.segmento],
     ["Quem respondeu", [item.nome, perfil.cargo].filter(Boolean).join(" · ")],
+    ["Tamanho da equipe", equipeDe(item)],
     ["Objetivo", perfil.objetivo],
     ["Canais que usa", perfil.canais],
     ["Veio de", d.origem === "manual" ? "Criado no admin" : origemDe(d.utms)],

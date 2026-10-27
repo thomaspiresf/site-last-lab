@@ -33,6 +33,17 @@
       ]
     },
     {
+      "id": "equipe",
+      "pergunta": "Quantas pessoas trabalham na empresa, contando com você?",
+      "tipo": "escolha",
+      "opcoes": [
+        { "id": "so_eu", "texto": "Só eu" },
+        { "id": "ate_5", "texto": "2 a 5" },
+        { "id": "ate_20", "texto": "6 a 20" },
+        { "id": "mais_20", "texto": "Mais de 20" }
+      ]
+    },
+    {
       "id": "segmento",
       "pergunta": "Em que tipo de negócio você atua?",
       "tipo": "escolha",
@@ -811,6 +822,7 @@
 
   "encerramento": {
     "fala_pos_resultado": "Essa é a sua marca vista por você. A outra metade é como ela é vista de fora, pelos olhos de quem ainda não te conhece. Isso eu posso olhar para você.",
+    "fala_pos_resultado_sozinho": "Essa é a sua marca vista por você. Se quiser conversar sobre o que fazer com esse resultado, me chama no WhatsApp.",
     "links": [
       { "id": "instagram", "tipo": "texto", "canal": "instagram", "rotulo": "@ do Instagram", "placeholder": "@suamarca", "obrigatorio": false },
       { "id": "site", "tipo": "texto", "canal": "site", "rotulo": "Site", "placeholder": "suamarca.com.br", "obrigatorio": false },
@@ -1164,7 +1176,7 @@
   },
 
   "qualificacao": {
-    "regra": "qualificado = cargo == dono E objetivo != curiosidade",
-    "observacao": "Faturamento 'nao_informado' conta como qualificado. Critério provisório, ajustar com os dados dos primeiros testes."
+    "regra": "qualificado = cargo == dono E objetivo != curiosidade E equipe != so_eu",
+    "observacao": "Porte mínimo: 2 pessoas (27/10/2026), subir quando houver mais clientes. Sem resposta de equipe (leads anteriores à pergunta) conta como qualificado."
   }
 }

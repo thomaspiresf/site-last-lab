@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { addContato } from "../lib/api";
-import { ABERTOS, COLUNAS, dataCurta, diasNaEtapa, empresaDe, hojeISO, statusDe } from "./crmEtapas";
+import { ABERTOS, COLUNAS, dataCurta, diasNaEtapa, empresaDe, equipeDe, hojeISO, statusDe } from "./crmEtapas";
 
 // CRM dos leads do diagnóstico: a tela "Hoje" (o que fazer agora) e o quadro do funil (arrastar entre etapas).
 
@@ -117,7 +117,7 @@ export function Quadro({ itens, onAbrir, onAtualizar }) {
                   className={`bg-white rounded-xl border border-zinc-200 p-3 cursor-grab active:cursor-grabbing hover:border-black ${arrastando === x.id ? "opacity-40" : ""}`}>
                   <p className="font-semibold text-sm text-black truncate">{empresaDe(x) || x.nome}</p>
                   <p className="text-xs text-zinc-500 truncate">
-                    {[empresaDe(x) && x.nome, x.persona && `${x.notaGeral}/100`].filter(Boolean).join(" · ")}
+                    {[empresaDe(x) && x.nome, x.persona && `${x.notaGeral}/100`, equipeDe(x)].filter(Boolean).join(" · ")}
                   </p>
                   <Acao item={x} />
                   <div className="flex items-center gap-1.5 mt-2 flex-wrap">

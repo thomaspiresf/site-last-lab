@@ -33,3 +33,9 @@ export const hojeISO = () => {
 export const diasNaEtapa = (item) => Math.max(0, Math.floor((Date.now() - new Date(item.etapaDesde || item.createdAt).getTime()) / DIA));
 export const dataCurta = (iso) => (iso ? new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) : "");
 export const empresaDe = (x) => x.apresentacao?.empresa || x.dados?.empresa || "";
+// porte (pergunta "Quantas pessoas trabalham na empresa?", desde 27/10/2026); leads anteriores ficam sem
+export const equipeDe = (x) => {
+  const e = x.dados?.perfil?.equipe;
+  if (!e) return "";
+  return e === "so_eu" ? "trabalha sozinho" : `${x.dados.devolutiva?.perfil_textos?.equipe} pessoas`;
+};
