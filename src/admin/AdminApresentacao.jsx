@@ -632,6 +632,15 @@ function Painel({ item, ap, salvar, urls, dados, sid, irPara }) {
         <input className={campo} value={rascunho.fechamento || ""} onChange={(e) => mudar({ fechamento: e.target.value })} onBlur={gravar} placeholder={(dados.oferta.servico.fechamento || "").replace(/\*\*/g, "")} />
         <p className="text-[11px] text-zinc-400 mt-1">Vazio: a frase do serviço. Use **assim** para o trecho em negrito.</p>
       </div>
+      <div>
+        <label className={rotulo}>Tamanho da frase · {rascunho.fechamentoFonte || 104}px</label>
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={() => salvar({ ...rascunho, fechamentoFonte: Math.max(56, (rascunho.fechamentoFonte || 104) - 8) })} className="w-9 h-9 rounded-lg border border-zinc-200 font-bold hover:border-black">A−</button>
+          <input type="range" min="56" max="140" step="4" value={rascunho.fechamentoFonte || 104} onChange={(e) => mudar({ fechamentoFonte: Number(e.target.value) })} onMouseUp={gravar} onTouchEnd={gravar} onKeyUp={gravar} className="flex-1 accent-[#ef4b3a]" />
+          <button type="button" onClick={() => salvar({ ...rascunho, fechamentoFonte: Math.min(140, (rascunho.fechamentoFonte || 104) + 8) })} className="w-9 h-9 rounded-lg border border-zinc-200 font-bold hover:border-black">A+</button>
+        </div>
+        {rascunho.fechamentoFonte && <button type="button" onClick={() => salvar({ ...rascunho, fechamentoFonte: undefined })} className="text-[11px] text-zinc-500 hover:text-black mt-1">Voltar ao padrão (104px)</button>}
+      </div>
     </>,
     conta: <>
       <div>
@@ -859,6 +868,7 @@ export function montarDados(item, ap, urls = {}) {
     parcelamentoProjeto: ap.parcelamentoProjeto || "",
     conta: ap.conta || "",
     fechamento: ap.fechamento || "",
+    fechamentoFonte: ap.fechamentoFonte || 104,
     pilares,
     segundo: segundo?.nome,
     visaoTitulo: ap.visaoTitulo || "",
@@ -1710,7 +1720,7 @@ function Fim({ d, escala }) {
     <Slide livre tipo="escuro" escala={escala} d={d}>
       <img src={LOGO} alt="Last Lab" style={{ position: "absolute", left: 70, top: 61, width: 263, height: 65, filter: "invert(1)" }} />
       <P x={89} y={340} s={30} peso={300} cor="#999999" style={{ letterSpacing: 4, textTransform: "uppercase" }}>{tx("fim", "chapeu")}</P>
-      <P x={82} y={400} s={104} lh={1.12} peso={300} cor="#fff" w={1040}>{negrito(frase)}</P>
+      <P x={82} y={400} s={d.fechamentoFonte} lh={1.12} peso={300} cor="#fff" w={1080}>{negrito(frase)}</P>
 
       <div className="apr-caixa apr-fecha" style={{ left: 1230, top: 72, width: 609, height: 840 }}>
         <p className="rot">{tx("fim", "validadeRot")}</p>
