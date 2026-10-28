@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import ICAL from "npm:ical.js@1.5.0";
 import { apiAgenda, tokenGoogle } from "../_shared/google.ts";
+import { TITULO_CLIENTE, zulu } from "../_shared/convite.ts";
 
 // Agenda do admin <-> Google Agenda do Thomás. Só para admin logado.
 //   {acao: "listar", desde, ate}  compromissos do período (horários ocupados). Com a conta conectada
@@ -164,7 +165,7 @@ async function salvarNoGoogle(token: string, id: string) {
   const mudou = data.convite_inicio && (new Date(data.convite_inicio).getTime() !== new Date(data.inicio).getTime() || (data.convite_link || "") !== local);
   if (data.convite_inicio && !mudou) return data;
   const seq = (data.convite_seq || 0) + (data.convite_inicio ? 1 : 0);
-  await enviarConvite({ ...data, uid: ev.iCalUID || `${ev.id}@google.com`, seq }, data.convite_inicio ? "remarcada" : "confirmada");
+  await enviarConvite(data, data.convite_inicio ? "remarcada" : "confirmada");
   const { data: final, error: e2 } = await supabase.from("reunioes")
     .update({ convite_inicio: data.inicio, convite_link: local, convite_seq: seq }).eq("id", id).select(COLUNAS_REUNIAO).single();
   if (e2) throw e2;
@@ -173,15 +174,10 @@ async function salvarNoGoogle(token: string, id: string) {
 
 async function cancelarNoGoogle(token: string, id: string) {
   const r = await lerReuniao(id);
-  let uid = "";
-  if (r.google_event_id) {
-    const ev = await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}`).catch(() => null);
-    uid = ev?.iCalUID || "";
-    await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}?sendUpdates=none`, { method: "DELETE" });
-  }
+  if (r.google_event_id) await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}?sendUpdates=none`, { method: "DELETE" });
   // o cliente só fica sabendo do cancelamento se tinha recebido a confirmação
   if (r.convidado_email && r.convite_inicio) {
-    await enviarConvite({ ...r, inicio: r.convite_inicio, uid: uid || `${r.google_event_id}@google.com`, seq: (r.convite_seq || 0) + 1 }, "cancelada");
+    await enviarConvite({ ...r, inicio: r.convite_inicio }, "cancelada");
   }
   const { data, error } = await supabase.from("reunioes")
     .update({ google_event_id: null, convite_inicio: null, convite_link: null, convite_seq: (r.convite_seq || 0) + 1 })
@@ -193,31 +189,7 @@ async function cancelarNoGoogle(token: string, id: string) {
 // ---------- e-mail da Last Lab ao convidado ----------
 
 const escH = (t: string) => String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-const escI = (t: string) => String(t ?? "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
-const zulu = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-const TITULO_CLIENTE = "Conversa com a Last Lab";
-
-/** Arquivo .ics (anexo): adiciona, atualiza ou cancela o evento na agenda do cliente (Google, Outlook, iPhone). */
-// deno-lint-ignore no-explicit-any
-function ics(r: any, tipo: string) {
-  const ini = new Date(r.inicio);
-  const fim = new Date(ini.getTime() + r.duracao_min * 60000);
-  const link = /^https?:\/\//.test(r.local || "") ? r.local : "";
-  const cancelada = tipo === "cancelada";
-  return [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Last Lab//Agenda//PT", "CALSCALE:GREGORIAN",
-    `METHOD:${cancelada ? "CANCEL" : "PUBLISH"}`,
-    "BEGIN:VEVENT",
-    `UID:${r.uid}`, `SEQUENCE:${r.seq || 0}`, `DTSTAMP:${zulu(new Date())}`,
-    `DTSTART:${zulu(ini)}`, `DTEND:${zulu(fim)}`,
-    `SUMMARY:${escI(TITULO_CLIENTE)}`,
-    `DESCRIPTION:${escI(link ? `Link da chamada: ${link}` : "Last Lab · lastlab.com.br")}`,
-    link ? `LOCATION:${escI(link)}` : "", link ? `URL:${link}` : "",
-    `ORGANIZER;CN=Last Lab:mailto:contato@lastlab.com.br`,
-    `STATUS:${cancelada ? "CANCELLED" : "CONFIRMED"}`,
-    "END:VEVENT", "END:VCALENDAR",
-  ].filter(Boolean).join("\r\n");
-}
+const LINK_ICS = (id: string) => `${Deno.env.get("SUPABASE_URL")}/functions/v1/convite-ics?r=${id}`;
 
 // deno-lint-ignore no-explicit-any
 function linkGoogleCliente(r: any) {
@@ -247,8 +219,10 @@ function emailConvite(r: any, tipo: string) {
   <p style="margin:6px 0 2px;font-size:20px;font-weight:600;${tipo === "cancelada" ? "text-decoration:line-through" : ""}">${escH(dia.charAt(0).toUpperCase() + dia.slice(1))}</p>
   <p style="margin:0;color:#5c5c63">${h(ini)} às ${h(fim)} (horário de Brasília)${link && tipo !== "cancelada" ? " · Google Meet" : ""}</p>
 </div>`;
-  const acoes = tipo === "cancelada" ? "" : `${link ? `<p style="margin:0 0 12px"><a href="${escH(link)}" style="display:inline-block;background:#ef4b3a;color:#fff;text-decoration:none;font-weight:600;padding:14px 24px;border-radius:999px">Entrar na chamada</a></p>` : ""}
-<p style="margin:0 0 24px;font-size:14px;color:#5c5c63"><a href="${escH(linkGoogleCliente(r))}" style="color:#17171a">Adicionar ao Google Agenda</a> · ou abra o convite em anexo para outras agendas</p>`;
+  const secundario = (href: string, texto: string) =>
+    `<a href="${escH(href)}" style="display:inline-block;border:1.5px solid #17171a;color:#17171a;text-decoration:none;font-weight:600;font-size:14px;padding:10px 18px;border-radius:999px;margin:0 8px 8px 0">${texto}</a>`;
+  const acoes = tipo === "cancelada" ? "" : `${link ? `<p style="margin:0 0 16px"><a href="${escH(link)}" style="display:inline-block;background:#ef4b3a;color:#fff;text-decoration:none;font-weight:600;padding:14px 24px;border-radius:999px">Entrar na chamada</a></p>` : ""}
+<p style="margin:0 0 20px">${secundario(linkGoogleCliente(r), "Adicionar ao Google Agenda")}${secundario(LINK_ICS(r.id), "Outlook ou iPhone")}</p>`;
   return `<!doctype html><html><body style="margin:0;background:#f4f2ec">
 <div style="max-width:560px;margin:0 auto;padding:32px 24px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#17171a">
 <p style="margin:0 0 28px"><img src="${LOGO}" width="120" alt="Last Lab" style="display:block;width:120px;height:auto"></p>
@@ -259,6 +233,30 @@ ${acoes}
 ${tipo === "cancelada" ? "" : p("Se precisar mudar o horário, é só responder este e-mail.")}
 ${p("Um abraço,<br>Thomás<br><span style=\"color:#5c5c63\">Last Lab · <a href=\"https://lastlab.com.br\" style=\"color:#5c5c63\">lastlab.com.br</a></span>")}
 </div></body></html>`;
+}
+
+/** Versão em texto puro (filtros de spam, como o do Outlook, desconfiam de e-mail só em HTML). */
+// deno-lint-ignore no-explicit-any
+function textoConvite(r: any, tipo: string) {
+  const ini = new Date(r.inicio);
+  const fim = new Date(ini.getTime() + r.duracao_min * 60000);
+  const h = (d: Date) => d.toLocaleTimeString("pt-BR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" });
+  const dia = ini.toLocaleDateString("pt-BR", { timeZone: TZ, weekday: "long", day: "numeric", month: "long" });
+  const link = /^https?:\/\//.test(r.local || "") ? r.local : "";
+  const nome = (r.lead?.nome || "").trim().split(/\s+/)[0];
+  const abertura = {
+    confirmada: "Nossa conversa está confirmada.",
+    remarcada: "Mudamos o horário da nossa conversa. O novo horário é este:",
+    cancelada: "A nossa conversa foi cancelada. Se quiser marcar um novo horário, é só responder este e-mail.",
+  }[tipo];
+  return [
+    `Oi${nome ? `, ${nome}` : ""}!`, abertura,
+    `${dia.charAt(0).toUpperCase() + dia.slice(1)}, das ${h(ini)} às ${h(fim)} (horário de Brasília).`,
+    tipo !== "cancelada" && link ? `Link da chamada: ${link}` : "",
+    tipo !== "cancelada" ? `Adicionar à agenda: ${linkGoogleCliente(r)}` : "",
+    tipo !== "cancelada" ? "Se precisar mudar o horário, é só responder este e-mail." : "",
+    "Um abraço,\nThomás\nLast Lab · lastlab.com.br",
+  ].filter(Boolean).join("\n\n");
 }
 
 // deno-lint-ignore no-explicit-any
@@ -275,7 +273,7 @@ async function enviarConvite(r: any, tipo: "confirmada" | "remarcada" | "cancela
       to: [String(r.convidado_email).trim()],
       subject: assunto,
       html: emailConvite(r, tipo),
-      attachments: [{ filename: tipo === "cancelada" ? "cancelamento.ics" : "convite.ics", content: btoa(unescape(encodeURIComponent(ics(r, tipo)))) }],
+      text: textoConvite(r, tipo),
     }),
   });
   if (!res.ok) throw new Error(`O e-mail ao convidado não foi enviado (Resend: ${await res.text()})`);
