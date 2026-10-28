@@ -1069,6 +1069,18 @@ export async function sincronizarMeta(dias = 30) {
   return data;
 }
 
+// Compromissos do Google Agenda num período (função google-agenda, só leitura) para a agenda do admin.
+export async function listGoogleAgenda(desde, ate) {
+  const { data, error } = await supabase.functions.invoke("google-agenda", { body: { desde, ate } });
+  if (error) {
+    const corpo = await error.context?.json?.().catch(() => null);
+    const e = new Error(corpo?.error || error.message);
+    e.codigo = corpo?.codigo;
+    throw e;
+  }
+  return data.eventos || [];
+}
+
 export async function getConteudoBaseDiagnostico() {
   const res = await fetch(`${DIAGNOSTICO_URL}/conteudo.json`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Não consegui ler o conteúdo do diagnóstico (${res.status}).`);

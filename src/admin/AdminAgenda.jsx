@@ -2,12 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { CalendarPlus, ChevronLeft, ChevronRight, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
 import AdminLayout from "./AdminLayout";
-import { addContato, deleteReuniao, listDiagnosticos, listReunioes, salvarReuniao, updateDiagnostico } from "../lib/api";
+import { addContato, deleteReuniao, listDiagnosticos, listGoogleAgenda, listReunioes, salvarReuniao, updateDiagnostico } from "../lib/api";
 import { ABERTOS, empresaDe } from "./crmEtapas";
 
 // Agenda interna da Last Lab: as reuniões marcadas (venda, devolutiva, projeto, internas). Ligada a um
 // lead, a reunião abre a ficha, a apresentação e o roteiro dele, e marcar a reunião move o lead para
 // "Reunião marcada". /admin/agenda?lead=<id> já abre o formulário com o lead escolhido.
+// Os compromissos do Google Agenda (função google-agenda, só leitura) aparecem em cinza como horário ocupado.
 
 const LARANJA = "#ef4b3a";
 const TIPOS = [
@@ -159,11 +160,26 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
 }
 
 
+const COR_GOOGLE = "bg-zinc-100 text-zinc-500 border border-zinc-200";
+
+/** Compromissos do Google por dia (yyyy-mm-dd). Os de dia inteiro ocupam cada dia do intervalo. */
+function googlePorDia(eventos) {
+  const g = {};
+  const por = (k, e) => (g[k] = g[k] || []).push(e);
+  for (const e of eventos) {
+    if (!e.diaInteiro) { por(dataLocal(new Date(e.inicio)), e); continue; }
+    const [y, m, d] = e.inicio.split("-").map(Number);
+    const fim = e.fim || e.inicio;
+    for (let dt = new Date(y, m - 1, d); dataLocal(dt) < fim || dataLocal(dt) === e.inicio; dt.setDate(dt.getDate() + 1)) por(dataLocal(dt), e);
+  }
+  return g;
+}
+
 const SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const PX_HORA = 52;
 
 /** Mês inteiro: cada dia mostra as reuniões; clicar no dia abre os horários dele ao lado. */
-function Mes({ mes, setMes, dia, escolherDia, porDia }) {
+function Mes({ mes, setMes, dia, escolherDia, porDia, google }) {
   const y = mes.getFullYear(), m = mes.getMonth();
   const offset = new Date(y, m, 1).getDay();
   const total = Math.ceil((offset + new Date(y, m + 1, 0).getDate()) / 7) * 7;
@@ -186,6 +202,10 @@ function Mes({ mes, setMes, dia, escolherDia, porDia }) {
         {celulas.map((d) => {
           const k = dataLocal(d);
           const rs = porDia[k] || [];
+          const gs = google[k] || [];
+          const itens = [...rs.map((r) => ({ id: r.id, ini: r.inicio, texto: `${horaLocal(new Date(r.inicio))} ${empresaDaReuniao(r) || r.titulo}`, cor: tipoDe(r.tipo)[2], riscado: r.status === "cancelada" })),
+            ...gs.map((e) => ({ id: e.id, ini: e.diaInteiro ? "" : e.inicio, texto: e.diaInteiro ? e.titulo : `${horaLocal(new Date(e.inicio))} ${e.titulo}`, cor: COR_GOOGLE }))]
+            .sort((a, b) => a.ini.localeCompare(b.ini));
           const fora = d.getMonth() !== m;
           const sel = k === dia;
           return (
@@ -194,19 +214,14 @@ function Mes({ mes, setMes, dia, escolherDia, porDia }) {
               <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${k === hoje ? "text-white" : fora ? "text-zinc-300" : "text-black"}`}
                 style={k === hoje ? { background: LARANJA } : undefined}>{d.getDate()}</span>
               <div className="hidden sm:block space-y-0.5 mt-0.5">
-                {rs.slice(0, 3).map((r) => {
-                  const [, , cor] = tipoDe(r.tipo);
-                  return (
-                    <span key={r.id} className={`block truncate text-[10px] font-semibold px-1.5 py-0.5 rounded ${cor} ${r.status === "cancelada" ? "line-through opacity-50" : ""}`}>
-                      {horaLocal(new Date(r.inicio))} {empresaDaReuniao(r) || r.titulo}
-                    </span>
-                  );
-                })}
-                {rs.length > 3 && <span className="block text-[10px] font-semibold text-zinc-500 px-1">+{rs.length - 3}</span>}
+                {itens.slice(0, 3).map((x) => (
+                  <span key={x.id} className={`block truncate text-[10px] font-semibold px-1.5 py-0.5 rounded ${x.cor} ${x.riscado ? "line-through opacity-50" : ""}`}>{x.texto}</span>
+                ))}
+                {itens.length > 3 && <span className="block text-[10px] font-semibold text-zinc-500 px-1">+{itens.length - 3}</span>}
               </div>
-              {rs.length > 0 && (
+              {itens.length > 0 && (
                 <div className="sm:hidden flex gap-0.5 mt-1 justify-center">
-                  {rs.slice(0, 3).map((r) => <i key={r.id} className="w-1.5 h-1.5 rounded-full" style={{ background: r.status === "cancelada" ? "#d4d4d8" : LARANJA }} />)}
+                  {itens.slice(0, 3).map((x) => <i key={x.id} className="w-1.5 h-1.5 rounded-full" style={{ background: x.cor === COR_GOOGLE || x.riscado ? "#d4d4d8" : LARANJA }} />)}
                 </div>
               )}
             </button>
@@ -218,15 +233,24 @@ function Mes({ mes, setMes, dia, escolherDia, porDia }) {
 }
 
 /** Horários do dia: as reuniões no horário certo; clicar num horário livre marca uma reunião ali. */
-function Dia({ dia, reunioes, aberta, setAberta, onNova }) {
+function Dia({ dia, reunioes, google, googleEstado, aberta, setAberta, onNova }) {
   const inicioMin = (r) => { const d = new Date(r.inicio); return d.getHours() * 60 + d.getMinutes(); };
-  const hIni = Math.min(8, ...reunioes.map((r) => Math.floor(inicioMin(r) / 60)));
-  const hFim = Math.max(20, ...reunioes.map((r) => Math.ceil((inicioMin(r) + r.duracao_min) / 60)));
+  const diaInteiro = google.filter((e) => e.diaInteiro);
+  // reuniões do site e compromissos do Google juntos na linha do tempo
+  const itens = [
+    ...reunioes,
+    ...google.filter((e) => !e.diaInteiro).map((e) => ({
+      id: e.id, titulo: e.titulo, inicio: e.inicio, externo: true,
+      duracao_min: Math.max(15, Math.min((new Date(e.fim) - new Date(e.inicio)) / 60000, 24 * 60 - inicioMin(e))),
+    })),
+  ].sort((a, b) => inicioMin(a) - inicioMin(b));
+  const hIni = Math.min(8, ...itens.map((r) => Math.floor(inicioMin(r) / 60)));
+  const hFim = Math.min(24, Math.max(20, ...itens.map((r) => Math.ceil((inicioMin(r) + r.duracao_min) / 60))));
   const horas = Array.from({ length: hFim - hIni }, (_, i) => hIni + i);
   // reuniões que se sobrepõem ficam lado a lado
   const colunas = [];
   const coluna = {};
-  reunioes.forEach((r) => {
+  itens.forEach((r) => {
     const i = colunas.findIndex((fim) => fim <= inicioMin(r));
     const c = i === -1 ? colunas.length : i;
     colunas[c] = inicioMin(r) + r.duracao_min;
@@ -240,7 +264,12 @@ function Dia({ dia, reunioes, aberta, setAberta, onNova }) {
     <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
       <div className="px-4 py-3 border-b border-zinc-100">
         <p className="text-sm font-bold text-black">{rotuloDia(`${dia}T12:00`)}</p>
-        <p className="text-xs text-zinc-500">{reunioes.length ? `${reunioes.length} ${reunioes.length === 1 ? "reunião" : "reuniões"}` : "Dia livre"} · clique num horário para marcar</p>
+        <p className="text-xs text-zinc-500">{reunioes.length ? `${reunioes.length} ${reunioes.length === 1 ? "reunião" : "reuniões"}` : "Nenhuma reunião"} · clique num horário para marcar</p>
+        {diaInteiro.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {diaInteiro.map((e) => <span key={e.id} className={`text-[11px] font-semibold px-2 py-0.5 rounded ${COR_GOOGLE}`}>{e.titulo}</span>)}
+          </div>
+        )}
       </div>
       <div className="pt-3 pb-2"><div className="relative" style={{ height: horas.length * PX_HORA }}>
         {horas.map((h, i) => (
@@ -255,21 +284,36 @@ function Dia({ dia, reunioes, aberta, setAberta, onNova }) {
             <i className="absolute -left-1 -top-1 w-2.5 h-2.5 rounded-full" style={{ background: LARANJA }} />
           </div>
         )}
-        {reunioes.map((r) => {
-          const [, , cor] = tipoDe(r.tipo);
+        {itens.map((r) => {
           const top = (inicioMin(r) - hIni * 60) * PX_HORA / 60;
           const altura = Math.max(r.duracao_min * PX_HORA / 60 - 2, 22);
           const largura = `calc((100% - 64px) / ${nCol})`;
+          const posicao = { top: top + 1, height: altura, left: `calc(60px + ${largura} * ${coluna[r.id]})`, width: `calc(${largura} - 4px)` };
+          if (r.externo) {
+            return (
+              <div key={r.id} title={`Google Agenda: ${r.titulo}`} className={`absolute rounded-lg px-2 py-1 overflow-hidden ${COR_GOOGLE}`} style={posicao}>
+                <p className="text-xs font-semibold truncate">{r.titulo}</p>
+                {altura > 34 && <p className="text-[11px] truncate">{horaLocal(new Date(r.inicio))}–{horaLocal(fimDe(r))} · Google</p>}
+              </div>
+            );
+          }
+          const [, , cor] = tipoDe(r.tipo);
           return (
             <button key={r.id} type="button" onClick={() => setAberta(r.id)}
               className={`absolute rounded-lg px-2 py-1 text-left overflow-hidden ${cor} ${aberta === r.id ? "ring-2 ring-black" : ""} ${r.status === "cancelada" ? "opacity-40 line-through" : ""}`}
-              style={{ top: top + 1, height: altura, left: `calc(60px + ${largura} * ${coluna[r.id]})`, width: `calc(${largura} - 4px)` }}>
+              style={posicao}>
               <p className="text-xs font-bold truncate">{empresaDaReuniao(r) || r.titulo}</p>
               {altura > 34 && <p className="text-[11px] opacity-80 truncate">{horaLocal(new Date(r.inicio))}–{horaLocal(fimDe(r))}</p>}
             </button>
           );
         })}
       </div></div>
+      <p className="px-4 py-2 border-t border-zinc-100 text-[11px] text-zinc-500">
+        {googleEstado === "ok" && <><i className={`inline-block w-2.5 h-2.5 rounded-sm align-middle mr-1.5 ${COR_GOOGLE}`} />Em cinza: compromissos do seu Google Agenda</>}
+        {googleEstado === "carregando" && "Lendo o Google Agenda..."}
+        {googleEstado === "nao_configurado" && "Google Agenda não conectado: falta o segredo GOOGLE_ICS_URL no Supabase."}
+        {googleEstado?.startsWith?.("erro:") && `Google Agenda: ${googleEstado.slice(5)}`}
+      </p>
     </div>
   );
 }
@@ -283,6 +327,8 @@ export default function AdminAgenda() {
   const [mes, setMes] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
   const [aberta, setAberta] = useState(null); // reunião escolhida no dia
   const [verPendentes, setVerPendentes] = useState(false);
+  const [google, setGoogle] = useState([]);
+  const [googleEstado, setGoogleEstado] = useState("carregando"); // ok | nao_configurado | erro:<mensagem>
   const [erro, setErro] = useState("");
 
   useEffect(() => {
@@ -291,6 +337,17 @@ export default function AdminAgenda() {
       .then((itens) => setLeads(itens.filter((x) => ABERTOS.includes(x.status) || x.status === "fechado")))
       .catch(() => {});
   }, []);
+  // Google Agenda do mês visível (com as pontas das semanas vizinhas)
+  useEffect(() => {
+    const y = mes.getFullYear(), m = mes.getMonth();
+    const ini = new Date(y, m, 1 - new Date(y, m, 1).getDay());
+    const fim = new Date(ini.getTime() + 43 * 86400000);
+    let vivo = true;
+    listGoogleAgenda(ini.toISOString(), fim.toISOString())
+      .then((eventos) => { if (vivo) { setGoogle(eventos); setGoogleEstado("ok"); } })
+      .catch((e) => { if (vivo) { setGoogle([]); setGoogleEstado(e.codigo === "nao_configurado" ? "nao_configurado" : `erro:${e.message || e}`); } });
+    return () => { vivo = false; };
+  }, [mes.getTime()]);
   // ?lead=<id>: abre o formulário já com o lead
   useEffect(() => {
     const id = params.get("lead");
@@ -353,6 +410,11 @@ export default function AdminAgenda() {
   }, {}), [reunioes]);
   // passaram e ninguém marcou como feita ou cancelada
   const pendentes = useMemo(() => (reunioes || []).filter((r) => fimDe(r) < new Date() && r.status === "marcada"), [reunioes]);
+  // o que foi criado no site e copiado para o Google não aparece duas vezes
+  const googleDia = useMemo(() => {
+    const doSite = new Set((reunioes || []).filter((r) => r.status !== "cancelada").map((r) => Math.round(new Date(r.inicio).getTime() / 60000)));
+    return googlePorDia(google.filter((e) => e.diaInteiro || !doSite.has(Math.round(new Date(e.inicio).getTime() / 60000))));
+  }, [google, reunioes]);
   const doDia = porDia[dia] || [];
   const escolhida = doDia.find((r) => r.id === aberta);
   const cartao = (r) => <Cartao key={r.id} r={r} onEditar={() => editar(r)} onStatus={(s) => mudarStatus(r, s)} onExcluir={() => excluir(r)} />;
@@ -387,9 +449,9 @@ export default function AdminAgenda() {
 
         {reunioes === null ? <p className="text-sm text-zinc-500">Carregando...</p> : (
           <div className="grid lg:grid-cols-[1fr_380px] gap-6 items-start">
-            <Mes mes={mes} setMes={setMes} dia={dia} escolherDia={escolherDia} porDia={porDia} />
+            <Mes mes={mes} setMes={setMes} dia={dia} escolherDia={escolherDia} porDia={porDia} google={googleDia} />
             <div className="space-y-3 lg:sticky lg:top-4">
-              <Dia dia={dia} reunioes={doDia} aberta={aberta} setAberta={setAberta}
+              <Dia dia={dia} reunioes={doDia} google={googleDia[dia] || []} googleEstado={googleEstado} aberta={aberta} setAberta={setAberta}
                 onNova={(hora) => { setForm(vazio(null, dia, hora)); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
               {escolhida && cartao(escolhida)}
             </div>
