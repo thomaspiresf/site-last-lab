@@ -103,6 +103,7 @@ function mapPost(row) {
     scheduled: row.scheduled,
     scheduledAt: row.scheduled_at,
     figmaUrl: row.figma_url,
+    canal: row.canal || "feed",
   };
 }
 
@@ -370,7 +371,7 @@ export async function listPosts(calendarId) {
   return data.map(mapPost);
 }
 
-export async function addPost({ calendarId, media, caption, scheduledDate, tag, figmaUrl }) {
+export async function addPost({ calendarId, media, caption, scheduledDate, tag, figmaUrl, canal }) {
   const { count } = await supabase
     .from("posts")
     .select("*", { count: "exact", head: true })
@@ -386,6 +387,7 @@ export async function addPost({ calendarId, media, caption, scheduledDate, tag, 
       scheduled_date: scheduledDate || null,
       tag: tag || "",
       figma_url: figmaUrl || null,
+      canal: canal || "feed",
     })
     .select()
     .single();

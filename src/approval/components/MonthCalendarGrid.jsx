@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Video } from "lucide-react";
 import { buildMonthWeeks } from "../../lib/dateGrid";
 import { tagColor } from "../../lib/tagColor";
+import { STORY_RING } from "../../lib/postFormat";
 import { PILLARS } from "../../lib/contentPillars";
 
 const WEEKDAYS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
@@ -82,7 +83,7 @@ export default function MonthCalendarGrid({ month, posts, onSelectPost }) {
                 {firstPost && (
                   <button
                     onClick={() => onSelectPost(firstPost)}
-                    className="sm:hidden relative w-full aspect-square rounded-md overflow-hidden bg-zinc-100 block mx-auto"
+                    className={`sm:hidden relative w-full aspect-square rounded-md overflow-hidden bg-zinc-100 block mx-auto ${firstPost.canal === "stories" ? STORY_RING : ""}`}
                   >
                     <Thumb media={firstPost.media?.[0]} className="w-full h-full object-cover" />
                     <span className={`absolute bottom-0 left-0 right-0 h-[3px] ${tagColor(firstPost.tag).dot}`} />
@@ -105,7 +106,7 @@ export default function MonthCalendarGrid({ month, posts, onSelectPost }) {
                         onClick={() => onSelectPost(post)}
                         className="block w-full text-left group"
                       >
-                        <div className="relative w-full aspect-square rounded-md overflow-hidden bg-zinc-100 mb-1">
+                        <div className={`relative w-full aspect-square rounded-md overflow-hidden bg-zinc-100 mb-1 ${post.canal === "stories" ? STORY_RING : ""}`}>
                           <Thumb media={post.media?.[0]} className="w-full h-full object-cover" />
                           {isVideo && (
                             <Video size={12} className="absolute bottom-1 right-1 text-white drop-shadow" />

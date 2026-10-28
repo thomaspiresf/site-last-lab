@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Video, Pencil } from "lucide-react";
 import { buildMonthWeeks } from "../../lib/dateGrid";
 import { tagColor } from "../../lib/tagColor";
-import { FORMAT_LABEL, getPostFormat } from "../../lib/postFormat";
+import { FORMAT_LABEL, getPostFormat, STORY_RING } from "../../lib/postFormat";
 import { PILLARS } from "../../lib/contentPillars";
 
 const WEEKDAYS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
@@ -103,9 +103,9 @@ export default function CalendarDragGrid({ month, posts, onMove, onEdit }) {
                   >
                     {cell.date.getDate()}
                   </p>
-                  {dayPosts[0] && FORMAT_LABEL[getPostFormat(dayPosts[0].media)] && (
+                  {dayPosts[0] && FORMAT_LABEL[getPostFormat(dayPosts[0].media, dayPosts[0].canal)] && (
                     <span className="text-[7px] sm:text-[9px] font-semibold text-zinc-400 truncate">
-                      {FORMAT_LABEL[getPostFormat(dayPosts[0].media)].label}
+                      {FORMAT_LABEL[getPostFormat(dayPosts[0].media, dayPosts[0].canal)].label}
                     </span>
                   )}
                 </div>
@@ -124,7 +124,7 @@ export default function CalendarDragGrid({ month, posts, onMove, onEdit }) {
                           setOverKey(null);
                         }}
                         onClick={() => onEdit?.(post)}
-                        className={`${dragCardCls(post.id)} group`}
+                        className={`${dragCardCls(post.id)} group ${post.canal === "stories" ? STORY_RING : ""}`}
                         title={post.caption || "Sem legenda"}
                       >
                         <Thumb media={post.media?.[0]} className="w-full h-full object-cover pointer-events-none" />

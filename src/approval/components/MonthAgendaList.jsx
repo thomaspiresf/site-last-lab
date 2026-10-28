@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Video } from "lucide-react";
 import { buildMonthWeeks } from "../../lib/dateGrid";
 import { tagColor } from "../../lib/tagColor";
+import { STORY_RING } from "../../lib/postFormat";
 
 const WEEKDAYS_SHORT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
@@ -48,7 +49,7 @@ export default function MonthAgendaList({ month, posts, onSelectPost }) {
                         onClick={() => onSelectPost(post)}
                         className="flex items-start gap-2.5 w-full text-left group"
                       >
-                        <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-md overflow-hidden bg-zinc-100 shrink-0">
+                        <div className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-md overflow-hidden bg-zinc-100 shrink-0 ${post.canal === "stories" ? STORY_RING : ""}`}>
                           {isVideo ? (
                             <video src={post.media[0].dataUrl} className="w-full h-full object-cover" muted />
                           ) : (

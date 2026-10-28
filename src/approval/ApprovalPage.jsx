@@ -5,6 +5,8 @@ import InstagramHeader from "./components/InstagramHeader";
 import InstagramTabs from "./components/InstagramTabs";
 import InstagramGrid from "./components/InstagramGrid";
 import InstagramPostModal from "./components/InstagramPostModal";
+import StoriesTray from "./components/StoriesTray";
+import StoryViewer from "./components/StoryViewer";
 import MonthCalendarGrid from "./components/MonthCalendarGrid";
 import MonthAgendaList from "./components/MonthAgendaList";
 import ViewSwitcher from "./components/ViewSwitcher";
@@ -25,7 +27,8 @@ function monthLabel(month) {
 export default function ApprovalPage() {
   const { token } = useParams();
   const [data, setData] = useState(undefined); // undefined = loading, null = not found
-  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null); // índice no feed
+  const [storyIndex, setStoryIndex] = useState(null); // índice nos stories
   const [view, setView] = useState("grid"); // "grid" | "calendar" | "list"
   const [submitting, setSubmitting] = useState(false);
   const [showAdjustModal, setShowAdjustModal] = useState(false);
@@ -85,6 +88,15 @@ export default function ApprovalPage() {
   }
 
   const { calendar, client, posts } = data;
+  // stories não entram na grade: ficam na fileira de círculos e abrem no visualizador 9:16
+  const feed = posts.filter((p) => p.canal !== "stories");
+  const stories = posts
+    .filter((p) => p.canal === "stories")
+    .sort((a, b) => (a.scheduledDate || "9999").localeCompare(b.scheduledDate || "9999"));
+  const abrirPost = (post) => {
+    if (post.canal === "stories") setStoryIndex(stories.findIndex((p) => p.id === post.id));
+    else setSelectedIndex(feed.findIndex((p) => p.id === post.id));
+  };
   const isApproved = calendar.status === "approved";
   const isAdjustRequested = calendar.status === "changes_requested";
 
@@ -120,20 +132,21 @@ export default function ApprovalPage() {
           <MonthCalendarGrid
             month={calendar.month}
             posts={posts}
-            onSelectPost={(post) => setSelectedIndex(posts.findIndex((p) => p.id === post.id))}
+            onSelectPost={abrirPost}
           />
         )}
         {view === "list" && (
           <MonthAgendaList
             month={calendar.month}
             posts={posts}
-            onSelectPost={(post) => setSelectedIndex(posts.findIndex((p) => p.id === post.id))}
+            onSelectPost={abrirPost}
           />
         )}
         {view === "grid" && (
           <>
+            <StoriesTray stories={stories} onSelect={setStoryIndex} />
             <InstagramTabs />
-            <InstagramGrid posts={posts} onSelect={setSelectedIndex} />
+            <InstagramGrid posts={feed} onSelect={setSelectedIndex} />
           </>
         )}
       </div>
@@ -187,10 +200,20 @@ export default function ApprovalPage() {
       {selectedIndex !== null && (
         <InstagramPostModal
           client={client}
-          posts={posts}
+          posts={feed}
           index={selectedIndex}
           onClose={() => setSelectedIndex(null)}
           onNavigate={setSelectedIndex}
+        />
+      )}
+
+      {storyIndex !== null && (
+        <StoryViewer
+          client={client}
+          stories={stories}
+          index={storyIndex}
+          onClose={() => setStoryIndex(null)}
+          onNavigate={setStoryIndex}
         />
       )}
     </div>

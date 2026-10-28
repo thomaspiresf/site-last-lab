@@ -24,6 +24,7 @@ import {
 import AdminLayout from "./AdminLayout";
 import CalendarDragGrid from "./components/CalendarDragGrid";
 import InstagramPostModal from "../approval/components/InstagramPostModal";
+import StoryViewer from "../approval/components/StoryViewer";
 import {
   getCalendar,
   getClient,
@@ -41,7 +42,7 @@ import {
 } from "../lib/api";
 import { tagColor } from "../lib/tagColor";
 import { PILLARS } from "../lib/contentPillars";
-import { FORMAT_LABEL, getPostFormat } from "../lib/postFormat";
+import { FORMAT_LABEL, getPostFormat, STORY_RING } from "../lib/postFormat";
 
 const VIEWS = [
   { id: "list", label: "Lista", icon: List },
@@ -84,6 +85,8 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
   const [saving, setSaving] = useState(false);
   const [draggingMediaIdx, setDraggingMediaIdx] = useState(null);
   const [figmaUrl, setFigmaUrl] = useState(post?.figmaUrl || "");
+  const [canal, setCanal] = useState(post?.canal || "feed");
+  const ehStories = canal === "stories";
   const [puxando, setPuxando] = useState(false);
   const [erroFigma, setErroFigma] = useState("");
 
@@ -133,9 +136,9 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
     setSaving(true);
 
     if (isEdit) {
-      await updatePost(post.id, { caption, scheduledDate, tag, media: mediaList, figmaUrl: figmaUrl.trim() || null });
+      await updatePost(post.id, { caption, scheduledDate, tag, media: mediaList, figmaUrl: figmaUrl.trim() || null, canal });
     } else {
-      await addPost({ calendarId, media: mediaList, caption, scheduledDate, tag, figmaUrl: figmaUrl.trim() });
+      await addPost({ calendarId, media: mediaList, caption, scheduledDate, tag, figmaUrl: figmaUrl.trim(), canal });
       setMediaList([]);
       setFigmaUrl("");
       setCaption("");
@@ -161,10 +164,35 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
       )}
 
       <div>
+        <label className="block text-xs font-semibold text-zinc-600 mb-2">Onde sai</label>
+        <div className="inline-flex items-center bg-zinc-100 rounded-[14px] p-1 gap-1 w-full">
+          {[
+            { id: "feed", label: "Feed", hint: "1080 × 1350 · entra na grade" },
+            { id: "stories", label: "Stories", hint: "1080 × 1920 · sequência, fora da grade" },
+          ].map((op) => (
+            <button
+              key={op.id}
+              type="button"
+              onClick={() => setCanal(op.id)}
+              title={op.hint}
+              className={`flex-1 px-3 py-2 rounded-[10px] text-sm font-semibold transition-all ${
+                canal === op.id ? "bg-white text-black shadow-sm" : "text-zinc-500 hover:text-zinc-700"
+              }`}
+            >
+              {op.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-zinc-400 mt-1.5">
+          {ehStories ? "Stories: telas em 1080 × 1920, na ordem em que vão ao ar." : "Feed: telas em 1080 × 1350; a primeira é a capa na grade."}
+        </p>
+      </div>
+
+      <div>
         <label className="flex items-center gap-2 text-xs font-semibold text-zinc-600 mb-2">
           Mídia do post
           {mediaList.length > 0 && (() => {
-            const format = FORMAT_LABEL[getPostFormat(mediaList)];
+            const format = FORMAT_LABEL[getPostFormat(mediaList, canal)];
             if (!format) return null;
             const FormatIcon = format.icon;
             return (
@@ -174,7 +202,7 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
               </span>
             );
           })()}
-          {mediaList.length > 1 && (
+          {mediaList.length > 1 && !ehStories && (
             <span className="font-normal text-zinc-400 normal-case">a primeira é a capa</span>
           )}
         </label>
@@ -255,13 +283,13 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-zinc-600 mb-1">Legenda</label>
+        <label className="block text-xs font-semibold text-zinc-600 mb-1">{ehStories ? "Notas do stories" : "Legenda"}</label>
         <textarea
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           rows={3}
           className="w-full px-3.5 py-2.5 rounded-[10px] border border-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-black/80 resize-none"
-          placeholder="Escreva a legenda do post..."
+          placeholder={ehStories ? "Link, enquete, caixinha de perguntas, música..." : "Escreva a legenda do post..."}
         />
       </div>
 
@@ -335,7 +363,7 @@ export default function AdminCalendarEditor() {
   const [view, setView] = useState("list");
   const [editingPost, setEditingPost] = useState(null);
   const [draggingPostId, setDraggingPostId] = useState(null);
-  const [previewIndex, setPreviewIndex] = useState(null);
+  const [previewId, setPreviewId] = useState(null);
   const [editingMonth, setEditingMonth] = useState(false);
   const [monthValue, setMonthValue] = useState("");
 
@@ -634,7 +662,7 @@ export default function AdminCalendarEditor() {
               <span className="text-zinc-300 hover:text-zinc-500 cursor-grab active:cursor-grabbing shrink-0 touch-none">
                 <GripVertical size={16} />
               </span>
-              <div className="w-16 h-16 rounded-lg overflow-hidden bg-zinc-100 shrink-0 relative">
+              <div className={`w-16 h-16 rounded-lg overflow-hidden bg-zinc-100 shrink-0 relative ${post.canal === "stories" ? STORY_RING : ""}`}>
                 {post.media[0]?.type === "video" ? (
                   <video src={post.media[0].dataUrl} className="w-full h-full object-cover pointer-events-none" muted />
                 ) : (
@@ -649,7 +677,7 @@ export default function AdminCalendarEditor() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
                   {(() => {
-                    const format = FORMAT_LABEL[getPostFormat(post.media)];
+                    const format = FORMAT_LABEL[getPostFormat(post.media, post.canal)];
                     if (!format) return null;
                     const FormatIcon = format.icon;
                     return (
@@ -691,7 +719,7 @@ export default function AdminCalendarEditor() {
                 <CalendarCheck size={16} />
               </button>
               <button
-                onClick={() => setPreviewIndex(posts.indexOf(post))}
+                onClick={() => setPreviewId(post.id)}
                 className="text-zinc-400 hover:text-black transition-colors shrink-0"
                 title="Visualizar formato final"
               >
@@ -731,15 +759,22 @@ export default function AdminCalendarEditor() {
         </div>
       </div>
 
-      {previewIndex !== null && posts && (
-        <InstagramPostModal
-          client={client}
-          posts={posts}
-          index={previewIndex}
-          onClose={() => setPreviewIndex(null)}
-          onNavigate={setPreviewIndex}
-        />
-      )}
+      {previewId && posts && (() => {
+        // feed e stories têm visualizações próprias; cada uma navega só entre os do mesmo canal
+        const alvo = posts.find((p) => p.id === previewId);
+        const lista = posts.filter((p) => (p.canal === "stories") === (alvo?.canal === "stories"));
+        const Visualizador = alvo?.canal === "stories" ? StoryViewer : InstagramPostModal;
+        return (
+          <Visualizador
+            client={client}
+            posts={lista}
+            stories={lista}
+            index={lista.findIndex((p) => p.id === previewId)}
+            onClose={() => setPreviewId(null)}
+            onNavigate={(i) => setPreviewId(lista[i].id)}
+          />
+        );
+      })()}
     </AdminLayout>
   );
 }
