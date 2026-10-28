@@ -1090,6 +1090,11 @@ export async function reuniaoNoGoogle(acao, id) {
   return (await invocarFuncao("google-agenda", { acao, id })).reuniao;
 }
 
+/** Analisa a transcrição da reunião com IA (função analisar-reuniao); devolve a reunião com os insights. */
+export async function analisarReuniao(id, transcricao) {
+  return (await invocarFuncao("analisar-reuniao", { id, transcricao })).reuniao;
+}
+
 /** Conta Google da agenda: "status" ({conectado, email}), "iniciar" ({url} do login) ou "desconectar". */
 export async function contaGoogleAgenda(acao = "status") {
   return invocarFuncao("google-conta", { acao, voltar: `${window.location.origin}/admin/agenda` });

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Bell, CalendarPlus, Check, ChevronLeft, ChevronRight, Copy, MessageCircle, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
+import { Bell, CalendarPlus, Check, ChevronLeft, ChevronRight, Copy, FileText, MessageCircle, X, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
 import AdminLayout from "./AdminLayout";
-import { addContato, contaGoogleAgenda, deleteReuniao, listDiagnosticos, listGoogleAgenda, listReunioes, reuniaoNoGoogle, salvarReuniao, updateDiagnostico } from "../lib/api";
+import { addContato, analisarReuniao, contaGoogleAgenda, deleteReuniao, listDiagnosticos, listGoogleAgenda, listReunioes, reuniaoNoGoogle, salvarReuniao, updateDiagnostico } from "../lib/api";
 import { ABERTOS, empresaDe } from "./crmEtapas";
 
 // Agenda interna da Last Lab: as reuniões marcadas (venda, devolutiva, projeto, internas). Ligada a um
@@ -149,7 +149,7 @@ function Formulario({ inicial, leads, googleConectado, onSalvar, onCancelar }) {
   );
 }
 
-function Cartao({ r, onEditar, onStatus, onExcluir }) {
+function Cartao({ r, onEditar, onStatus, onExcluir, onConversa }) {
   // confirmação dentro do card (o confirm() do navegador some em alguns navegadores embutidos)
   const [confirmando, setConfirmando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
@@ -206,6 +206,11 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
             </>
           )}
           {!r.google_event_id && <a href={linkGoogle(r)} target="_blank" rel="noopener" className={botao} title="Abre o evento preenchido no Google Agenda"><CalendarPlus size={13} />Google Agenda</a>}
+          {(passou || r.insights) && (
+            <button type="button" onClick={onConversa} className={botao} title="Cole a transcrição e a IA tira os insights">
+              <FileText size={13} />{r.insights ? "Ver conversa" : "Registrar conversa"}
+            </button>
+          )}
           <button type="button" onClick={onEditar} className={botao}>Editar</button>
           {r.status === "marcada" && passou && <button type="button" onClick={() => onStatus("feita")} className={botao}>Marcar como feita</button>}
           {r.status === "marcada" && <button type="button" onClick={() => onStatus("cancelada")} className={botao}>Cancelar</button>}
@@ -240,6 +245,88 @@ function googlePorDia(eventos) {
     for (let dt = new Date(y, m - 1, d); dataLocal(dt) < fim || dataLocal(dt) === e.inicio; dt.setDate(dt.getDate() + 1)) por(dataLocal(dt), e);
   }
   return g;
+}
+
+
+const TEMPERATURA = { quente: "bg-[#ef4b3a] text-white", morna: "bg-amber-100 text-amber-800", fria: "bg-sky-100 text-sky-800" };
+
+/** Registro da conversa: cola a transcrição (tl;dv, Fathom...) e a IA tira dores, objeções e próximos passos. */
+function Conversa({ r, onFechar, onSalva }) {
+  const [editando, setEditando] = useState(!r.insights);
+  const [texto, setTexto] = useState(r.transcricao || "");
+  const [analisando, setAnalisando] = useState(false);
+  const [erro, setErro] = useState("");
+  const i = r.insights;
+  const analisar = async () => {
+    setAnalisando(true); setErro("");
+    try { onSalva(await analisarReuniao(r.id, texto)); setEditando(false); }
+    catch (e) { setErro(e.message || String(e)); }
+    finally { setAnalisando(false); }
+  };
+  const lista = (titulo, itens, citacao) => itens?.length > 0 && (
+    <section>
+      <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1.5">{titulo}</h3>
+      <ul className="space-y-1">
+        {itens.map((t, k) => <li key={k} className={`text-sm ${citacao ? "italic text-zinc-700 border-l-2 border-zinc-200 pl-3" : "text-zinc-800 pl-3 relative before:content-['·'] before:absolute before:left-0"}`}>{citacao ? `“${t}”` : t}</li>)}
+      </ul>
+    </section>
+  );
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-start justify-center p-4 overflow-y-auto" onClick={onFechar}>
+      <div className="bg-white rounded-3xl w-full max-w-2xl my-8 p-6 space-y-5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide">Conversa</p>
+            <h2 className="text-xl font-black text-black">{r.titulo}</h2>
+            <p className="text-sm text-zinc-500">{rotuloDia(r.inicio)} · {horaLocal(new Date(r.inicio))}</p>
+          </div>
+          <button type="button" onClick={onFechar} className="p-1.5 rounded-full hover:bg-zinc-100" title="Fechar"><X size={18} /></button>
+        </div>
+
+        {editando ? (
+          <div className="space-y-3">
+            <p className="text-sm text-zinc-600">Cole a transcrição da reunião (do tl;dv, Fathom ou outra ferramenta). A IA tira o resumo, as dores, as objeções, o que interessou e os próximos passos, e registra na ficha do lead.</p>
+            <textarea value={texto} onChange={(e) => setTexto(e.target.value)} rows={12} placeholder="Cole a transcrição aqui..."
+              className="w-full px-3 py-2 rounded-xl border border-zinc-200 text-sm outline-none focus:border-black resize-y font-mono" />
+            {erro && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{erro}</p>}
+            <div className="flex justify-end gap-2">
+              {r.insights && <button type="button" onClick={() => setEditando(false)} className="px-4 py-2 rounded-full text-sm font-semibold border border-zinc-200 hover:border-black">Voltar</button>}
+              <button type="button" onClick={analisar} disabled={analisando || texto.trim().length < 200}
+                className="px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800 disabled:opacity-40">
+                {analisando ? "Analisando... (até 1 min)" : r.insights ? "Analisar de novo" : "Analisar com IA"}
+              </button>
+            </div>
+          </div>
+        ) : i && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full capitalize ${TEMPERATURA[i.temperatura] || TEMPERATURA.morna}`}>{i.temperatura}</span>
+              <span className="text-sm text-zinc-600">{i.temperatura_motivo}</span>
+            </div>
+            <p className="text-[15px] text-zinc-800 leading-relaxed">{i.resumo}</p>
+            <div className="grid sm:grid-cols-3 gap-2">
+              {[["Orçamento", i.orcamento], ["Urgência", i.urgencia], ["Quem decide", i.decisores]].map(([t, v]) => (
+                <div key={t} className="bg-zinc-50 rounded-xl px-3 py-2">
+                  <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-wide">{t}</p>
+                  <p className="text-sm text-zinc-800">{v}</p>
+                </div>
+              ))}
+            </div>
+            {lista("Próximos passos", i.proximos_passos)}
+            {lista("Dores", i.dores)}
+            {lista("Objeções", i.objecoes)}
+            {lista("O que interessou", i.interesse)}
+            {lista("Frases do cliente", i.frases, true)}
+            {lista("Para a Last Lab aprender", i.aprendizados)}
+            <div className="flex justify-between items-center pt-2 border-t border-zinc-100">
+              <p className="text-xs text-zinc-400">Analisado em {new Date(r.insights_em).toLocaleString("pt-BR")}{r.diagnostico_id ? " · registrado na ficha do lead" : ""}</p>
+              <button type="button" onClick={() => setEditando(true)} className="text-sm font-semibold text-zinc-600 hover:text-black underline">Ver transcrição / refazer</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
 
 const SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -394,6 +481,7 @@ export default function AdminAgenda() {
   const [mes, setMes] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
   const [aberta, setAberta] = useState(null); // reunião escolhida no dia
   const [verPendentes, setVerPendentes] = useState(false);
+  const [conversa, setConversa] = useState(null); // id da reunião com o registro da conversa aberto
   const [google, setGoogle] = useState([]);
   const [googleEstado, setGoogleEstado] = useState("carregando"); // ok | nao_configurado | erro:<mensagem>
   const [conta, setConta] = useState(null); // {conectado, email} da conta Google (Meet e convites)
@@ -560,7 +648,8 @@ export default function AdminAgenda() {
   }, [google, reunioes]);
   const doDia = porDia[dia] || [];
   const escolhida = doDia.find((r) => r.id === aberta);
-  const cartao = (r) => <Cartao key={r.id} r={r} onEditar={() => editar(r)} onStatus={(s) => mudarStatus(r, s)} onExcluir={() => excluir(r)} />;
+  const cartao = (r) => <Cartao key={r.id} r={r} onEditar={() => editar(r)} onStatus={(s) => mudarStatus(r, s)} onExcluir={() => excluir(r)} onConversa={() => setConversa(r.id)} />;
+  const reuniaoConversa = (reunioes || []).find((r) => r.id === conversa);
 
   return (
     <AdminLayout>
@@ -619,6 +708,10 @@ export default function AdminAgenda() {
           </div>
         )}
       </div>
+      {reuniaoConversa && (
+        <Conversa r={reuniaoConversa} onFechar={() => setConversa(null)}
+          onSalva={(salva) => setReunioes((lista) => lista.map((x) => (x.id === salva.id ? salva : x)))} />
+      )}
     </AdminLayout>
   );
 }
