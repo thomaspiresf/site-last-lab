@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Bell, CalendarPlus, ChevronLeft, ChevronRight, MessageCircle, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
+import { Bell, CalendarPlus, Check, ChevronLeft, ChevronRight, Copy, MessageCircle, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { addContato, contaGoogleAgenda, deleteReuniao, listDiagnosticos, listGoogleAgenda, listReunioes, reuniaoNoGoogle, salvarReuniao, updateDiagnostico } from "../lib/api";
 import { ABERTOS, empresaDe } from "./crmEtapas";
@@ -153,6 +153,17 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
   // confirmação dentro do card (o confirm() do navegador some em alguns navegadores embutidos)
   const [confirmando, setConfirmando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
+  const [copiado, setCopiado] = useState(false);
+  const copiarLink = async () => {
+    try { await navigator.clipboard.writeText(r.local); }
+    catch {
+      // navegadores sem a API de área de transferência
+      const t = document.createElement("textarea");
+      t.value = r.local; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove();
+    }
+    setCopiado(true);
+    setTimeout(() => setCopiado(false), 2000);
+  };
   const [, nomeTipo, corTipo] = tipoDe(r.tipo);
   const passou = fimDe(r) < new Date();
   const apagada = r.status !== "marcada";
@@ -180,6 +191,9 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
         <div className="flex flex-wrap gap-2 mt-3">
           {r.local && /^https?:\/\//.test(r.local) && (
             <a href={r.local} target="_blank" rel="noopener" className={`${botao} !border-black bg-black text-white hover:bg-zinc-800`}><Video size={13} />Entrar</a>
+          )}
+          {r.local && /^https?:\/\//.test(r.local) && (
+            <button type="button" onClick={copiarLink} className={botao} title={r.local}>{copiado ? <><Check size={13} />Copiado</> : <><Copy size={13} />Copiar link</>}</button>
           )}
           {r.local && !/^https?:\/\//.test(r.local) && <span className="text-xs text-zinc-500 self-center">{r.local}</span>}
           {r.status === "marcada" && whatsDe(r) && (
