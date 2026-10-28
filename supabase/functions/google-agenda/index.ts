@@ -14,6 +14,8 @@ import { TITULO_CLIENTE, zulu } from "../_shared/convite.ts";
 const TZ = "America/Sao_Paulo";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const REMETENTE = Deno.env.get("EMAIL_REMETENTE") || "Thomás · Last Lab <contato@lastlab.com.br>";
+// respostas do cliente vão para o Gmail do Thomás (a caixa contato@ não é acompanhada)
+const RESPONDER_PARA = Deno.env.get("EMAIL_RESPOSTA") || "thomas.pires.f@gmail.com";
 const LOGO = "https://lastlab.com.br/images/logo.png";
 const COLUNAS_REUNIAO = "*, lead:diagnosticos(id, nome, email, whatsapp, status, apresentacao, empresa:dados->>empresa)";
 
@@ -270,6 +272,7 @@ async function enviarConvite(r: any, tipo: "confirmada" | "remarcada" | "cancela
     headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from: REMETENTE,
+      reply_to: RESPONDER_PARA,
       to: [String(r.convidado_email).trim()],
       subject: assunto,
       html: emailConvite(r, tipo),

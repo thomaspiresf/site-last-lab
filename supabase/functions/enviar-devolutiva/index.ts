@@ -10,6 +10,8 @@ const corsHeaders = {
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const REMETENTE = Deno.env.get("EMAIL_REMETENTE") || "Thomás · Last Lab <contato@lastlab.com.br>";
+// respostas do cliente vão para o Gmail do Thomás (a caixa contato@ não é acompanhada)
+const RESPONDER_PARA = Deno.env.get("EMAIL_RESPOSTA") || "thomas.pires.f@gmail.com";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -35,6 +37,7 @@ Deno.serve(async (req) => {
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         from: REMETENTE,
+        reply_to: RESPONDER_PARA,
         to: [d.email],
         subject: `${primeiroNome}, sua devolutiva da Last Lab está pronta`,
         html: montarEmail(primeiroNome, link, d.dados, d.oferta_escolhida),
