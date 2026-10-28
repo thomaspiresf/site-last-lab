@@ -437,7 +437,13 @@ export default function AdminAgenda() {
     return () => clearInterval(t);
   }, [permissao, reunioes]);
 
-  // Google Agenda do mês visível (com as pontas das semanas vizinhas)
+  // Google Agenda do mês visível (com as pontas das semanas vizinhas); versaoGoogle relê depois de mudanças
+  const [versaoGoogle, setVersaoGoogle] = useState(0);
+  // a cópia do Google de uma reunião apagada/cancelada sai na hora (antes ela ficava escondida atrás da reunião)
+  const tirarDoGoogle = (googleId) => {
+    if (googleId) setGoogle((lista) => lista.filter((e) => e.googleId !== googleId));
+    setVersaoGoogle((v) => v + 1);
+  };
   useEffect(() => {
     const y = mes.getFullYear(), m = mes.getMonth();
     const ini = new Date(y, m, 1 - new Date(y, m, 1).getDay());
@@ -447,7 +453,7 @@ export default function AdminAgenda() {
       .then((eventos) => { if (vivo) { setGoogle(eventos); setGoogleEstado("ok"); } })
       .catch((e) => { if (vivo) { setGoogle([]); setGoogleEstado(e.codigo === "nao_configurado" ? "nao_configurado" : `erro:${e.message || e}`); } });
     return () => { vivo = false; };
-  }, [mes.getTime(), conta?.conectado]);
+  }, [mes.getTime(), conta?.conectado, versaoGoogle]);
   // ?lead=<id>: abre o formulário já com o lead
   useEffect(() => {
     const id = params.get("lead");
@@ -488,7 +494,10 @@ export default function AdminAgenda() {
     try {
       let salva = await salvarReuniao({ id: r.id, status });
       // cancelar avisa o convidado pelo Google; voltar para marcada recria o convite
-      if (conta?.conectado && status === "cancelada" && r.google_event_id) salva = await reuniaoNoGoogle("cancelar", r.id).catch(() => salva);
+      if (conta?.conectado && status === "cancelada" && r.google_event_id) {
+        salva = await reuniaoNoGoogle("cancelar", r.id).catch(() => salva);
+        tirarDoGoogle(r.google_event_id);
+      }
       if (conta?.conectado && status === "marcada" && r.status === "cancelada" && r.convidado_email) salva = await reuniaoNoGoogle("salvar", r.id).catch(() => salva);
       setReunioes((lista) => lista.map((x) => (x.id === r.id ? salva : x)));
       if (status === "feita" && r.diagnostico_id) addContato(r.diagnostico_id, { tipo: "reuniao", texto: `Reunião feita: ${r.titulo}`, quando: r.inicio }).catch(() => {});
@@ -497,7 +506,11 @@ export default function AdminAgenda() {
   const excluir = async (r) => {
     try {
       if (conta?.conectado && r.google_event_id) await reuniaoNoGoogle("cancelar", r.id);
-      await deleteReuniao(r.id); setReunioes((lista) => lista.filter((x) => x.id !== r.id)); }
+      await deleteReuniao(r.id);
+      setReunioes((lista) => lista.filter((x) => x.id !== r.id));
+      setAberta(null);
+      tirarDoGoogle(r.google_event_id);
+    }
     catch (e) { setErro(`Não consegui excluir: ${e.message || e}`); }
   };
   const editar = (r) => {
