@@ -392,7 +392,9 @@ export default function AdminCalendarEditor() {
     );
   }
 
-  const shareUrl = `${window.location.origin}/aprovar/${calendar.token}`;
+  const shareUrl = client?.slug
+    ? `${window.location.origin}/aprovacao/${client.slug}/${calendar.month}`
+    : `${window.location.origin}/aprovar/${calendar.token}`;
   const status = STATUS_LABEL[calendar.status] || STATUS_LABEL.draft;
 
   const handleCopy = () => {

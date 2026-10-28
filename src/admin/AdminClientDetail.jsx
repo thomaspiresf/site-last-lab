@@ -58,7 +58,9 @@ export default function AdminClientDetail() {
   };
 
   const handleCopyPortal = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/portal/${clientId}`);
+    navigator.clipboard.writeText(
+      client?.slug ? `${window.location.origin}/aprovacao/${client.slug}` : `${window.location.origin}/portal/${clientId}`
+    );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

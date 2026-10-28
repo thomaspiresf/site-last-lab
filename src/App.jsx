@@ -116,6 +116,8 @@ function Shell() {
           <Route path="/admin/calendarios/:calendarId" element={<AdminCalendarEditor />} />
           <Route path="/aprovar/:token" element={<ApprovalPage />} />
           <Route path="/portal/:clientId" element={<ClientPortal />} />
+          <Route path="/aprovacao/:slug" element={<ClientPortal />} />
+          <Route path="/aprovacao/:slug/:mes" element={<ApprovalPage />} />
           <Route path="/projetos/:slug" element={<ProjectDetail />} />
           {/* Direct routes for legacy slug URLs */}
           <Route path="/semantix" element={<ProjectDetail />} />

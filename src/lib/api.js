@@ -17,6 +17,7 @@ function mapClient(row) {
     id: row.id,
     name: row.name,
     handle: row.handle,
+    slug: row.slug,
     avatarDataUrl: row.avatar_url,
     brandBrief: row.brand_brief,
     createdAt: row.created_at,
@@ -195,11 +196,31 @@ export async function getClient(clientId) {
   return mapClient(data);
 }
 
+/** "Angelini Seguros" → "angelini-seguros" (nome do cliente no link de aprovação). */
+export function slugify(texto) {
+  return texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+async function slugLivre(name) {
+  const base = slugify(name) || "cliente";
+  const { data } = await supabase.from("clients").select("slug").like("slug", `${base}%`);
+  const usados = new Set((data || []).map((r) => r.slug));
+  let slug = base;
+  for (let i = 2; usados.has(slug); i++) slug = `${base}-${i}`;
+  return slug;
+}
+
 export async function createClient({ name, handle, avatarDataUrl }) {
   const { data, error } = await supabase
     .from("clients")
     .insert({
       name,
+      slug: await slugLivre(name),
       handle: handle?.replace(/^@/, "") || name.toLowerCase().replace(/\s+/g, ""),
       avatar_url: avatarDataUrl || null,
     })
@@ -246,14 +267,18 @@ export async function getCalendar(calendarId) {
 
 // Client portal — lists every month already published to the client
 // (drafts stay invisible until the admin hits "Publicar para aprovação").
-export async function getClientPortal(clientId) {
+const EH_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Aceita o id do cliente (link antigo /portal/:id) ou o slug (/aprovacao/:slug).
+export async function getClientPortal(clientIdOrSlug) {
   const { data: clientRow, error: clientError } = await supabase
     .from("clients")
     .select("*")
-    .eq("id", clientId)
+    .eq(EH_UUID.test(clientIdOrSlug) ? "id" : "slug", clientIdOrSlug)
     .maybeSingle();
   if (clientError) throw clientError;
   if (!clientRow) return null;
+  const clientId = clientRow.id;
 
   const { data: calRows, error: calError } = await supabase
     .from("calendars")
@@ -285,6 +310,21 @@ export async function getClientPortal(clientId) {
   });
 
   return { client: mapClient(clientRow), calendars: calendarsWithCover };
+}
+
+/** Calendário de um mês ("2026-11") pelo slug do cliente: /aprovacao/:slug/:mes. */
+export async function getCalendarBySlug(slug, month) {
+  const { data: clientRow } = await supabase.from("clients").select("id").eq("slug", slug).maybeSingle();
+  if (!clientRow) return null;
+  const { data: calRow } = await supabase
+    .from("calendars")
+    .select("token")
+    .eq("client_id", clientRow.id)
+    .eq("month", month)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return calRow ? getCalendarByToken(calRow.token) : null;
 }
 
 export async function getCalendarByToken(token) {

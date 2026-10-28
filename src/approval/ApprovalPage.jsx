@@ -11,7 +11,7 @@ import MonthCalendarGrid from "./components/MonthCalendarGrid";
 import MonthAgendaList from "./components/MonthAgendaList";
 import ViewSwitcher from "./components/ViewSwitcher";
 import AdjustmentChannelModal from "./components/AdjustmentChannelModal";
-import { getCalendarByToken, submitApprovalDecision } from "../lib/api";
+import { getCalendarByToken, getCalendarBySlug, submitApprovalDecision } from "../lib/api";
 
 const WHATSAPP_NUMBER = "5515991295541";
 const CONTACT_EMAIL = "contato@lastlab.com.br";
@@ -25,7 +25,7 @@ function monthLabel(month) {
 }
 
 export default function ApprovalPage() {
-  const { token } = useParams();
+  const { token, slug, mes } = useParams(); // /aprovar/:token (antigo) ou /aprovacao/:slug/:mes
   const [data, setData] = useState(undefined); // undefined = loading, null = not found
   const [selectedIndex, setSelectedIndex] = useState(null); // índice no feed
   const [storyIndex, setStoryIndex] = useState(null); // índice nos stories
@@ -34,19 +34,19 @@ export default function ApprovalPage() {
   const [showAdjustModal, setShowAdjustModal] = useState(false);
 
   const load = async () => {
-    const result = await getCalendarByToken(token);
+    const result = token ? await getCalendarByToken(token) : await getCalendarBySlug(slug, mes);
     setData(result);
   };
 
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [token, slug, mes]);
 
   const handleApprove = async () => {
     setSubmitting(true);
     const nextStatus = calendar?.status === "approved" ? "pending" : "approved";
-    await submitApprovalDecision(token, { status: nextStatus, feedback: null });
+    await submitApprovalDecision(data.calendar.token, { status: nextStatus, feedback: null });
     await load();
     setSubmitting(false);
   };
@@ -64,7 +64,7 @@ export default function ApprovalPage() {
       window.open(`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`, "_blank");
     }
 
-    await submitApprovalDecision(token, { status: "changes_requested", feedback: null });
+    await submitApprovalDecision(data.calendar.token, { status: "changes_requested", feedback: null });
     await load();
     setSubmitting(false);
     setShowAdjustModal(false);
@@ -111,7 +111,7 @@ export default function ApprovalPage() {
 
       <div className="w-full max-w-4xl px-4 sm:px-6">
         <Link
-          to={`/portal/${client.id}`}
+          to={client.slug ? `/aprovacao/${client.slug}` : `/portal/${client.id}`}
           className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-black transition-colors mt-4"
         >
           <ChevronLeft size={16} />

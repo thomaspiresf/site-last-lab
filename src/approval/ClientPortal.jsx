@@ -15,13 +15,13 @@ function monthLabel(month) {
   return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 }
 
-function CalendarCard({ calendar }) {
+function CalendarCard({ calendar, client }) {
   const status = STATUS[calendar.status] || STATUS.pending;
   const StatusIcon = status.icon;
 
   return (
     <Link
-      to={`/aprovar/${calendar.token}`}
+      to={client?.slug ? `/aprovacao/${client.slug}/${calendar.month}` : `/aprovar/${calendar.token}`}
       className="group flex items-center gap-4 p-4 sm:p-5 bg-white rounded-2xl border border-zinc-200/80 hover:shadow-md hover:border-zinc-300 transition-all duration-300"
     >
       <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-zinc-100 shrink-0 flex items-center justify-center text-zinc-300">
@@ -51,13 +51,13 @@ function CalendarCard({ calendar }) {
 }
 
 export default function ClientPortal() {
-  const { clientId } = useParams();
+  const { clientId, slug } = useParams(); // /portal/:clientId (antigo) ou /aprovacao/:slug
   const [data, setData] = useState(undefined);
   const [tab, setTab] = useState("calendarios");
 
   useEffect(() => {
-    getClientPortal(clientId).then(setData);
-  }, [clientId]);
+    getClientPortal(clientId || slug).then(setData);
+  }, [clientId, slug]);
 
   if (data === undefined) {
     return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Carregando...</div>;
@@ -117,7 +117,7 @@ export default function ClientPortal() {
           ) : (
             <div className="space-y-3 pb-16">
               {calendars.map((cal) => (
-                <CalendarCard key={cal.id} calendar={cal} />
+                <CalendarCard key={cal.id} calendar={cal} client={data.client} />
               ))}
             </div>
           )
