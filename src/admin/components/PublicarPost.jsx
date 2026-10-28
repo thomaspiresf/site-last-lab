@@ -1,52 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { X, Copy, Check, Download, Loader2 } from "lucide-react";
-
-// Tira a marcação interna do começo da legenda ("[Manifesto · fixar]") antes de copiar.
-export function legendaParaPostar(caption = "") {
-  return caption.replace(/^\s*\[[^\]\n]*\]\s*\n*/, "").trim();
-}
-
-function nomeArquivo(post, idx, total, ext) {
-  const data = post.scheduledDate || "post";
-  return total > 1 ? `${data}-${String(idx + 1).padStart(2, "0")}.${ext}` : `${data}.${ext}`;
-}
+import { legendaParaPostar, useArquivosDoPost, salvarArquivos, copiarTexto } from "../../lib/publicar";
 
 // Janela para postar do celular: copia a legenda e salva as telas na galeria
 // (folha de compartilhamento do sistema; no computador, baixa os arquivos).
 export default function PublicarPost({ post, onClose }) {
-  const [arquivos, setArquivos] = useState(null); // File[] já baixados, para o compartilhar abrir no clique
+  const { arquivos, erro: erroPreparo } = useArquivosDoPost(post);
   const [erro, setErro] = useState("");
   const [copiado, setCopiado] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const legenda = legendaParaPostar(post.caption);
   const media = post.media || [];
 
-  useEffect(() => {
-    let vivo = true;
-    Promise.all(
-      media.map(async (m, idx) => {
-        const blob = await fetch(m.dataUrl).then((r) => r.blob());
-        const ext = m.type === "video" ? "mp4" : blob.type.includes("png") ? "png" : "jpg";
-        return new File([blob], nomeArquivo(post, idx, media.length, ext), { type: blob.type });
-      })
-    )
-      .then((files) => vivo && setArquivos(files))
-      .catch(() => vivo && setErro("Não consegui preparar as imagens. Tente de novo."));
-    return () => { vivo = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [post.id]);
-
   const copiar = async () => {
-    try {
-      await navigator.clipboard.writeText(legenda);
-    } catch {
-      const t = document.createElement("textarea");
-      t.value = legenda;
-      document.body.appendChild(t);
-      t.select();
-      document.execCommand("copy");
-      t.remove();
-    }
+    await copiarTexto(legenda);
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2500);
   };
@@ -54,25 +21,11 @@ export default function PublicarPost({ post, onClose }) {
   const salvar = async () => {
     if (!arquivos) return;
     setErro("");
-    if (navigator.canShare?.({ files: arquivos })) {
-      try {
-        await navigator.share({ files: arquivos });
-      } catch (e) {
-        if (e.name !== "AbortError") setErro("O compartilhamento falhou. Tente de novo.");
-      }
-      return;
-    }
     setSalvando(true);
-    for (const f of arquivos) {
-      const url = URL.createObjectURL(f);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = f.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      await new Promise((r) => setTimeout(r, 300));
+    try {
+      await salvarArquivos(arquivos);
+    } catch {
+      setErro("O compartilhamento falhou. Tente de novo.");
     }
     setSalvando(false);
   };
@@ -130,7 +83,7 @@ export default function PublicarPost({ post, onClose }) {
           {copiado ? "Legenda copiada" : "Copiar legenda"}
         </button>
 
-        {erro && <p className="text-xs text-red-600">{erro}</p>}
+        {(erro || erroPreparo) && <p className="text-xs text-red-600">{erro || erroPreparo}</p>}
         <p className="text-xs text-zinc-400">
           No celular, "Salvar" abre a folha de compartilhamento: escolha "Salvar imagens" para mandar tudo para a galeria, na ordem do post.
         </p>

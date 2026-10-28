@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { X, ChevronLeft, ChevronRight, Heart, MessageCircle, Send, Bookmark } from "lucide-react";
+import BotoesPublicar from "./BotoesPublicar";
+import { legendaParaPostar } from "../../lib/publicar";
 
 export default function InstagramPostModal({ client, posts, index, onClose, onNavigate }) {
   const [mediaIdx, setMediaIdx] = useState(0);
@@ -46,7 +48,7 @@ export default function InstagramPostModal({ client, posts, index, onClose, onNa
       )}
 
       <div
-        className="bg-white rounded-xl overflow-hidden w-full max-w-3xl max-h-[90vh] flex flex-col sm:flex-row"
+        className="bg-white rounded-xl overflow-y-auto sm:overflow-hidden w-full max-w-3xl max-h-[90vh] flex flex-col sm:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Media */}
@@ -100,10 +102,14 @@ export default function InstagramPostModal({ client, posts, index, onClose, onNa
             <p className="font-semibold text-sm text-black">{client?.handle}</p>
           </div>
 
+          <div className="px-4 py-3 border-b border-zinc-100">
+            <BotoesPublicar post={post} />
+          </div>
+
           <div className="flex-1 overflow-y-auto px-4 py-4">
             <p className="text-sm text-zinc-800 leading-relaxed whitespace-pre-line">
               <span className="font-semibold mr-1.5">{client?.handle}</span>
-              {post.caption || <em className="text-zinc-400">Sem legenda</em>}
+              {legendaParaPostar(post.caption) || <em className="text-zinc-400">Sem legenda</em>}
             </p>
           </div>
 
@@ -116,6 +122,7 @@ export default function InstagramPostModal({ client, posts, index, onClose, onNa
             </div>
             <p className="text-[11px] text-zinc-400 uppercase tracking-wide mt-2">Prévia — sem interações reais</p>
           </div>
+
         </div>
       </div>
     </div>

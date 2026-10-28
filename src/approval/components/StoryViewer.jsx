@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import BotoesPublicar from "./BotoesPublicar";
+import { legendaParaPostar } from "../../lib/publicar";
 
 const DURACAO_IMAGEM = 5000;
 
@@ -112,7 +114,12 @@ export default function StoryViewer({ client, stories, index, onClose, onNavigat
 
         <div className="w-full max-w-[428px] text-white">
           <p className="text-xs uppercase tracking-wide text-white/60 capitalize">{dataLonga(story.scheduledDate)}</p>
-          {story.caption && <p className="text-sm text-white/90 whitespace-pre-line mt-1 line-clamp-4">{story.caption}</p>}
+          {legendaParaPostar(story.caption) && (
+            <p className="text-sm text-white/90 whitespace-pre-line mt-1 line-clamp-4">{legendaParaPostar(story.caption)}</p>
+          )}
+          <div className="mt-3">
+            <BotoesPublicar post={story} legenda={false} escuro />
+          </div>
         </div>
       </div>
     </div>
