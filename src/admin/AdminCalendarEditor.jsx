@@ -20,11 +20,13 @@ import {
   CalendarX,
   Sparkles,
   Frame,
+  Share2,
 } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import CalendarDragGrid from "./components/CalendarDragGrid";
 import InstagramPostModal from "../approval/components/InstagramPostModal";
 import StoryViewer from "../approval/components/StoryViewer";
+import PublicarPost from "./components/PublicarPost";
 import {
   getCalendar,
   getClient,
@@ -364,6 +366,7 @@ export default function AdminCalendarEditor() {
   const [editingPost, setEditingPost] = useState(null);
   const [draggingPostId, setDraggingPostId] = useState(null);
   const [previewId, setPreviewId] = useState(null);
+  const [publicarId, setPublicarId] = useState(null);
   const [editingMonth, setEditingMonth] = useState(false);
   const [monthValue, setMonthValue] = useState("");
 
@@ -719,6 +722,13 @@ export default function AdminCalendarEditor() {
                 <CalendarCheck size={16} />
               </button>
               <button
+                onClick={() => setPublicarId(post.id)}
+                className="text-zinc-400 hover:text-black transition-colors shrink-0"
+                title="Publicar: copiar legenda e salvar imagens"
+              >
+                <Share2 size={16} />
+              </button>
+              <button
                 onClick={() => setPreviewId(post.id)}
                 className="text-zinc-400 hover:text-black transition-colors shrink-0"
                 title="Visualizar formato final"
@@ -758,6 +768,10 @@ export default function AdminCalendarEditor() {
           />
         </div>
       </div>
+
+      {publicarId && posts?.find((p) => p.id === publicarId) && (
+        <PublicarPost post={posts.find((p) => p.id === publicarId)} onClose={() => setPublicarId(null)} />
+      )}
 
       {previewId && posts && (() => {
         // feed e stories têm visualizações próprias; cada uma navega só entre os do mesmo canal
