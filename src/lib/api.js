@@ -919,7 +919,7 @@ export async function deleteContato(id) {
 
 // ---------- agenda de reuniões ----------
 
-const COLUNAS_REUNIAO = "*, lead:diagnosticos(id, nome, status, apresentacao, empresa:dados->>empresa)";
+const COLUNAS_REUNIAO = "*, lead:diagnosticos(id, nome, email, whatsapp, status, apresentacao, empresa:dados->>empresa)";
 
 /** Reuniões a partir de uma data (ISO), com o nome e a empresa do lead ligado. */
 export async function listReunioes(desde) {
@@ -1069,16 +1069,30 @@ export async function sincronizarMeta(dias = 30) {
   return data;
 }
 
-// Compromissos do Google Agenda num período (função google-agenda, só leitura) para a agenda do admin.
-export async function listGoogleAgenda(desde, ate) {
-  const { data, error } = await supabase.functions.invoke("google-agenda", { body: { desde, ate } });
+async function invocarFuncao(nome, body) {
+  const { data, error } = await supabase.functions.invoke(nome, { body });
   if (error) {
     const corpo = await error.context?.json?.().catch(() => null);
     const e = new Error(corpo?.error || error.message);
     e.codigo = corpo?.codigo;
     throw e;
   }
-  return data.eventos || [];
+  return data;
+}
+
+// Compromissos do Google Agenda num período (função google-agenda) para a agenda do admin.
+export async function listGoogleAgenda(desde, ate) {
+  return (await invocarFuncao("google-agenda", { acao: "listar", desde, ate })).eventos || [];
+}
+
+/** Cria/atualiza ("salvar") ou apaga ("cancelar") a reunião no Google Agenda; devolve a reunião atualizada. */
+export async function reuniaoNoGoogle(acao, id) {
+  return (await invocarFuncao("google-agenda", { acao, id })).reuniao;
+}
+
+/** Conta Google da agenda: "status" ({conectado, email}), "iniciar" ({url} do login) ou "desconectar". */
+export async function contaGoogleAgenda(acao = "status") {
+  return invocarFuncao("google-conta", { acao, voltar: `${window.location.origin}/admin/agenda` });
 }
 
 export async function getConteudoBaseDiagnostico() {

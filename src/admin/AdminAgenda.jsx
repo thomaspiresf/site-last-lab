@@ -1,14 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { CalendarPlus, ChevronLeft, ChevronRight, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
+import { CalendarPlus, ChevronLeft, ChevronRight, MessageCircle, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
 import AdminLayout from "./AdminLayout";
-import { addContato, deleteReuniao, listDiagnosticos, listGoogleAgenda, listReunioes, salvarReuniao, updateDiagnostico } from "../lib/api";
+import { addContato, contaGoogleAgenda, deleteReuniao, listDiagnosticos, listGoogleAgenda, listReunioes, reuniaoNoGoogle, salvarReuniao, updateDiagnostico } from "../lib/api";
 import { ABERTOS, empresaDe } from "./crmEtapas";
 
 // Agenda interna da Last Lab: as reuniões marcadas (venda, devolutiva, projeto, internas). Ligada a um
 // lead, a reunião abre a ficha, a apresentação e o roteiro dele, e marcar a reunião move o lead para
 // "Reunião marcada". /admin/agenda?lead=<id> já abre o formulário com o lead escolhido.
-// Os compromissos do Google Agenda (função google-agenda, só leitura) aparecem em cinza como horário ocupado.
+// Os compromissos do Google Agenda aparecem em cinza como horário ocupado. Com a conta Google conectada
+// (google-conta), a reunião vira evento no Google com Meet e convite para o cliente, e o card monta a
+// mensagem de WhatsApp com o link.
 
 const LARANJA = "#ef4b3a";
 const TIPOS = [
@@ -36,6 +38,22 @@ function rotuloDia(iso) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
+/** Mensagem de confirmação para o cliente, com o link da chamada. */
+function mensagemWhats(r) {
+  const d = new Date(r.inicio);
+  const nome = (r.lead?.nome || "").trim().split(/\s+/)[0];
+  const quando = d.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit" });
+  const linhas = [`Oi${nome ? `, ${nome}` : ""}! Tudo certo para a nossa conversa ${quando}, às ${horaLocal(d)}.`];
+  if (/^https?:\/\//.test(r.local || "")) linhas.push(`O link da chamada é este: ${r.local}`);
+  if (r.google_event_id && r.convidado_email) linhas.push("Também mandei o convite para o seu e-mail.");
+  linhas.push("Até lá!");
+  return linhas.join("\n\n");
+}
+const linkWhats = (numero, texto) => {
+  const d = (numero || "").replace(/\D/g, "");
+  return `https://wa.me/${d.length <= 11 ? "55" + d : d}?text=${encodeURIComponent(texto)}`;
+};
+
 /** Link "adicionar ao Google Agenda" (sem integração: abre o evento já preenchido). */
 function linkGoogle(r) {
   const z = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
@@ -54,11 +72,12 @@ const vazio = (lead, data, hora) => {
   return {
     data: data || dataLocal(d), hora: hora || "10:00", duracao_min: 30, tipo: lead ? "venda" : "interna",
     titulo: lead ? `Reunião · ${empresaDe(lead) || lead.nome}` : "", diagnostico_id: lead?.id || "", local: "", notas: "",
+    convidado_email: lead?.email || "",
   };
 };
 
-function Formulario({ inicial, leads, onSalvar, onCancelar }) {
-  const [f, setF] = useState(inicial);
+function Formulario({ inicial, leads, googleConectado, onSalvar, onCancelar }) {
+  const [f, setF] = useState(() => ({ ...inicial, noGoogle: inicial.noGoogle ?? googleConectado }));
   const [salvando, setSalvando] = useState(false);
   const muda = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
   const escolherLead = (e) => {
@@ -67,6 +86,7 @@ function Formulario({ inicial, leads, onSalvar, onCancelar }) {
       ...x, diagnostico_id: e.target.value,
       titulo: !x.titulo || x.titulo.startsWith("Reunião · ") ? (lead ? `Reunião · ${empresaDe(lead) || lead.nome}` : "") : x.titulo,
       tipo: lead && x.tipo === "interna" ? "venda" : x.tipo,
+      convidado_email: lead?.email && (!x.convidado_email || leads.some((l) => l.email === x.convidado_email)) ? lead.email : x.convidado_email,
     }));
   };
   const enviar = async (e) => {
@@ -97,8 +117,17 @@ function Formulario({ inicial, leads, onSalvar, onCancelar }) {
             <option value="">Sem lead</option>
             {leads.map((l) => <option key={l.id} value={l.id}>{empresaDe(l) ? `${empresaDe(l)} · ${l.nome}` : l.nome}</option>)}
           </select></label>
-        <label className="col-span-2 sm:col-span-4"><span className={rotulo}>Link da chamada ou endereço</span>
-          <input value={f.local} onChange={muda("local")} className={campo} placeholder="https://meet.google.com/..." /></label>
+        <label className="col-span-2"><span className={rotulo}>E-mail do convidado</span>
+          <input type="email" value={f.convidado_email} onChange={muda("convidado_email")} className={campo} placeholder="cliente@empresa.com" /></label>
+        <label className="col-span-2"><span className={rotulo}>Link da chamada ou endereço</span>
+          <input value={f.local} onChange={muda("local")} className={campo} placeholder={f.noGoogle ? "Vazio: o Google cria um Meet" : "https://meet.google.com/..."} /></label>
+        {googleConectado && (
+          <label className="col-span-2 sm:col-span-4 flex items-start gap-2 text-sm text-zinc-700 cursor-pointer">
+            <input type="checkbox" checked={f.noGoogle} onChange={(e) => setF((x) => ({ ...x, noGoogle: e.target.checked }))} className="mt-0.5 accent-black" />
+            <span>Criar no Google Agenda{!f.local && " com Meet"}{f.convidado_email ? " e enviar o convite para o convidado" : ""}
+              <span className="block text-xs text-zinc-500">Mudanças e cancelamentos também avisam o convidado pelo Google.</span></span>
+          </label>
+        )}
         <label className="col-span-2 sm:col-span-4"><span className={rotulo}>Notas</span>
           <textarea value={f.notas} onChange={muda("notas")} rows={3} className={`${campo} resize-y`} placeholder="Objetivo da reunião, o que levar, combinados" /></label>
       </div>
@@ -129,6 +158,7 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${corTipo}`}>{nomeTipo}</span>
           {r.status === "feita" && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-700 text-white">feita</span>}
           {r.status === "cancelada" && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-600">cancelada</span>}
+          {r.google_event_id && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600" title={r.convidado_email ? `Convite enviado para ${r.convidado_email}` : "No Google Agenda"}>{r.convidado_email ? "convite enviado" : "no Google"}</span>}
         </div>
         {r.lead && (
           <Link to={`/admin/diagnosticos?lead=${r.lead.id}`} className="text-sm text-zinc-600 hover:text-black underline-offset-2 hover:underline">
@@ -141,13 +171,16 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
             <a href={r.local} target="_blank" rel="noopener" className={`${botao} !border-black bg-black text-white hover:bg-zinc-800`}><Video size={13} />Entrar</a>
           )}
           {r.local && !/^https?:\/\//.test(r.local) && <span className="text-xs text-zinc-500 self-center">{r.local}</span>}
+          {r.status === "marcada" && r.lead?.whatsapp && (
+            <a href={linkWhats(r.lead.whatsapp, mensagemWhats(r))} target="_blank" rel="noopener" className={`${botao} !border-[#25D366] text-[#128C7E]`} title="Abre o WhatsApp com a mensagem pronta"><MessageCircle size={13} />Avisar no WhatsApp</a>
+          )}
           {r.lead && (
             <>
               <Link to={`/admin/diagnosticos/${r.lead.id}/apresentar`} className={botao}><Presentation size={13} />Apresentação</Link>
               <a href={`/admin/diagnosticos/${r.lead.id}/roteiro`} target="_blank" rel="noopener" className={botao}><ScrollText size={13} />Roteiro</a>
             </>
           )}
-          <a href={linkGoogle(r)} target="_blank" rel="noopener" className={botao} title="Abre o evento preenchido no Google Agenda"><CalendarPlus size={13} />Google Agenda</a>
+          {!r.google_event_id && <a href={linkGoogle(r)} target="_blank" rel="noopener" className={botao} title="Abre o evento preenchido no Google Agenda"><CalendarPlus size={13} />Google Agenda</a>}
           <button type="button" onClick={onEditar} className={botao}>Editar</button>
           {r.status === "marcada" && passou && <button type="button" onClick={() => onStatus("feita")} className={botao}>Marcar como feita</button>}
           {r.status === "marcada" && <button type="button" onClick={() => onStatus("cancelada")} className={botao}>Cancelar</button>}
@@ -329,6 +362,8 @@ export default function AdminAgenda() {
   const [verPendentes, setVerPendentes] = useState(false);
   const [google, setGoogle] = useState([]);
   const [googleEstado, setGoogleEstado] = useState("carregando"); // ok | nao_configurado | erro:<mensagem>
+  const [conta, setConta] = useState(null); // {conectado, email} da conta Google (Meet e convites)
+  const [aviso, setAviso] = useState("");
   const [erro, setErro] = useState("");
 
   useEffect(() => {
@@ -337,6 +372,25 @@ export default function AdminAgenda() {
       .then((itens) => setLeads(itens.filter((x) => ABERTOS.includes(x.status) || x.status === "fechado")))
       .catch(() => {});
   }, []);
+  // conta Google conectada? (?google=... é a volta do login do Google)
+  useEffect(() => {
+    const volta = params.get("google");
+    if (volta) {
+      if (volta === "conectado") setAviso("Google Agenda conectado: as próximas reuniões já saem com Meet e convite.");
+      else setErro(volta === "cancelado" ? "A conexão com o Google foi cancelada." : "Não consegui conectar o Google. Tente de novo.");
+      setParams({}, { replace: true });
+    }
+    contaGoogleAgenda("status").then(setConta).catch((e) => setConta({ conectado: false, faltaConfigurar: e.codigo === "nao_configurado" }));
+  }, []);
+  const conectarGoogle = async () => {
+    try { window.location.href = (await contaGoogleAgenda("iniciar")).url; }
+    catch (e) { setErro(e.codigo === "nao_configurado" ? "Faltam os segredos GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no Supabase." : `Não consegui conectar: ${e.message || e}`); }
+  };
+  const desconectarGoogle = async () => {
+    if (!confirm("Desconectar o Google Agenda? As reuniões já criadas continuam lá.")) return;
+    try { setConta(await contaGoogleAgenda("desconectar")); } catch (e) { setErro(e.message || String(e)); }
+  };
+
   // Google Agenda do mês visível (com as pontas das semanas vizinhas)
   useEffect(() => {
     const y = mes.getFullYear(), m = mes.getMonth();
@@ -347,7 +401,7 @@ export default function AdminAgenda() {
       .then((eventos) => { if (vivo) { setGoogle(eventos); setGoogleEstado("ok"); } })
       .catch((e) => { if (vivo) { setGoogle([]); setGoogleEstado(e.codigo === "nao_configurado" ? "nao_configurado" : `erro:${e.message || e}`); } });
     return () => { vivo = false; };
-  }, [mes.getTime()]);
+  }, [mes.getTime(), conta?.conectado]);
   // ?lead=<id>: abre o formulário já com o lead
   useEffect(() => {
     const id = params.get("lead");
@@ -356,10 +410,15 @@ export default function AdminAgenda() {
   }, [leads]);
 
   const salvar = async (f) => {
-    const { data, hora, id, ...resto } = f;
-    const campos = { ...resto, inicio: new Date(`${data}T${hora}`).toISOString(), diagnostico_id: resto.diagnostico_id || null };
+    const { data, hora, id, noGoogle, ...resto } = f;
+    const campos = { ...resto, convidado_email: (resto.convidado_email || "").trim(), inicio: new Date(`${data}T${hora}`).toISOString(), diagnostico_id: resto.diagnostico_id || null };
     try {
-      const salva = await salvarReuniao(id ? { id, ...campos } : campos);
+      let salva = await salvarReuniao(id ? { id, ...campos } : campos);
+      // no Google: cria/atualiza com Meet e convite; desmarcado numa que já estava lá, apaga de lá
+      if (conta?.conectado && (noGoogle || salva.google_event_id)) {
+        try { salva = await reuniaoNoGoogle(noGoogle ? "salvar" : "cancelar", salva.id); }
+        catch (e) { setErro(`A reunião foi salva, mas o Google recusou: ${e.message || e}`); }
+      }
       setReunioes((lista) => [...lista.filter((x) => x.id !== salva.id), salva].sort((a, b) => a.inicio.localeCompare(b.inicio)));
       // reunião nova de venda com lead: o lead vai para "Reunião marcada", com a reunião como próxima ação
       if (!id && salva.diagnostico_id) {
@@ -381,19 +440,24 @@ export default function AdminAgenda() {
   };
   const mudarStatus = async (r, status) => {
     try {
-      const salva = await salvarReuniao({ id: r.id, status });
+      let salva = await salvarReuniao({ id: r.id, status });
+      // cancelar avisa o convidado pelo Google; voltar para marcada recria o convite
+      if (conta?.conectado && status === "cancelada" && r.google_event_id) salva = await reuniaoNoGoogle("cancelar", r.id).catch(() => salva);
+      if (conta?.conectado && status === "marcada" && r.status === "cancelada" && r.convidado_email) salva = await reuniaoNoGoogle("salvar", r.id).catch(() => salva);
       setReunioes((lista) => lista.map((x) => (x.id === r.id ? salva : x)));
       if (status === "feita" && r.diagnostico_id) addContato(r.diagnostico_id, { tipo: "reuniao", texto: `Reunião feita: ${r.titulo}`, quando: r.inicio }).catch(() => {});
     } catch (e) { setErro(`Não consegui salvar: ${e.message || e}`); }
   };
   const excluir = async (r) => {
     if (!confirm(`Excluir "${r.titulo}"?`)) return;
-    try { await deleteReuniao(r.id); setReunioes((lista) => lista.filter((x) => x.id !== r.id)); }
+    try {
+      if (conta?.conectado && r.google_event_id) await reuniaoNoGoogle("cancelar", r.id);
+      await deleteReuniao(r.id); setReunioes((lista) => lista.filter((x) => x.id !== r.id)); }
     catch (e) { setErro(`Não consegui excluir: ${e.message || e}`); }
   };
   const editar = (r) => {
     const d = new Date(r.inicio);
-    setForm({ id: r.id, data: dataLocal(d), hora: horaLocal(d), duracao_min: r.duracao_min, tipo: r.tipo, titulo: r.titulo, diagnostico_id: r.diagnostico_id || "", local: r.local, notas: r.notas });
+    setForm({ id: r.id, data: dataLocal(d), hora: horaLocal(d), duracao_min: r.duracao_min, tipo: r.tipo, titulo: r.titulo, diagnostico_id: r.diagnostico_id || "", local: r.local, notas: r.notas, convidado_email: r.convidado_email || "", noGoogle: !!r.google_event_id });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -412,8 +476,10 @@ export default function AdminAgenda() {
   const pendentes = useMemo(() => (reunioes || []).filter((r) => fimDe(r) < new Date() && r.status === "marcada"), [reunioes]);
   // o que foi criado no site e copiado para o Google não aparece duas vezes
   const googleDia = useMemo(() => {
-    const doSite = new Set((reunioes || []).filter((r) => r.status !== "cancelada").map((r) => Math.round(new Date(r.inicio).getTime() / 60000)));
-    return googlePorDia(google.filter((e) => e.diaInteiro || !doSite.has(Math.round(new Date(e.inicio).getTime() / 60000))));
+    const ativas = (reunioes || []).filter((r) => r.status !== "cancelada");
+    const ids = new Set(ativas.map((r) => r.google_event_id).filter(Boolean));
+    const horarios = new Set(ativas.map((r) => Math.round(new Date(r.inicio).getTime() / 60000)));
+    return googlePorDia(google.filter((e) => !ids.has(e.googleId) && (e.diaInteiro || !horarios.has(Math.round(new Date(e.inicio).getTime() / 60000)))));
   }, [google, reunioes]);
   const doDia = porDia[dia] || [];
   const escolhida = doDia.find((r) => r.id === aberta);
@@ -426,6 +492,16 @@ export default function AdminAgenda() {
           <div>
             <h1 className="text-3xl font-black text-black tracking-tight">Agenda</h1>
             <p className="text-sm text-zinc-500 mt-1">Reuniões da Last Lab. Ligadas a um lead, abrem a apresentação e o roteiro.</p>
+            {conta && (conta.conectado ? (
+              <p className="text-xs text-zinc-500 mt-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5" />Google Agenda conectado{conta.email ? ` · ${conta.email}` : ""}
+                <button type="button" onClick={desconectarGoogle} className="ml-2 underline hover:text-black">desconectar</button>
+              </p>
+            ) : (
+              <button type="button" onClick={conectarGoogle} className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-zinc-200 hover:border-black">
+                <CalendarPlus size={13} />Conectar Google Agenda (Meet e convites)
+              </button>
+            ))}
           </div>
           {!form && (
             <button type="button" onClick={() => setForm(vazio(null, dia))} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800">
@@ -434,8 +510,9 @@ export default function AdminAgenda() {
           )}
         </div>
 
+        {aviso && <p className="text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mb-4">{aviso}</p>}
         {erro && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-4">{erro}</p>}
-        {form && <div className="mb-6 max-w-3xl"><Formulario key={form.id || `nova-${form.data}-${form.hora}`} inicial={form} leads={leads} onSalvar={salvar} onCancelar={() => setForm(null)} /></div>}
+        {form && <div className="mb-6 max-w-3xl"><Formulario key={form.id || `nova-${form.data}-${form.hora}`} inicial={form} leads={leads} googleConectado={!!conta?.conectado} onSalvar={salvar} onCancelar={() => setForm(null)} /></div>}
 
         {pendentes.length > 0 && (
           <div className="mb-4">
