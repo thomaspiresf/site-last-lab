@@ -48,7 +48,7 @@ function mensagemWhats(r) {
     ? `Oi${nome ? `, ${nome}` : ""}! Passando para confirmar a nossa conversa de hoje, às ${horaLocal(d)}.`
     : `Oi${nome ? `, ${nome}` : ""}! Tudo certo para a nossa conversa ${quando}, às ${horaLocal(d)}.`];
   if (/^https?:\/\//.test(r.local || "")) linhas.push(`O link da chamada é este: ${r.local}`);
-  if (!hoje && r.google_event_id && r.convidado_email) linhas.push("Também mandei o convite para o seu e-mail.");
+  if (!hoje && r.convite_inicio) linhas.push("Também mandei o convite para o seu e-mail.");
   linhas.push(hoje ? "Até já!" : "Até lá!");
   return linhas.join("\n\n");
 }
@@ -128,7 +128,7 @@ function Formulario({ inicial, leads, googleConectado, onSalvar, onCancelar }) {
           <label className="col-span-2 sm:col-span-4 flex items-start gap-2 text-sm text-zinc-700 cursor-pointer">
             <input type="checkbox" checked={f.noGoogle} onChange={(e) => setF((x) => ({ ...x, noGoogle: e.target.checked }))} className="mt-0.5 accent-black" />
             <span>Criar no Google Agenda{!f.local && " com Meet"}{f.convidado_email ? " e enviar o convite para o convidado" : ""}
-              <span className="block text-xs text-zinc-500">Mudanças e cancelamentos também avisam o convidado pelo Google.</span></span>
+              <span className="block text-xs text-zinc-500">O convidado recebe o e-mail da Last Lab com o link; mudanças de horário e cancelamentos também.</span></span>
           </label>
         )}
         <label className="col-span-2 sm:col-span-4"><span className={rotulo}>Notas</span>
@@ -161,7 +161,7 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${corTipo}`}>{nomeTipo}</span>
           {r.status === "feita" && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-700 text-white">feita</span>}
           {r.status === "cancelada" && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-200 text-zinc-600">cancelada</span>}
-          {r.google_event_id && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600" title={r.convidado_email ? `Convite enviado para ${r.convidado_email}` : "No Google Agenda"}>{r.convidado_email ? "convite enviado" : "no Google"}</span>}
+          {r.google_event_id && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-600" title={r.convite_inicio ? `E-mail da Last Lab enviado para ${r.convidado_email}` : "No Google Agenda"}>{r.convite_inicio ? "convite enviado" : "no Google"}</span>}
         </div>
         {r.lead && (
           <Link to={`/admin/diagnosticos?lead=${r.lead.id}`} className="text-sm text-zinc-600 hover:text-black underline-offset-2 hover:underline">

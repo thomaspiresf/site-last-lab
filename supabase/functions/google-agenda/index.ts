@@ -5,9 +5,15 @@ import { apiAgenda, tokenGoogle } from "../_shared/google.ts";
 // Agenda do admin <-> Google Agenda do Thomás. Só para admin logado.
 //   {acao: "listar", desde, ate}  compromissos do período (horários ocupados). Com a conta conectada
 //                                 (google-conta) usa a API; sem ela, o endereço secreto iCal (GOOGLE_ICS_URL).
-//   {acao: "salvar", id}          cria ou atualiza a reunião no Google, com Meet e convite para o cliente
-//   {acao: "cancelar", id}        apaga o evento no Google e avisa o convidado
+//   {acao: "salvar", id}          cria ou atualiza a reunião no Google, com Meet, e manda ao convidado o
+//                                 e-mail da Last Lab (confirmada ou remarcada, com .ics)
+//   {acao: "cancelar", id}        apaga o evento no Google e manda ao convidado o e-mail de cancelamento
+// O Google não manda o convite dele (sendUpdates=none): o convidado fica no evento só para entrar no Meet
+// sem pedir permissão. Segredos do e-mail: RESEND_API_KEY e EMAIL_REMETENTE (opcional).
 const TZ = "America/Sao_Paulo";
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const REMETENTE = Deno.env.get("EMAIL_REMETENTE") || "Thomás · Last Lab <contato@lastlab.com.br>";
+const LOGO = "https://lastlab.com.br/images/logo.png";
 const COLUNAS_REUNIAO = "*, lead:diagnosticos(id, nome, email, whatsapp, status, apresentacao, empresa:dados->>empresa)";
 
 const corsHeaders = {
@@ -142,25 +148,137 @@ async function salvarNoGoogle(token: string, id: string) {
   let ev = null;
   if (r.google_event_id) {
     pedirMeet();
-    ev = await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}?sendUpdates=all&conferenceDataVersion=1`, { method: "PATCH", body: JSON.stringify(corpo) });
+    ev = await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}?sendUpdates=none&conferenceDataVersion=1`, { method: "PATCH", body: JSON.stringify(corpo) });
   }
   if (!ev) {
     // nova, ou apagada lá no Google: cria de novo
     if (!linkProprio) corpo.conferenceData = { createRequest: { requestId: crypto.randomUUID(), conferenceSolutionKey: { type: "hangoutsMeet" } } };
-    ev = await apiAgenda(token, "events?sendUpdates=all&conferenceDataVersion=1", { method: "POST", body: JSON.stringify(corpo) });
+    ev = await apiAgenda(token, "events?sendUpdates=none&conferenceDataVersion=1", { method: "POST", body: JSON.stringify(corpo) });
   }
   const local = linkProprio || ev.hangoutLink || r.local || "";
   const { data, error } = await supabase.from("reunioes").update({ google_event_id: ev.id, local }).eq("id", id).select(COLUNAS_REUNIAO).single();
   if (error) throw error;
-  return data;
+
+  // e-mail ao convidado: na primeira vez "confirmada"; depois, só se mudou o horário ou o link
+  if (!data.convidado_email) return data;
+  const mudou = data.convite_inicio && (new Date(data.convite_inicio).getTime() !== new Date(data.inicio).getTime() || (data.convite_link || "") !== local);
+  if (data.convite_inicio && !mudou) return data;
+  const seq = (data.convite_seq || 0) + (data.convite_inicio ? 1 : 0);
+  await enviarConvite({ ...data, uid: ev.iCalUID || `${ev.id}@google.com`, seq }, data.convite_inicio ? "remarcada" : "confirmada");
+  const { data: final, error: e2 } = await supabase.from("reunioes")
+    .update({ convite_inicio: data.inicio, convite_link: local, convite_seq: seq }).eq("id", id).select(COLUNAS_REUNIAO).single();
+  if (e2) throw e2;
+  return final;
 }
 
 async function cancelarNoGoogle(token: string, id: string) {
   const r = await lerReuniao(id);
-  if (r.google_event_id) await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}?sendUpdates=all`, { method: "DELETE" });
-  const { data, error } = await supabase.from("reunioes").update({ google_event_id: null }).eq("id", id).select(COLUNAS_REUNIAO).single();
+  let uid = "";
+  if (r.google_event_id) {
+    const ev = await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}`).catch(() => null);
+    uid = ev?.iCalUID || "";
+    await apiAgenda(token, `events/${encodeURIComponent(r.google_event_id)}?sendUpdates=none`, { method: "DELETE" });
+  }
+  // o cliente só fica sabendo do cancelamento se tinha recebido a confirmação
+  if (r.convidado_email && r.convite_inicio) {
+    await enviarConvite({ ...r, inicio: r.convite_inicio, uid: uid || `${r.google_event_id}@google.com`, seq: (r.convite_seq || 0) + 1 }, "cancelada");
+  }
+  const { data, error } = await supabase.from("reunioes")
+    .update({ google_event_id: null, convite_inicio: null, convite_link: null, convite_seq: (r.convite_seq || 0) + 1 })
+    .eq("id", id).select(COLUNAS_REUNIAO).single();
   if (error) throw error;
   return data;
+}
+
+// ---------- e-mail da Last Lab ao convidado ----------
+
+const escH = (t: string) => String(t ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const escI = (t: string) => String(t ?? "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+const zulu = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+const TITULO_CLIENTE = "Conversa com a Last Lab";
+
+/** Arquivo .ics (anexo): adiciona, atualiza ou cancela o evento na agenda do cliente (Google, Outlook, iPhone). */
+// deno-lint-ignore no-explicit-any
+function ics(r: any, tipo: string) {
+  const ini = new Date(r.inicio);
+  const fim = new Date(ini.getTime() + r.duracao_min * 60000);
+  const link = /^https?:\/\//.test(r.local || "") ? r.local : "";
+  const cancelada = tipo === "cancelada";
+  return [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Last Lab//Agenda//PT", "CALSCALE:GREGORIAN",
+    `METHOD:${cancelada ? "CANCEL" : "PUBLISH"}`,
+    "BEGIN:VEVENT",
+    `UID:${r.uid}`, `SEQUENCE:${r.seq || 0}`, `DTSTAMP:${zulu(new Date())}`,
+    `DTSTART:${zulu(ini)}`, `DTEND:${zulu(fim)}`,
+    `SUMMARY:${escI(TITULO_CLIENTE)}`,
+    `DESCRIPTION:${escI(link ? `Link da chamada: ${link}` : "Last Lab · lastlab.com.br")}`,
+    link ? `LOCATION:${escI(link)}` : "", link ? `URL:${link}` : "",
+    `ORGANIZER;CN=Last Lab:mailto:contato@lastlab.com.br`,
+    `STATUS:${cancelada ? "CANCELLED" : "CONFIRMED"}`,
+    "END:VEVENT", "END:VCALENDAR",
+  ].filter(Boolean).join("\r\n");
+}
+
+// deno-lint-ignore no-explicit-any
+function linkGoogleCliente(r: any) {
+  const ini = new Date(r.inicio);
+  const fim = new Date(ini.getTime() + r.duracao_min * 60000);
+  const link = /^https?:\/\//.test(r.local || "") ? r.local : "";
+  const p = new URLSearchParams({ action: "TEMPLATE", text: TITULO_CLIENTE, dates: `${zulu(ini)}/${zulu(fim)}`, details: link ? `Link da chamada: ${link}` : "", location: link });
+  return `https://calendar.google.com/calendar/render?${p}`;
+}
+
+// deno-lint-ignore no-explicit-any
+function emailConvite(r: any, tipo: string) {
+  const ini = new Date(r.inicio);
+  const fim = new Date(ini.getTime() + r.duracao_min * 60000);
+  const dia = ini.toLocaleDateString("pt-BR", { timeZone: TZ, weekday: "long", day: "numeric", month: "long" });
+  const h = (d: Date) => d.toLocaleTimeString("pt-BR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" });
+  const link = /^https?:\/\//.test(r.local || "") ? r.local : "";
+  const nome = (r.lead?.nome || "").trim().split(/\s+/)[0];
+  const p = (t: string) => `<p style="margin:0 0 16px">${t}</p>`;
+  const abertura = {
+    confirmada: "Nossa conversa está confirmada. Seguem os detalhes:",
+    remarcada: "Mudamos o horário da nossa conversa. O novo horário é este:",
+    cancelada: "A nossa conversa foi cancelada. Se quiser marcar um novo horário, é só responder este e-mail.",
+  }[tipo];
+  const cartao = `<div style="background:#fff;border-radius:16px;padding:20px 22px;margin:8px 0 24px${tipo === "cancelada" ? ";opacity:.6" : ""}">
+  <p style="margin:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#ef4b3a;font-weight:700">${tipo === "cancelada" ? "Cancelada" : TITULO_CLIENTE}</p>
+  <p style="margin:6px 0 2px;font-size:20px;font-weight:600;${tipo === "cancelada" ? "text-decoration:line-through" : ""}">${escH(dia.charAt(0).toUpperCase() + dia.slice(1))}</p>
+  <p style="margin:0;color:#5c5c63">${h(ini)} às ${h(fim)} (horário de Brasília)${link && tipo !== "cancelada" ? " · Google Meet" : ""}</p>
+</div>`;
+  const acoes = tipo === "cancelada" ? "" : `${link ? `<p style="margin:0 0 12px"><a href="${escH(link)}" style="display:inline-block;background:#ef4b3a;color:#fff;text-decoration:none;font-weight:600;padding:14px 24px;border-radius:999px">Entrar na chamada</a></p>` : ""}
+<p style="margin:0 0 24px;font-size:14px;color:#5c5c63"><a href="${escH(linkGoogleCliente(r))}" style="color:#17171a">Adicionar ao Google Agenda</a> · ou abra o convite em anexo para outras agendas</p>`;
+  return `<!doctype html><html><body style="margin:0;background:#f4f2ec">
+<div style="max-width:560px;margin:0 auto;padding:32px 24px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#17171a">
+<p style="margin:0 0 28px"><img src="${LOGO}" width="120" alt="Last Lab" style="display:block;width:120px;height:auto"></p>
+${p(`Oi${nome ? `, ${escH(nome)}` : ""}!`)}
+${p(abertura!)}
+${cartao}
+${acoes}
+${tipo === "cancelada" ? "" : p("Se precisar mudar o horário, é só responder este e-mail.")}
+${p("Um abraço,<br>Thomás<br><span style=\"color:#5c5c63\">Last Lab · <a href=\"https://lastlab.com.br\" style=\"color:#5c5c63\">lastlab.com.br</a></span>")}
+</div></body></html>`;
+}
+
+// deno-lint-ignore no-explicit-any
+async function enviarConvite(r: any, tipo: "confirmada" | "remarcada" | "cancelada") {
+  if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY não configurada: o convite por e-mail não foi enviado.");
+  const ini = new Date(r.inicio);
+  const quando = `${ini.toLocaleDateString("pt-BR", { timeZone: TZ, weekday: "short", day: "2-digit", month: "2-digit" }).replace(".", "")} às ${ini.toLocaleTimeString("pt-BR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" })}`;
+  const assunto = { confirmada: `Reunião confirmada com a Last Lab · ${quando}`, remarcada: `Reunião remarcada · ${quando}`, cancelada: `Reunião cancelada · ${quando}` }[tipo];
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: REMETENTE,
+      to: [String(r.convidado_email).trim()],
+      subject: assunto,
+      html: emailConvite(r, tipo),
+      attachments: [{ filename: tipo === "cancelada" ? "cancelamento.ics" : "convite.ics", content: btoa(unescape(encodeURIComponent(ics(r, tipo)))) }],
+    }),
+  });
+  if (!res.ok) throw new Error(`O e-mail ao convidado não foi enviado (Resend: ${await res.text()})`);
 }
 
 function json(body: unknown, status = 200) {
