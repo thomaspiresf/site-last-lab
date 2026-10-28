@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { listArtigos } from "../lib/api";
+import { listArtigos, getAdminSession } from "../lib/api";
 
 export function dataArtigo(iso) {
   if (!iso) return "";
@@ -21,6 +21,7 @@ export function CartaoArtigo({ artigo }) {
         )}
       </div>
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-500 mb-2">
+        {!artigo.publicado && <span className="normal-case tracking-normal font-bold px-2 py-0.5 rounded-full bg-zinc-900 text-white">Rascunho · só você vê</span>}
         {artigo.serie && <span className="text-[#EF4B3A]">{artigo.serie}</span>}
         {artigo.serie && artigo.publicadoEm && <span>·</span>}
         <span>{dataArtigo(artigo.publicadoEm)}</span>
@@ -38,7 +39,11 @@ export default function Blog() {
 
   useEffect(() => {
     document.title = "Blog | Last Lab";
-    listArtigos({ publicados: true }).then(setArtigos).catch(() => setArtigos([]));
+    // logado no admin, a lista inclui os rascunhos (para ver a prévia antes de publicar)
+    getAdminSession()
+      .then((sessao) => listArtigos({ publicados: !sessao }))
+      .then(setArtigos)
+      .catch(() => setArtigos([]));
   }, []);
 
   return (
