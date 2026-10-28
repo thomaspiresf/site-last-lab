@@ -102,10 +102,6 @@ export default function InstagramPostModal({ client, posts, index, onClose, onNa
             <p className="font-semibold text-sm text-black">{client?.handle}</p>
           </div>
 
-          <div className="px-4 py-3 border-b border-zinc-100">
-            <BotoesPublicar post={post} />
-          </div>
-
           <div className="flex-1 overflow-y-auto px-4 py-4">
             <p className="text-sm text-zinc-800 leading-relaxed whitespace-pre-line">
               <span className="font-semibold mr-1.5">{client?.handle}</span>
@@ -121,6 +117,10 @@ export default function InstagramPostModal({ client, posts, index, onClose, onNa
               <Bookmark size={24} className="ml-auto" />
             </div>
             <p className="text-[11px] text-zinc-400 uppercase tracking-wide mt-2">Prévia — sem interações reais</p>
+          </div>
+
+          <div className="px-4 py-3 border-t border-zinc-100">
+            <BotoesPublicar post={post} />
           </div>
 
         </div>
