@@ -520,7 +520,7 @@ export default function AdminAgenda() {
   };
   const editar = (r) => {
     const d = new Date(r.inicio);
-    setForm({ id: r.id, data: dataLocal(d), hora: horaLocal(d), duracao_min: r.duracao_min, tipo: r.tipo, titulo: r.titulo, diagnostico_id: r.diagnostico_id || "", local: r.local, notas: r.notas, convidado_email: r.convidado_email || "", convidado_whatsapp: r.convidado_whatsapp || r.lead?.whatsapp || "", noGoogle: !!r.google_event_id });
+    setForm({ id: r.id, data: dataLocal(d), hora: horaLocal(d), duracao_min: r.duracao_min, tipo: r.tipo, titulo: r.titulo, diagnostico_id: r.diagnostico_id || "", local: r.local, notas: r.notas, convidado_email: r.convidado_email || (r.google_event_id ? "" : r.lead?.email || ""), convidado_whatsapp: r.convidado_whatsapp || r.lead?.whatsapp || "", noGoogle: !!r.google_event_id || !!conta?.conectado });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
