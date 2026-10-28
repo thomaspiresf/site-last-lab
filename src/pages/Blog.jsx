@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { listArtigos, getAdminSession } from "../lib/api";
 
@@ -36,6 +36,8 @@ export function CartaoArtigo({ artigo }) {
 
 export default function Blog() {
   const [artigos, setArtigos] = useState(null);
+  const [params, setParams] = useSearchParams();
+  const tag = params.get("tag");
 
   useEffect(() => {
     document.title = "Blog | Last Lab";
@@ -63,11 +65,26 @@ export default function Blog() {
         ) : artigos.length === 0 ? (
           <p className="text-zinc-500">Os primeiros textos chegam em breve.</p>
         ) : (
+          <>
+          {(() => {
+            const todas = [...new Set(artigos.flatMap((a) => a.tags || []))].sort();
+            if (todas.length === 0) return null;
+            const chip = (ativo) => `text-sm px-3.5 py-1.5 rounded-full transition-colors ${ativo ? "bg-black text-white" : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"}`;
+            return (
+              <div className="flex flex-wrap gap-2 mb-10">
+                <button onClick={() => setParams({})} className={chip(!tag)}>Todos</button>
+                {todas.map((t) => (
+                  <button key={t} onClick={() => setParams({ tag: t })} className={chip(tag === t)}>#{t}</button>
+                ))}
+              </div>
+            );
+          })()}
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-14">
-            {artigos.map((a) => (
+            {artigos.filter((a) => !tag || a.tags?.includes(tag)).map((a) => (
               <CartaoArtigo key={a.id} artigo={a} />
             ))}
           </div>
+          </>
         )}
       </section>
     </div>

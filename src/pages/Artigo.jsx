@@ -83,7 +83,11 @@ export default function Artigo() {
     if (artigo.capaUrl) definirMeta("og:image", artigo.capaUrl, "property");
   }, [artigo]);
 
-  const html = useMemo(() => (artigo ? marked.parse(artigo.corpo || "") : ""), [artigo]);
+  // corpo em HTML (editor visual) ou markdown (artigos antigos)
+  const html = useMemo(() => {
+    const c = artigo?.corpo || "";
+    return c.trim().startsWith("<") ? c : marked.parse(c);
+  }, [artigo]);
 
   if (artigo === undefined) return <div className="pt-40 pb-24 text-center text-zinc-400 text-sm">Carregando...</div>;
   if (artigo === null)
@@ -117,6 +121,15 @@ export default function Artigo() {
 
       <div className="max-w-3xl mx-auto px-6">
         <div className="artigo mt-12" dangerouslySetInnerHTML={{ __html: html }} />
+        {artigo.tags?.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-10">
+            {artigo.tags.map((t) => (
+              <Link key={t} to={`/blog?tag=${encodeURIComponent(t)}`} className="text-sm px-3 py-1.5 rounded-full bg-zinc-100 text-zinc-700 hover:bg-zinc-200">
+                #{t}
+              </Link>
+            ))}
+          </div>
+        )}
         <Convite artigo={artigo} />
       </div>
 

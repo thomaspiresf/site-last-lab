@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -23,7 +23,8 @@ import AdminClientReferences from "./admin/AdminClientReferences";
 import AdminBriefings from "./admin/AdminBriefings";
 import AdminDiagnosticos from "./admin/AdminDiagnosticos";
 import AdminAgenda from "./admin/AdminAgenda";
-import AdminBlog from "./admin/AdminBlog";
+// o editor do blog (TipTap) só carrega no admin, para não pesar o site
+const AdminBlog = lazy(() => import("./admin/AdminBlog"));
 import AdminDiagnosticoAjustes from "./admin/AdminDiagnosticoAjustes";
 import AdminAnalytics from "./admin/AdminAnalytics";
 import AdminApresentacao from "./admin/AdminApresentacao";
@@ -108,8 +109,8 @@ function Shell() {
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/diagnosticos" element={<AdminDiagnosticos />} />
           <Route path="/admin/agenda" element={<AdminAgenda />} />
-          <Route path="/admin/blog" element={<AdminBlog />} />
-          <Route path="/admin/blog/:id" element={<AdminBlog />} />
+          <Route path="/admin/blog" element={<Suspense fallback={null}><AdminBlog /></Suspense>} />
+          <Route path="/admin/blog/:id" element={<Suspense fallback={null}><AdminBlog /></Suspense>} />
           <Route path="/admin/diagnosticos/ajustes" element={<AdminDiagnosticoAjustes />} />
           <Route path="/admin/diagnosticos/:id/apresentar" element={<AdminApresentacao />} />
           <Route path="/admin/diagnosticos/:id/roteiro" element={<AdminRoteiro />} />

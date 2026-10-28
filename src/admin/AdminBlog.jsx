@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { marked } from "marked";
-import { Plus, ChevronLeft, ExternalLink, ImagePlus, Loader2, Check, Trash2, Eye, Pencil } from "lucide-react";
+import { Plus, ChevronLeft, ExternalLink, ImagePlus, Loader2, Check, Trash2, X } from "lucide-react";
 import AdminLayout from "./AdminLayout";
+import EditorTexto from "./components/EditorTexto";
 import { listArtigos, getArtigo, salvarArtigo, excluirArtigo, uploadImagemDoc, slugify } from "../lib/api";
 
 const SERIES = ["Raio-X", "Ponto de vista", "Na prancheta", "Guia"];
@@ -11,7 +12,47 @@ const CTAS = [
   { id: "diagnostico", label: "Diagnóstico", dica: "Convida para o diagnóstico (e para seguir)" },
   { id: "nenhum", label: "Nenhum", dica: "Termina sem convite" },
 ];
-const VAZIO = { titulo: "", slug: "", resumo: "", capaUrl: "", corpo: "", serie: "Raio-X", instagramUrl: "", cta: "instagram", publicado: false };
+const VAZIO = { titulo: "", slug: "", resumo: "", capaUrl: "", corpo: "", serie: "Raio-X", tags: [], instagramUrl: "", cta: "instagram", publicado: false };
+
+// Artigos antigos estão em markdown; o editor visual trabalha com HTML.
+const paraHtml = (corpo = "") => (corpo.trim().startsWith("<") ? corpo : marked.parse(corpo));
+
+function CampoTags({ tags, onChange, sugestoes }) {
+  const [texto, setTexto] = useState("");
+  const add = (t) => {
+    const tag = t.trim().replace(/^#/, "");
+    if (tag && !tags.some((x) => x.toLowerCase() === tag.toLowerCase())) onChange([...tags, tag]);
+    setTexto("");
+  };
+  const livres = sugestoes.filter((s) => !tags.includes(s) && s.toLowerCase().includes(texto.toLowerCase())).slice(0, 8);
+  return (
+    <div>
+      <div className="flex flex-wrap gap-1.5 mb-2">
+        {tags.map((t) => (
+          <span key={t} className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-black text-white">
+            {t}
+            <button type="button" onClick={() => onChange(tags.filter((x) => x !== t))} aria-label={`Tirar ${t}`}><X size={12} /></button>
+          </span>
+        ))}
+      </div>
+      <input
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(texto); } }}
+        onBlur={() => texto && add(texto)}
+        placeholder="Digite e aperte Enter"
+        className="w-full px-3.5 py-2.5 rounded-[10px] border border-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-black/80"
+      />
+      {livres.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {livres.map((t) => (
+            <button key={t} type="button" onClick={() => add(t)} className="text-xs px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-600 hover:bg-zinc-200">+ {t}</button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Lista() {
   const [artigos, setArtigos] = useState(null);
@@ -60,14 +101,16 @@ function Editor({ id }) {
   const navigate = useNavigate();
   const [a, setA] = useState(id === "novo" ? VAZIO : null);
   const [slugManual, setSlugManual] = useState(id !== "novo");
-  const [aba, setAba] = useState("escrever");
   const [salvando, setSalvando] = useState(false);
   const [subindo, setSubindo] = useState("");
   const [msg, setMsg] = useState("");
   const [confirmar, setConfirmar] = useState(false);
-  const corpoRef = useRef(null);
+  const [sugestoes, setSugestoes] = useState([]);
 
-  useEffect(() => { if (id !== "novo") getArtigo(id).then(setA); }, [id]);
+  useEffect(() => {
+    if (id !== "novo") getArtigo(id).then((x) => setA({ ...x, corpo: paraHtml(x.corpo) }));
+    listArtigos().then((l) => setSugestoes([...new Set(l.flatMap((x) => x.tags))].sort()));
+  }, [id]);
   if (!a) return <AdminLayout><p className="text-sm text-zinc-500">Carregando...</p></AdminLayout>;
 
   const muda = (campo, valor) => setA((x) => ({ ...x, [campo]: valor, ...(campo === "titulo" && !slugManual ? { slug: slugify(valor) } : {}) }));
@@ -80,12 +123,6 @@ function Editor({ id }) {
     try {
       const url = await uploadImagemDoc(f);
       if (destino === "capa") muda("capaUrl", url);
-      else {
-        const el = corpoRef.current;
-        const pos = el?.selectionStart ?? a.corpo.length;
-        const trecho = `\n\n![](${url})\n*Legenda da imagem*\n\n`;
-        muda("corpo", a.corpo.slice(0, pos) + trecho + a.corpo.slice(pos));
-      }
     } catch (err) {
       setMsg(err.message);
     }
@@ -126,9 +163,9 @@ function Editor({ id }) {
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${a.publicado ? "bg-green-100 text-green-700" : "bg-zinc-100 text-zinc-600"}`}>
             {a.publicado ? "Publicado" : "Rascunho"}
           </span>
-          {a.publicado && a.slug && (
+          {a.id && a.slug && (
             <a href={`/blog/${a.slug}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-zinc-600 hover:text-black">
-              Ver no site <ExternalLink size={14} />
+              {a.publicado ? "Ver no site" : "Ver prévia no site"} <ExternalLink size={14} />
             </a>
           )}
         </div>
@@ -148,33 +185,7 @@ function Editor({ id }) {
           <textarea value={a.titulo} onChange={(e) => muda("titulo", e.target.value.replace(/\n/g, " "))} rows={2} placeholder="Título do artigo" className="w-full text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight text-black bg-transparent focus:outline-none resize-none" />
           <textarea value={a.resumo} onChange={(e) => muda("resumo", e.target.value)} rows={2} placeholder="Resumo (aparece abaixo do título, na lista do blog e no Google)" className={`${campo} resize-none`} />
 
-          <div className="bg-white rounded-2xl border border-zinc-200/80">
-            <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-100">
-              <div className="inline-flex bg-zinc-100 rounded-[10px] p-1">
-                {[["escrever", "Escrever", Pencil], ["previa", "Prévia", Eye]].map(([k, l, I]) => (
-                  <button key={k} onClick={() => setAba(k)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] text-xs font-semibold ${aba === k ? "bg-white text-black shadow-sm" : "text-zinc-500"}`}>
-                    <I size={13} /> {l}
-                  </button>
-                ))}
-              </div>
-              <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-600 hover:text-black cursor-pointer">
-                {subindo === "corpo" ? <Loader2 size={14} className="animate-spin" /> : <ImagePlus size={14} />} Inserir imagem
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => subir(e, "corpo")} />
-              </label>
-            </div>
-            {aba === "escrever" ? (
-              <textarea
-                ref={corpoRef}
-                value={a.corpo}
-                onChange={(e) => muda("corpo", e.target.value)}
-                rows={26}
-                placeholder={"Escreva em markdown.\n\n## Subtítulo\n\nParágrafo com **negrito** e [link](https://...).\n\n> Frase de destaque\n\n- item\n- item"}
-                className="w-full p-4 text-sm font-mono leading-relaxed focus:outline-none resize-y rounded-b-2xl"
-              />
-            ) : (
-              <div className="artigo p-6 max-w-none" dangerouslySetInnerHTML={{ __html: marked.parse(a.corpo || "") }} />
-            )}
-          </div>
+          <EditorTexto key={a.id || "novo"} valor={a.corpo} onChange={(html) => muda("corpo", html)} enviarImagem={uploadImagemDoc} />
         </div>
 
         <div className="space-y-5">
@@ -200,6 +211,10 @@ function Editor({ id }) {
             <select value={a.serie} onChange={(e) => muda("serie", e.target.value)} className={campo}>
               {SERIES.map((s) => <option key={s}>{s}</option>)}
             </select>
+          </div>
+          <div>
+            <label className={rotulo}>Tags</label>
+            <CampoTags tags={a.tags || []} onChange={(t) => muda("tags", t)} sugestoes={sugestoes} />
           </div>
           <div>
             <label className={rotulo}>Post do Instagram</label>
