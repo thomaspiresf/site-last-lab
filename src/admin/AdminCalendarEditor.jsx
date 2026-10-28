@@ -228,7 +228,7 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
                 ) : (
                   <img src={m.dataUrl} alt="" className="w-full h-full object-cover pointer-events-none" />
                 )}
-                {idx === 0 && (
+                {idx === 0 && !ehStories && (
                   <span className="absolute top-0.5 left-0.5 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.5 rounded pointer-events-none">
                     Capa
                   </span>
