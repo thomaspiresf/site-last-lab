@@ -65,7 +65,7 @@ function mensagemWhats(r: any) {
 function emailLembrete(r: any) {
   const empresa = r.lead?.apresentacao?.empresa || r.lead?.empresa || "";
   const cliente = [empresa, r.lead?.nome].filter(Boolean).filter((x, i, a) => a.indexOf(x) === i).join(" · ");
-  const d = (r.lead?.whatsapp || "").replace(/\D/g, "");
+  const d = (r.convidado_whatsapp || r.lead?.whatsapp || "").replace(/\D/g, "");
   const whats = d ? `https://wa.me/${d.length <= 11 ? "55" + d : d}?text=${encodeURIComponent(mensagemWhats(r))}` : "";
   const link = /^https?:\/\//.test(r.local || "") ? r.local : "";
   const botao = (href: string, texto: string, cor: string) =>

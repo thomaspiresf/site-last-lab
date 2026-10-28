@@ -52,6 +52,8 @@ function mensagemWhats(r) {
   linhas.push(hoje ? "Até já!" : "Até lá!");
   return linhas.join("\n\n");
 }
+// WhatsApp da reunião: o digitado no formulário, ou o do lead
+const whatsDe = (r) => r.convidado_whatsapp || r.lead?.whatsapp || "";
 const linkWhats = (numero, texto) => {
   const d = (numero || "").replace(/\D/g, "");
   return `https://wa.me/${d.length <= 11 ? "55" + d : d}?text=${encodeURIComponent(texto)}`;
@@ -75,7 +77,7 @@ const vazio = (lead, data, hora) => {
   return {
     data: data || dataLocal(d), hora: hora || "10:00", duracao_min: 30, tipo: lead ? "venda" : "interna",
     titulo: lead ? `Reunião · ${empresaDe(lead) || lead.nome}` : "", diagnostico_id: lead?.id || "", local: "", notas: "",
-    convidado_email: lead?.email || "",
+    convidado_email: lead?.email || "", convidado_whatsapp: lead?.whatsapp || "",
   };
 };
 
@@ -90,6 +92,7 @@ function Formulario({ inicial, leads, googleConectado, onSalvar, onCancelar }) {
       titulo: !x.titulo || x.titulo.startsWith("Reunião · ") ? (lead ? `Reunião · ${empresaDe(lead) || lead.nome}` : "") : x.titulo,
       tipo: lead && x.tipo === "interna" ? "venda" : x.tipo,
       convidado_email: lead?.email && (!x.convidado_email || leads.some((l) => l.email === x.convidado_email)) ? lead.email : x.convidado_email,
+      convidado_whatsapp: lead?.whatsapp && (!x.convidado_whatsapp || leads.some((l) => l.whatsapp === x.convidado_whatsapp)) ? lead.whatsapp : x.convidado_whatsapp,
     }));
   };
   const enviar = async (e) => {
@@ -122,7 +125,9 @@ function Formulario({ inicial, leads, googleConectado, onSalvar, onCancelar }) {
           </select></label>
         <label className="col-span-2"><span className={rotulo}>E-mail do convidado</span>
           <input type="email" value={f.convidado_email} onChange={muda("convidado_email")} className={campo} placeholder="cliente@empresa.com" /></label>
-        <label className="col-span-2"><span className={rotulo}>Link da chamada ou endereço</span>
+        <label className="col-span-2"><span className={rotulo}>WhatsApp do convidado</span>
+          <input type="tel" value={f.convidado_whatsapp} onChange={muda("convidado_whatsapp")} className={campo} placeholder="(11) 99999-9999" /></label>
+        <label className="col-span-2 sm:col-span-4"><span className={rotulo}>Link da chamada ou endereço</span>
           <input value={f.local} onChange={muda("local")} className={campo} placeholder={f.noGoogle ? "Vazio: o Google cria um Meet" : "https://meet.google.com/..."} /></label>
         {googleConectado && (
           <label className="col-span-2 sm:col-span-4 flex items-start gap-2 text-sm text-zinc-700 cursor-pointer">
@@ -177,8 +182,8 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
             <a href={r.local} target="_blank" rel="noopener" className={`${botao} !border-black bg-black text-white hover:bg-zinc-800`}><Video size={13} />Entrar</a>
           )}
           {r.local && !/^https?:\/\//.test(r.local) && <span className="text-xs text-zinc-500 self-center">{r.local}</span>}
-          {r.status === "marcada" && r.lead?.whatsapp && (
-            <a href={linkWhats(r.lead.whatsapp, mensagemWhats(r))} target="_blank" rel="noopener" className={`${botao} !border-[#25D366] text-[#128C7E]`} title="Abre o WhatsApp com a mensagem pronta"><MessageCircle size={13} />Avisar no WhatsApp</a>
+          {r.status === "marcada" && whatsDe(r) && (
+            <a href={linkWhats(whatsDe(r), mensagemWhats(r))} target="_blank" rel="noopener" className={`${botao} !border-[#25D366] text-[#128C7E]`} title="Abre o WhatsApp com a mensagem pronta"><MessageCircle size={13} />Avisar no WhatsApp</a>
           )}
           {r.lead && (
             <>
@@ -422,12 +427,12 @@ export default function AdminAgenda() {
         const chave = `aviso-reuniao-${r.id}`;
         try { if (localStorage.getItem(chave)) continue; localStorage.setItem(chave, "1"); } catch { /* sem storage: avisa mesmo assim */ }
         const n = new Notification(`Em ${Math.round(falta / 60000)} min: ${r.titulo}`, {
-          body: r.lead?.whatsapp ? `Às ${horaLocal(new Date(r.inicio))}. Clique para mandar a confirmação no WhatsApp.` : `Às ${horaLocal(new Date(r.inicio))}.`,
+          body: whatsDe(r) ? `Às ${horaLocal(new Date(r.inicio))}. Clique para mandar a confirmação no WhatsApp.` : `Às ${horaLocal(new Date(r.inicio))}.`,
           tag: r.id, requireInteraction: true,
         });
         n.onclick = () => {
           window.focus();
-          if (r.lead?.whatsapp) window.open(linkWhats(r.lead.whatsapp, mensagemWhats(r)), "_blank");
+          if (whatsDe(r)) window.open(linkWhats(whatsDe(r), mensagemWhats(r)), "_blank");
           n.close();
         };
       }
@@ -463,7 +468,7 @@ export default function AdminAgenda() {
 
   const salvar = async (f) => {
     const { data, hora, id, noGoogle, ...resto } = f;
-    const campos = { ...resto, convidado_email: (resto.convidado_email || "").trim(), inicio: new Date(`${data}T${hora}`).toISOString(), diagnostico_id: resto.diagnostico_id || null };
+    const campos = { ...resto, convidado_email: (resto.convidado_email || "").trim(), convidado_whatsapp: (resto.convidado_whatsapp || "").trim(), inicio: new Date(`${data}T${hora}`).toISOString(), diagnostico_id: resto.diagnostico_id || null };
     try {
       let salva = await salvarReuniao(id ? { id, ...campos } : campos);
       // no Google: cria/atualiza com Meet e convite; desmarcado numa que já estava lá, apaga de lá
@@ -515,7 +520,7 @@ export default function AdminAgenda() {
   };
   const editar = (r) => {
     const d = new Date(r.inicio);
-    setForm({ id: r.id, data: dataLocal(d), hora: horaLocal(d), duracao_min: r.duracao_min, tipo: r.tipo, titulo: r.titulo, diagnostico_id: r.diagnostico_id || "", local: r.local, notas: r.notas, convidado_email: r.convidado_email || "", noGoogle: !!r.google_event_id });
+    setForm({ id: r.id, data: dataLocal(d), hora: horaLocal(d), duracao_min: r.duracao_min, tipo: r.tipo, titulo: r.titulo, diagnostico_id: r.diagnostico_id || "", local: r.local, notas: r.notas, convidado_email: r.convidado_email || "", convidado_whatsapp: r.convidado_whatsapp || r.lead?.whatsapp || "", noGoogle: !!r.google_event_id });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
