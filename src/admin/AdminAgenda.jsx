@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { CalendarPlus, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
+import { CalendarPlus, ChevronLeft, ChevronRight, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { addContato, deleteReuniao, listDiagnosticos, listReunioes, salvarReuniao, updateDiagnostico } from "../lib/api";
 import { ABERTOS, empresaDe } from "./crmEtapas";
@@ -48,10 +48,10 @@ function linkGoogle(r) {
   return `https://calendar.google.com/calendar/render?${p}`;
 }
 
-const vazio = (lead) => {
+const vazio = (lead, data, hora) => {
   const d = new Date(Date.now() + 86400000);
   return {
-    data: dataLocal(d), hora: "10:00", duracao_min: 30, tipo: lead ? "venda" : "interna",
+    data: data || dataLocal(d), hora: hora || "10:00", duracao_min: 30, tipo: lead ? "venda" : "interna",
     titulo: lead ? `Reunião · ${empresaDe(lead) || lead.nome}` : "", diagnostico_id: lead?.id || "", local: "", notas: "",
   };
 };
@@ -158,17 +158,135 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
   );
 }
 
+
+const SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const PX_HORA = 52;
+
+/** Mês inteiro: cada dia mostra as reuniões; clicar no dia abre os horários dele ao lado. */
+function Mes({ mes, setMes, dia, escolherDia, porDia }) {
+  const y = mes.getFullYear(), m = mes.getMonth();
+  const offset = new Date(y, m, 1).getDay();
+  const total = Math.ceil((offset + new Date(y, m + 1, 0).getDate()) / 7) * 7;
+  const celulas = Array.from({ length: total }, (_, i) => new Date(y, m, 1 - offset + i));
+  const hoje = dataLocal(new Date());
+  const titulo = mes.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }).replace(/^./, (c) => c.toUpperCase());
+  const seta = "p-1.5 rounded-full hover:bg-zinc-100";
+  return (
+    <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3">
+        <p className="text-lg font-black text-black">{titulo}</p>
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={() => escolherDia(hoje)} className="px-3 py-1 mr-1 rounded-full text-xs font-semibold border border-zinc-200 hover:border-black">Hoje</button>
+          <button type="button" onClick={() => setMes(new Date(y, m - 1, 1))} className={seta} title="Mês anterior"><ChevronLeft size={18} /></button>
+          <button type="button" onClick={() => setMes(new Date(y, m + 1, 1))} className={seta} title="Próximo mês"><ChevronRight size={18} /></button>
+        </div>
+      </div>
+      <div className="grid grid-cols-7 border-t border-zinc-100">
+        {SEMANA.map((s) => <p key={s} className="text-[11px] font-bold text-zinc-400 uppercase tracking-wide text-center py-2">{s}</p>)}
+        {celulas.map((d) => {
+          const k = dataLocal(d);
+          const rs = porDia[k] || [];
+          const fora = d.getMonth() !== m;
+          const sel = k === dia;
+          return (
+            <button key={k} type="button" onClick={() => escolherDia(k)}
+              className={`min-h-[64px] sm:min-h-[96px] p-1 sm:p-1.5 text-left border-t border-l border-zinc-100 first:border-l-0 [&:nth-child(7n+1)]:border-l-0 align-top transition-colors ${sel ? "bg-zinc-50 ring-2 ring-inset ring-black" : "hover:bg-zinc-50"}`}>
+              <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${k === hoje ? "text-white" : fora ? "text-zinc-300" : "text-black"}`}
+                style={k === hoje ? { background: LARANJA } : undefined}>{d.getDate()}</span>
+              <div className="hidden sm:block space-y-0.5 mt-0.5">
+                {rs.slice(0, 3).map((r) => {
+                  const [, , cor] = tipoDe(r.tipo);
+                  return (
+                    <span key={r.id} className={`block truncate text-[10px] font-semibold px-1.5 py-0.5 rounded ${cor} ${r.status === "cancelada" ? "line-through opacity-50" : ""}`}>
+                      {horaLocal(new Date(r.inicio))} {empresaDaReuniao(r) || r.titulo}
+                    </span>
+                  );
+                })}
+                {rs.length > 3 && <span className="block text-[10px] font-semibold text-zinc-500 px-1">+{rs.length - 3}</span>}
+              </div>
+              {rs.length > 0 && (
+                <div className="sm:hidden flex gap-0.5 mt-1 justify-center">
+                  {rs.slice(0, 3).map((r) => <i key={r.id} className="w-1.5 h-1.5 rounded-full" style={{ background: r.status === "cancelada" ? "#d4d4d8" : LARANJA }} />)}
+                </div>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/** Horários do dia: as reuniões no horário certo; clicar num horário livre marca uma reunião ali. */
+function Dia({ dia, reunioes, aberta, setAberta, onNova }) {
+  const inicioMin = (r) => { const d = new Date(r.inicio); return d.getHours() * 60 + d.getMinutes(); };
+  const hIni = Math.min(8, ...reunioes.map((r) => Math.floor(inicioMin(r) / 60)));
+  const hFim = Math.max(20, ...reunioes.map((r) => Math.ceil((inicioMin(r) + r.duracao_min) / 60)));
+  const horas = Array.from({ length: hFim - hIni }, (_, i) => hIni + i);
+  // reuniões que se sobrepõem ficam lado a lado
+  const colunas = [];
+  const coluna = {};
+  reunioes.forEach((r) => {
+    const i = colunas.findIndex((fim) => fim <= inicioMin(r));
+    const c = i === -1 ? colunas.length : i;
+    colunas[c] = inicioMin(r) + r.duracao_min;
+    coluna[r.id] = c;
+  });
+  const nCol = Math.max(1, colunas.length);
+  const agora = new Date();
+  const agoraMin = agora.getHours() * 60 + agora.getMinutes();
+  const ehHoje = dia === dataLocal(agora);
+  return (
+    <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+      <div className="px-4 py-3 border-b border-zinc-100">
+        <p className="text-sm font-bold text-black">{rotuloDia(`${dia}T12:00`)}</p>
+        <p className="text-xs text-zinc-500">{reunioes.length ? `${reunioes.length} ${reunioes.length === 1 ? "reunião" : "reuniões"}` : "Dia livre"} · clique num horário para marcar</p>
+      </div>
+      <div className="pt-3 pb-2"><div className="relative" style={{ height: horas.length * PX_HORA }}>
+        {horas.map((h, i) => (
+          <button key={h} type="button" onClick={() => onNova(`${pad(h)}:00`)} title={`Marcar às ${pad(h)}:00`}
+            className="group absolute left-0 right-0 border-t border-zinc-100 text-left hover:bg-zinc-50" style={{ top: i * PX_HORA, height: PX_HORA }}>
+            <span className="absolute left-3 -top-2 bg-white px-1 text-[11px] font-semibold text-zinc-400">{pad(h)}:00</span>
+            <span className="absolute left-16 top-3 text-[11px] font-semibold text-zinc-400 opacity-0 group-hover:opacity-100">+ marcar</span>
+          </button>
+        ))}
+        {ehHoje && agoraMin >= hIni * 60 && agoraMin <= hFim * 60 && (
+          <div className="absolute left-14 right-2 h-0.5 pointer-events-none z-10" style={{ top: (agoraMin - hIni * 60) * PX_HORA / 60, background: LARANJA }}>
+            <i className="absolute -left-1 -top-1 w-2.5 h-2.5 rounded-full" style={{ background: LARANJA }} />
+          </div>
+        )}
+        {reunioes.map((r) => {
+          const [, , cor] = tipoDe(r.tipo);
+          const top = (inicioMin(r) - hIni * 60) * PX_HORA / 60;
+          const altura = Math.max(r.duracao_min * PX_HORA / 60 - 2, 22);
+          const largura = `calc((100% - 64px) / ${nCol})`;
+          return (
+            <button key={r.id} type="button" onClick={() => setAberta(r.id)}
+              className={`absolute rounded-lg px-2 py-1 text-left overflow-hidden ${cor} ${aberta === r.id ? "ring-2 ring-black" : ""} ${r.status === "cancelada" ? "opacity-40 line-through" : ""}`}
+              style={{ top: top + 1, height: altura, left: `calc(60px + ${largura} * ${coluna[r.id]})`, width: `calc(${largura} - 4px)` }}>
+              <p className="text-xs font-bold truncate">{empresaDaReuniao(r) || r.titulo}</p>
+              {altura > 34 && <p className="text-[11px] opacity-80 truncate">{horaLocal(new Date(r.inicio))}–{horaLocal(fimDe(r))}</p>}
+            </button>
+          );
+        })}
+      </div></div>
+    </div>
+  );
+}
+
 export default function AdminAgenda() {
   const [params, setParams] = useSearchParams();
   const [reunioes, setReunioes] = useState(null);
   const [leads, setLeads] = useState([]);
   const [form, setForm] = useState(null); // null fechado; { ...campos, id? }
-  const [verPassadas, setVerPassadas] = useState(false);
+  const [dia, setDia] = useState(() => dataLocal(new Date()));
+  const [mes, setMes] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
+  const [aberta, setAberta] = useState(null); // reunião escolhida no dia
+  const [verPendentes, setVerPendentes] = useState(false);
   const [erro, setErro] = useState("");
 
   useEffect(() => {
-    // as dos últimos 60 dias também, para marcar como feita e consultar
-    listReunioes(new Date(Date.now() - 60 * 86400000).toISOString()).then(setReunioes).catch((e) => { setErro(e.message || String(e)); setReunioes([]); });
+    listReunioes().then(setReunioes).catch((e) => { setErro(e.message || String(e)); setReunioes([]); });
     listDiagnosticos()
       .then((itens) => setLeads(itens.filter((x) => ABERTOS.includes(x.status) || x.status === "fechado")))
       .catch(() => {});
@@ -198,6 +316,8 @@ export default function AdminAgenda() {
         }).catch(() => {});
       }
       setForm(null);
+      escolherDia(dataLocal(new Date(salva.inicio)));
+      setAberta(salva.id);
     } catch (e) {
       setErro(`Não consegui salvar: ${e.message || e}`);
     }
@@ -220,65 +340,59 @@ export default function AdminAgenda() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const { proximas, passadas, pendentes } = useMemo(() => {
-    const agora = new Date();
-    const lista = reunioes || [];
-    return {
-      proximas: lista.filter((r) => fimDe(r) >= agora),
-      passadas: lista.filter((r) => fimDe(r) < agora).reverse(),
-      // passaram e ninguém marcou como feita ou cancelada
-      pendentes: lista.filter((r) => fimDe(r) < agora && r.status === "marcada").length,
-    };
-  }, [reunioes]);
-  const porDia = (lista) => lista.reduce((g, r) => {
+  const escolherDia = (k) => {
+    setDia(k);
+    setAberta(null);
+    const [y, m] = k.split("-").map(Number);
+    setMes(new Date(y, m - 1, 1));
+  };
+  const porDia = useMemo(() => (reunioes || []).reduce((g, r) => {
     const k = dataLocal(new Date(r.inicio));
     (g[k] = g[k] || []).push(r);
     return g;
-  }, {});
-  const grupos = (lista) => Object.entries(porDia(lista)).map(([dia, rs]) => (
-    <section key={dia}>
-      <h2 className="text-sm font-bold text-black mb-2">{rotuloDia(rs[0].inicio)}</h2>
-      <div className="space-y-2">
-        {rs.map((r) => <Cartao key={r.id} r={r} onEditar={() => editar(r)} onStatus={(s) => mudarStatus(r, s)} onExcluir={() => excluir(r)} />)}
-      </div>
-    </section>
-  ));
+  }, {}), [reunioes]);
+  // passaram e ninguém marcou como feita ou cancelada
+  const pendentes = useMemo(() => (reunioes || []).filter((r) => fimDe(r) < new Date() && r.status === "marcada"), [reunioes]);
+  const doDia = porDia[dia] || [];
+  const escolhida = doDia.find((r) => r.id === aberta);
+  const cartao = (r) => <Cartao key={r.id} r={r} onEditar={() => editar(r)} onStatus={(s) => mudarStatus(r, s)} onExcluir={() => excluir(r)} />;
 
   return (
     <AdminLayout>
-      <div className="max-w-3xl">
+      <div className="max-w-6xl">
         <div className="flex items-end justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-black text-black tracking-tight">Agenda</h1>
             <p className="text-sm text-zinc-500 mt-1">Reuniões da Last Lab. Ligadas a um lead, abrem a apresentação e o roteiro.</p>
           </div>
           {!form && (
-            <button type="button" onClick={() => setForm(vazio())} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800">
+            <button type="button" onClick={() => setForm(vazio(null, dia))} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800">
               <Plus size={16} />Nova reunião
             </button>
           )}
         </div>
 
         {erro && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2 mb-4">{erro}</p>}
-        {form && <div className="mb-6"><Formulario key={form.id || "nova"} inicial={form} leads={leads} onSalvar={salvar} onCancelar={() => setForm(null)} /></div>}
+        {form && <div className="mb-6 max-w-3xl"><Formulario key={form.id || `nova-${form.data}-${form.hora}`} inicial={form} leads={leads} onSalvar={salvar} onCancelar={() => setForm(null)} /></div>}
+
+        {pendentes.length > 0 && (
+          <div className="mb-4">
+            <button type="button" onClick={() => setVerPendentes((v) => !v)} className="text-sm font-semibold text-zinc-600 hover:text-black">
+              <span className="mr-2 text-xs font-bold px-2 py-0.5 rounded-full text-white" style={{ background: LARANJA }}>{pendentes.length}</span>
+              {pendentes.length === 1 ? "reunião passou" : "reuniões passaram"} sem registro · {verPendentes ? "esconder" : "ver"}
+            </button>
+            {verPendentes && <div className="space-y-2 mt-3 max-w-3xl">{pendentes.map(cartao)}</div>}
+          </div>
+        )}
 
         {reunioes === null ? <p className="text-sm text-zinc-500">Carregando...</p> : (
-          <div className="space-y-6">
-            {proximas.length === 0 && (
-              <div className="text-center py-14 bg-white rounded-3xl border border-dashed border-zinc-300">
-                <p className="text-zinc-500">Nenhuma reunião marcada.</p>
-              </div>
-            )}
-            {grupos(proximas)}
-            {passadas.length > 0 && (
-              <div className="pt-2">
-                <button type="button" onClick={() => setVerPassadas((v) => !v)} className="text-sm font-semibold text-zinc-600 hover:text-black">
-                  {verPassadas ? "Esconder" : "Ver"} reuniões passadas ({passadas.length})
-                  {pendentes > 0 && <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full text-white" style={{ background: LARANJA }}>{pendentes} sem registro</span>}
-                </button>
-                {verPassadas && <div className="space-y-6 mt-4">{grupos(passadas)}</div>}
-              </div>
-            )}
+          <div className="grid lg:grid-cols-[1fr_380px] gap-6 items-start">
+            <Mes mes={mes} setMes={setMes} dia={dia} escolherDia={escolherDia} porDia={porDia} />
+            <div className="space-y-3 lg:sticky lg:top-4">
+              <Dia dia={dia} reunioes={doDia} aberta={aberta} setAberta={setAberta}
+                onNova={(hora) => { setForm(vazio(null, dia, hora)); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+              {escolhida && cartao(escolhida)}
+            </div>
           </div>
         )}
       </div>
