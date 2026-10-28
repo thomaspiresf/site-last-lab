@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { CalendarPlus, ChevronLeft, ChevronRight, MessageCircle, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
+import { Bell, CalendarPlus, ChevronLeft, ChevronRight, MessageCircle, Plus, Presentation, ScrollText, Trash2, Video } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import { addContato, contaGoogleAgenda, deleteReuniao, listDiagnosticos, listGoogleAgenda, listReunioes, reuniaoNoGoogle, salvarReuniao, updateDiagnostico } from "../lib/api";
 import { ABERTOS, empresaDe } from "./crmEtapas";
@@ -38,15 +38,18 @@ function rotuloDia(iso) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-/** Mensagem de confirmação para o cliente, com o link da chamada. */
+/** Mensagem de confirmação para o cliente, com o link da chamada (no dia: "de hoje"). */
 function mensagemWhats(r) {
   const d = new Date(r.inicio);
   const nome = (r.lead?.nome || "").trim().split(/\s+/)[0];
+  const hoje = dataLocal(d) === dataLocal(new Date());
   const quando = d.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit" });
-  const linhas = [`Oi${nome ? `, ${nome}` : ""}! Tudo certo para a nossa conversa ${quando}, às ${horaLocal(d)}.`];
+  const linhas = [hoje
+    ? `Oi${nome ? `, ${nome}` : ""}! Passando para confirmar a nossa conversa de hoje, às ${horaLocal(d)}.`
+    : `Oi${nome ? `, ${nome}` : ""}! Tudo certo para a nossa conversa ${quando}, às ${horaLocal(d)}.`];
   if (/^https?:\/\//.test(r.local || "")) linhas.push(`O link da chamada é este: ${r.local}`);
-  if (r.google_event_id && r.convidado_email) linhas.push("Também mandei o convite para o seu e-mail.");
-  linhas.push("Até lá!");
+  if (!hoje && r.google_event_id && r.convidado_email) linhas.push("Também mandei o convite para o seu e-mail.");
+  linhas.push(hoje ? "Até já!" : "Até lá!");
   return linhas.join("\n\n");
 }
 const linkWhats = (numero, texto) => {
@@ -391,6 +394,35 @@ export default function AdminAgenda() {
     try { setConta(await contaGoogleAgenda("desconectar")); } catch (e) { setErro(e.message || String(e)); }
   };
 
+  // aviso no PC 1h antes (com o admin aberto): clicar abre o WhatsApp do cliente com a confirmação pronta
+  const temNotificacao = typeof window !== "undefined" && "Notification" in window;
+  const [permissao, setPermissao] = useState(() => (temNotificacao ? Notification.permission : "denied"));
+  const ativarAvisos = async () => setPermissao(await Notification.requestPermission());
+  useEffect(() => {
+    if (permissao !== "granted" || !reunioes) return;
+    const avisar = () => {
+      const agora = Date.now();
+      for (const r of reunioes) {
+        const falta = new Date(r.inicio).getTime() - agora;
+        if (r.status !== "marcada" || falta < 0 || falta > 60 * 60000) continue;
+        const chave = `aviso-reuniao-${r.id}`;
+        try { if (localStorage.getItem(chave)) continue; localStorage.setItem(chave, "1"); } catch { /* sem storage: avisa mesmo assim */ }
+        const n = new Notification(`Em ${Math.round(falta / 60000)} min: ${r.titulo}`, {
+          body: r.lead?.whatsapp ? `Às ${horaLocal(new Date(r.inicio))}. Clique para mandar a confirmação no WhatsApp.` : `Às ${horaLocal(new Date(r.inicio))}.`,
+          tag: r.id, requireInteraction: true,
+        });
+        n.onclick = () => {
+          window.focus();
+          if (r.lead?.whatsapp) window.open(linkWhats(r.lead.whatsapp, mensagemWhats(r)), "_blank");
+          n.close();
+        };
+      }
+    };
+    avisar();
+    const t = setInterval(avisar, 30000);
+    return () => clearInterval(t);
+  }, [permissao, reunioes]);
+
   // Google Agenda do mês visível (com as pontas das semanas vizinhas)
   useEffect(() => {
     const y = mes.getFullYear(), m = mes.getMonth();
@@ -502,6 +534,13 @@ export default function AdminAgenda() {
                 <CalendarPlus size={13} />Conectar Google Agenda (Meet e convites)
               </button>
             ))}
+            {temNotificacao && permissao === "default" && (
+              <button type="button" onClick={ativarAvisos} className="mt-2 ml-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-zinc-200 hover:border-black">
+                <Bell size={13} />Ativar avisos no PC (1h antes)
+              </button>
+            )}
+            {temNotificacao && permissao === "denied" && <p className="text-xs text-zinc-400 mt-1"><Bell size={11} className="inline mr-1" />Avisos no PC bloqueados neste navegador: libere as notificações do site no cadeado da barra de endereço.</p>}
+            {permissao === "granted" && <p className="text-xs text-zinc-500 mt-1"><Bell size={11} className="inline mr-1" />Avisos no PC ativos: 1h antes, com esta aba aberta.</p>}
           </div>
           {!form && (
             <button type="button" onClick={() => setForm(vazio(null, dia))} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-sm font-semibold hover:bg-zinc-800">

@@ -135,6 +135,8 @@ async function salvarNoGoogle(token: string, id: string) {
     start: { dateTime: new Date(r.inicio).toISOString(), timeZone: TZ },
     end: { dateTime: fim.toISOString(), timeZone: TZ },
     attendees: r.convidado_email ? [{ email: r.convidado_email.trim() }] : [],
+    // alerta para o Thomás 1h antes (hora de mandar a confirmação no WhatsApp) e 10 min antes
+    reminders: { useDefault: false, overrides: [{ method: "popup", minutes: 60 }, { method: "popup", minutes: 10 }] },
   };
   const pedirMeet = () => { if (!linkProprio && !r.local) corpo.conferenceData = { createRequest: { requestId: crypto.randomUUID(), conferenceSolutionKey: { type: "hangoutsMeet" } } }; };
   let ev = null;
