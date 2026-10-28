@@ -145,6 +145,9 @@ function Formulario({ inicial, leads, googleConectado, onSalvar, onCancelar }) {
 }
 
 function Cartao({ r, onEditar, onStatus, onExcluir }) {
+  // confirmação dentro do card (o confirm() do navegador some em alguns navegadores embutidos)
+  const [confirmando, setConfirmando] = useState(false);
+  const [excluindo, setExcluindo] = useState(false);
   const [, nomeTipo, corTipo] = tipoDe(r.tipo);
   const passou = fimDe(r) < new Date();
   const apagada = r.status !== "marcada";
@@ -188,7 +191,16 @@ function Cartao({ r, onEditar, onStatus, onExcluir }) {
           {r.status === "marcada" && passou && <button type="button" onClick={() => onStatus("feita")} className={botao}>Marcar como feita</button>}
           {r.status === "marcada" && <button type="button" onClick={() => onStatus("cancelada")} className={botao}>Cancelar</button>}
           {r.status !== "marcada" && <button type="button" onClick={() => onStatus("marcada")} className={botao}>Voltar para marcada</button>}
-          <button type="button" onClick={onExcluir} title="Excluir" className="p-1.5 text-zinc-300 hover:text-red-600"><Trash2 size={14} /></button>
+          {confirmando ? (
+            <span className="inline-flex items-center gap-1.5 text-xs">
+              <span className="text-zinc-600">Excluir{r.convite_inicio ? " e avisar o convidado" : ""}?</span>
+              <button type="button" disabled={excluindo} onClick={async () => { setExcluindo(true); try { await onExcluir(); } finally { setExcluindo(false); setConfirmando(false); } }}
+                className="px-3 py-1.5 rounded-full font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">{excluindo ? "Excluindo..." : "Excluir"}</button>
+              <button type="button" onClick={() => setConfirmando(false)} className="px-3 py-1.5 rounded-full font-semibold border border-zinc-200 hover:border-black">Não</button>
+            </span>
+          ) : (
+            <button type="button" onClick={() => setConfirmando(true)} title="Excluir" className="p-1.5 text-zinc-300 hover:text-red-600"><Trash2 size={14} /></button>
+          )}
         </div>
       </div>
     </article>
@@ -389,9 +401,11 @@ export default function AdminAgenda() {
     try { window.location.href = (await contaGoogleAgenda("iniciar")).url; }
     catch (e) { setErro(e.codigo === "nao_configurado" ? "Faltam os segredos GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET no Supabase." : `Não consegui conectar: ${e.message || e}`); }
   };
+  const [desconectando, setDesconectando] = useState(false); // 1º clique pede confirmação
   const desconectarGoogle = async () => {
-    if (!confirm("Desconectar o Google Agenda? As reuniões já criadas continuam lá.")) return;
+    if (!desconectando) { setDesconectando(true); return; }
     try { setConta(await contaGoogleAgenda("desconectar")); } catch (e) { setErro(e.message || String(e)); }
+    setDesconectando(false);
   };
 
   // aviso no PC 1h antes (com o admin aberto): clicar abre o WhatsApp do cliente com a confirmação pronta
@@ -481,7 +495,6 @@ export default function AdminAgenda() {
     } catch (e) { setErro(`Não consegui salvar: ${e.message || e}`); }
   };
   const excluir = async (r) => {
-    if (!confirm(`Excluir "${r.titulo}"?`)) return;
     try {
       if (conta?.conectado && r.google_event_id) await reuniaoNoGoogle("cancelar", r.id);
       await deleteReuniao(r.id); setReunioes((lista) => lista.filter((x) => x.id !== r.id)); }
@@ -527,7 +540,7 @@ export default function AdminAgenda() {
             {conta && (conta.conectado ? (
               <p className="text-xs text-zinc-500 mt-2">
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5" />Google Agenda conectado{conta.email ? ` · ${conta.email}` : ""}
-                <button type="button" onClick={desconectarGoogle} className="ml-2 underline hover:text-black">desconectar</button>
+                <button type="button" onClick={desconectarGoogle} className={`ml-2 underline hover:text-black ${desconectando ? "text-red-600" : ""}`}>{desconectando ? "confirmar: desconectar (as reuniões continuam no Google)" : "desconectar"}</button>
               </p>
             ) : (
               <button type="button" onClick={conectarGoogle} className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-zinc-200 hover:border-black">
