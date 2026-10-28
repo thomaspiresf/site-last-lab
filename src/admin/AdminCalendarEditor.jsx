@@ -19,6 +19,7 @@ import {
   CalendarCheck,
   CalendarX,
   Sparkles,
+  Frame,
 } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import CalendarDragGrid from "./components/CalendarDragGrid";
@@ -36,6 +37,7 @@ import {
   setPostScheduled,
   uploadPostMedia,
   deleteCalendar,
+  puxarDoFigma,
 } from "../lib/api";
 import { tagColor } from "../lib/tagColor";
 import { PILLARS } from "../lib/contentPillars";
@@ -81,6 +83,21 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
   const [tag, setTag] = useState(post?.tag || PILLARS[0].id);
   const [saving, setSaving] = useState(false);
   const [draggingMediaIdx, setDraggingMediaIdx] = useState(null);
+  const [figmaUrl, setFigmaUrl] = useState(post?.figmaUrl || "");
+  const [puxando, setPuxando] = useState(false);
+  const [erroFigma, setErroFigma] = useState("");
+
+  // Troca as mídias pelas pranchetas da seção do Figma (na ordem da seção).
+  const handlePuxarFigma = async () => {
+    setPuxando(true);
+    setErroFigma("");
+    try {
+      setMediaList(await puxarDoFigma(figmaUrl.trim()));
+    } catch (err) {
+      setErroFigma(err.message);
+    }
+    setPuxando(false);
+  };
 
   const handleFiles = async (e) => {
     const selected = Array.from(e.target.files || []);
@@ -116,10 +133,11 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
     setSaving(true);
 
     if (isEdit) {
-      await updatePost(post.id, { caption, scheduledDate, tag, media: mediaList });
+      await updatePost(post.id, { caption, scheduledDate, tag, media: mediaList, figmaUrl: figmaUrl.trim() || null });
     } else {
-      await addPost({ calendarId, media: mediaList, caption, scheduledDate, tag });
+      await addPost({ calendarId, media: mediaList, caption, scheduledDate, tag, figmaUrl: figmaUrl.trim() });
       setMediaList([]);
+      setFigmaUrl("");
       setCaption("");
       setTag(PILLARS[0].id);
     }
@@ -208,6 +226,32 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
           {uploading ? "Enviando..." : mediaList.length > 0 ? "Adicionar mais imagens/vídeo" : "Selecionar imagens/vídeo"}
           <input type="file" accept="image/*,video/*" multiple className="hidden" onChange={handleFiles} disabled={uploading} />
         </label>
+
+        <div className="mt-3">
+          <label className="block text-xs font-semibold text-zinc-600 mb-1">Ou puxe do Figma</label>
+          <div className="flex gap-2">
+            <input
+              type="url"
+              value={figmaUrl}
+              onChange={(e) => setFigmaUrl(e.target.value)}
+              placeholder="Link da seção do post no Figma"
+              className="flex-1 min-w-0 px-3.5 py-2.5 rounded-[10px] border border-zinc-300 text-sm focus:outline-none focus:ring-2 focus:ring-black/80"
+            />
+            <button
+              type="button"
+              onClick={handlePuxarFigma}
+              disabled={!figmaUrl.trim() || puxando}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] border border-zinc-300 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-40 shrink-0"
+            >
+              {puxando ? <Loader2 size={16} className="animate-spin" /> : <Frame size={16} />}
+              {puxando ? "Puxando..." : post?.figmaUrl && figmaUrl.trim() === post.figmaUrl ? "Atualizar do Figma" : "Puxar do Figma"}
+            </button>
+          </div>
+          <p className="text-xs text-zinc-400 mt-1.5">
+            No Figma, coloque as telas do post dentro de uma seção, clique com o botão direito nela e use “Copiar link”. As telas entram na ordem da esquerda para a direita e substituem as mídias acima.
+          </p>
+          {erroFigma && <p className="text-xs text-red-600 mt-1.5">{erroFigma}</p>}
+        </div>
       </div>
 
       <div>
@@ -260,7 +304,7 @@ function PostForm({ calendarId, month, post, onSaved, onCancel }) {
       <div className="flex items-center gap-2">
         <button
           type="submit"
-          disabled={saving || uploading || (!isEdit && mediaList.length === 0)}
+          disabled={saving || uploading || puxando || (!isEdit && mediaList.length === 0)}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] bg-black text-white text-sm font-semibold hover:bg-zinc-800 transition-colors disabled:opacity-40"
         >
           {isEdit ? <Check size={16} /> : <Plus size={16} />}

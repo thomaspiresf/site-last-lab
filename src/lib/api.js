@@ -102,6 +102,7 @@ function mapPost(row) {
     createdAt: row.created_at,
     scheduled: row.scheduled,
     scheduledAt: row.scheduled_at,
+    figmaUrl: row.figma_url,
   };
 }
 
@@ -110,6 +111,7 @@ const POST_FIELD_MAP = {
   order: "order_index",
   scheduledDate: "scheduled_date",
   scheduledAt: "scheduled_at",
+  figmaUrl: "figma_url",
 };
 
 function toPostRow(patch) {
@@ -368,7 +370,7 @@ export async function listPosts(calendarId) {
   return data.map(mapPost);
 }
 
-export async function addPost({ calendarId, media, caption, scheduledDate, tag }) {
+export async function addPost({ calendarId, media, caption, scheduledDate, tag, figmaUrl }) {
   const { count } = await supabase
     .from("posts")
     .select("*", { count: "exact", head: true })
@@ -383,6 +385,7 @@ export async function addPost({ calendarId, media, caption, scheduledDate, tag }
       caption: caption || "",
       scheduled_date: scheduledDate || null,
       tag: tag || "",
+      figma_url: figmaUrl || null,
     })
     .select()
     .single();
@@ -1088,6 +1091,11 @@ export async function listGoogleAgenda(desde, ate) {
 /** Cria/atualiza ("salvar") ou apaga ("cancelar") a reunião no Google Agenda; devolve a reunião atualizada. */
 export async function reuniaoNoGoogle(acao, id) {
   return (await invocarFuncao("google-agenda", { acao, id })).reuniao;
+}
+
+/** Renderiza as pranchetas de uma seção (ou uma prancheta) do Figma e devolve as mídias do post, na ordem. */
+export async function puxarDoFigma(url) {
+  return (await invocarFuncao("figma-puxar", { url })).media;
 }
 
 /** Analisa a transcrição da reunião com IA (função analisar-reuniao); devolve a reunião com os insights. */
