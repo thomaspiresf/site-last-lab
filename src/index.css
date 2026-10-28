@@ -59,3 +59,20 @@
   background-color: #ffffff;
   color: #000000;
 }
+
+/* Corpo dos artigos do blog (markdown) */
+.artigo { color: #27272a; font-size: 1.125rem; line-height: 1.8; }
+.artigo > * + * { margin-top: 1.25em; }
+.artigo h2 { font-size: 1.75rem; line-height: 1.25; font-weight: 800; color: #000; letter-spacing: -0.02em; margin-top: 2.2em; }
+.artigo h3 { font-size: 1.3rem; line-height: 1.35; font-weight: 700; color: #000; margin-top: 1.8em; }
+.artigo strong { color: #000; font-weight: 700; }
+.artigo a { color: #000; text-decoration: underline; text-underline-offset: 3px; }
+.artigo ul, .artigo ol { padding-left: 1.4em; }
+.artigo ul { list-style: disc; }
+.artigo ol { list-style: decimal; }
+.artigo li + li { margin-top: 0.4em; }
+.artigo li::marker { color: #EF4B3A; }
+.artigo img { width: 100%; border-radius: 1.25rem; border: 1px solid #e4e4e7; margin-top: 2em; margin-bottom: 0.5em; }
+.artigo img + em, .artigo p > em:only-child { display: block; font-size: 0.85rem; color: #71717a; font-style: normal; }
+.artigo blockquote { border-left: 4px solid #EF4B3A; padding: 0.25em 0 0.25em 1.25em; font-size: 1.35rem; line-height: 1.5; font-weight: 600; color: #000; }
+.artigo hr { border: 0; border-top: 1px solid #e4e4e7; margin: 2.5em 0; }

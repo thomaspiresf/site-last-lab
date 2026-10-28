@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate, Link, useLocation } from "react-router-dom";
-import { LayoutGrid, LogOut, FileText, Sparkles, Gauge, Package, BookOpen, BarChart3, CalendarDays } from "lucide-react";
+import { LayoutGrid, LogOut, FileText, Sparkles, Gauge, Package, BookOpen, BarChart3, CalendarDays, Newspaper } from "lucide-react";
 import { getAdminSession, onAdminAuthChange, adminLogout } from "../lib/api";
 import { marcarInterno } from "../lib/analytics";
 
@@ -94,6 +94,15 @@ export default function AdminLayout({ children }) {
             >
               <BookOpen size={16} />
               Entregáveis
+            </Link>
+            <Link
+              to="/admin/blog"
+              className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                location.pathname.startsWith("/admin/blog") ? "text-black" : "text-zinc-600 hover:text-black"
+              }`}
+            >
+              <Newspaper size={16} />
+              Blog
             </Link>
             <Link
               to="/admin/naming"

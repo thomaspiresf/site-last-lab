@@ -1225,3 +1225,70 @@ export async function salvarCatalogoServicos(dados) {
   if (error) throw error;
   return data.criado_em;
 }
+
+// --- Blog (tabela artigos; público só vê os publicados) ---
+
+function mapArtigo(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    slug: row.slug,
+    titulo: row.titulo,
+    resumo: row.resumo || "",
+    capaUrl: row.capa_url || "",
+    corpo: row.corpo || "",
+    serie: row.serie || "",
+    instagramUrl: row.instagram_url || "",
+    cta: row.cta || "instagram",
+    publicado: row.publicado,
+    publicadoEm: row.publicado_em,
+    atualizadoEm: row.atualizado_em,
+  };
+}
+
+/** Artigos do blog. `publicados: true` para o site; o admin vê todos. */
+export async function listArtigos({ publicados = false } = {}) {
+  let q = supabase.from("artigos").select("*").order("publicado_em", { ascending: false, nullsFirst: true }).order("criado_em", { ascending: false });
+  if (publicados) q = q.eq("publicado", true);
+  const { data, error } = await q;
+  if (error) throw error;
+  return data.map(mapArtigo);
+}
+
+export async function getArtigoPorSlug(slug) {
+  const { data, error } = await supabase.from("artigos").select("*").eq("slug", slug).maybeSingle();
+  if (error) throw error;
+  return mapArtigo(data);
+}
+
+export async function getArtigo(id) {
+  const { data, error } = await supabase.from("artigos").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return mapArtigo(data);
+}
+
+/** Cria (sem id) ou atualiza o artigo. Ao publicar pela primeira vez, grava a data de publicação. */
+export async function salvarArtigo(a) {
+  const row = {
+    slug: slugify(a.slug || a.titulo),
+    titulo: a.titulo,
+    resumo: a.resumo || null,
+    capa_url: a.capaUrl || null,
+    corpo: a.corpo || "",
+    serie: a.serie || null,
+    instagram_url: a.instagramUrl || null,
+    cta: a.cta || "instagram",
+    publicado: !!a.publicado,
+    publicado_em: a.publicado ? a.publicadoEm || new Date().toISOString() : a.publicadoEm || null,
+    atualizado_em: new Date().toISOString(),
+  };
+  const q = a.id ? supabase.from("artigos").update(row).eq("id", a.id) : supabase.from("artigos").insert(row);
+  const { data, error } = await q.select().single();
+  if (error) throw new Error(error.code === "23505" ? "Já existe um artigo com esse endereço (slug)." : error.message);
+  return mapArtigo(data);
+}
+
+export async function excluirArtigo(id) {
+  const { error } = await supabase.from("artigos").delete().eq("id", id);
+  if (error) throw error;
+}

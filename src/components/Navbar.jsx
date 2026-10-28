@@ -22,6 +22,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "Sobre", path: "/sobre" },
+    { name: "Blog", path: "/blog" },
     { name: "Contato", path: "/contato" },
   ];
 
@@ -55,7 +56,7 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-10">
           {navLinks.map((link) => {
-            const isActive = location.pathname === link.path;
+            const isActive = link.path === "/" ? location.pathname === "/" : location.pathname.startsWith(link.path);
             return (
               <Link
                 key={link.path}
@@ -84,7 +85,7 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-b border-zinc-200 px-6 py-6 space-y-4 shadow-lg">
           {navLinks.map((link) => {
-            const isActive = location.pathname === link.path;
+            const isActive = link.path === "/" ? location.pathname === "/" : location.pathname.startsWith(link.path);
             return (
               <Link
                 key={link.path}

@@ -4,6 +4,8 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Blog from "./pages/Blog";
+import Artigo from "./pages/Artigo";
 import Contact from "./pages/Contact";
 import ProjectDetail from "./pages/ProjectDetail";
 import Thomas from "./pages/Thomas";
@@ -21,6 +23,7 @@ import AdminClientReferences from "./admin/AdminClientReferences";
 import AdminBriefings from "./admin/AdminBriefings";
 import AdminDiagnosticos from "./admin/AdminDiagnosticos";
 import AdminAgenda from "./admin/AdminAgenda";
+import AdminBlog from "./admin/AdminBlog";
 import AdminDiagnosticoAjustes from "./admin/AdminDiagnosticoAjustes";
 import AdminAnalytics from "./admin/AdminAnalytics";
 import AdminApresentacao from "./admin/AdminApresentacao";
@@ -89,6 +92,8 @@ function Shell() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sobre" element={<About />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<Artigo />} />
           <Route path="/contato" element={<Contact />} />
           <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/thomas" element={<Thomas />} />
@@ -103,6 +108,8 @@ function Shell() {
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/diagnosticos" element={<AdminDiagnosticos />} />
           <Route path="/admin/agenda" element={<AdminAgenda />} />
+          <Route path="/admin/blog" element={<AdminBlog />} />
+          <Route path="/admin/blog/:id" element={<AdminBlog />} />
           <Route path="/admin/diagnosticos/ajustes" element={<AdminDiagnosticoAjustes />} />
           <Route path="/admin/diagnosticos/:id/apresentar" element={<AdminApresentacao />} />
           <Route path="/admin/diagnosticos/:id/roteiro" element={<AdminRoteiro />} />
