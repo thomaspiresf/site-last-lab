@@ -51,10 +51,11 @@
         { "id": "local", "icone": "loja", "texto": "Atendimento no local", "exemplos": "barbearia, salão, academia, restaurante, pet shop, oficina, pousada" },
         { "id": "saude", "icone": "saude", "texto": "Saúde, beleza e bem-estar", "exemplos": "médico, dentista, fisioterapeuta, psicólogo, nutricionista, clínica de estética" },
         { "id": "liberal", "icone": "maleta", "texto": "Profissional liberal", "exemplos": "advogado, contador, consultor, corretor de imóveis ou seguros" },
-        { "id": "projetos", "icone": "regua", "texto": "Projetos sob medida", "exemplos": "arquiteto, marceneiro, reformas, fotógrafo, casamentos e eventos" },
+        { "id": "projetos", "icone": "regua", "texto": "Projetos sob medida", "exemplos": "arquiteto, marceneiro, reformas, casamentos e eventos" },
         { "id": "educacao", "icone": "capelo", "texto": "Educação e conteúdo", "exemplos": "escola, idiomas, cursos, mentoria, curso online" },
-        { "id": "empresas", "icone": "predio", "texto": "Vendo para empresas", "exemplos": "agência, software, indústria, distribuidora, consultoria empresarial" },
+        { "id": "empresas", "icone": "predio", "texto": "Vendo para empresas", "exemplos": "software, indústria, distribuidora, consultoria empresarial" },
         { "id": "produto", "icone": "sacola", "texto": "Produto e loja", "exemplos": "marca própria, e-commerce, loja física, moda, cosméticos, alimentos" },
+        { "id": "criativo", "icone": "camera", "texto": "Design, foto, vídeo ou comunicação", "exemplos": "designer, estúdio de branding, fotógrafo, produtora, agência de publicidade ou marketing" },
         { "id": "outro", "icone": "mais", "texto": "Outro" }
       ]
     },
@@ -270,7 +271,8 @@
     "aliases": {
       "b2b": "empresas",
       "especialista": "liberal",
-      "marca_propria": "produto"
+      "marca_propria": "produto",
+      "criativo": "outro"
     },
     "local": {
       "pesos": {
