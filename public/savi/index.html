@@ -11,7 +11,7 @@
 <script>
 /* Fora do claude.ai: fotos fixas da embalagem e downloads direto pelo navegador */
 (function(){
-  var DOCS={'embalagem/destaque':{id:'caixa-fita.jpg',caption:''},'embalagem/slot1':{id:'envelope-branco.jpg',caption:''}};
+  var DOCS={'embalagem/destaque':{id:'caixa-fita.jpg',caption:''},'embalagem/slot1':{id:'envelope-branco.jpg',caption:''},'embalagem/slot2':{id:'caixa-2.png',caption:''}};
   var db={doc:function(p){return{get:function(){var d=DOCS[p];return Promise.resolve({exists:!!d,data:function(){return d}})},set:function(){return Promise.reject({code:'unavailable'})}}}};
   var dl={save:function(r){var b=r.data instanceof Blob?r.data:new Blob([r.data]);var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=r.filename;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);return Promise.resolve({status:'saved'})}};
   window.claude={use:function(n){return Promise.resolve(n==='db'?db:n==='downloads'?dl:null)}};
