@@ -280,6 +280,8 @@
 .hc-quarteto .hc-fig { aspect-ratio: 16 / 9; }
 .hc-quarteto .hc-img { height: 100%; object-fit: cover; }
 .hc-trio { grid-template-columns: repeat(3, 1fr); }
+.hc-linha { display: flex; gap: 12px; align-items: flex-start; }
+.hc-linha .hc-fig { flex: var(--formato, 1) 1 0; min-width: 0; }
 .hc-fig-alta { aspect-ratio: 4 / 5; }
 .hc-fig-alta .hc-img { height: 100%; }
 .hc-video { position: relative; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; background: #000; }
@@ -323,6 +325,8 @@
   .hc-texto > span { display: none; }
   .hc-trio { grid-template-columns: 1fr; }
   .hc-dupla { grid-template-columns: 1fr; }
+  .hc-linha { flex-direction: column; }
+  .hc-linha .hc-fig { flex: none; width: 100%; }
   .hc-quarteto { grid-template-columns: 1fr 1fr; }
   .hc-ficha { margin-top: 8px; }
 }

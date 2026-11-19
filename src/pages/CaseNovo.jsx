@@ -35,24 +35,33 @@ function Vimeo({ id }) {
   );
 }
 
+// imagens lado a lado sem corte: cada uma ocupa a largura proporcional ao seu formato,
+// então todas ficam com a mesma altura e aparecem inteiras (nada de logo cortado ou margem branca)
+function Linha({ srcs }) {
+  const [formatos, setFormatos] = useState({});
+  return (
+    <div className="hc-linha">
+      {srcs.map((s) => (
+        <figure key={s} className="hc-fig" style={{ "--formato": formatos[s] || 1 }}>
+          <img
+            className="hc-img"
+            src={s}
+            alt=""
+            loading="lazy"
+            onLoad={(e) => {
+              const { naturalWidth: w, naturalHeight: h } = e.currentTarget;
+              if (w && h) setFormatos((f) => ({ ...f, [s]: w / h }));
+            }}
+          />
+        </figure>
+      ))}
+    </div>
+  );
+}
+
 function Bloco({ b }) {
   if (b.tipo === "imagem") return <figure className="hc-fig"><Midia m={{ src: b.src }} className="hc-img" /></figure>;
-  if (b.tipo === "dupla")
-    return (
-      <div className="hc-dupla">
-        {b.srcs.map((s) => (
-          <figure key={s} className="hc-fig hc-fig-alta"><Midia m={{ src: s }} className="hc-img" conter={b.conter} /></figure>
-        ))}
-      </div>
-    );
-  if (b.tipo === "trio")
-    return (
-      <div className="hc-trio">
-        {b.srcs.map((s) => (
-          <figure key={s} className="hc-fig hc-fig-alta"><Midia m={{ src: s }} className="hc-img" /></figure>
-        ))}
-      </div>
-    );
+  if (b.tipo === "dupla" || b.tipo === "trio") return <Linha srcs={b.srcs} />;
   if (b.tipo === "vimeo") return <Vimeo id={b.id} />;
   if (b.tipo === "youtube")
     return (
