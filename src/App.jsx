@@ -1,19 +1,20 @@
 import React, { lazy, Suspense, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Blog from "./pages/Blog";
-import Artigo from "./pages/Artigo";
-import Contact from "./pages/Contact";
-import ProjectDetail from "./pages/ProjectDetail";
+import RodapeNovo from "./components/RodapeNovo";
+import HomeNova from "./pages/HomeNova";
+import CaseNovo from "./pages/CaseNovo";
+import EstudioNovo from "./pages/EstudioNovo";
+import ContatoNovo from "./pages/ContatoNovo";
+import { BlogNovo, ArtigoNovo } from "./pages/BlogNovo";
 import Thomas from "./pages/Thomas";
 import BrandBriefing from "./pages/BrandBriefing";
 import Privacidade from "./pages/Privacidade";
 import ThomasSobre from "./pages/ThomasSobre";
 import ThomasProjectDetail from "./pages/ThomasProjectDetail";
 import WhatsAppButton from "./components/WhatsAppButton";
+import WhatsAppNovo from "./components/WhatsAppNovo";
 import AvisoCookies from "./components/AvisoCookies";
 import { iniciarAnalytics, registrar } from "./lib/analytics";
 import AdminLogin from "./admin/AdminLogin";
@@ -49,6 +50,8 @@ function ScrollToTop() {
         return;
       }
     }
+    // a página de case nova cuida da própria rolagem (para a transição de expandir)
+    if (pathname.startsWith("/projetos/")) return;
     window.scrollTo(0, 0);
   }, [pathname, hash]);
 
@@ -67,7 +70,13 @@ function IrParaDiagnostico() {
     busca.set("r", "1");
     window.location.replace(`/diagnostico/${resto}?${busca}${window.location.hash}`);
   }, [jaTentou]);
-  return jaTentou ? <Home /> : null;
+  return jaTentou ? <HomeNova /> : null;
+}
+
+// /home-nova/... (endereço do protótipo) vira o mesmo caminho sem o prefixo
+function RedirecionarPrototipo() {
+  const { pathname, search, hash } = useLocation();
+  return <Navigate to={`${pathname.replace(/^\/home-nova/, "") || "/"}${search}${hash}`} replace />;
 }
 
 // páginas privadas (admin, portal e aprovação do cliente) não entram nas estatísticas
@@ -85,17 +94,29 @@ function Shell() {
     pathname.startsWith("/aprovar") ||
     pathname.startsWith("/portal") ||
     pathname.startsWith("/briefing");
+  // as páginas novas trazem a própria barra de navegação; só a de privacidade segue no layout antigo
+  const chromeAntigo = pathname.startsWith("/privacidade");
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 flex flex-col justify-between selection:bg-black selection:text-white font-sans w-full max-w-full">
-      {!hideAgencyChrome && <Navbar />}
+      {!hideAgencyChrome && chromeAntigo && <Navbar />}
       <main className="flex-grow w-full max-w-full">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/sobre" element={<About />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<Artigo />} />
-          <Route path="/contato" element={<Contact />} />
+          <Route path="/" element={<HomeNova />} />
+          <Route path="/projetos/:slug" element={<CaseNovo />} />
+          <Route path="/estudio" element={<EstudioNovo />} />
+          <Route path="/contato" element={<ContatoNovo />} />
+          <Route path="/blog" element={<BlogNovo />} />
+          <Route path="/blog/:slug" element={<ArtigoNovo />} />
+          {/* endereços antigos e do protótipo */}
+          <Route path="/sobre" element={<Navigate to="/estudio" replace />} />
+          <Route path="/home-nova" element={<Navigate to="/" replace />} />
+          <Route path="/home-nova/*" element={<RedirecionarPrototipo />} />
+          <Route path="/semantix" element={<Navigate to="/projetos/semantix" replace />} />
+          <Route path="/site-pronto-pra-partir" element={<Navigate to="/projetos/site-pronto-pra-partir" replace />} />
+          <Route path="/site-ppp" element={<Navigate to="/projetos/site-pronto-pra-partir" replace />} />
+          <Route path="/highline" element={<Navigate to="/#projetos" replace />} />
+          <Route path="/guarana-story" element={<Navigate to="/#projetos" replace />} />
           <Route path="/privacidade" element={<Privacidade />} />
           <Route path="/thomas" element={<Thomas />} />
           <Route path="/thomas/sobre" element={<ThomasSobre />} />
@@ -126,19 +147,12 @@ function Shell() {
           <Route path="/portal/:clientId" element={<ClientPortal />} />
           <Route path="/aprovacao/:slug" element={<ClientPortal />} />
           <Route path="/aprovacao/:slug/:mes" element={<ApprovalPage />} />
-          <Route path="/projetos/:slug" element={<ProjectDetail />} />
-          {/* Direct routes for legacy slug URLs */}
-          <Route path="/semantix" element={<ProjectDetail />} />
-          <Route path="/site-pronto-pra-partir" element={<ProjectDetail />} />
-          <Route path="/site-ppp" element={<ProjectDetail />} />
-          <Route path="/highline" element={<ProjectDetail />} />
-          <Route path="/guarana-story" element={<ProjectDetail />} />
           <Route path="/diagnostico/*" element={<IrParaDiagnostico />} />
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<HomeNova />} />
         </Routes>
       </main>
-      {!hideAgencyChrome && <Footer />}
-      {!hideAgencyChrome && <WhatsAppButton />}
+      {!hideAgencyChrome && (chromeAntigo ? <Footer /> : <RodapeNovo />)}
+      {!hideAgencyChrome && (chromeAntigo ? <WhatsAppButton /> : <WhatsAppNovo />)}
       {!PRIVADAS.test(pathname) && <AvisoCookies />}
     </div>
   );
