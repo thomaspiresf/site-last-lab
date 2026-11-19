@@ -8,11 +8,9 @@ import CaseNovo from "./pages/CaseNovo";
 import EstudioNovo from "./pages/EstudioNovo";
 import ContatoNovo from "./pages/ContatoNovo";
 import { BlogNovo, ArtigoNovo } from "./pages/BlogNovo";
-import Thomas from "./pages/Thomas";
 import BrandBriefing from "./pages/BrandBriefing";
 import Privacidade from "./pages/Privacidade";
-import ThomasSobre from "./pages/ThomasSobre";
-import ThomasProjectDetail from "./pages/ThomasProjectDetail";
+import { ThomasInicio, ThomasSobreNova, ThomasCase } from "./pages/ThomasNova";
 import WhatsAppButton from "./components/WhatsAppButton";
 import WhatsAppNovo from "./components/WhatsAppNovo";
 import AvisoCookies from "./components/AvisoCookies";
@@ -51,7 +49,7 @@ function ScrollToTop() {
       }
     }
     // a página de case nova cuida da própria rolagem (para a transição de expandir)
-    if (pathname.startsWith("/projetos/")) return;
+    if (/^(\/thomas)?\/projetos\//.test(pathname)) return;
     window.scrollTo(0, 0);
   }, [pathname, hash]);
 
@@ -118,9 +116,9 @@ function Shell() {
           <Route path="/highline" element={<Navigate to="/#projetos" replace />} />
           <Route path="/guarana-story" element={<Navigate to="/#projetos" replace />} />
           <Route path="/privacidade" element={<Privacidade />} />
-          <Route path="/thomas" element={<Thomas />} />
-          <Route path="/thomas/sobre" element={<ThomasSobre />} />
-          <Route path="/thomas/projetos/:slug" element={<ThomasProjectDetail />} />
+          <Route path="/thomas" element={<ThomasInicio />} />
+          <Route path="/thomas/sobre" element={<ThomasSobreNova />} />
+          <Route path="/thomas/projetos/:slug" element={<ThomasCase />} />
           <Route path="/briefing" element={<BrandBriefing />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminDashboard />} />

@@ -3,6 +3,7 @@
 import { projects } from "../data/projects";
 import { destaques, maisProjetos } from "./homeNovaDados";
 import { projetosTalison } from "./projetosTalison";
+import { ehDoTalison } from "./siteContexto";
 
 const ehImagem = (v) => typeof v === "string" && /^\/images\/.+\.(png|jpe?g|webp|avif|gif)$/i.test(v);
 
@@ -36,8 +37,9 @@ function blocosDosCampos(project) {
 }
 
 // "próximo projeto": segue a ordem da home (destaques, depois outros trabalhos)
-function proximoDe(slug) {
-  const ordem = [...destaques.map((d) => d.slug), ...maisProjetos.map((m) => m.slug)];
+// no portfólio pessoal (/thomas) os trabalhos do Talison ficam de fora
+function proximoDe(slug, pessoal = false) {
+  const ordem = [...destaques.map((d) => d.slug), ...maisProjetos.map((m) => m.slug)].filter((s) => !pessoal || !ehDoTalison(s));
   const s = ordem[(ordem.indexOf(slug) + 1) % ordem.length];
   const d = destaques.find((x) => x.slug === s);
   const m = maisProjetos.find((x) => x.slug === s);
@@ -51,7 +53,8 @@ function proximoDe(slug) {
   };
 }
 
-export function montarCase(slug) {
+export function montarCase(slug, pessoal = false) {
+  if (pessoal && ehDoTalison(slug)) return null;
   // projetos do Talison já vêm no formato da página nova
   const t = projetosTalison.find((p) => p.slug === slug);
   if (t) {
@@ -59,7 +62,7 @@ export function montarCase(slug) {
       ...t,
       parceiro: "",
       lastlab: !t.outraEquipe,
-      proximo: proximoDe(slug),
+      proximo: proximoDe(slug, pessoal),
     };
   }
   const project = projects.find((p) => p.slug === slug);
@@ -101,7 +104,7 @@ export function montarCase(slug) {
     capa,
     abertura,
     blocos,
-    proximo: proximoDe(slug),
+    proximo: proximoDe(slug, pessoal),
   };
 }
 
@@ -131,8 +134,8 @@ function alvoCapa() {
 
 const px = (r) => ({ left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
 
-export function expandirCase({ slug, midia, navigate }) {
-  const destino = `/projetos/${slug}`;
+export function expandirCase({ slug, midia, navigate, base = "" }) {
+  const destino = `${base}/projetos/${slug}`;
   if (andando) return;
   if (!midia || !midia.animate) { navigate(destino); return; }
   andando = true;

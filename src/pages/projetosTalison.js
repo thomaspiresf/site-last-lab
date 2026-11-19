@@ -10,7 +10,7 @@ const trio = (slug, a, b, c) => ({ tipo: "trio", srcs: [img(slug, a), img(slug, 
 
 const CREDITO = "Talison Nascimento";
 
-export const projetosTalison = [
+const lista = [
   {
     slug: "pinceis-articulados",
     nome: "Pincéis Articulados",
@@ -129,6 +129,10 @@ export const projetosTalison = [
     ],
   },
 ];
+
+// ordem nas listas do site: os estudos autorais (Rhode, The Blend) vêm antes dos trabalhos de O Boticário
+const ORDEM = ["rhode-lip-tint", "the-blend-saffron", "pinceis-articulados", "k-drama-box"];
+export const projetosTalison = [...lista].sort((a, b) => ORDEM.indexOf(a.slug) - ORDEM.indexOf(b.slug));
 
 // cards da faixa "Outros trabalhos" e da grade do filtro
 export const cardsTalison = projetosTalison.map((p) => ({

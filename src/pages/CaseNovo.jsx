@@ -1,7 +1,8 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Nav } from "./HomeNova";
 import { montarCase, pegarTransicao, expandirCase } from "./caseNovoDados";
+import { useSite, rotas } from "./siteContexto";
 import "./homeNova.css";
 
 // Página de case nova (protótipo, rota /projetos/:slug), no esquema da Koto:
@@ -90,7 +91,12 @@ function Bloco({ b }) {
 export default function CaseNovo() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const c = montarCase(slug);
+  const site = useSite();
+  const r = rotas(site);
+  const c = montarCase(slug, site.pessoal);
+  useEffect(() => {
+    document.title = `${c?.nome || "Projeto"} | ${site.pessoal ? "Thomás Pires" : "Last Lab"}`;
+  }, [c?.nome, site.pessoal]);
   const capaRef = useRef(null);
   const [entrou, setEntrou] = useState(false);
 
@@ -127,7 +133,7 @@ export default function CaseNovo() {
     return (
       <div className="hn hc">
         <Nav escura />
-        <p className="hc-vazio">Projeto não encontrado. <Link to="/#projetos">Ver todos os projetos</Link></p>
+        <p className="hc-vazio">Projeto não encontrado. <Link to={r.projetos}>Ver todos os projetos</Link></p>
       </div>
     );
   }
@@ -136,7 +142,7 @@ export default function CaseNovo() {
     // o "próximo projeto" também expande até virar a capa do próximo case
     if (e.metaKey || e.ctrlKey) return;
     e.preventDefault();
-    expandirCase({ slug: slugDestino, midia: img, navigate });
+    expandirCase({ slug: slugDestino, midia: img, navigate, base: site.base });
   };
 
   return (
@@ -144,7 +150,7 @@ export default function CaseNovo() {
       <Nav escura />
       <div className="hc-grid">
         <aside className="hc-lado">
-          <Link to="/#projetos" className="hc-voltar" aria-label="Voltar aos projetos">←</Link>
+          <Link to={r.projetos} className="hc-voltar" aria-label="Voltar aos projetos">←</Link>
           <div className="hc-lado-topo hc-aparece">
             <h1 className="hn-titulo hc-nome">
               {c.nome}
@@ -180,7 +186,7 @@ export default function CaseNovo() {
 
           {c.proximo && (
             <Link
-              to={`/projetos/${c.proximo.slug}`}
+              to={r.caso(c.proximo.slug)}
               className="hc-proximo"
               onClick={(e) => irPara(e, c.proximo.slug, e.currentTarget.querySelector("img"))}
             >
@@ -194,8 +200,8 @@ export default function CaseNovo() {
           )}
 
           <div className="hc-fim">
-            <Link to="/#projetos" className="hn-link-case">Ver todos os projetos</Link>
-            <Link to="/contato" className="hn-link-case">Tem um projeto em mente? Vamos conversar ↗</Link>
+            <Link to={r.projetos} className="hn-link-case">Ver todos os projetos</Link>
+            <Link to={r.contato} className="hn-link-case">{site.pessoal ? "Vamos conversar? ↗" : "Tem um projeto em mente? Vamos conversar ↗"}</Link>
           </div>
         </main>
       </div>

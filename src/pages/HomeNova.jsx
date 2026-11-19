@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { heroSlides, destaques, maisProjetos } from "./homeNovaDados";
 import { expandirCase } from "./caseNovoDados";
+import { useSite, rotas, ehDoTalison, CV_THOMAS } from "./siteContexto";
 import "./homeNova.css";
 
-// Protótipo da home nova (rota /, só local até aprovar).
+// Home da Last Lab (rota /). Hero, Projetos e Nav também servem ao portfólio do Thomás (/thomas).
 // Hero: trabalho em tela cheia + frase fixa. Cases: destaques estilo Koto
 // (texto fixo à esquerda, mídias rolando à direita) + faixa "Mais projetos" estilo Collins.
 
@@ -14,11 +15,12 @@ const TEMPO_SLIDE = 5500;
 // sem ele, usa a imagem de dentro do próprio link clicado.
 function useAbrirCase() {
   const navigate = useNavigate();
+  const { base } = useSite();
   return (e, slug, acharMidia) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     const midia = acharMidia ? acharMidia() : e.currentTarget.querySelector("img, video");
-    expandirCase({ slug, midia, navigate });
+    expandirCase({ slug, midia, navigate, base });
   };
 }
 
@@ -32,6 +34,23 @@ export function Nav({ escura = false, clara = false }) {
     return () => window.removeEventListener("scroll", f);
   }, [escura, clara]);
   const [aberto, setAberto] = useState(false);
+  const site = useSite();
+  if (site.pessoal) {
+    return (
+      <header className={`hn-nav ${escura ? "is-escura" : ""} ${rolou ? "is-solida" : ""} ${aberto ? "is-aberto" : ""}`}>
+        <Link to="/thomas" className="hn-nav-logo hn-nav-nome">Thomás Pires</Link>
+        <button className="hn-nav-menu" onClick={() => setAberto((v) => !v)} aria-expanded={aberto}>
+          {aberto ? "Fechar" : "Menu"}
+        </button>
+        <nav className="hn-nav-links" onClick={() => setAberto(false)}>
+          <Link to="/thomas#projetos">Projetos</Link>
+          <Link to="/thomas/sobre">Sobre</Link>
+          <Link to="/thomas#contato">Contato</Link>
+          <a href={CV_THOMAS} download className="hn-nav-cta">Currículo</a>
+        </nav>
+      </header>
+    );
+  }
   return (
     <header className={`hn-nav ${escura ? "is-escura" : ""} ${rolou ? "is-solida" : ""} ${aberto ? "is-aberto" : ""}`}>
       <Link to="/" className="hn-nav-logo" aria-label="Last Lab">
@@ -51,8 +70,9 @@ export function Nav({ escura = false, clara = false }) {
   );
 }
 
-function Hero() {
+export function Hero({ titulo = "Somos a Last Lab,", subtitulo = "estúdio de marca e design." }) {
   const abrir = useAbrirCase();
+  const r = rotas(useSite());
   const [atual, setAtual] = useState(0);
   useEffect(() => {
     // reinicia a contagem a cada troca (inclusive quando a pessoa clica numa barra)
@@ -75,11 +95,11 @@ function Hero() {
       <div className="hn-hero-conteudo">
         <div className="hn-hero-rodape">
           <h1 className="hn-titulo hn-hero-titulo">
-            Somos a Last Lab,
-            <span className="hn-hero-titulo-2">estúdio de marca e design.</span>
+            {titulo}
+            <span className="hn-hero-titulo-2">{subtitulo}</span>
           </h1>
           <Link
-            to={`/projetos/${slide.slug}`}
+            to={r.caso(slide.slug)}
             className="hn-hero-case"
             key={slide.slug}
             onClick={(e) => abrir(e, slide.slug, () => document.querySelector(".hn-hero-img.is-ativa"))}
@@ -125,11 +145,16 @@ function Midia({ m, nome }) {
 
 // Filtro por categoria (vem das categorias de src/data/projects.js)
 const FILTROS = ["Branding", "Sites", "Campanhas", "Produtos", "Eventos", "Apresentações"];
-const todos = [...destaques, ...maisProjetos];
 const passa = (cat) => (item) => !cat || item.cats.includes(cat);
 const DESTAQUES = "destaques"; // primeira aba: a vitrine da home (Koto + faixa)
 
-function Projetos() {
+export function Projetos() {
+  const { pessoal } = useSite();
+  // no portfólio pessoal os trabalhos do Talison ficam de fora
+  const fica = (p) => !pessoal || !ehDoTalison(p.slug);
+  const meusDestaques = destaques.filter(fica);
+  const meusMais = maisProjetos.filter(fica);
+  const todos = [...meusDestaques, ...meusMais];
   const [filtro, setFiltro] = useState(DESTAQUES);
   const secao = useRef(null);
   const escolher = (cat) => {
@@ -141,7 +166,7 @@ function Projetos() {
     });
   };
   const opcoes = [
-    { rotulo: "Destaques", cat: DESTAQUES, n: destaques.length },
+    { rotulo: "Destaques", cat: DESTAQUES, n: meusDestaques.length },
     { rotulo: "Todos", cat: null, n: todos.length },
     ...FILTROS.map((f) => ({ rotulo: f, cat: f, n: todos.filter(passa(f)).length })),
   ];
@@ -166,8 +191,8 @@ function Projetos() {
       {/* Destaques: vitrine (Koto) + faixa (Collins). Todos e categorias: grade com tudo visível. */}
       {filtro === DESTAQUES ? (
         <>
-          <Destaques itens={destaques} />
-          <MaisProjetos itens={maisProjetos} />
+          <Destaques itens={meusDestaques} titulo={pessoal ? "Trabalhos" : "Nosso trabalho"} />
+          <MaisProjetos itens={meusMais} />
         </>
       ) : (
         <Grade key={filtro || "todos"} itens={todos.filter(passa(filtro))} />
@@ -178,6 +203,7 @@ function Projetos() {
 
 export function Grade({ itens }) {
   const abrir = useAbrirCase();
+  const r = rotas(useSite());
   return (
     <section className="hn-grade">
       {itens.map((p) => {
@@ -187,7 +213,7 @@ export function Grade({ itens }) {
         return (
           <Link
             key={p.slug}
-            to={`/projetos/${p.slug}`}
+            to={r.caso(p.slug)}
             className="hn-grade-item"
             onClick={(e) => abrir(e, p.slug)}
           >
@@ -212,8 +238,9 @@ export function Grade({ itens }) {
   );
 }
 
-function Destaques({ itens: destaques }) {
+function Destaques({ itens: destaques, titulo }) {
   const abrir = useAbrirCase();
+  const r = rotas(useSite());
   const [ativo, setAtivo] = useState(0);
   const blocos = useRef([]);
 
@@ -254,7 +281,7 @@ function Destaques({ itens: destaques }) {
         {/* coluna fixa (desktop) */}
         <aside className="hn-destaques-fixo">
           <h2 className="hn-titulo hn-destaques-nome">
-            Nosso trabalho
+            {titulo}
             <span key={c.slug} className="hn-destaques-case">{c.nome}</span>
           </h2>
           <p className="hn-destaques-paragrafo" key={`${c.slug}-p`}>{c.texto}</p>
@@ -264,7 +291,7 @@ function Destaques({ itens: destaques }) {
               <span>{c.setor} · {c.ano}{c.outraEquipe ? " · com outra equipe" : ""}</span>
             </div>
             <Link
-              to={`/projetos/${c.slug}`}
+              to={r.caso(c.slug)}
               className="hn-link-case"
               onClick={(e) => abrir(e, c.slug, () => blocos.current[ativo]?.querySelector("img, video"))}
             >
@@ -292,12 +319,12 @@ function Destaques({ itens: destaques }) {
               data-i={i}
               ref={(el) => (blocos.current[i] = el)}
             >
-              <Link to={`/projetos/${d.slug}`} className="hn-case-midia" onClick={(e) => abrir(e, d.slug)}>
+              <Link to={r.caso(d.slug)} className="hn-case-midia" onClick={(e) => abrir(e, d.slug)}>
                 <Midia m={d.midia} nome={d.nome} />
               </Link>
               {/* legenda (mobile) */}
               <Link
-                to={`/projetos/${d.slug}`}
+                to={r.caso(d.slug)}
                 className="hn-case-legenda"
                 onClick={(e) => abrir(e, d.slug, () => blocos.current[i]?.querySelector("img, video"))}
               >
@@ -320,6 +347,7 @@ function Destaques({ itens: destaques }) {
 
 function MaisProjetos({ itens: maisProjetos }) {
   const abrir = useAbrirCase();
+  const r = rotas(useSite());
   const trilho = useRef(null);
   const mover = (dir) => {
     const el = trilho.current;
@@ -339,7 +367,7 @@ function MaisProjetos({ itens: maisProjetos }) {
       </div>
       <div className="hn-trilho" ref={trilho}>
         {maisProjetos.map((p) => (
-          <Link key={p.slug} to={`/projetos/${p.slug}`} className="hn-cartao" onClick={(e) => abrir(e, p.slug)}>
+          <Link key={p.slug} to={r.caso(p.slug)} className="hn-cartao" onClick={(e) => abrir(e, p.slug)}>
             <span className="hn-cartao-img"><img src={p.img} alt={p.nome} loading="lazy" /></span>
             <span className="hn-cartao-info">
               <strong>{p.nome}</strong>
@@ -353,6 +381,7 @@ function MaisProjetos({ itens: maisProjetos }) {
 }
 
 export function Convite({ escuro = false }) {
+  const r = rotas(useSite());
   return (
     <section className={`hn-cta ${escuro ? "is-escuro" : ""}`}>
         <h2 className="hn-titulo hn-cta-titulo">
@@ -360,13 +389,14 @@ export function Convite({ escuro = false }) {
           <span className="hn-cta-titulo-2">Vamos conversar.</span>
         </h2>
         <div className="hn-cta-acoes">
-          <Link to="/contato" className="hn-botao">Agendar uma conversa</Link>
+          <Link to={r.contato} className="hn-botao">Agendar uma conversa</Link>
         </div>
     </section>
   );
 }
 
 export default function HomeNova() {
+  useEffect(() => { document.title = "Last Lab | Estúdio de Design & Marketing Digital"; }, []);
   return (
     <div className="hn">
       <Nav />

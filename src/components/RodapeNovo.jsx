@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { registrar } from "../lib/analytics";
+import { useSite, CV_THOMAS, EMAIL_THOMAS, LINKEDIN_THOMAS } from "../pages/siteContexto";
 import "../pages/homeNova.css";
 
 // Rodapé das páginas novas (home). Preto, com links, canais e o logo grande
@@ -17,6 +18,43 @@ export default function RodapeNovo() {
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
+  const { pessoal } = useSite();
+
+  // portfólio pessoal (/thomas): mesmo rodapé, com os links e contatos do Thomás e o nome no lugar do logo
+  if (pessoal) {
+    return (
+      <footer className="hn hn-rodape">
+        <div className="hn-rodape-topo">
+          <p className="hn-rodape-frase hn-titulo">
+            Brand & product designer. <span className="hn-cinza">Design como ferramenta de decisão.</span>
+          </p>
+          <nav className="hn-rodape-col" aria-label="Rodapé">
+            <span className="hn-rodape-rotulo">Navegação</span>
+            <Link to="/thomas#projetos">Projetos</Link>
+            <Link to="/thomas/sobre">Sobre</Link>
+            <Link to="/thomas#contato">Contato</Link>
+            <a href={CV_THOMAS} download>Currículo ↓</a>
+          </nav>
+          <div className="hn-rodape-col">
+            <span className="hn-rodape-rotulo">Contato</span>
+            <a href={`mailto:${EMAIL_THOMAS}`}>{EMAIL_THOMAS}</a>
+            <a href={LINKEDIN_THOMAS} target="_blank" rel="noreferrer">LinkedIn ↗</a>
+          </div>
+        </div>
+
+        <div ref={logo} className={`hn-rodape-logo hn-rodape-nome ${visivel ? "is-visivel" : ""}`}>
+          <span className="hn-titulo">Thomás Pires</span>
+        </div>
+
+        <div className="hn-rodape-base">
+          <span>© {new Date().getFullYear()} Thomás Pires.</span>
+          <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+            Voltar ao topo ↑
+          </button>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer className="hn hn-rodape">
